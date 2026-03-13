@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Manager_Approval_Check_Validation_Rule</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+  ISCHANGED(IsConverted),
+  IsConverted,
+  OR(
+    NOT(Site_Visit_Manager_Approval__c),
+    NOT( ISPICKVAL(Approval_Status__c, &quot;Approved&quot;) )
+  )
+)</errorConditionFormula>
+    <errorMessage>Lead conversion is restricted. Manager approval and an Approval Status of “Approved” are required before proceeding with conversion.</errorMessage>
+</ValidationRule>

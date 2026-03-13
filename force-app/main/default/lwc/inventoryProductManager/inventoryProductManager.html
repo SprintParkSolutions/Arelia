@@ -1,0 +1,372 @@
+<template>
+    <div class="catalog-root">
+
+        <!-- ================= STEP PROGRESS BAR ================= -->
+        <template if:false={isStep0}>
+    <div class="stepper">
+        <div class={stepClass1}>
+            <span class="step-index">1</span>
+            <span class="step-label">Spaces</span>
+        </div>
+        <div class="step-line"></div>
+
+        <div class={stepClass2}>
+            <span class="step-index">2</span>
+            <span class="step-label">Category</span>
+        </div>
+        <div class="step-line"></div>
+
+        <div class={stepClass3}>
+            <span class="step-index">3</span>
+            <span class="step-label">Products</span>
+        </div>
+    </div>
+</template>
+
+<!-- ================= STEP 0 : OPPORTUNITY SUMMARY ================= -->
+<template if:true={isStep0}>
+
+    <!-- DATA READY -->
+    <template if:true={oppSummary}>
+        <section class="step-screen intro-center summary-hero-flat">
+
+    <h1 class="summary-title-flat">
+        Customer Information Summary
+    </h1>
+
+    <div class="summary-grid-flat">
+
+        <div class="summary-row-flat">
+            <span class="label">Client Name</span>
+            <span class="value">{oppSummary.Lead_Name__c}</span>
+        </div>
+
+        <div class="summary-row-flat">
+            <span class="label">Email</span>
+            <span class="value">{oppSummary.Email__c}</span>
+        </div>
+
+        <div class="summary-row-flat">
+            <span class="label">Quotation Type</span>
+            <span class="value highlight">
+                {oppSummary.Project_Request_Quotation_Type__c}
+            </span>
+        </div>
+
+        <template if:true={isManual}>
+            <div class="summary-row-flat">
+                <span class="label">Project Type</span>
+                <span class="value">
+                    {oppSummary.Type_of_Project__c}
+                </span>
+            </div>
+        </template>
+
+        <template if:true={isAutomatic}>
+            <div class="summary-row-flat">
+                <span class="label">Interior Project</span>
+                <span class="value">
+                    {interiorProjectTypeName}
+                </span>
+            </div>
+        </template>
+
+    </div>
+
+    <div class="summary-actions-flat">
+        <button class="uiverse-cart-btn primary-cta"
+                onclick={goToStep1}>
+            Proceed to Catalogue →
+        </button>
+    </div>
+
+</section>
+    </template>
+
+    <!-- LOADING STATE -->
+    <template if:false={oppSummary}>
+        <section class="step-screen intro-center">
+            <lightning-spinner size="medium"></lightning-spinner>
+        </section>
+    </template>
+
+</template>
+
+        <!-- ================= STEP 1 ================= -->
+<template if:true={isStep1}>
+    <section class="step-screen intro-center">
+
+        <!-- 🔥 HEADER WITH BACK BUTTON -->
+        <div class="catalog-header">
+            <button class="uiverse-cart-btn secondary-cta"
+        onclick={handleBackClick}>
+    ← {backButtonLabel}
+</button>
+
+            <div class="title-block"></div>
+
+            <button class="uiverse-cart-btn" onclick={openCart}>
+                🛒 {cartLabel}
+            </button>
+        </div>
+
+        <div class="intro-content">
+            <h1 class="heading">Interior Product Catalogue</h1>
+            <p class="subheading">
+                Browse curated interior solutions and build your quotation effortlessly.
+            </p>
+
+            <div class="filter-label">Choose Below Based on Your Project Type</div>
+
+            <div class="chip-row">
+                <template for:each={roomTypesUI} for:item="room">
+                    <div key={room.value}
+                         class={room.className}
+                         data-value={room.value}
+                         onclick={handleRoomSelect}>
+                        {room.value}
+                    </div>
+                </template>
+            </div>
+        </div>
+    </section>
+</template>
+
+        <!-- ================= STEP 2 ================= -->
+        <template if:true={isStep2}>
+            <section class="step-screen fade-slide">
+
+                <div class="catalog-header">
+                    <button class="uiverse-cart-btn secondary-cta"
+        onclick={handleBackClick}>
+    ← {backButtonLabel}
+</button>
+
+                    <div class="title-block">
+                        <h2>Selected Room → <strong>{selectedRoomType}</strong></h2>
+                    </div>
+
+                    <button class="uiverse-cart-btn" onclick={openCart}>
+                        🛒 {cartLabel}
+                    </button>
+                </div>
+
+                <div class="filter-label">Choose Product Category</div>
+                <div class="chip-row">
+                    <template for:each={categories} for:item="cat">
+                        <div key={cat.value}
+                             class={cat.className}
+                             data-value={cat.value}
+                             onclick={handleCategorySelect}>
+                            {cat.value}
+                        </div>
+                    </template>
+                </div>
+            </section>
+        </template>
+
+        <!-- ================= STEP 3 ================= -->
+        <template if:true={isStep3}>
+            <section class="step-screen fade-slide">
+
+                <div class="catalog-header">
+                    <button class="uiverse-cart-btn secondary-cta"
+        onclick={handleBackClick}>
+    ← {backButtonLabel}
+</button>
+
+                    <div class="title-block">
+                        <h2>
+                            {selectedRoomType} → {selectedCategory}
+                        </h2>
+                    </div>
+
+                    <button class="uiverse-cart-btn" onclick={openCart}>
+                        🛒 {cartLabel}
+                    </button>
+                </div>
+
+                <template if:true={isLoading}>
+                    <lightning-spinner size="medium"></lightning-spinner>
+                </template>
+
+                <template if:true={visibleProducts.length}>
+                    <section class="cards-grid">
+                        <template for:each={visibleProducts} for:item="prod">
+                            <article key={prod.Id}
+                                     class="product-card"
+                                     data-product={prod.Id}>
+
+                                <div class="card-media">
+                                    <img src={prod.imageUrl}
+                                         data-url={prod.imageUrl}
+                                         onclick={openImageModal}
+                                         class="product-image-click"/>
+                                </div>
+
+                                <div class="card-body">
+                                    <h3>{prod.Name}</h3>
+
+                                    <!-- Quality -->
+                                    <div class="glass-radio-group"
+                                         data-id={prod.Id}
+                                         onchange={handleQualityRadio}>
+                                        <input type="radio" name={prod.qualityGroupName}
+                                               id={prod.standardId} value="Standard"
+                                               checked={prod.isStandard}/>
+                                        <label for={prod.standardId}>Standard</label>
+
+                                        <input type="radio" name={prod.qualityGroupName}
+                                               id={prod.premiumId} value="Premium"
+                                               checked={prod.isPremium}/>
+                                        <label for={prod.premiumId}>Premium</label>
+
+                                        <input type="radio" name={prod.qualityGroupName}
+                                               id={prod.luxuryId} value="Luxury"
+                                               checked={prod.isLuxury}/>
+                                        <label for={prod.luxuryId}>Luxury</label>
+                                        <div class="glass-glider"></div>
+                                    </div>
+
+                                    <div class="price-value">₹ {prod.displayPrice}</div>
+
+                                    <template if:false={prod.inCart}>
+                                        <lightning-button
+                                            label="Add to Cart"
+                                            data-id={prod.Id}
+                                            onclick={handleAddToCart}>
+                                        </lightning-button>
+                                    </template>
+
+                                    <template if:true={prod.inCart}>
+    <div class="qty-wrapper">
+        <button class="qty-circle minus"
+                data-id={prod.Id}
+                onclick={handleQtyMinus}>-</button>
+
+        <input class="qty-center-input"
+               type="number"
+               value={prod.qty}
+               min="1"
+               data-id={prod.Id}
+               onchange={handleQtyInput}/>
+
+        <button class="qty-circle plus"
+                data-id={prod.Id}
+                onclick={handleQtyPlus}>+</button>
+    </div>
+</template>
+                                </div>
+                            </article>
+                        </template>
+                    </section>
+
+                    <div class="pagination-controls">
+                        <button onclick={prevPage} disabled={isFirstPage}>Previous</button>
+                        <span>{currentPage} / {totalPages}</span>
+                        <button onclick={nextPage} disabled={isLastPage}>Next</button>
+                    </div>
+                </template>
+            </section>
+        </template>
+
+        <!-- IMAGE MODAL -->
+        <template if:true={isImageModalOpen}>
+            <section class="image-modal-bg" onclick={closeImageModal}>
+                <div class="image-modal-container" onclick={stopEvent}>
+                    <img src={modalImageUrl}/>
+                    <button class="image-modal-close" onclick={closeImageModal}>×</button>
+                </div>
+            </section>
+        </template>
+
+        <!-- Cart Modal -->
+        <template if:true={isCartOpen}>
+            <section class="modal-backdrop">
+                <div class="modal-panel">
+                    <div class="cart-header-row">
+                        <h2>🛒 Cart Preview</h2>
+                        <lightning-button-icon icon-name="utility:close" class="close-btn" onclick={closeCart}></lightning-button-icon>
+                    </div>
+
+                    <template if:true={cartItems.length}>
+                         <div class="cart-body" onscroll={handleCartScroll}>
+    <template for:each={cartItems} for:item="item">
+        <div key={item.Id} class="cart-line-row">
+
+            <div class="cart-line-left">
+                <span class="cart-product-link"
+      data-id={item.Interior_Product__c}
+      onclick={handleSelectedProductClick}>
+    {item.Quantity__c}× {item.Name}
+</span>
+                <span class="quality-chip">{item.Quality__c}</span>
+            </div>
+            
+
+            <div class="cart-line-right">
+                <span class="price-text">₹ {item.Total_Amount__c}</span>
+
+                <!-- 🗑 Delete button per item -->
+                <button class="remove-btn"
+                        title="Remove item"
+                        data-id={item.Id}
+                        data-productid={item.Interior_Product__c}
+                        onclick={handleRemoveItem}>
+                    🗑
+                </button>
+            </div>
+
+        </div>
+        
+    </template>
+   
+    </div>
+    
+
+    <div class="cart-total-row ">
+        <strong>Total</strong>
+        <span class="cart-total">₹ {cartTotal}</span>
+    <!-- Scroll to top -->
+    <div
+        class="scroll-indicator"
+        if:true={showScrollTop}
+        onclick={scrollCartToTop}
+        title="Scroll to top">
+        <span class="arrow">⌃</span>
+        <span class="label">Scroll to top</span>
+    </div>
+</div>
+
+    <div class="modal-actions">
+        <lightning-button label="Close" onclick={closeCart}></lightning-button>
+        <lightning-button variant="brand" label="Submit" onclick={handleGenerateClick}></lightning-button>
+    </div>
+
+    <div class="clear-btn-wrap">
+        <lightning-button variant="destructive" label="Clear Cart" onclick={handleClearCart}></lightning-button>
+    </div>
+</template>
+
+                    <template if:false={cartItems.length}>
+                        <div class="empty-state">Your cart is empty.</div>
+                    </template>
+                </div>
+            </section>
+        </template>
+        
+
+        <!-- Toast / Popup -->
+        <template if:true={showPopup}>
+            <section class="toast-overlay">
+                <div class="toast-box">
+                    <span class="toast-title">{popupTitle}</span>
+                    <p class="toast-msg">{popupMessage}</p>
+                    <button class="toast-close-btn" onclick={closePopup}>Close</button>
+                </div>
+            </section>
+        </template>
+
+    </div>
+    
+</template>

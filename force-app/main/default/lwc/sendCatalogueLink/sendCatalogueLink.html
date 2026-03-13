@@ -1,0 +1,37 @@
+<template>
+    <lightning-quick-action-panel header="Send Catalogue Link">
+
+        <!-- BODY -->
+        <div class="info-box">
+            <lightning-icon
+                icon-name="utility:link"
+                size="small"
+                class="info-icon">
+            </lightning-icon>
+
+            <div class="info-text">
+                <h3>Why send this link?</h3>
+                <p>
+                    This action sends the inventory catalogue link to the customer.
+                    They can review, modify, or upgrade items before final approval.
+                </p>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div slot="footer">
+            <lightning-button
+                label="Cancel"
+                onclick={handleCancel}>
+            </lightning-button>
+
+            <lightning-button
+                variant="brand"
+                label="Send Link"
+                class="slds-m-left_small"
+                onclick={handleSend}>
+            </lightning-button>
+        </div>
+
+    </lightning-quick-action-panel>
+</template>

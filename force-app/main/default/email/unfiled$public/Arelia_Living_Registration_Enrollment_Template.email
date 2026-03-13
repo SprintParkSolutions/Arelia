@@ -1,0 +1,24 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hello Arelia Team,<br />
+<br />
+We got the new Registered Customer. Please review the details and check whether they raised the Project Request Quote.<br />
+<br />
+<strong>Customer Details:</strong></span></span>
+<ul>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Name:&nbsp;<strong>{{{Recipient.Name}}}</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Email:&nbsp;<strong>{{{Recipient.Email}}}</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Phone:&nbsp;<strong>{{{Recipient.Phone}}}</strong></span></span></li>
+</ul>
+<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"> <em><strong>Next Steps</strong>:</em></span></span>
+
+<ol>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Reach out to the customer within 1–2 business days.</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">If they have not created a project request quote yet, share this link and guide them:&nbsp;</span></span><a href="{{{ProjectRequestLink}}}">Link</a></li>
+</ol>
+<br />
+<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Regards,<br />
+Arelia Living</span></span></body>
+</html>

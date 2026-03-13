@@ -1,0 +1,53 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<table cellpadding="0" cellspacing="0" width="100%">
+	
+		<tr valign="top">
+			<td width="100%">
+			<table cellpadding="0" cellspacing="0">
+				
+					<tr>
+						<td>
+						<table cellpadding="0" cellspacing="0" id="contentRegion">
+							
+								<tr>
+									<td><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Dear&nbsp;{{{Recipient.Supervisor_User__c}}},<br />
+									<br />
+									<br />
+									A New Lead has been assigned to you, check the details of the following&nbsp;customer.<br />
+									<br />
+									<strong>Lead Details:</strong></span></span>
+									<ul>
+										<li style="margin-left: 40px;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">&nbsp; &nbsp; &nbsp;<strong>First Name:</strong>&nbsp;{{{Recipient.FirstName}}}</span></span></li>
+										<li style="margin-left: 40px;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">&nbsp; &nbsp; &nbsp;<strong>Last&nbsp;Name:</strong>&nbsp;{{{Recipient.LastName}}}</span></span></li>
+										<li style="margin-left: 40px;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">&nbsp; &nbsp; &nbsp;<strong>Email:</strong>&nbsp;{{{Recipient.Email}}}</span></span></li>
+										<li style="margin-left: 40px;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">&nbsp; &nbsp; &nbsp;<strong>Phone:&nbsp;</strong>{{{Recipient.Phone}}}</span></span></li>
+										<li style="margin-left: 40px;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">&nbsp; &nbsp; &nbsp;<strong>Company:</strong>{{{Recipient.Company}}}</span></span></li>
+										<li style="margin-left: 40px;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">&nbsp; &nbsp; &nbsp;<strong>Project Request&nbsp;Type:</strong> {{{Recipient.Project_Request_Quotation_Type__c}}}</span></span></li>
+										<li style="margin-left: 40px;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">&nbsp; &nbsp; &nbsp;<strong>Project Description:</strong>&nbsp;{{{Recipient.Project_Description__c}}}</span></span></li>
+									</ul>
+
+									<div style="margin-left: 40px;">&nbsp;</div>
+									<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"> Thank you for your response.</span></span><br />
+									<br />
+									<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Best Regards,</span></span><br />
+									<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Arelia Living</span></span></td>
+								</tr>
+								<tr>
+									<td>&nbsp;</td>
+								</tr>
+							
+						</table>
+						</td>
+					</tr>
+				
+			</table>
+			</td>
+		</tr>
+	
+</table>
+</body>
+</html>

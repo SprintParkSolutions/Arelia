@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Sent to the Supervisor when the Manager takes action.</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Proforma Manager Response Notification</name>
+    <style>none</style>
+    <subject>Manager Decision Recorded – Proforma Invoice for  [OPPORTUNITY_NAME]</subject>
+    <type>custom</type>
+    <uiType>SFX</uiType>
+</EmailTemplate>

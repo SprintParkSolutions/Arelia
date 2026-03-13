@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Rooms_Count__c</fullName>
+    <description>Mention Rooms Count here like Manager cabin-1, Lunch Room-1, HR Room-1,....</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Mention Rooms Count here like Manager cabin-1, Lunch Room-1, HR Room-1,....</inlineHelpText>
+    <label>Rooms Count</label>
+    <length>255</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

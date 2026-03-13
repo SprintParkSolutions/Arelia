@@ -1,0 +1,48 @@
+<template>
+  <div class="ba-root">
+
+    <nav class="ba-tabs" role="tablist" aria-label="Commercial selections">
+      <button class={restaurantTabClass} data-pair="restaurant" role="tab" aria-selected={isSelectedRestaurant} onclick={onSelectPair}>Restaurant</button>
+      <button class={barTabClass} data-pair="bar" role="tab" aria-selected={isSelectedBar} onclick={onSelectPair}>Bar / Lounge</button>
+      <button class={banquetTabClass} data-pair="banquet" role="tab" aria-selected={isSelectedBanquet} onclick={onSelectPair}>Banquet</button>
+      <button class={lobbyTabClass} data-pair="lobby" role="tab" aria-selected={isSelectedLobby} onclick={onSelectPair}>Lobby / Reception</button>
+    </nav>
+
+    <figure role="group" aria-label="Before and After comparison">
+      <div class="ba-stage"
+           onpointerdown={handlePointerDown}
+           ontouchstart={handlePointerDown}
+           tabindex="0"
+           onkeydown={handleKeyDown}
+           data-id="stage">
+
+        <img src={computedAfter} alt={afterAlt} class="ba-img ba-base" />
+
+        <div class="ba-overlay-wrap" style={afterWrapStyle} data-id="afterWrap">
+           <img src={computedBefore} alt={beforeAlt} class="ba-img ba-overlay" />
+        </div>
+
+        <div class="ba-handle"
+             role="slider"
+             tabindex="0"
+             aria-valuemin="0"
+             aria-valuemax="100"
+             aria-valuenow={position}
+             aria-label="Before and After slider"
+             style={handleStyle}
+             onpointerdown={handlePointerDown}
+             ontouchstart={handlePointerDown}
+             data-id="handle">
+          <div class="ba-handle-inner">
+            <span class="bar"></span>
+          </div>
+        </div>
+
+        <div class="ba-label ba-label-left">BEFORE </div>
+        <div class="ba-label ba-label-right">AFTER</div>
+      </div>
+
+      <figcaption class="ba-caption">Drag the handle or use arrow keys to compare</figcaption>
+    </figure>
+  </div>
+</template>

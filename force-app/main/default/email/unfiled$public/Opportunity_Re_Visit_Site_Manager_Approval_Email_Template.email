@@ -1,0 +1,38 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<div><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Dear Arelia Manager,<br />
+<br />
+We are pleased to inform you that a new project has been officially approved by <strong>{{{Site_Visit_Report__c.Supervisor_User__r.Name}}}&nbsp;</strong>for the following lead.<br />
+<br />
+<strong>Opportunity Information:</strong></span></span></div>
+
+<ul>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Opportunity&nbsp;Name:&nbsp;</span></span><strong>{{{Site_Visit_Report__c.Opportunity__r.Name}}}</strong></li>
+</ul>
+
+<div><br />
+<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Site Visit Report Information:</strong></span></span></div>
+
+<ul>
+	<li>Site Visit Report Number:&nbsp;<strong>{{{Site_Visit_Report__c.Name}}}&nbsp;</strong></li>
+	<li>Site Visit Supervisor:&nbsp;<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>{{{Site_Visit_Report__c.Supervisor_User__r.Name}}}</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Site Visit Date:&nbsp;</span></span><strong>{{{Site_Visit_Report__c.Site_Visit_Date__c}}}</strong></li>
+	<li>Site Visit Time Slot:&nbsp;<strong>{{{Site_Visit_Report__c.Site_Visit_Time_Slot__c}}}</strong></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Estimated Completion Months:&nbsp;</span></span><strong>{{{Site_Visit_Report__c.Estimated_Completion_Months__c}}}</strong></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Supervisor Finall Estimated&nbsp;Cost: <strong>{{{Site_Visit_Report__c.Total_Estimated_Cost__c}}}</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Site Visit Report Status: <strong>{{{Site_Visit_Report__c.Site_Visit_Report_Status__c}}}</strong></span></span></li>
+</ul>
+
+<div><br />
+<font face="Times New Roman, Times New Roman, Times, serif">Please review and update the site visit report. </font><a href="{{{siteVisitRecordPageLink}}}">Click</a> <font face="Times New Roman, Times New Roman, Times, serif">on the link to view the report.</font></div>
+
+<div><br />
+<br />
+<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Best Regards, &nbsp;<br />
+<strong>{{{Site_Visit_Report__c.Supervisor_User__r.Name}}}<br />
+{{{Site_Visit_Report__c.Supervisor_User__r.Phone}}}</strong></span></span></div>
+</body>
+</html>

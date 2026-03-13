@@ -1,0 +1,14 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hi </span></span>{{{Supervisor_User__c.Name}}}<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">,<br />
+<br />
+Great news! The Site Re-Visit Appointment for <strong>{{{Recipient.Name}}}</strong> on <strong>{{{Re_Visit_Appointment_Date__c}}}</strong>&nbsp;at <strong>{{{Re_Visit_Appointment_Time_Slots__c}}}</strong> has been approved.<br />
+<br />
+If you have any further instructions or notes to share, feel free to connect with the client directly contact: <strong>{{{Recipient.Phone}}}</strong>.<br />
+<br />
+<br />
+Thanks,<br />
+Arelia Living Team</span></span></body>
+</html>

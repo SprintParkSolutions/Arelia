@@ -1,0 +1,22 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Dear <strong>{{{Project__r.Supervisor_User__r.Name}}}</strong>,<br />
+<br />
+The below are the accepted project details for the Client&nbsp;</span></span><strong>{{{Project__r.Client__r.Name}}}</strong><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">. The project is ready to get started. Please start working on this project by assigning vendors and allotting tasks.<br />
+<br />
+<strong>Project Details:</strong></span></span>
+<ul>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Project Name: </strong>{{{Project__c.Name}}}</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Project Code:</strong> {{{Project__c.Project_Code__c}}}</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Project Status:</strong> {{{Project__c.Status__c}}}</span></span></li>
+	<li><strong>Project Request&nbsp;Type:&nbsp;</strong>{{{Project__c.Project_Request_Quotation_Type__c}}}</li>
+</ul>
+<br />
+<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Thank You.<br />
+<br />
+<br />
+Kind Regards,<br />
+Arelia Living</span></span></body>
+</html>

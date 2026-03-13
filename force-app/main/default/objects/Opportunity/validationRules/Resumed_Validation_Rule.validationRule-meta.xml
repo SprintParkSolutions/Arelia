@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Resumed_Validation_Rule</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+    ISPICKVAL(StageName, &quot;Resumed&quot;),
+    NOT(All_Vendors_Agreement_Completed__c)
+)</errorConditionFormula>
+    <errorMessage>Stage cannot be set to &apos;Resumed&apos; until All Vendors Agreement Completed is checked.</errorMessage>
+</ValidationRule>

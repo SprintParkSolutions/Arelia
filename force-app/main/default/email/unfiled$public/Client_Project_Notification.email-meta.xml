@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Sending project status and project code to the customer when lead is accepted</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Send Project Status and Code to Client</name>
+    <relatedEntityType>Project__c</relatedEntityType>
+    <style>none</style>
+    <subject>Project  {{{Project__c.Name}}}- Accepted</subject>
+    <type>custom</type>
+    <uiType>SFX</uiType>
+</EmailTemplate>

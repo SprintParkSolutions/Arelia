@@ -1,0 +1,110 @@
+<template>
+    <div class="container">
+
+        <!-- MAIN TITLE -->
+        <h2 class="section-title"
+            style="font-size:40px !important; font-family:'Playfair Display', serif !important; line-height:1.2 !important;">
+            Pillars of
+            <span style="font-family:'Playfair Display', serif !important;"> Excellence</span>
+        </h2>
+
+        <!-- SUB TITLE -->
+        <p class="section-subtitle"
+            style="font-size:18 px !important; font-family:'Lato', sans-serif !important; line-height:1.4 !important;">
+            Unlike traditional firms, we bring specialized expertise to every vertical.
+        </p>
+
+        <div class="pillars-wrapper">
+            <template for:each={pillars} for:item="pillar">
+                <div key={pillar.id} class="pillar-card">
+
+                    <div class="image-container">
+                        <img src={pillar.image} alt={pillar.title} class="pillar-img">
+                    </div>
+
+                    <div class="content-container">
+                        <div class="accent-line"></div>
+                        <div class="content-inner">
+
+                            <!-- CATEGORY TEXT -->
+                            <span class="category"
+                                style="font-size:15px !important; font-family:'Lato', sans-serif !important; line-height:1.3 !important;">
+                                {pillar.subtitle}
+                            </span>
+
+                            <!-- PILLAR TITLE -->
+                            <h3 class="title"
+                                style="font-size:28px !important; font-family:'Playfair Display', serif !important; line-height:1.3 !important;">
+                                {pillar.title}
+                            </h3>
+
+                            <!-- DESCRIPTION -->
+                            <p class="description"
+                                style="font-size:15px !important; font-family:'Lato', sans-serif !important; line-height:1.6 !important;">
+                                {pillar.description}
+                            </p>
+
+                            <!-- CTA BUTTON -->
+                            <button class="cta-explore"
+                                style="font-size:16px !important; font-family:'Lato', sans-serif !important; line-height:1.4 !important;"
+                                data-pillar={pillar.key} onclick={openExplore} aria-haspopup="dialog"
+                                aria-controls="explore-modal">
+                                Explore &rarr;
+                            </button>
+
+                        </div>
+                    </div>
+
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- MODAL PANEL -->
+    <template if:true={modalOpen}>
+        <div class="explore-modal-backdrop" onclick={handleBackdropClick}>
+            <div class="explore-modal" role="dialog" aria-modal="true" aria-labelledby="explore-title"
+                onkeydown={handleKeyDown} tabindex="-1" data-pillar={activePillar} id="explore-modal">
+
+                <button class="modal-close" onclick={closeExplore} aria-label="Close explore panel"
+                    style="font-size:24px !important; font-family:'Lato', sans-serif !important;">&times;</button>
+
+                <div class="modal-head">
+                    <h3 id="explore-title"
+                        style="font-size:28px !important; font-family:'Playfair Display', serif !important; line-height:1.3 !important;">
+                        {activeData.title}
+                    </h3>
+
+                    <p class="modal-sub"
+                        style="font-size:14px !important; font-family:'Lato', sans-serif !important; line-height:1.4 !important;">
+                        {activeData.tagline}
+                    </p>
+                </div>
+
+                <div class="modal-actions" role="menu" aria-label="Explore actions">
+                    <button class="modal-action" data-action="styles" onclick={handleModalAction} role="menuitem"
+                        style="font-size:16px !important; font-family:'Lato', sans-serif !important;">
+                        Explore Styles
+                    </button>
+
+                    <button class="modal-action" data-action="beforeafter" onclick={handleModalAction} role="menuitem"
+                        style="font-size:16px !important; font-family:'Lato', sans-serif !important;">
+                        Before & After
+                    </button>
+
+                    <button class="modal-action primary" data-action="book" onclick={handleModalAction} role="menuitem"
+                        style="font-size:16px !important; font-family:'Lato', sans-serif !important;">
+                        Book Consultation
+                    </button>
+                </div>
+
+                <div class="modal-footer">
+                    <small
+                        style="font-size:12px !important; font-family:'Lato', sans-serif !important; line-height:1.4 !important;">
+                        Tip: Actions open quickly — you can always explore the full page later.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </template>
+</template>

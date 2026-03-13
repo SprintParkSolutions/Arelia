@@ -1,0 +1,36 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<div style="font-family: Arial, sans-serif; font-size: 14px; line-height: 1.5;">
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Dear {{{Vendor__c.Name}}},</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">You are formally invited to participate in the tender process for the <b>{{{Vendor_Category__c}}}</b> requirement under our opportunity titled <b>{{{Opportunity.Name}}}</b>.</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><b>Please find the attached Proforma Invoice, blueprints, and relevant project documents for your review.</b></span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Kindly confirm your intent to participate by responding to this email with either:</span></span></p>
+
+<ul>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><b>Accepted:</b> if you are willing to proceed with this tender opportunity.</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><b>Declined:</b> if you choose not to participate, please mention a reason.</span></span></li>
+</ul>
+{{{Specification_Table}}}
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">If you have any questions or require clarifications, please feel free to contact the opportunity owner:</span></span></p>
+
+<ul>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><b>Supervisor Name:</b> {{{Opportunity.SupervisorName}}}</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><b>Email:</b> {{{Opportunity.SupervisorEmail}}}</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><b>Phone:</b> {{{Opportunity.SupervisorPhone}}}</span></span></li>
+</ul>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Please refer to the attached files (including the Proforma Invoice and images of specific items) for complete details.</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Sincerely,</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Arelia Living</span></span></p>
+</div>
+</body>
+</html>

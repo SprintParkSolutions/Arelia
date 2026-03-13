@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Project_Health__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(
+  AND(ISBLANK(Actual_Completion_Date__c), TODAY() &gt;  Estimated_End_Date__c),
+  &quot;Overdue&quot;,
+IF(
+  AND(
+    ISBLANK(Actual_Completion_Date__c),
+    Project_Completion_Status__c &lt; 0.75,
+    (Estimated_End_Date__c - TODAY()) &lt; 30
+  ),
+  &quot;At Risk&quot;,
+IF(
+  AND(
+    ISBLANK(Actual_Completion_Date__c),
+    Project_Completion_Status__c &gt;= 0.75,
+    (Estimated_End_Date__c - TODAY()) &lt; 30
+  ),
+  &quot;Nearly Complete&quot;,
+IF(
+  AND(ISBLANK(Actual_Completion_Date__c), (Estimated_End_Date__c - TODAY()) &gt;= 30),
+  &quot;On Track&quot;,
+IF(
+  AND(NOT(ISBLANK(Actual_Completion_Date__c)), Actual_Completion_Date__c &gt; Estimated_End_Date__c),
+  &quot;Completed, but Delayed&quot;,
+IF(
+  AND(NOT(ISBLANK(Actual_Completion_Date__c)), Actual_Completion_Date__c &lt;=  Estimated_End_Date__c),
+  &quot;Completed On Time&quot;,
+&quot;&quot;
+))))))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Project Health</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

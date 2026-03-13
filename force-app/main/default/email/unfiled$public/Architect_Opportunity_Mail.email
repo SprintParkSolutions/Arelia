@@ -1,0 +1,24 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p>Dear <strong>{{{Opportunity.Architect_Name__c}}}</strong>,</p>
+
+<p>I hope this email finds you well.</p>
+
+<p>We would like to inform you about a potential opportunity&nbsp;<strong>{{{Opportunity.Name}}}</strong>, related to an upcoming project. Based on your expertise and experience, we believe this project may align well with your profile.</p>
+
+<p>Kindly connect with our supervisor&nbsp;<strong>{{{Opportunity.Supervisor_User__c}}}{{{Opportunity.Supervisor_Name__c}}}</strong>&nbsp;to discuss the project details, scope, and next steps in more detail. They will be able to provide you with comprehensive information and address any questions you may have.</p>
+
+<p>Supervisor Contact Number :&nbsp;<strong>{{{Opportunity.Supervisor_User_Phone__c}}},</strong><br />
+Supervisor Contact Mail :&nbsp;<strong>{{{Opportunity.Supervisor_User_Email__c}}}</strong></p>
+
+<p>Please feel free to reach out at your convenience.</p>
+
+<p>Thank you for your time and interest. We look forward to your response.</p>
+
+<p>Best regards,<br />
+<strong>Arelia Living</strong></p>
+</body>
+</html>

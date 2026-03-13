@@ -1,0 +1,21 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hello <strong>{{{Recipient.FirstName}}}</strong>,</span></span><br />
+<br />
+Thank you for providing the details of your automatic project request. Here is a summary of the information you have submitted for our review and consideration.
+<ul>
+	<li>Company:&nbsp;<strong>{{{Recipient.Company}}}</strong></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Project Type:&nbsp;<strong>{{{Recipient.Interior_Project_Type__c}}}</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Category:&nbsp;<strong>{{{Recipient.Interior_Category__c}}}</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Plan:&nbsp;<strong>{{{Recipient.Plan_Level__c}}}</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Site Space:&nbsp;<strong>{{{Recipient.Site_Space__c}}}</strong>&nbsp;<strong>sq ft</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Estimated Budget: <strong>{{{Recipient.Estimated_Budget__c}}}</strong></span></span></li>
+</ul>
+Should you have any further questions or require additional information, please do not hesitate to contact our management team.<br />
+<br />
+<br />
+Best Regards,<br />
+The Arelia Living Team</body>
+</html>

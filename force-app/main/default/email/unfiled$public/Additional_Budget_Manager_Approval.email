@@ -1,0 +1,25 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p>Hello <strong>Arelia Manager</strong>,<br />
+<br />
+<br />
+An additional budget request has been submitted for the project below:</p>
+
+<ul>
+	<li><strong>Project Name:</strong>&nbsp;{{{Project__c.Name}}}</li>
+	<li><strong>Additional Requested Amount:</strong>&nbsp;{{{Project__c.Pending_Additional_Amount__c}}}</li>
+	<li><strong>Additional Amount Request Reason:</strong>&nbsp;{{{Project__c.Pending_Additional_Reason__c}}}</li>
+	<li><strong>Status:</strong>&nbsp;{{{Project__c.Additional_Request_Status__c}}}</li>
+</ul>
+
+<p><br />
+Please review and take action using the link below: <a href="{{{approvalLink}}}">Link</a><br />
+&nbsp;</p>
+
+<p>Best Regards,<br />
+Arelia Team</p>
+</body>
+</html>

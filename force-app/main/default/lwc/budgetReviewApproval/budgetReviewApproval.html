@@ -1,0 +1,181 @@
+<template>
+    <div class="arelia-container">
+        
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" size="medium" variant="brand"></lightning-spinner>
+        </template>
+
+        <template if:false={showSuccessModal}>
+            
+            <template if:true={approvalData}>
+                
+                <div class="header-section slds-text-align_center slds-m-bottom_large animate-fade-in">
+                    <template if:true={isClient}>
+                        <h1 class="main-title">Budget Approval</h1>
+                        <div class="message-box client-msg">
+                            <p>Hello <strong>{clientName}</strong>,</p>
+                            <p>This is the budget estimation after Proforma and Design confirmation.</p>
+                            <p>Please review and approve below. Once approved, it will be sent to the Manager for final sign-off.</p>
+                        </div>
+                    </template>
+
+                    <template if:false={isClient}>
+                        <h1 class="main-title">Final Budget Review</h1>
+                        <div class="message-box manager-msg">
+                            <p><strong>Manager Final Sign-Off</strong></p>
+                            <p>The client, <strong>{clientName}</strong>, has approved this budget.</p>
+                            <p>Please review and provide the final approval to lock the budget.</p>
+                        </div>
+                    </template>
+
+                    <template if:true={isRevised}>
+                        <span class="slds-badge slds-theme_warning slds-m-top_small">Revised Budget</span>
+                    </template>
+                </div>
+
+                <div class="arelia-card slds-m-bottom_large animate-fade-in">
+                    <div class="slds-grid slds-wrap">
+                        
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 project-details-col">
+                            <div class="details-wrapper">
+                                <h3 class="section-label">Project Details</h3>
+                                
+                                <div class="detail-item">
+                                    <div class="icon-box">
+                                        <lightning-icon icon-name="standard:home" size="small" alternative-text="Project"></lightning-icon>
+                                    </div>
+                                    <div class="info-content">
+                                        <label>Project Name</label>
+                                        <div class="value">{approvalData.opportunity.Name}</div>
+                                    </div>
+                                </div>
+
+                                <div class="detail-item">
+                                    <div class="icon-box">
+                                        <lightning-icon icon-name="standard:user" size="small" alternative-text="Client"></lightning-icon>
+                                    </div>
+                                    <div class="info-content">
+                                        <label>Client Name</label>
+                                        <div class="value">{clientName}</div>
+                                    </div>
+                                </div>
+
+                                <div class="detail-item">
+                                    <div class="icon-box">
+                                        <lightning-icon icon-name="standard:avatar" size="small" alternative-text="Supervisor"></lightning-icon>
+                                    </div>
+                                    <div class="info-content">
+                                        <label>Supervisor</label>
+                                        <div class="value">{supervisorName}</div>
+                                        <div class="sub-value">{supervisorEmail}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 budget-summary-col">
+                            <div class="budget-wrapper">
+                                <h3 class="section-label">Estimation Summary</h3>
+                                
+                                <div class="budget-row">
+                                    <span class="lbl">Customer Budget</span>
+                                    <span class="val">
+                                        <lightning-formatted-number value={approvalData.customerBudget} format-style="currency" currency-code="INR"></lightning-formatted-number>
+                                    </span>
+                                </div>
+                                <div class="budget-row">
+                                    <span class="lbl">Supervisor Estimate</span>
+                                    <span class="val">
+                                        <lightning-formatted-number value={approvalData.supervisorBudget} format-style="currency" currency-code="INR"></lightning-formatted-number>
+                                    </span>
+                                </div>
+                                <div class="budget-row">
+                                    <span class="lbl">Estimated Duration</span>
+                                    <span class="val">{approvalData.estimatedDuration}</span>
+                                </div>
+                                
+                                <div class="divider"></div>
+
+                                <div class="final-row">
+                                    <label>Total Approved Budget</label>
+                                    <div class="big-number">
+                                        <lightning-formatted-number value={approvalData.finalBudget} format-style="currency" currency-code="INR"></lightning-formatted-number>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+                <div class="arelia-card slds-p-around_large slds-text-align_center animate-fade-in">
+                    
+                    <template if:false={isProcessed}>
+                        <div class="button-container">
+                            <button class="arelia-btn btn-approve" onclick={handleApproveClick}>
+                                {approveButtonLabel}
+                            </button>
+                            <button class="arelia-btn btn-request" onclick={handleRequestChangesClick}>
+                                Request Changes
+                            </button>
+                        </div>
+
+                        <template if:true={showCommentBox}>
+                            <div class="slds-m-top_medium animate-fade-in">
+                                <div class="slds-text-align_left slds-m-bottom_x-small" style="font-weight:600; color:#ba0517;">
+                                    Please provide details for the revision:
+                                </div>
+                                <lightning-textarea 
+                                    variant="label-hidden" 
+                                    value={comments} 
+                                    onchange={handleCommentChange} 
+                                    placeholder="Enter your remarks here..." 
+                                    class="custom-textarea">
+                                </lightning-textarea>
+                                <button class="arelia-btn btn-submit-changes slds-m-top_small" onclick={handleRejectClick}>
+                                    Submit Request
+                                </button>
+                            </div>
+                        </template>
+                    </template>
+
+                    <template if:true={isProcessed}>
+                        <div class="info-box slds-theme_success">
+                            <h2>Decision Recorded</h2>
+                            <p>Current Status: {currentStatus}</p>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <template if:false={approvalData}>
+                <div class="arelia-card slds-p-around_large slds-text-align_center slds-m-top_large">
+                    <h2 class="main-title" style="color:#555;">No Record Found</h2>
+                    <p>We could not find the budget details.</p>
+                    <p style="font-size: 0.9rem; color: red;">Check if the URL contains the correct <b>id</b> parameter.</p>
+                </div>
+            </template>
+
+        </template>
+
+        <template if:true={showSuccessModal}>
+            <div class="custom-modal-backdrop">
+                <div class="custom-modal-box animate-pop-in">
+                    <div class="slds-m-bottom_medium">
+                        <lightning-icon icon-name="action:approval" alternative-text="Success" size="large"></lightning-icon>
+                    </div>
+                    <h2 class="main-title" style="font-size: 1.8rem;">Thank You!</h2>
+                    <p class="main-subtitle slds-m-bottom_large" style="font-size: 1rem;">
+                        Your decision has been successfully recorded.
+                    </p>
+                    <button class="arelia-btn btn-approve" onclick={handleNavigateHome}>
+                        Close
+                    </button>
+                </div>
+            </div>
+        </template>
+
+        <template if:true={error}>
+            <div class="slds-notify slds-notify_alert slds-theme_error">{error}</div>
+        </template>
+
+    </div>
+</template>

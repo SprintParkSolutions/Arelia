@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Rejection_Reason__c</fullName>
+    <label>Rejection Reason</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Approval_Status__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>No Longer Needed</fullName>
+                <default>false</default>
+                <label>No Longer Needed</label>
+            </value>
+            <value>
+                <fullName>Budget Issues, Cannot Process further</fullName>
+                <default>false</default>
+                <label>Budget Issues, Cannot Process further</label>
+            </value>
+            <value>
+                <fullName>Didn&apos;t met the requirements, Cannot Process further</fullName>
+                <default>false</default>
+                <label>Didn&apos;t met the requirements, Cannot Process further</label>
+            </value>
+            <value>
+                <fullName>Didn&apos;t met the requirements,  Can be useful in the future</fullName>
+                <default>false</default>
+                <label>Didn&apos;t met the requirements,  Can be useful in the future</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Rejected</controllingFieldValue>
+            <valueName>No Longer Needed</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Rejected</controllingFieldValue>
+            <valueName>Budget Issues, Cannot Process further</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Rejected</controllingFieldValue>
+            <valueName>Didn&apos;t met the requirements, Cannot Process further</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Rejected</controllingFieldValue>
+            <valueName>Didn&apos;t met the requirements,  Can be useful in the future</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

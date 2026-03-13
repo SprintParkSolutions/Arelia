@@ -1,0 +1,26 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Dear [SUPERVISOR_NAME],<br />
+<br />
+The client has taken action on the <b>Proforma Invoice</b> shared for the interior project [PROJECT_NAME].<br />
+<br />
+<b>Client Response Summary:</b></span></span>
+<ul>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><b>Project Name:</b> [PROJECT_NAME]</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><b>Client Name:</b> [CLIENT_NAME]</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><b>Client Email:</b> [CLIENT_EMAIL]</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><b>Client Decision:</b> <b>[CLIENT_ACTION]</b></span></span></li>
+</ul>
+<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"> <b>Client Comments / Remarks:</b><br />
+[COMMENTS]<br />
+<br />
+The latest version of the proforma invoice reviewed by the client is attached to this email for your reference.<br />
+<br />
+<b>Next Steps:</b><br />
+Please review the client’s response and proceed with the required follow-up actions (e.g., confirmation, revisions, or further coordination with the design or procurement teams).<br />
+<br />
+Regards,<br />
+<b>Arelia Living&nbsp;</b></span></span></body>
+</html>

@@ -1,0 +1,32 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hi {{{Recipient.Name}}},<br />
+<br />
+We are pleased to confirm your upcoming revisit to the site for <strong>{{{appointmentType}}}</strong>&nbsp;with our supervisor, <strong>{{{Supervisor_User__c.Name}}}</strong>.<br />
+<br />
+Your appointment is scheduled on&nbsp;<strong>{{{appointmentDate}}} </strong>at&nbsp;<strong>{{{timeSlot}}}.</strong><br />
+<br />
+In case of any changes or further inquiries, please feel free to contact our supervisor directly:<br />
+<br />
+<strong>Supervisor Information:</strong></span></span></p>
+
+<ul>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Email: <strong>{{{Supervisor_User__c.Email}}}</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Mobile Number: <strong>{{{Supervisor_User__c.Phone}}}&nbsp;</strong></span></span></li>
+</ul>
+
+<p><br />
+<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">We are excited to assist you in bringing your vision to life and ensuring everything is set up to your satisfaction.<br />
+<br />
+If you need to reschedule or confirm your appointment, please click the following link :</span></span><a href="{{{appointmentApprovalLink}}}">Link</a><br />
+<br />
+<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">We look forward to assisting you in bringing your vision to life.<br />
+<br />
+<br />
+Best regards,<br />
+The Arelia Living Team,</span></span></p>
+</body>
+</html>

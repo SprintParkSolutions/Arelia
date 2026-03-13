@@ -1,0 +1,20 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hi <strong>{{{Supervisor_User__c.Name}}}</strong>,<br />
+<br />
+The Site Re-Visit Appointment for <strong>{{{Recipient.Name}}}</strong> has been rescheduled.<br />
+<br />
+<strong>New Rescheduled Appointment Details:</strong></span></span>
+<ul>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Re-Scheduled Appointment Date: <strong>{{{Re_Visit_Appointment_Rescheduled_Date__c}}}</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Re-Scheduled Appointment Slots: <strong>{{{Re_Visit_Appointm_Rescheduled_Time_Slots__c}}}</strong></span></span></li>
+</ul>
+<br />
+<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">If you have any further instructions or notes to share, feel free to connect with the client directly contact:&nbsp;<strong>{{{Recipient.Phone}}}</strong>.<br />
+<br />
+<br />
+Thanks,<br />
+Arelia Living Team</span></span></body>
+</html>

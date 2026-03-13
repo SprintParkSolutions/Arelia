@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Notification sent when client approves or rejects a design.</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Client Response Notification</name>
+    <style>none</style>
+    <subject>3D Design Proposal Status Update by  [CLIENT_NAME] -[DECISION]</subject>
+    <type>custom</type>
+    <uiType>SFX</uiType>
+</EmailTemplate>

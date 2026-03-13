@@ -1,0 +1,27 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="font-family: Arial, sans-serif; font-size: 14px; color: rgb(51, 51, 51); height: auto; min-height: auto;">
+<p>Dear {{CLIENT_NAME}},</p>
+
+<p>Thank you for reviewing and approving the payment schedule for your project, <strong>{{OPPORTUNITY_NAME}}</strong>.</p>
+
+<p>This email serves as an official confirmation that the agreed payment terms have been locked in our system. Our team has been notified and will proceed with the next stages of your project execution.</p>
+
+<p><strong>Project Details:</strong></p>
+
+<p style="margin-left: 20px;"><strong>Project Name:</strong> {{OPPORTUNITY_NAME}}<br />
+<strong>Supervisor:</strong> {{SUPERVISOR_NAME}}<br />
+<strong>Status:</strong> <span style="color: green; font-weight: bold;">Client Approved</span></p>
+
+<p>You can view the approved schedule at any time by visiting your project portal link below:</p>
+
+<p><a href="{{APPROVAL_LINK}}" style="background-color: #0070d2; color: #ffffff; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold;">View Approved Terms</a></p>
+
+<p>If you have any further questions, please feel free to reach out to your supervisor directly.</p>
+
+<p>Sincerely,<br />
+Arelia Living</p>
+</body>
+</html>

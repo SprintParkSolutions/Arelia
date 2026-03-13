@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>The email client receives upon case creation</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Client Case Template</name>
+    <relatedEntityType>Case</relatedEntityType>
+    <style>none</style>
+    <subject>Case Registeration Successful</subject>
+    <type>custom</type>
+    <uiType>SFX</uiType>
+</EmailTemplate>

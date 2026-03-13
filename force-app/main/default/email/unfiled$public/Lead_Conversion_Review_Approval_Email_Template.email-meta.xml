@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Lead Conversion Review Approval Email Template</name>
+    <relatedEntityType>Site_Visit_Report__c</relatedEntityType>
+    <style>none</style>
+    <subject>Site Visit Review Approval Report by {{{Site_Visit_Report__c.Supervisor_User__r.Name}}}</subject>
+    <type>custom</type>
+    <uiType>SFX</uiType>
+</EmailTemplate>

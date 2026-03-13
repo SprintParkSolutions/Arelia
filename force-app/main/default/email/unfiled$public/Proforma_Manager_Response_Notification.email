@@ -1,0 +1,23 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Dear [SUPERVISOR_NAME],<br />
+<br />
+This is to inform you that the <b>Manager has completed the review</b> of the Proforma Invoice associated with the interior project <b>&nbsp;[OPPORTUNITY_NAME]</b>.<br />
+<br />
+<b>Review Summary:</b></span></span>
+<ul>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><b>Client Name:</b> [CLIENT_NAME]</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><b>Manager Decision:</b> <b>[DECISION]</b></span></span></li>
+</ul>
+<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"> <b>Manager’s Comments:</b><br />
+[COMMENTS]<br />
+<br />
+The system records have been updated accordingly. Please proceed with the next steps in the workflow as required.<br />
+<br />
+If you need any further clarification or follow-up, feel free to coordinate with the respective teams.<br />
+<br />
+Regards,<br />
+<b>Arelia Living&nbsp;</b></span></span></body>
+</html>

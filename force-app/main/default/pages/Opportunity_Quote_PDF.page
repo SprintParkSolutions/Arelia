@@ -1,0 +1,257 @@
+<apex:page controller="OpportunityQuotePDFController"
+           renderAs="pdf"
+           applyHtmlTag="false"
+           applyBodyTag="false"
+           showHeader="false"
+           standardStylesheets="false"
+           docType="html-5.0"
+           cache="false">
+
+<html>
+<head>
+    <style type="text/css">
+        @page {
+            size: A4;
+            margin: 0.5in;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            color: #222;
+        }
+
+        /* HEADER */
+        .header-box {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #0070d2;
+        }
+
+        .company-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0070d2;
+            text-transform: uppercase;
+        }
+
+        .sub-header {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* DETAILS */
+        .details-table {
+            width: 100%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+
+        .details-table td {
+            vertical-align: top;
+            width: 50%;
+            padding: 6px;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #555;
+            display: inline-block;
+            margin-top: 6px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 20px 0 10px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+
+        /* TABLE */
+        .inventory-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .inventory-table th,
+        .inventory-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            font-size: 11px;
+        }
+
+        .inventory-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+
+        /* TOTAL */
+        .total-box {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .grand-total-wrapper {
+            display: inline-block;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 10px 20px;
+            border-radius: 4px;
+        }
+
+        .grand-total-label {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .grand-total-amount {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0070d2;
+            margin-left: 10px;
+        }
+
+        /* FOOTER */
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 10px;
+            color: #999;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+<div class="header-box">
+    <div class="company-name">Arelia Living</div>
+    <div class="sub-header">Official Project Quotation</div>
+</div>
+
+<!-- ================= DETAILS ================= -->
+<table class="details-table">
+    <tr>
+        <!-- LEFT -->
+        <td>
+            <div class="label">Opportunity / Project Name:</div><br/>
+            <apex:outputText value="{!IF(ISBLANK(Opp.Name),'—',Opp.Name)}"/><br/>
+
+            <div class="label">Customer Name:</div><br/>
+            <apex:outputText value="{!IF(ISBLANK(Opp.Lead_Name__c),'—',Opp.Lead_Name__c)}"/><br/>
+
+            <div class="label">Email:</div><br/>
+            <apex:outputText value="{!IF(ISBLANK(Opp.Email__c),'—',Opp.Email__c)}"/><br/>
+
+            <div class="label">Phone:</div><br/>
+            <apex:outputText value="{!IF(ISBLANK(Opp.Lead_Phone__c),'—',Opp.Lead_Phone__c)}"/>
+        </td>
+
+        <!-- RIGHT -->
+        <td>
+            <div class="label">Quotation Type:</div><br/>
+            <apex:outputText value="{!quotationType}"/><br/>
+
+            
+        </td>
+    </tr>
+</table>
+
+<!-- ================= INVENTORY ================= -->
+<div class="section-title">Selected Inventory</div>
+
+<table class="inventory-table">
+    <thead>
+        <tr>
+            <th width="30%">Product</th>
+            <th width="15%">Quality</th>
+            <th width="15%">Category</th>
+            <th width="15%">Room</th>
+            <th width="5%" class="text-center">Qty</th>
+            <th width="10%" class="text-right">Unit Price</th>
+            <th width="10%" class="text-right">Total</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        <apex:repeat value="{!specItems}" var="item">
+            <tr>
+                <td>
+                    <apex:outputText value="{!item.Interior_Product__r.Name}"/>
+                </td>
+
+                <td>
+                    <apex:outputText value="{!IF(ISBLANK(item.Quality__c),'Standard',item.Quality__c)}"/>
+                </td>
+
+                <td>
+                    <apex:outputText value="{!item.Interior_Product__r.Product_Category__c}"/>
+                </td>
+
+                <td>
+                    <apex:outputText value="{!item.Interior_Product__r.Room_Type__c}"/>
+                </td>
+
+                <td class="text-center">
+                    <apex:outputText value="{!item.Quantity__c}"/>
+                </td>
+
+                <td class="text-right">
+                    ₹ <apex:outputText value="{0,number,#,##0.00}">
+                        <apex:param value="{!item.Unit_Price__c}"/>
+                    </apex:outputText>
+                </td>
+
+                <td class="text-right">
+                    ₹ <apex:outputText value="{0,number,#,##0.00}">
+                        <apex:param value="{!item.Total_Amount__c}"/>
+                    </apex:outputText>
+                </td>
+            </tr>
+        </apex:repeat>
+
+        <apex:outputPanel rendered="{!specItems.size == 0}">
+            <tr>
+                <td colspan="7" class="text-center" style="padding:20px;color:#999;">
+                    No items selected.
+                </td>
+            </tr>
+        </apex:outputPanel>
+
+    </tbody>
+</table>
+
+<!-- ================= TOTAL ================= -->
+<div class="total-box">
+    <div class="grand-total-wrapper">
+        <span class="grand-total-label">Grand Total:</span>
+        <span class="grand-total-amount">
+            ₹ <apex:outputText value="{0,number,#,##0.00}">
+                <apex:param value="{!grandTotal}"/>
+            </apex:outputText>
+        </span>
+    </div>
+</div>
+
+<!-- ================= FOOTER ================= -->
+<div class="footer">
+    This quote is valid for 30 days. Please contact your consultant for approval.<br/>
+    Generated on:
+    <apex:outputText value="{0,date,dd/MM/yyyy HH:mm}">
+        <apex:param value="{!generatedOn}"/>
+    </apex:outputText>
+</div>
+
+</body>
+</html>
+</apex:page>

@@ -1,0 +1,21 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hi {{{Recipient.Name}}},<br />
+<br />
+<br />
+A New site visit request has been sent to the below Client.<br />
+<br />
+Client Name:&nbsp;<strong>{{{leadName}}}</strong></span></span><br />
+<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Client Email: <strong>{{{leadEmail}}}</strong><br />
+Appoitment Type:<strong>&nbsp;{{{appointmentType}}}</strong><br />
+Appointment Date: <strong>{{{appointmentDate}}}</strong><br />
+Appointment Time Slot:<strong>&nbsp;{{{timeSlot}}}</strong><br />
+<br />
+Please ensure your availability for the appointment.<br />
+<br />
+<br />
+Best regards,<br />
+The Arelia Living Team</span></span></body>
+</html>

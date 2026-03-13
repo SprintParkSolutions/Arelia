@@ -1,0 +1,37 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p>Hello Manager,</p>
+
+<p>This is a notification regarding the project <strong>{{OPPORTUNITY_NAME}}</strong>.</p>
+
+<p><strong>Current Status: Client Approved</strong><br />
+The client, <strong>{{CLIENT_NAME}}</strong>, has formally reviewed and <strong>APPROVED</strong> the budget and payment terms.</p>
+
+<p><strong>Why is this required?</strong><br />
+As per our internal compliance protocols, a final Manager sign-off is required to:</p>
+
+<ul>
+	<li>Lock the budget figures in the system.</li>
+	<li>Authorize the release of resources.</li>
+	<li>Generate the final contract for signing.</li>
+</ul>
+
+<p>Please review the client-approved figures and any remarks below:</p>
+
+<ul>
+	<li><strong>Client Remarks:</strong> {{CLIENT_REMARKS}}</li>
+	<li><strong>Supervisor Estimate:</strong> {{FINAL_BUDGET}} (Check record for details)</li>
+</ul>
+<br />
+<a href="{{APPROVAL_LINK}}" style="background-color:#0070d2; color:#ffffff; display:inline-block; padding:14px 28px; text-decoration:none; border-radius:4px; font-weight:bold; font-family:Arial, sans-serif; font-size:16px;">Proceed to Manager Approval</a><br />
+&nbsp;
+<p>Thank you.</p>
+
+<p>Regards,</p>
+
+<p>Arelia Living</p>
+</body>
+</html>

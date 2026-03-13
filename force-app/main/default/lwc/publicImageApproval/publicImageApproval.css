@@ -1,0 +1,207 @@
+/* --- SHARED ARELIA STYLES --- */
+.arelia-container {
+    background-color: #f9f9f9;
+    padding: 40px 20px;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    position: relative;
+    box-sizing: border-box; 
+}
+
+.submit-spinner { z-index: 9999; position: absolute; }
+
+/* Typography */
+.main-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+    line-height: 1.2;
+}
+
+.main-subtitle {
+    font-size: 1.1rem;
+    color: #555;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.5;
+}
+
+/* Card Styling */
+.arelia-card {
+    background: white;
+    width: 100%;
+    max-width: 800px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    margin: 0 auto;
+    box-sizing: border-box; 
+}
+
+.card-inner-content { width: 100%; max-width: 650px; }
+
+.card-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Note Box */
+.note-box {
+    background-color: #f4f3f1; 
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    width: 100%;
+    color: #444;
+    box-sizing: border-box;
+}
+
+.note-icon {
+    --slds-c-icon-color-foreground: #7f7f7f; 
+    flex-shrink: 0;
+}
+
+.note-box p {
+    margin: 0;
+    line-height: 1.4;
+    font-size: 0.95rem;
+}
+
+/* Custom Button Styles */
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+    flex-wrap: wrap; 
+}
+
+.arelia-btn {
+    border: none;
+    border-radius: 6px;
+    padding: 12px 24px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 200px;
+}
+
+.btn-approve {
+    background-color: #4f8a55; 
+}
+.btn-approve:hover {
+    background-color: #3e7044;
+}
+
+.btn-request {
+    background-color: #c23934; 
+}
+.btn-request:hover {
+    background-color: #a6302c;
+}
+
+/* Sub-button */
+.btn-submit-changes {
+    background-color: #0176d3; 
+    font-size: 1rem;
+    padding: 10px 20px;
+    min-width: auto;
+}
+.btn-submit-changes:hover {
+     background-color: #005fb2;
+}
+
+/* Footer Text */
+.card-footer-text p {
+    font-size: 1.05rem;
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 5px;
+}
+
+/* Comment Box */
+.comment-box-container {
+    width: 100%;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+/* Animation */
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+@keyframes fadeIn {
+    0% { opacity: 0; transform: translateY(-10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.slds-badge {
+    font-size: 1rem;
+    padding: 8px 16px;
+}
+
+/* --- MODAL STYLES (Ensure they appear above everything) --- */
+.slds-modal {
+    z-index: 9001; /* Above backdrops */
+}
+.slds-backdrop {
+    z-index: 9000;
+}
+.slds-modal__header.slds-theme_success {
+    background-color: #04844b;
+    color: white;
+}
+
+/* --- MOBILE RESPONSIVE STYLES --- */
+@media only screen and (max-width: 600px) {
+    .arelia-container {
+        padding: 20px 10px; 
+    }
+
+    .main-title {
+        font-size: 1.8rem;
+    }
+
+    .main-subtitle {
+        font-size: 1rem;
+    }
+
+    .arelia-card {
+        padding: 1.5rem 1rem !important; 
+    }
+
+    .button-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .arelia-btn {
+        width: 100%;
+        min-width: auto;
+        font-size: 1rem; 
+        padding: 14px 20px; 
+    }
+
+    .btn-approve {
+        margin-right: 0 !important; 
+    }
+
+    .note-box {
+        padding: 1rem !important;
+    }
+    
+    /* Mobile Modal Adjustment */
+    .slds-modal__container {
+        width: 90%;
+        max-width: none;
+        margin: 0 auto;
+        padding: 20px 0;
+    }
+}

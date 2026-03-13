@@ -1,0 +1,22 @@
+.shell { padding:16px; display:flex; justify-content:center; }
+.card { width:100%; max-width:980px; background:#fff; border:1px solid #d8dde6; border-radius:16px; padding:20px; }
+.header { padding-bottom:12px; border-bottom:1px solid #eef1f6; margin-bottom:14px; }
+.title { font-size:20px; font-weight:900; color:#101828; }
+
+.grid { margin-top: 6px; }
+.row { display:flex; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px dashed #eef1f6; }
+.k { color:#667085; font-size:13px; font-weight:600; }
+.v { font-weight:800; color:#101828; font-size:13px; text-align:right; word-break:break-word; }
+
+.btnRow { margin-top:18px; display:flex; justify-content:center; gap:12px; }
+
+.historyWrap { margin-top:18px; padding-top:14px; border-top:1px solid #eef1f6; }
+.historyHeader { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.historyTitle { font-weight:900; color:#101828; }
+
+.historyList { margin:12px 0 0; padding-left:18px; }
+.historyItem { margin:8px 0; color:#344054; font-size:13px; line-height:1.5; }
+.muted { margin-top:10px; color:#667085; font-size:13px; }
+
+.alert { background:#fdecea; border:1px solid #f5c6cb; color:#611a15; padding:10px 12px; border-radius:8px; margin-bottom:12px; }
+.empty { margin-top:14px; text-align:center; color:#667085; font-weight:600; }

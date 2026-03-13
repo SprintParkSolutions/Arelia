@@ -1,0 +1,22 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hello&nbsp;<strong>Arelia Living Team,</strong><br />
+<br />
+Very excited to inform you that a project request has been formally submitted. Below are the comprehensive details of the project.</span></span>
+<ul>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Client Name:&nbsp;<strong>{{{Recipient.Name}}}</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Company:&nbsp;<strong>{{{Recipient.Company}}}</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Project Type:&nbsp;<strong>{{{Recipient.Interior_Project_Type__c}}}</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Category:&nbsp;<strong>{{{Recipient.Interior_Category__c}}}</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Plan:&nbsp;<strong>{{{Recipient.Plan_Level__c}}}</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Site Space:&nbsp;<strong>{{{Recipient.Site_Space__c}}}</strong>&nbsp;sq ft</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Estimated Budget:&nbsp;<strong>{{{Recipient.Estimated_Budget__c}}}</strong></span></span></li>
+</ul>
+<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"> We hope you have a great and successful experience throughout the course of the project. Wishing you all the best as you move forward with the upcoming milestones.<br />
+<br />
+<br />
+Best Regards,<br />
+Arelia Living</span></span></body>
+</html>

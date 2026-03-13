@@ -1,0 +1,580 @@
+<template>
+    <section class="page">
+        <article class="slds-card card">
+
+            <!-- Header -->
+            <header class="slds-card__header headerWrap">
+                <div class="hdrCenter">
+                    <div class="hdrLine">
+                        <lightning-icon icon-name="standard:quotes" size="small"></lightning-icon>
+                        <div class="title">FINAL INVOICE</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="slds-card__body slds-card__body_inner">
+
+                <!-- Loading -->
+                <template if:true={loading}>
+                    <div class="loaderWrap">
+                        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                    </div>
+                </template>
+
+                <!-- STEP 1: Opportunity Picker -->
+                <template if:true={showPicker}>
+                    <div class="startShell">
+                        <div class="startCard">
+                            <div class="startTop">
+                                <div class="startBadge">STEP 1</div>
+                                <div class="startHeading">Select Opportunity</div>
+
+                                <div class="startSub">
+                                    <div class="tipItem">
+                                        <span class="tipDot"></span>
+                                        Select Opportunity and click <b>Open Invoice Form</b>.
+                                    </div>
+                                    <div class="tipItem">
+                                        <span class="tipDot"></span>
+                                        Add Sections (WOOD / ELECTRICAL / CIVIL) and Lines.
+                                    </div>
+                                    <div class="tipItem">
+                                        <span class="tipDot"></span>
+                                        <b>Save Draft</b> saves to Salesforce as Draft.
+                                    </div>
+                                    <div class="tipItem">
+                                        <span class="tipDot"></span>
+                                        <b>Submit</b> creates Submitted version + PDF job.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="startBody">
+                                <div class="startField">
+                                    <lightning-record-picker label="Opportunity" placeholder="Search Opportunity..."
+                                        object-api-name="Opportunity" onchange={handleOppChange}>
+                                    </lightning-record-picker>
+                                </div>
+                            </div>
+
+                            <div class="startActions">
+                                <lightning-button variant="brand" label="Open Invoice Form" onclick={handleStart}>
+                                </lightning-button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- STEP 2: Invoice Form -->
+                <template if:true={showForm}>
+
+                    <div class="topActions">
+                        <lightning-button variant="neutral" label="Change Opportunity" onclick={handleBackToSearch}>
+                        </lightning-button>
+                    </div>
+
+                    <div class="selOppBar">
+                        <span class="selOppLbl">Selected Opportunity Id:</span>
+                        <span class="selOppVal">{selectedOpportunityIdLabel}</span>
+                    </div>
+
+                    <!-- Header info -->
+                    <div class="topHeader">
+                        <div class="clientBox">
+                            <div class="boxTitle">Client Details</div>
+
+                            <div class="row2">
+                                <lightning-input class="inp" label="Client Name" value={header.clientName}
+                                    data-field="clientName" onchange={handleHeaderChange}>
+                                </lightning-input>
+
+                                <lightning-input class="inp" label="Phone" value={header.phone} data-field="phone"
+                                    onchange={handleHeaderChange}>
+                                </lightning-input>
+                            </div>
+
+                            <lightning-textarea class="inp" label="Address" value={header.clientAddress}
+                                data-field="clientAddress" onchange={handleHeaderChange}>
+                            </lightning-textarea>
+                        </div>
+
+                        <div class="invoiceBox">
+                            <div class="boxTitle">Invoice</div>
+
+                            <lightning-input class="inp" label="Date" type="date" value={header.invoiceDate}
+                                data-field="invoiceDate" onchange={handleHeaderChange}>
+                            </lightning-input>
+
+                            <lightning-input class="inp" label="Invoice No" value={header.invoiceNo}
+                                data-field="invoiceNo" onchange={handleHeaderChange}>
+                            </lightning-input>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <!-- Add Section -->
+                    <div class="sectionTopBar">
+                        <lightning-button label="Add Section" variant="neutral" onclick={addSection}>
+                        </lightning-button>
+                    </div>
+
+                    <!-- Sections Empty -->
+                    <template if:true={sectionsEmpty}>
+                        <div class="emptyHint">No sections yet. Click <b>Add Section</b>.</div>
+                    </template>
+
+                    <!-- Sections -->
+                    <template for:each={sections} for:item="s" for:index="sIndex">
+                        <div key={s.id} class={s.sectionCardClass}>
+
+                            <!-- Section Header -->
+                            <div class="sectionHeader">
+                                <div class="secLeft">
+                                    <span class="secTag">SECTION</span>
+
+                                    <lightning-input class="secName" variant="label-hidden"
+                                        placeholder="Section Name (e.g., Kitchen Electrical)" value={s.sectionName}
+                                        data-sindex={sIndex} data-field="sectionName" onchange={handleSectionChange}>
+                                    </lightning-input>
+
+                                    <lightning-combobox class="secType" variant="label-hidden" value={s.sectionType}
+                                        options={sectionTypeOptions} data-sindex={sIndex} data-field="sectionType"
+                                        onchange={handleSectionChange}>
+                                    </lightning-combobox>
+
+                                    <template if:true={s.isActive}>
+                                        <span class="activePill">Selected</span>
+                                    </template>
+                                </div>
+
+                                <div class="secRight">
+                                    <lightning-button label="Add Line" variant="neutral" data-sindex={sIndex}
+                                        onclick={addLine}>
+                                    </lightning-button>
+
+                                    <div class="secSubtotal">
+                                        <div class="secLbl">Subtotal</div>
+                                        <div class="secTotal">{s.subtotal}</div>
+                                    </div>
+
+                                    <lightning-button-icon icon-name="utility:delete" alternative-text="Delete Section"
+                                        title="Delete Section" data-sindex={sIndex} onclick={deleteSection}>
+                                    </lightning-button-icon>
+                                </div>
+                            </div>
+
+                            <!-- TABLE SHELL -->
+                            <div class="tableShell">
+
+                                <!-- ✅ WOOD TABLE (WOOD + CIVIL WORK will come here because JS sets isWood=true) -->
+                                <template if:true={s.isWood}>
+                                    <table class="inv">
+                                        <thead>
+                                            <tr class="theadMain">
+                                                <th>Category</th>
+                                                <th>Item</th>
+                                                <th>Brand</th>
+                                                <th>Length(Inches)</th>
+                                                <th>Height(Inches)</th>
+                                                <th>Qty</th>
+                                                <th>Sqft</th>
+                                                <th>Rate</th>
+                                                <th>Amount</th>
+                                                <th>Explanation</th>
+                                                <th class="actionsCol">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template for:each={s.lines} for:item="l" for:index="lIndex">
+                                                <tr key={l.id} class="lineRow">
+                                                    <td>
+                                                        <lightning-input variant="label-hidden" value={l.category}
+                                                            placeholder="Category" data-sindex={sIndex}
+                                                            data-lindex={lIndex} data-field="category"
+                                                            onchange={handleLineChange}>
+                                                        </lightning-input>
+                                                    </td>
+                                                    <td>
+                                                        <lightning-input variant="label-hidden" value={l.item}
+                                                            placeholder="Item" data-sindex={sIndex} data-lindex={lIndex}
+                                                            data-field="item" onchange={handleLineChange}>
+                                                        </lightning-input>
+                                                    </td>
+                                                    <td>
+                                                        <lightning-input variant="label-hidden" value={l.brand}
+                                                            placeholder="Brand" data-sindex={sIndex}
+                                                            data-lindex={lIndex} data-field="brand"
+                                                            onchange={handleLineChange}>
+                                                        </lightning-input>
+                                                    </td>
+
+                                                    <td>
+                                                        <lightning-input type="number" variant="label-hidden"
+                                                            value={l.l} data-sindex={sIndex} data-lindex={lIndex}
+                                                            data-field="l" onchange={handleLineChange}>
+                                                        </lightning-input>
+                                                    </td>
+                                                    <td>
+                                                        <lightning-input type="number" variant="label-hidden"
+                                                            value={l.h} data-sindex={sIndex} data-lindex={lIndex}
+                                                            data-field="h" onchange={handleLineChange}>
+                                                        </lightning-input>
+                                                    </td>
+                                                    <td>
+                                                        <lightning-input type="number" variant="label-hidden"
+                                                            value={l.qty} data-sindex={sIndex} data-lindex={lIndex}
+                                                            data-field="qty" onchange={handleLineChange}>
+                                                        </lightning-input>
+                                                    </td>
+
+                                                    <td class="calc">{l.sqft}</td>
+
+                                                    <td>
+                                                        <lightning-input type="number" variant="label-hidden"
+                                                            value={l.rate} data-sindex={sIndex} data-lindex={lIndex}
+                                                            data-field="rate" onchange={handleLineChange}>
+                                                        </lightning-input>
+                                                    </td>
+
+                                                    <td class="calc amt">{l.amount}</td>
+
+                                                    <td>
+                                                        <lightning-input variant="label-hidden" value={l.explanation}
+                                                            placeholder="Optional" data-sindex={sIndex}
+                                                            data-lindex={lIndex} data-field="explanation"
+                                                            onchange={handleLineChange}>
+                                                        </lightning-input>
+                                                    </td>
+
+                                                    <td class="actionsCol">
+                                                        <lightning-button-icon icon-name="utility:delete"
+                                                            title="Delete Line" data-sindex={sIndex}
+                                                            data-lindex={lIndex} onclick={deleteLine}>
+                                                        </lightning-button-icon>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </template>
+
+                                <!-- ELECTRICAL TABLE -->
+                                <template if:true={s.isElectrical}>
+                                    <table class="inv">
+                                        <thead>
+                                            <tr class="theadMain">
+                                                <th>Category</th>
+                                                <th>Item</th>
+                                                <th>Brand</th>
+                                                <th>Mode</th>
+                                                <th>Coils</th>
+                                                <th>Meters</th>
+                                                <th>Qty</th>
+                                                <th>Rate</th>
+                                                <th>Amount</th>
+                                                <th>Explanation</th>
+                                                <th class="actionsCol">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template for:each={s.lines} for:item="l" for:index="lIndex">
+                                                <tr key={l.id} class="lineRow">
+                                                    <td>
+                                                        <lightning-input variant="label-hidden" value={l.category}
+                                                            placeholder="Category" data-sindex={sIndex}
+                                                            data-lindex={lIndex} data-field="category"
+                                                            onchange={handleLineChange}>
+                                                        </lightning-input>
+                                                    </td>
+                                                    <td>
+                                                        <lightning-input variant="label-hidden" value={l.item}
+                                                            placeholder="Item" data-sindex={sIndex} data-lindex={lIndex}
+                                                            data-field="item" onchange={handleLineChange}>
+                                                        </lightning-input>
+                                                    </td>
+                                                    <td>
+                                                        <lightning-input variant="label-hidden" value={l.brand}
+                                                            placeholder="Brand" data-sindex={sIndex}
+                                                            data-lindex={lIndex} data-field="brand"
+                                                            onchange={handleLineChange}>
+                                                        </lightning-input>
+                                                    </td>
+
+                                                    <td>
+                                                        <lightning-combobox variant="label-hidden"
+                                                            value={l.electricalMode} options={electricalModeOptions}
+                                                            data-sindex={sIndex} data-lindex={lIndex}
+                                                            data-field="electricalMode" onchange={handleLineChange}>
+                                                        </lightning-combobox>
+                                                    </td>
+
+                                                    <td>
+                                                        <lightning-input type="number" variant="label-hidden"
+                                                            value={l.coils} disabled={l.disableCoils}
+                                                            data-sindex={sIndex} data-lindex={lIndex} data-field="coils"
+                                                            onchange={handleLineChange}>
+                                                        </lightning-input>
+                                                    </td>
+
+                                                    <td>
+                                                        <lightning-input type="number" variant="label-hidden"
+                                                            value={l.meters} read-only={l.readonlyMeters}
+                                                            disabled={l.disableMeters} data-sindex={sIndex}
+                                                            data-lindex={lIndex} data-field="meters"
+                                                            onchange={handleLineChange}>
+                                                        </lightning-input>
+                                                    </td>
+
+                                                    <td>
+                                                        <lightning-input type="number" variant="label-hidden"
+                                                            value={l.qty} disabled={l.disableQty} data-sindex={sIndex}
+                                                            data-lindex={lIndex} data-field="qty"
+                                                            onchange={handleLineChange}>
+                                                        </lightning-input>
+                                                    </td>
+
+                                                    <td>
+                                                        <lightning-input type="number" variant="label-hidden"
+                                                            value={l.rate} data-sindex={sIndex} data-lindex={lIndex}
+                                                            data-field="rate" onchange={handleLineChange}>
+                                                        </lightning-input>
+                                                    </td>
+
+                                                    <td class="calc amt">{l.amount}</td>
+
+                                                    <td>
+                                                        <lightning-input variant="label-hidden" value={l.explanation}
+                                                            placeholder="Optional" data-sindex={sIndex}
+                                                            data-lindex={lIndex} data-field="explanation"
+                                                            onchange={handleLineChange}>
+                                                        </lightning-input>
+                                                    </td>
+
+                                                    <td class="actionsCol">
+                                                        <lightning-button-icon icon-name="utility:delete"
+                                                            title="Delete Line" data-sindex={sIndex}
+                                                            data-lindex={lIndex} onclick={deleteLine}>
+                                                        </lightning-button-icon>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </template>
+
+                                <!-- OTHER TABLE (MANUAL AMOUNT) -->
+                                <template if:true={s.isOther}>
+                                    <table class="inv">
+                                        <thead>
+                                            <tr class="theadMain">
+                                                <th>Category</th>
+                                                <th>Item</th>
+                                                <th>Brand</th>
+                                                <th>Amount</th>
+                                                <th>Explanation</th>
+                                                <th class="actionsCol">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template for:each={s.lines} for:item="l" for:index="lIndex">
+                                                <tr key={l.id} class="lineRow">
+                                                    <td>
+                                                        <lightning-input variant="label-hidden" value={l.category}
+                                                            data-sindex={sIndex} data-lindex={lIndex}
+                                                            data-field="category" onchange={handleLineChange}>
+                                                        </lightning-input>
+                                                    </td>
+                                                    <td>
+                                                        <lightning-input variant="label-hidden" value={l.item}
+                                                            data-sindex={sIndex} data-lindex={lIndex} data-field="item"
+                                                            onchange={handleLineChange}>
+                                                        </lightning-input>
+                                                    </td>
+                                                    <td>
+                                                        <lightning-input variant="label-hidden" value={l.brand}
+                                                            data-sindex={sIndex} data-lindex={lIndex} data-field="brand"
+                                                            onchange={handleLineChange}>
+                                                        </lightning-input>
+                                                    </td>
+                                                    <td>
+                                                        <lightning-input type="number" variant="label-hidden"
+                                                            value={l.amount} data-sindex={sIndex} data-lindex={lIndex}
+                                                            data-field="amount" onchange={handleLineChange}>
+                                                        </lightning-input>
+                                                    </td>
+                                                    <td>
+                                                        <lightning-input variant="label-hidden" value={l.explanation}
+                                                            data-sindex={sIndex} data-lindex={lIndex}
+                                                            data-field="explanation" onchange={handleLineChange}>
+                                                        </lightning-input>
+                                                    </td>
+                                                    <td class="actionsCol">
+                                                        <lightning-button-icon icon-name="utility:delete"
+                                                            data-sindex={sIndex} data-lindex={lIndex}
+                                                            onclick={deleteLine}>
+                                                        </lightning-button-icon>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </template>
+
+
+
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Totals -->
+                    <div class="totalsCard">
+                        <div class="totRow">
+                            <div class="lbl">Total</div>
+                            <div class="val">{totalAmount}</div>
+                        </div>
+
+                        <div class="totRow gstRow">
+                            <div class="lbl">GST</div>
+                            <div class="mid">
+                                <lightning-input type="number" variant="label-hidden" class="gstInp" value={gstPercent}
+                                    onchange={handleGstChange}>
+                                </lightning-input>
+                                <span class="pct">%</span>
+                            </div>
+                            <div class="val">{gstAmount}</div>
+                        </div>
+
+                        <div class="totRow grand">
+                            <div class="lbl">Grand Total</div>
+                            <div class="val">{grandTotalWithGst}</div>
+                        </div>
+                    </div>
+
+                    <!-- Footer blocks -->
+                    <div class="footerBlocks">
+                        <div class="block">
+                            <div class="blockTitle">THANK YOU FOR YOUR BUSINESS AND SUPPORT!!</div>
+
+                            <table class="miniTbl">
+                                <thead>
+                                    <tr>
+                                        <th>Material Used</th>
+                                        <th>Brand Name</th>
+                                        <th>Grade</th>
+                                        <th class="miniAct">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template if:true={materialsEmpty}>
+                                        <tr>
+                                            <td colspan="4" class="miniEmpty">No materials added.</td>
+                                        </tr>
+                                    </template>
+
+                                    <template for:each={materials} for:item="m" for:index="mIndex">
+                                        <tr key={m.id}>
+                                            <td>
+                                                <lightning-input variant="label-hidden" value={m.material}
+                                                    data-index={mIndex} data-field="material"
+                                                    onchange={handleMaterialChange}>
+                                                </lightning-input>
+                                            </td>
+                                            <td>
+                                                <lightning-input variant="label-hidden" value={m.brand}
+                                                    data-index={mIndex} data-field="brand"
+                                                    onchange={handleMaterialChange}>
+                                                </lightning-input>
+                                            </td>
+                                            <td>
+                                                <lightning-input variant="label-hidden" value={m.grade}
+                                                    data-index={mIndex} data-field="grade"
+                                                    onchange={handleMaterialChange}>
+                                                </lightning-input>
+                                            </td>
+                                            <td class="miniAct">
+                                                <lightning-button-icon icon-name="utility:delete" title="Remove"
+                                                    data-index={mIndex} onclick={removeMaterial}>
+                                                </lightning-button-icon>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+
+                            <div class="miniBtns">
+                                <lightning-button label="Add Material Row" variant="neutral" onclick={addMaterial}>
+                                </lightning-button>
+                            </div>
+                        </div>
+
+                        <div class="block">
+                            <div class="blockTitle">Not Included In the Above Bill</div>
+
+                            <div class="notWrap">
+                                <template if:true={notIncludedEmpty}>
+                                    <div class="miniEmpty">No items added.</div>
+                                </template>
+
+                                <template for:each={notIncluded} for:item="n" for:index="nIndex">
+                                    <div class="notRow" key={n.id}>
+                                        <lightning-input variant="label-hidden" value={n.text} data-index={nIndex}
+                                            onchange={handleNotIncludedChange}>
+                                        </lightning-input>
+
+                                        <lightning-button-icon icon-name="utility:delete" title="Remove"
+                                            data-index={nIndex} onclick={removeNotIncluded}>
+                                        </lightning-button-icon>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <div class="miniBtns">
+                                <lightning-button label="Add Not Included" variant="neutral" onclick={addNotIncluded}>
+                                </lightning-button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Save / Submit -->
+                    <div class="actionBarCenter">
+                        <lightning-button label="Save Draft" variant="neutral" onclick={handleSaveDraft}
+                            disabled={loading}>
+                        </lightning-button>
+
+                        <lightning-button label="Submit" variant="brand" onclick={handleSubmit} disabled={loading}>
+                        </lightning-button>
+                    </div>
+
+                </template>
+
+                <!-- Success Modal -->
+                <template if:true={showSuccess}>
+                    <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            <header class="slds-modal__header successHdr">
+                                <h2 class="slds-text-heading_medium successTitle">Invoice Submitted Successfully</h2>
+                            </header>
+
+                            <div class="slds-modal__content successBody">
+                                <div class="successMsg">
+                                    <div class="successLine">✅ Invoice created and PDF job started.</div>
+                                    <div class="successLine">📎 PDF will be attached to the Invoice record.</div>
+                                    <div class="successLine">📩 If you trigger email after submit, it can run from your
+                                        existing logic.</div>
+                                </div>
+                            </div>
+
+                            <footer class="slds-modal__footer successFtr">
+                                <lightning-button variant="brand" label="Close" onclick={handleCloseSuccess}>
+                                </lightning-button>
+                            </footer>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </template>
+
+            </div>
+        </article>
+    </section>
+</template>

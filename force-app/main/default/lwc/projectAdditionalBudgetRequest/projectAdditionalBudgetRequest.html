@@ -1,0 +1,44 @@
+<template>
+    <template if:true={error}>
+        <div class="alert">{error}</div>
+    </template>
+
+    <div class="qaSimpleShell">
+        <div class="qaSimpleCard">
+            <div class="qaHeaderSimple">Additional Budget Request</div>
+
+            <div class="qaBodySimple">
+                <lightning-input type="number" step="0.01" label={amountLabel} value={amount} onchange={onAmount}
+                    required>
+                </lightning-input>
+
+                <lightning-textarea class="mt" label={reasonLabel} value={reason} onchange={onReason} required>
+                </lightning-textarea>
+
+                <!-- ✅ Upload supporting documents -->
+                <div class="uploadBox mt">
+                    <div class="uploadTitle">Supporting Documents (optional)</div>
+                    <lightning-file-upload record-id={recordId} multiple accept={acceptedFormats}
+                        onuploadfinished={handleUploadFinished}>
+                    </lightning-file-upload>
+
+                    <template if:true={uploadedFiles.length}>
+                        <ul class="fileList">
+                            <template for:each={uploadedFiles} for:item="f">
+                                <li key={f.documentId} class="fileItem">
+                                    {f.name}
+                                </li>
+                            </template>
+                        </ul>
+                    </template>
+                </div>
+            </div>
+
+            <div class="qaFooterSimple">
+                <lightning-button label="Cancel" variant="neutral" onclick={handleCancel}></lightning-button>
+                <lightning-button label={submitLabel} variant="brand" onclick={handleSubmit}
+                    disabled={isBusy}></lightning-button>
+            </div>
+        </div>
+    </div>
+</template>

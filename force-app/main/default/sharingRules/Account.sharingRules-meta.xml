@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SharingRules xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sharingGuestRules>
+        <fullName>Arelia_Living_Guest_User_Account_Access</fullName>
+        <accessLevel>Read</accessLevel>
+        <label>Arelia Living Guest User Account Access</label>
+        <sharedTo>
+            <guestUser>Arelia_Living</guestUser>
+        </sharedTo>
+        <criteriaItems>
+            <field>Name</field>
+            <operation>notEqual</operation>
+            <value></value>
+        </criteriaItems>
+        <includeHVUOwnedRecords>false</includeHVUOwnedRecords>
+    </sharingGuestRules>
+    <sharingGuestRules>
+        <fullName>Guest_User_Account_Permission</fullName>
+        <accessLevel>Read</accessLevel>
+        <label>Guest User Account Permission</label>
+        <sharedTo>
+            <guestUser>Careers</guestUser>
+        </sharedTo>
+        <criteriaItems>
+            <field>Name</field>
+            <operation>notEqual</operation>
+            <value></value>
+        </criteriaItems>
+        <includeHVUOwnedRecords>false</includeHVUOwnedRecords>
+    </sharingGuestRules>
+</SharingRules>

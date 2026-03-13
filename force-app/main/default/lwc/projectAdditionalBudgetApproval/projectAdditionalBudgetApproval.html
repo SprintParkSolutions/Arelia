@@ -1,0 +1,96 @@
+<template>
+    <template if:true={error}>
+        <div class="alert">{error}</div>
+    </template>
+
+    <div class="shell">
+        <div class="card">
+            <div class="header">
+                <div class="title">Additional Budget Approval</div>
+            </div>
+
+            <template if:true={isBusy}>
+                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+            </template>
+
+            <template if:true={project}>
+                <div class="grid">
+                    <div class="row"><span class="k">Project</span><span class="v">{project.name}</span></div>
+                    <div class="row"><span class="k">Status</span><span class="v">{project.requestStatus}</span></div>
+                    <div class="row"><span class="k">Request Amount</span><span class="v">{project.pendingAmount}</span>
+                    </div>
+                    <div class="row"><span class="k">Request Reason</span><span class="v">{project.pendingReason}</span>
+                    </div>
+
+                    <!-- ✅ Stored rejection reason from new field -->
+                    <template if:true={project.additionalBudgetRejectionReason}>
+                        <div class="row">
+                            <span class="k">Last Rejection Reason</span>
+                            <span class="v">{project.additionalBudgetRejectionReason}</span>
+                        </div>
+                    </template>
+                </div>
+
+                <template if:true={project.hasPending}>
+                    <!-- Reject Reason Panel -->
+                    <template if:true={showRejectBox}>
+                        <div class="rejectBox">
+                            <lightning-textarea label="Rejection Reason" value={rejectionReason}
+                                onchange={handleRejectionReasonChange} required max-length="240">
+                            </lightning-textarea>
+
+                            <div class="btnRow">
+                                <lightning-button variant="neutral" label="Cancel" onclick={cancelReject}
+                                    disabled={disableActions}>
+                                </lightning-button>
+
+                                <lightning-button variant="destructive" label="Confirm Reject" onclick={confirmReject}
+                                    disabled={disableActions}>
+                                </lightning-button>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Normal Buttons -->
+                    <template if:false={showRejectBox}>
+                        <div class="btnRow">
+                            <lightning-button variant="destructive" label="Reject" onclick={openReject}
+                                disabled={disableActions}>
+                            </lightning-button>
+
+                            <lightning-button variant="brand" label="Approve" onclick={approve}
+                                disabled={disableActions}>
+                            </lightning-button>
+                        </div>
+                    </template>
+                </template>
+
+                <template if:false={project.hasPending}>
+                    <div class="empty">No pending request found.</div>
+                </template>
+
+                <div class="historyWrap">
+                    <div class="historyHeader">
+                        <div class="historyTitle">History</div>
+                        <lightning-button variant="neutral" label={historyBtnLabel}
+                            onclick={toggleHistory}></lightning-button>
+                    </div>
+
+                    <template if:true={showHistory}>
+                        <template if:true={project.historyPretty}>
+                            <ul class="historyList">
+                                <template for:each={project.historyPretty} for:item="h">
+                                    <li key={h} class="historyItem">{h}</li>
+                                </template>
+                            </ul>
+                        </template>
+
+                        <template if:false={project.historyPretty}>
+                            <div class="muted">No history available.</div>
+                        </template>
+                    </template>
+                </div>
+            </template>
+        </div>
+    </div>
+</template>

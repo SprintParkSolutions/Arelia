@@ -1,0 +1,61 @@
+/* ===== your existing colors ===== */
+.slds-is-complete .slds-path__stage {
+    border-color: #f4f7f9;
+}
+
+.slds-is-error .slds-path__stage {
+    background-color: #ea001e;
+    border-color: #ea001e;
+}
+
+.slds-is-current .slds-path__stage {
+    background-color: #ffb75d;
+    border-color: #ffb75d;
+}
+
+/* ===== shared wrapper (desktop won't change) ===== */
+.pathScroll {
+    width: 100%;
+}
+
+/* ===== MOBILE: keep same desktop look + enable swipe ===== */
+@media (max-width: 768px) {
+
+    /* enable horizontal swipe area */
+    .pathScroll {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 0.25rem;
+    }
+
+    /* force SLDS scroller to allow overflow */
+    .slds-path__scroller-container,
+    .slds-path__scroller {
+        overflow: visible !important;
+    }
+
+    /* make UL wider than screen so scroll works */
+    .slds-path__nav {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        width: fit-content !important;
+        min-width: fit-content !important;
+    }
+
+    /* stop steps from shrinking */
+    .slds-path__item {
+        flex: 0 0 auto !important;
+        min-width: 180px;  /* keep same desktop feel; adjust 160–220 */
+    }
+
+    /* ✅ MOST IMPORTANT: mobile often hides this */
+    .slds-path__title {
+        display: inline-block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        white-space: normal !important;
+        word-break: break-word;
+        max-width: 12rem; /* keeps it like desktop */
+    }
+}

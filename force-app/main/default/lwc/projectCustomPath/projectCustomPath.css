@@ -1,0 +1,95 @@
+/* ==========================================================================
+   1. BASE STYLES (Mobile First / Default)
+   These apply to Mobile and Small Screens -> Enables Scrolling
+   ========================================================================== */
+
+/* The window you look through */
+.slds-path__scroller {
+    overflow-x: auto !important;       /* Enable horizontal scroll */
+    overflow-y: hidden;
+    width: 100%;
+    display: block;
+    -webkit-overflow-scrolling: touch; /* Momentum scrolling on iOS */
+    scrollbar-width: thin;
+    padding-bottom: 10px;              /* Space for scrollbar */
+}
+
+/* Forces the content to be wider than the screen */
+.slds-path__scroller_inner {
+    width: max-content !important;     /* CRITICAL: Force width to fit content */
+    min-width: 100%;
+    display: block;
+}
+
+/* The list of items */
+.slds-path__nav {
+    display: flex !important;
+    flex-wrap: nowrap !important;      /* No wrapping */
+}
+
+/* Individual Step Styling for Mobile */
+.slds-path__item {
+    flex: 0 0 auto !important;         /* Fixed rigid width */
+    min-width: 9rem;                   /* Force overflow on small screens */
+    max-width: 15rem;
+}
+
+/* Link Styling */
+.slds-path__link {
+    width: 100%;
+    justify-content: center;
+    text-decoration: none;
+    cursor: default; 
+}
+
+/* Icon Toggle Logic */
+.slds-path__stage lightning-icon {
+    display: none;
+}
+.slds-is-complete .slds-path__stage lightning-icon {
+    display: block;
+}
+
+/* Scrollbar Polish */
+.slds-path__scroller::-webkit-scrollbar {
+    height: 4px;
+    background: transparent;
+}
+.slds-path__scroller::-webkit-scrollbar-thumb {
+    background: #dddbda; 
+    border-radius: 4px;
+}
+
+
+/* ==========================================================================
+   2. DESKTOP OVERRIDES (Responsive)
+   Triggers when screen is larger than 1024px (Standard Desktop/Landscape Tablet)
+   ========================================================================== */
+
+@media (min-width: 64em) { 
+
+    /* 1. Disable Scrolling */
+    .slds-path__scroller {
+        overflow: visible !important;  /* Remove scrollbar */
+        padding-bottom: 0;             /* Remove scrollbar space */
+    }
+
+    /* 2. Fit Content to Screen Width */
+    .slds-path__scroller_inner {
+        width: 100% !important;        /* Snap back to container width */
+    }
+
+    /* 3. Make Steps Flexible (Grow/Shrink) */
+    .slds-path__item {
+        flex: 1 1 auto !important;     /* Grow to fill space, shrink if needed */
+        min-width: 0 !important;       /* Allow shrinking to fit */
+        max-width: none !important;    /* Remove width caps */
+    }
+    
+    /* Optional: Ensure text doesn't overflow weirdly on desktop */
+    .slds-path__title {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}

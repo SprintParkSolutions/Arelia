@@ -1,0 +1,22 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Dear {{{Opportunity.Lead_Name__c}}},</strong></span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Congratulations !</strong><br />
+<br />
+We would like to inform you about the next step. Based on the requirements discussed, our Architect will prepare the 3D design and share it with you for review shortly.<br />
+<br />
+Please feel free to reach out to the Supervisor, if you have any questions or any requirement changes.<br />
+<br />
+<strong>Supervisor Name:&nbsp;</strong>{{{Opportunity.Supervisor_User__c}}}<br />
+<strong>Supervisor Email:&nbsp;</strong>{{{Opportunity.Supervisor_User_Email__c}}}<br />
+<strong>Supervisor Mobile:&nbsp;</strong>{{{Opportunity.Supervisor_User_Phone__c}}}<br />
+<br />
+We appreciate your cooperation and look forward to your feedback.</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Best regards,</span></span></p>
+<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Arelia Living</span></span></body>
+</html>

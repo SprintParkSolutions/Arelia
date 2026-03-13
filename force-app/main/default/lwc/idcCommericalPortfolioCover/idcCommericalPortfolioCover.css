@@ -1,0 +1,211 @@
+:host {
+    display: block;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box;
+
+    /* overlay variables for this component (scoped) */
+    --overlay-bg: rgba(34, 28, 22, 0.48);
+    /* dark glass for contrast */
+    --overlay-text: #fff;
+}
+
+/* make the component full-bleed */
+.portfolio-cover {
+    position: relative;
+    width: 100vw;
+    left: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    padding: 0 !important;
+    margin-top: 0 !important;
+    box-sizing: border-box;
+    z-index: 1;
+    background: transparent;
+}
+
+/* hero container fixed height (same as residential) */
+.image-container {
+    position: relative;
+    width: 100%;
+    height: 781.19px;
+    overflow: hidden;
+    background: #000;
+}
+
+/* video styles + entrance animation */
+.cover-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    z-index: 0;
+    transform: scale(0.995);
+    opacity: 0;
+    transition: transform 900ms cubic-bezier(.2, .9, .2, 1), opacity 900ms ease;
+    will-change: transform, opacity;
+    pointer-events: none;
+}
+
+.image-container.in-view .cover-video {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* glass overlay */
+.caption-overlay {
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    text-align: center;
+    width: min(90%, 920px);
+    padding: 22px 26px;
+    background: var(--overlay-bg);
+    backdrop-filter: blur(6px) saturate(110%);
+    -webkit-backdrop-filter: blur(6px) saturate(110%);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 12px 40px rgba(16, 24, 32, 0.18);
+    z-index: 2;
+    opacity: 0;
+    transition:
+        transform 650ms cubic-bezier(.2, .9, .2, 1),
+        opacity 650ms ease;
+    will-change: transform, opacity;
+}
+
+.image-container.in-view .caption-overlay {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+/* text */
+.hero-title {
+    margin: 0;
+    font-size: 28px;
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    color: var(--overlay-text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    margin-bottom: 10px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 520ms ease 180ms, transform 520ms ease 180ms;
+}
+
+.image-container.in-view .hero-title {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.hero-sub {
+    margin: 0 0 18px 0;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.88);
+    font-family: Inter, Arial, sans-serif;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 520ms ease 260ms, transform 520ms ease 260ms;
+}
+
+.image-container.in-view .hero-sub {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Button — Soft Gold variant (matches residential) */
+.unique-button {
+    display: inline-block;
+    background: linear-gradient(180deg, #e8d9b7 0%, #d5c49a 100%);
+    /* soft gold */
+    color: #3a3a2e;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: 600;
+    box-shadow: 0 8px 18px rgba(50, 40, 20, 0.22);
+    transition: transform 260ms ease, box-shadow 260ms ease, opacity 260ms ease;
+    transform-origin: center;
+    opacity: 0;
+}
+
+/* reveal button after overlay */
+.image-container.in-view .unique-button {
+    opacity: 1;
+    transition-delay: 340ms;
+}
+
+.unique-button:hover,
+.unique-button:focus {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px rgba(50, 40, 20, 0.28);
+    outline: none;
+}
+
+@keyframes btn-pulse {
+    0% {
+        transform: translateY(-4px) scale(1);
+    }
+
+    50% {
+        transform: translateY(-5px) scale(1.01);
+    }
+
+    100% {
+        transform: translateY(-4px) scale(1);
+    }
+}
+
+/* Responsive tweaks */
+@media (max-width: 1200px) {
+    .caption-overlay {
+        width: min(94%, 840px);
+        padding: 18px;
+    }
+
+    .hero-title {
+        font-size: 24px;
+    }
+
+    .hero-sub {
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .image-container {
+        height: clamp(260px, calc(100vw * 0.473145), 480px);
+    }
+
+    .caption-overlay {
+        bottom: 10%;
+        width: 92%;
+        padding: 12px 14px;
+        border-radius: 10px;
+    }
+
+    .hero-title {
+        font-size: 18px;
+    }
+
+    .hero-sub {
+        font-size: 14px;
+        margin-bottom: 12px;
+    }
+
+    .unique-button {
+        padding: 10px 18px;
+        font-size: 14px;
+    }
+
+    .cover-video {
+        object-position: center top;
+    }
+}

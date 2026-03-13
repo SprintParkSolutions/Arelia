@@ -1,0 +1,25 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hi {{{Recipient.Name}}},<br />
+<br />
+<br />
+Thank you for expressing your interest in Arelia Living. We would be delighted to take the next step by arranging a <strong>{{{appointmentType}}}</strong> site visit with our supervisor, <strong>{{{Supervisor_User__c.Name}}}</strong>.<br />
+<br />
+For further inquiries or to confirm your appointment, please feel free to reach out to the supervisor directly:<br />
+<br />
+Email: <strong>{{{Supervisor_User__c.Email}}}</strong><br />
+Mobile Number: <strong>{{{Supervisor_User__c.Phone}}}&nbsp;</strong><br />
+<br />
+Your appointment is scheduled on&nbsp;</span></span><strong>{{{appointmentDate}}} </strong>at&nbsp;<strong>{{{timeSlot}}}</strong><br />
+<br />
+<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">To confirm or reject this appointment, please click the following:</span></span><a href="{{{appointmentApprovalLink}}}">Link</a><br />
+<br />
+<br />
+<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">We look forward to assisting you in bringing your vision to life.<br />
+<br />
+<br />
+Best regards,<br />
+The Arelia Living Team,</span></span></body>
+</html>

@@ -1,0 +1,34 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p>Dear [CLIENT_NAME],</p>
+
+<p>We are pleased to inform you that the 3D Design Proposal for your project has received final internal approval.</p>
+
+<p><strong>Project Details</strong></p>
+
+<ul>
+	<li><strong>Project Name:</strong> [PROJECT_NAME]</li>
+	<li><strong>Project Description:</strong> [PROJECT_DESCRIPTION]</li>
+</ul>
+
+<p>With this approval, we will now proceed to the next phase of execution as per the agreed project plan. Our team will connect with you shortly to discuss the upcoming steps, timelines, and any required coordination.</p>
+
+<p>Should you have any questions or require further clarification, please feel free to reach out to your supervisor.</p>
+
+<p><strong>Supervisor Details</strong></p>
+
+<ul>
+	<li><strong>Supervisor Email ID:</strong> [SUPERVISOR_EMAIL]</li>
+	<li><strong>Supervisor Contact Number:</strong> [SUPERVISOR_PHONE]</li>
+</ul>
+
+<p>Thank you for your continued trust and cooperation.</p>
+
+<p>Warm regards,</p>
+
+<p><strong>Arelia Living</strong></p>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Hi <strong>{{{Recipient.Name}}}</strong>,</span></span><br />
+<br />
+Great News! Your site visit appointment has been Approved.<br />
+<br />
+<strong>Appointment Details:</strong>
+<ul>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Scheduled Date:&nbsp;</span></span><strong>{{{Re_Visit_Appointment_Date__c}}}</strong></li>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Scheduled Time:&nbsp;</span></span><strong>{{{Re_Visit_Appointment_Time_Slots__c}}}</strong></li>
+</ul>
+<br />
+If you have any quaries, please contact supervisor.&nbsp;<br />
+<br />
+<strong>Supervisor Details:</strong>
+
+<ul>
+	<li>Supervisor Name:&nbsp;<strong>{{{Supervisor_User__c.Name}}}</strong></li>
+	<li>Email<strong>:</strong>&nbsp;<strong>{{{Supervisor_User__c.Email}}}</strong></li>
+	<li>Phone:&nbsp;<strong>{{{Supervisor_User__c.Phone}}}</strong></li>
+</ul>
+<br />
+<span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Thank you,<br />
+Arelia Living Team</span></span></body>
+</html>

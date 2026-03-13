@@ -1,0 +1,78 @@
+/* Row & Text Alignment */
+.row-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 8px;
+    border-bottom: 1px solid #f2f2f2;
+    transition: background-color 0.2s ease;
+}
+
+.row-item:hover {
+    background-color: #fafafa;
+}
+
+.label-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.slds-form-element__label {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: #444;
+}
+
+.value-wrapper {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #181818;
+}
+
+/* Base Highlighting */
+.highlight-row {
+    background-color: #f8fbff;
+    border-bottom: 1px solid #dcebfb;
+}
+
+/* Final Result Card */
+.result-card {
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-left-width: 6px; 
+    border-left-style: solid;
+    transition: all 0.3s ease;
+}
+
+.big-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+/* Dynamic Status Colors */
+.status-green {
+    border-left-color: #2e844a; 
+    background-color: #f3fcf4; 
+}
+.status-green .big-number {
+    color: #2e844a;
+}
+
+.status-yellow {
+    border-left-color: #dd7a01; 
+    background-color: #fffaf0; 
+}
+.status-yellow .big-number {
+    color: #dd7a01;
+}
+
+.status-red {
+    border-left-color: #ea001e; 
+    background-color: #fff5f5; 
+}
+.status-red .big-number {
+    color: #ea001e;
+}

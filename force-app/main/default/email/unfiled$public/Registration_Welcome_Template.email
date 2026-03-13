@@ -1,0 +1,24 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;"><span style="font-size:18px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hi <strong>{{{Recipient.Name}}}</strong>,<br />
+<br />
+Welcome to <strong>Arelia Living!&nbsp;</strong>Your registration is complete and we are excited to help you design your space.<br />
+<br />
+Here is a quick summary of the details we have received:</span></span>
+<ul>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:18px;">Name:&nbsp;<strong>{{{Recipient.Name}}}</strong></span></span></li>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:18px;">Email:&nbsp;<strong>{{{Recipient.Email}}}</strong></span></span></li>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:18px;">Phone:&nbsp;<strong>{{{Recipient.Phone}}}</strong></span></span></li>
+</ul>
+
+<p><span style="font-size:18px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">To continue with the next step of your interior project,&nbsp;please click the below: </span></span><a href="{{{ProjectRequestLink}}}"><span style="font-size:18px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Link</span></span></a><br />
+<br />
+<span style="font-size:18px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Our team will review your information after you complete the next step and get in touch with you to discuss suggestions,&nbsp;timelines, and design options.</span></span></p>
+
+<p><br />
+<span style="font-size:18px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Best Regards,</span></span><br />
+<span style="font-size:18px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Arelia Living.</span></span></p>
+</body>
+</html>

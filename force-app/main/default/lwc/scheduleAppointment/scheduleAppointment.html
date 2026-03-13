@@ -1,0 +1,26 @@
+<template>
+    <lightning-card title="Schedule Site Visit" icon-name="utility:event">
+        <div class="slds-grid slds-wrap slds-gutters slds-p-around_medium">
+            <!-- ✅ NEW: Appointment Type -->
+            <div class="slds-col slds-size_2-of-2 slds-m-top_small">
+                <lightning-combobox name="AppointmentType" label="Appointment Type" value={selectedAppointmentType}
+                    placeholder="Select appointment type" options={appointmentTypeOptions} onchange={handleAppointmentTypeChange}>
+                </lightning-combobox>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <lightning-input type="date" label="Appointment Date" value={appointmentDate}
+                    onchange={handleDateChange} min={todayDate}>
+                </lightning-input>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <lightning-combobox name="TimeSlot" label="Appointment Time Slot" value={selectedTimeSlot}
+                    placeholder="Select a time slot" options={timeSlotOptions}
+                    onchange={handleTimeSlotChange}></lightning-combobox>
+            </div>
+        </div>
+        <div class="slds-p-around_medium slds-align_absolute-center">
+            <lightning-button label="Schedule Appointment" variant="brand" onclick={handleSchedule}>
+            </lightning-button>
+        </div>
+    </lightning-card>
+</template>

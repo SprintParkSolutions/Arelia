@@ -1,0 +1,315 @@
+<apex:page controller="InvoicePdfController"
+           renderAs="pdf"
+           showHeader="false"
+           standardStylesheets="false"
+           applyHtmlTag="false">
+
+    <style>
+        /* Give real space for header + footer */
+        @page { size: A4; margin: 30mm 10mm 22mm 10mm; }
+
+        body {
+            font-family: Arial;
+            font-size: 10.5px;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Avoid split rows in PDF */
+        tr { page-break-inside: avoid; }
+        table { page-break-inside: auto; }
+
+        /* Wrap long text nicely */
+        td, th { word-break: break-word; white-space: normal; }
+
+        /* ================= HEADER (EVERY PAGE) ================= */
+        .pdfHeader {
+            position: fixed;
+            top: 0mm;          /* ✅ NO negative values */
+            left: 0mm;
+            right: 0mm;
+            height: 20mm;
+        }
+        .headerRow {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .headerLeft {
+            text-align: left;
+            vertical-align: top;
+            padding-left: 0mm;
+        }
+        .logoTop {
+            height: 10px;      /* ✅ professional size */
+            display: block;    /* ✅ prevents weird inline rendering */
+        }
+
+        /* ================= FOOTER (EVERY PAGE) ================= */
+        .pdfFooter {
+            position: fixed;
+            bottom: 0mm;       /* ✅ NO negative values */
+            left: 0mm;
+            right: 0mm;
+            height: 18mm;
+            text-align: center;
+        }
+
+        /* Main content sits under fixed header/footer automatically due to @page margins */
+        .contentWrap {
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+
+    <!-- ================= HEADER ================= -->
+    <div class="pdfHeader">
+        <table class="headerRow">
+            <tr>
+                <td class="headerLeft">
+                    <!-- ✅ ONE IMAGE ONLY -->
+                    <img class="logoTop" src="{!URLFOR($Resource.AreliaLogo)}" alt="Arelia" />
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- ================= CONTENT ================= -->
+    <div class="contentWrap">
+
+        <!-- TITLE -->
+        <div style="text-align:center; font-size:16px; font-weight:900; margin-bottom:10px;">
+            FINAL INVOICE
+        </div>
+
+        <!-- HEADER (Row format) -->
+        <table width="100%" border="1" cellspacing="0" cellpadding="0"
+               style="border:1.5px solid #000; border-collapse:collapse; font-size:10.5px;">
+            <tr>
+                <td width="58%" style="border:1.5px solid #000; padding:8px; background:#e8e8e8; vertical-align:top;">
+                    <div style="font-weight:900; margin-bottom:6px;">Client Details</div>
+                </td>
+                <td width="42%" style="border:1.5px solid #000; padding:8px; background:#e8e8e8; vertical-align:top;">
+                    <div style="font-weight:900; margin-bottom:6px;">Invoice Details</div>
+                </td>
+            </tr>
+
+            <tr>
+                <td width="58%" style="border:1.5px solid #000; padding:8px; vertical-align:top;">
+                    <div><span style="font-weight:700;">Name:</span> {!inv.Client_Name__c}</div>
+                </td>
+                <td width="42%" style="border:1.5px solid #000; padding:8px; vertical-align:top;">
+                    <div><span style="font-weight:700;">Date:</span> {!TEXT(inv.Invoice_Date__c)}</div>
+                </td>
+            </tr>
+
+            <tr>
+                <td width="58%" style="border:1.5px solid #000; padding:8px; vertical-align:top;">
+                    <div><span style="font-weight:700;">Phone:</span> {!inv.Phone__c}</div>
+                </td>
+                <td width="42%" style="border:1.5px solid #000; padding:8px; vertical-align:top;">
+                    <div><span style="font-weight:700;">Invoice No:</span> {!inv.Invoice_No__c}</div>
+                </td>
+            </tr>
+
+            <tr>
+                <td width="58%" style="border:1.5px solid #000; padding:8px; vertical-align:top;">
+                    <div><span style="font-weight:700;">Address:</span> {!inv.Address__c}</div>
+                </td>
+                <td width="42%" style="border:1.5px solid #000; padding:8px; vertical-align:top;">
+                    <div>&#160;</div>
+                </td>
+            </tr>
+        </table>
+
+        <div style="height:10px;"></div>
+
+        <!-- SECTIONS -->
+        <apex:repeat value="{!sections}" var="s">
+
+            <!-- SECTION TITLE BAR -->
+            <table width="100%" border="1" cellspacing="0" cellpadding="0"
+                   style="border:1.5px solid #000; border-collapse:collapse; font-size:10.5px; margin-top:10px;">
+                <tr>
+                    <td style="border:1.5px solid #000; padding:7px; background:#e8e8e8; font-weight:900;">
+                        SECTION NAME: {!s.sectionName}
+                        &#160;&#160; | &#160;&#160;
+                        SECTION TYPE: {!s.sectionType}
+                    </td>
+                </tr>
+            </table>
+
+            <apex:outputPanel layout="block" style="margin-top:-1px;">
+
+                <!-- WOOD TABLE -->
+                <apex:outputPanel rendered="{!s.isWood}" layout="none">
+                    <table width="100%" border="1" cellspacing="0" cellpadding="0"
+                           style="border:1.5px solid #000; border-collapse:collapse; font-size:10.5px;">
+                        <tr>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Category</th>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Item</th>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Brand</th>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Length(Inches)</th>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Height(Inches)</th>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Qty</th>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Sqft</th>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Rate</th>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Amount</th>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Explanation</th>
+                        </tr>
+
+                        <apex:repeat value="{!s.rows}" var="l">
+                            <tr>
+                                <td style="border:1.5px solid #000; padding:7px;">{!l.Category__c}</td>
+                                <td style="border:1.5px solid #000; padding:7px;">{!l.Item__c}</td>
+                                <td style="border:1.5px solid #000; padding:7px;">{!l.Brand__c}</td>
+                                <td style="border:1.5px solid #000; padding:7px; text-align:center;">{!l.L__c}</td>
+                                <td style="border:1.5px solid #000; padding:7px; text-align:center;">{!l.H__c}</td>
+                                <td style="border:1.5px solid #000; padding:7px; text-align:center;">{!l.Qty__c}</td>
+                                <td style="border:1.5px solid #000; padding:7px; text-align:center;">{!l.Area_Sqft__c}</td>
+                                <td style="border:1.5px solid #000; padding:7px; text-align:center;">{!l.Rate__c}</td>
+                                <td style="border:1.5px solid #000; padding:7px; text-align:right;">{!l.Amount__c}</td>
+                                <td style="border:1.5px solid #000; padding:7px;">{!l.Explanation__c}</td>
+                            </tr>
+                        </apex:repeat>
+                    </table>
+                </apex:outputPanel>
+
+                <!-- ELECTRICAL TABLE -->
+                <apex:outputPanel rendered="{!s.isElectrical}" layout="none">
+                    <table width="100%" border="1" cellspacing="0" cellpadding="0"
+                           style="border:1.5px solid #000; border-collapse:collapse; font-size:10.5px;">
+                        <tr>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Category</th>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Item</th>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Brand</th>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Mode</th>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Coils</th>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Meters</th>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Qty</th>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Rate</th>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Amount</th>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Explanation</th>
+                        </tr>
+
+                        <apex:repeat value="{!s.rows}" var="l">
+                            <tr>
+                                <td style="border:1.5px solid #000; padding:7px;">{!l.Category__c}</td>
+                                <td style="border:1.5px solid #000; padding:7px;">{!l.Item__c}</td>
+                                <td style="border:1.5px solid #000; padding:7px;">{!l.Brand__c}</td>
+                                <td style="border:1.5px solid #000; padding:7px; text-align:center;">{!l.Electrical_Mode__c}</td>
+                                <td style="border:1.5px solid #000; padding:7px; text-align:center;">{!l.Coils__c}</td>
+                                <td style="border:1.5px solid #000; padding:7px; text-align:center;">{!l.Meters__c}</td>
+                                <td style="border:1.5px solid #000; padding:7px; text-align:center;">{!l.Qty__c}</td>
+                                <td style="border:1.5px solid #000; padding:7px; text-align:center;">{!l.Rate__c}</td>
+                                <td style="border:1.5px solid #000; padding:7px; text-align:right;">{!l.Amount__c}</td>
+                                <td style="border:1.5px solid #000; padding:7px;">{!l.Explanation__c}</td>
+                            </tr>
+                        </apex:repeat>
+                    </table>
+                </apex:outputPanel>
+
+                <!-- OTHER TABLE -->
+                <apex:outputPanel rendered="{!s.isOther}" layout="none">
+                    <table width="100%" border="1" cellspacing="0" cellpadding="0"
+                           style="border:1.5px solid #000; border-collapse:collapse; font-size:10.5px;">
+                        <tr>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Category</th>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Item</th>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Brand</th>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Amount</th>
+                            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2;">Explanation</th>
+                        </tr>
+
+                        <apex:repeat value="{!s.rows}" var="l">
+                            <tr>
+                                <td style="border:1.5px solid #000; padding:7px;">{!l.Category__c}</td>
+                                <td style="border:1.5px solid #000; padding:7px;">{!l.Item__c}</td>
+                                <td style="border:1.5px solid #000; padding:7px;">{!l.Brand__c}</td>
+                                <td style="border:1.5px solid #000; padding:7px; text-align:right;">{!l.Amount__c}</td>
+                                <td style="border:1.5px solid #000; padding:7px;">{!l.Explanation__c}</td>
+                            </tr>
+                        </apex:repeat>
+                    </table>
+                </apex:outputPanel>
+
+            </apex:outputPanel>
+        </apex:repeat>
+
+        <div style="height:10px;"></div>
+
+        <!-- TOTALS -->
+        <table width="100%" border="1" cellspacing="0" cellpadding="0"
+               style="border:1.5px solid #000; border-collapse:collapse; font-size:10.5px;">
+            <tr>
+                <td width="80%" style="border:1.5px solid #000; padding:8px; background:#f2f2f2; font-weight:900; text-align:right;">
+                    Total
+                </td>
+                <td width="20%" style="border:1.5px solid #000; padding:8px; font-weight:900; text-align:right;">
+                    ₹ {!inv.Total__c}
+                </td>
+            </tr>
+            <tr>
+                <td style="border:1.5px solid #000; padding:8px; background:#f2f2f2; font-weight:900; text-align:right;">
+                    GST ({!inv.GST_Percent__c}%)
+                </td>
+                <td style="border:1.5px solid #000; padding:8px; font-weight:900; text-align:right;">
+                    ₹ {!inv.GST_Amount__c}
+                </td>
+            </tr>
+            <tr>
+                <td style="border:1.5px solid #000; padding:8px; background:#dff3ff; font-weight:900; text-align:right;">
+                    Grand Total
+                </td>
+                <td style="border:1.5px solid #000; padding:8px; background:#dff3ff; font-weight:900; text-align:right;">
+                    ₹ {!inv.Grand_Total__c}
+                </td>
+            </tr>
+        </table>
+
+        <div style="height:15px;"></div>
+
+    <!-- THANK YOU BAR -->
+    <table width="100%" border="1" cellspacing="0" cellpadding="0"
+           style="border:1.5px solid #000; border-collapse:collapse; font-family:Arial; font-size:10.5px;">
+        <tr>
+            <td style="border:1.5px solid #000; padding:8px; background:#ffe08a; font-weight:900; text-align:center;">
+                THANK YOU FOR YOUR BUSINESS AND SUPPORT!!
+            </td>
+        </tr>
+    </table>
+
+    <!-- MATERIAL USED -->
+    <table width="100%" border="1" cellspacing="0" cellpadding="0"
+           style="border:1.5px solid #000; border-collapse:collapse; table-layout:fixed; font-family:Arial; font-size:10.5px; margin-top:6px;">
+        <tr>
+            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2; font-weight:900; text-align:left;">MATERIAL USED</th>
+            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2; font-weight:900; text-align:center;">BRAND NAME</th>
+            <th style="border:1.5px solid #000; padding:7px; background:#f2f2f2; font-weight:900; text-align:center;">GRADE</th>
+        </tr>
+        <apex:repeat value="{!materials}" var="m">
+            <tr>
+                <td style="border:1.5px solid #000; padding:7px;">{!m.Material__c}</td>
+                <td style="border:1.5px solid #000; padding:7px; text-align:center;">{!m.Brand__c}</td>
+                <td style="border:1.5px solid #000; padding:7px; text-align:center;">{!m.Grade__c}</td>
+            </tr>
+        </apex:repeat>
+    </table>
+
+    <div style="height:15px;"></div>
+
+    <!-- NOT INCLUDED -->
+    <table width="100%" border="1" cellspacing="0" cellpadding="0"
+           style="border:1.5px solid #000; border-collapse:collapse; font-family:Arial; font-size:10.5px;">
+        <tr>
+            <th style="border:1.5px solid #000; padding:8px; background:#ffe08a; font-weight:900; text-align:center;">
+                Not Included In the Above Bill
+            </th>
+        </tr>
+        <apex:repeat value="{!notIncluded}" var="n">
+            <tr>
+                <td style="border:1.5px solid #000; padding:7px;">{!n.Text__c}</td>
+            </tr>
+        </apex:repeat>
+    </table>
+    </div>
+</apex:page>

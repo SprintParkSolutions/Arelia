@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Site Visit Approval by Manager Template</name>
+    <relatedEntityType>Site_Visit_Report__c</relatedEntityType>
+    <style>none</style>
+    <subject>Site Visit Report Status: Approved by Manager</subject>
+    <type>custom</type>
+    <uiType>SFX</uiType>
+</EmailTemplate>

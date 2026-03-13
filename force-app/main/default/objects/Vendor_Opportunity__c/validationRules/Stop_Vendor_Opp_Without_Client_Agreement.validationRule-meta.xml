@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Stop_Vendor_Opp_Without_Client_Agreement</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+    ISNEW(),
+    OR(
+        NOT(Opportunity__r.Client_Agreement_Sent__c),
+        NOT(Opportunity__r.Client_Agreement_Signed__c)
+    )
+)</errorConditionFormula>
+    <errorMessage>You cannot create a Vendor Opportunity until the Client Agreement has been sent and signed.</errorMessage>
+</ValidationRule>

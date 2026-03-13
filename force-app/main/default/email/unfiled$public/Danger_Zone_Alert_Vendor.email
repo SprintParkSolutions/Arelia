@@ -1,0 +1,24 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">Dear <strong>{{VendorName}}</strong>,<br />
+<br />
+This notification is to inform you that the task&nbsp;named <strong>{{TaskSubject}},</strong>&nbsp;associated with&nbsp;<strong>Vendor Assignment ID:&nbsp;</strong><strong>{{AssignmentName}}&nbsp;</strong>under the project&nbsp;<strong>{{ProjectName}},&nbsp;</strong>has exceeded the defined threshold timeline.<br />
+<br />
+<strong>Original Due Date:&nbsp;</strong>{{DueDate}}<br />
+<br />
+As per project governance standards, tasks that cross the approved threshold timeline are flagged due to their potential impact on dependent activities, overall project milestones, and final deliverables.<br />
+&nbsp;
+<p>Timely resolution will help prevent further escalation and ensure alignment with project delivery commitments.</p>
+
+<p>Thank you for your prompt attention and cooperation.<br />
+<br />
+Best Regards,<br />
+Arelia Living Team</p>
+<br />
+Thank you,<br />
+Arelia Living Team.<br />
+<br />
+&nbsp;</body>
+</html>

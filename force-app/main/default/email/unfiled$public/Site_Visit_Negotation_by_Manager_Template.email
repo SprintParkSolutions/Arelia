@@ -1,0 +1,19 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hello {{{Site_Visit_Report__c.Supervisor_User__r.Name}}},<br />
+<br />
+The Site Visit Report submitted for the following lead has been marked for <strong>negotiation</strong>&nbsp;by the manager.</span></span>
+<ul>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Client Name</strong>: {{{Site_Visit_Report__c.Lead__r.Name}}}</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Site Visit Report Name:&nbsp;</strong>{{{Site_Visit_Report__c.Name}}}</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Negotiation Reason:&nbsp;</strong>{{{Site_Visit_Report__c.Negotation_Reason__c}}}</span></span></li>
+</ul>
+<br />
+<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Please review the manager's comments and take necessary action.<br />
+<br />
+<br />
+Thanks,<br />
+Arelia Living</span></span></body>
+</html>

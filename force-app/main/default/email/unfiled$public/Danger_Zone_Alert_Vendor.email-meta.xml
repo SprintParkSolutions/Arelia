@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Sends daily overdue alerts to the vendor when the assignment’s related task is overdue, reminding them to follow up.</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Danger Zone Alert Vendor</name>
+    <relatedEntityType>Vendor_Assignment__c</relatedEntityType>
+    <style>none</style>
+    <subject>ATTENTION REQUIRED : Overdue Task - {{TaskSubject}} | {{AssignmentName}}</subject>
+    <type>custom</type>
+    <uiType>SFX</uiType>
+</EmailTemplate>

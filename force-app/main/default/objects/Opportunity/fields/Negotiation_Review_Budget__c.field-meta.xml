@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Negotiation_Review_Budget__c</fullName>
+    <defaultValue>0</defaultValue>
+    <inlineHelpText>Enter the updated Supervisor Estimate Budget agreed upon after a vendor change. Use this field when the original vendor has left mid-project and a replacement vendor has been onboarded, resulting in a revised budget.</inlineHelpText>
+    <label>Negotiation/Review Budget</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Currency</type>
+</CustomField>

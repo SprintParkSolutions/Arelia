@@ -1,0 +1,207 @@
+/* proformaSendRequest.css */
+
+:host {
+    --brand-primary: #0176d3;
+    --brand-secondary: #0b5cab;
+    --brand-light-bg: #f3f8fc;
+    --success-green: #027e46;
+    --text-dark: #181818;
+    --border-color: #dddbda;
+    --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --hover-shadow: 0 6px 16px rgba(1, 118, 211, 0.1);
+}
+
+.main-container {
+    background-color: #f8f9fb;
+    border-radius: 8px;
+}
+
+/* Header */
+.header-icon-box {
+    background: linear-gradient(135deg, #0176d3, #0b5cab);
+    padding: 10px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(1, 118, 211, 0.2);
+}
+
+.text-dark { color: var(--text-dark); }
+
+/* Guidelines Card */
+.guidelines-card {
+    background-color: white;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    border-top: 3px solid var(--brand-primary);
+}
+
+.card-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #f2f2f2;
+}
+
+.requirements-box {
+    background-color: var(--brand-light-bg);
+    border-radius: 8px;
+    border: 1px solid #e1eaf3;
+}
+
+.brand-text { color: var(--brand-secondary); }
+.check-icon { --slds-c-icon-color-foreground-default: var(--success-green); }
+
+.icon-list-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.6rem;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+}
+
+/* Upload Section */
+.upload-section {
+    background-color: white;
+    border-radius: 12px;
+    padding: 6px;
+    box-shadow: var(--card-shadow);
+}
+
+.dashed-border {
+    border: 2px dashed #c9c7c5;
+    border-radius: 8px;
+    background-color: #fcfcfc;
+    transition: all 0.3s ease;
+}
+
+.dashed-border:hover {
+    border-color: var(--brand-primary);
+    background-color: #f0f6fa;
+}
+
+.cloud-icon { --slds-c-icon-color-foreground-default: var(--brand-primary); }
+
+/* Footer Action Bar */
+.footer-section {
+    background-color: white;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--hover-shadow);
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+}
+
+.footer-header {
+    background-color: #f4f6f9;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.action-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Scrollable File List */
+.file-list-container {
+    flex-grow: 1;
+    max-height: 220px; 
+    overflow-y: auto;  
+    padding-right: 10px;
+    scroll-behavior: smooth;
+}
+
+/* Scrollbar Styles */
+.file-list-container::-webkit-scrollbar { width: 6px; }
+.file-list-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+.file-list-container::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+
+/* File Cards */
+.file-item-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #e5e5e5;
+    border-left: 5px solid var(--brand-primary);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    margin-bottom: 12px;
+    transition: all 0.2s ease;
+}
+
+.file-item-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+}
+
+.file-left-group {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.file-icon-box {
+    background-color: #eff1f5;
+    padding: 8px;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.file-name-text {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    word-break: break-all;
+}
+
+.file-status-text {
+    font-size: 0.75rem;
+    color: #696969;
+}
+
+.delete-icon-btn:hover {
+    --slds-c-button-icon-color-foreground: #ea001e;
+}
+
+/* UPDATED: Action Controls & Button Sizing */
+.action-controls {
+    display: flex;
+    /* Removed fixed width */
+    flex-shrink: 0;
+    justify-content: flex-end;
+}
+
+.send-button {
+    --slds-c-button-brand-color-background: var(--brand-primary);
+    --slds-c-button-brand-color-border: var(--brand-primary);
+    box-shadow: 0 4px 10px rgba(1, 118, 211, 0.25);
+    /* Removed width: 100% so it fits text */
+}
+
+/* History Table */
+.table-container {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+}
+
+.dynamic-height {
+    height: auto;
+    max-height: 300px; 
+    overflow-y: auto;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.spinner-overlay {
+    background-color: rgba(255,255,255,0.8);
+    position: absolute;
+    top:0; left:0; right:0; bottom:0;
+    z-index: 10;
+}

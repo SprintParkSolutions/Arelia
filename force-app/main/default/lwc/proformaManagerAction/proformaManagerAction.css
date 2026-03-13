@@ -1,0 +1,190 @@
+/* --- SHARED ARELIA STYLES --- */
+.arelia-container {
+    background-color: #f9f9f9;
+    padding: 40px 20px;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.submit-spinner { z-index: 9999; position: absolute; }
+
+/* Typography */
+.main-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+    line-height: 1.2;
+}
+
+.main-subtitle {
+    font-size: 1.1rem;
+    color: #555;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.5;
+}
+
+/* Card Styling */
+.arelia-card {
+    background: white;
+    width: 100%;
+    max-width: 800px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.card-inner-content { width: 100%; max-width: 650px; }
+
+.card-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* --- MANAGER SPECIFIC ELEMENTS --- */
+
+/* Client Status Box */
+.info-box {
+    background-color: #f0fcf4; /* Light green tint */
+    border-radius: 8px;
+    border: 1px solid #c9e7d0;
+    width: 100%;
+    box-sizing: border-box;
+}
+.client-status-label {
+    font-size: 0.85rem;
+    color: #2e844a; /* Dark green */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+}
+.value-text { font-size: 1.1rem; font-weight: 600; color: #333; }
+.success-text { color: #2e844a; }
+.sub-label { font-size: 0.9rem; color: #666; }
+
+/* Note Box (Warning Style) */
+.note-box {
+    background-color: #fff8e1; /* Warning Yellow tint */
+    border: 1px solid #ffe0b2;
+    border-radius: 8px;
+    width: 100%;
+    color: #5d4037;
+    box-sizing: border-box;
+}
+.note-icon { --slds-c-icon-color-foreground: #f57f17; flex-shrink: 0; }
+
+/* --- BUTTONS --- */
+.button-container { 
+    display: flex; 
+    justify-content: center; 
+    gap: 20px; 
+    width: 100%; 
+    flex-wrap: wrap; 
+}
+
+.arelia-btn {
+    border: none;
+    border-radius: 6px;
+    padding: 12px 24px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 200px;
+    transition: background-color 0.2s;
+}
+
+.btn-approve { background-color: #0070d2; }
+.btn-approve:hover { background-color: #005fb2; }
+
+.btn-request { background-color: #ba0517; }
+.btn-request:hover { background-color: #8e0000; }
+
+.btn-submit-changes {
+    background-color: #333;
+    font-size: 1rem;
+    padding: 10px 20px;
+    min-width: auto;
+}
+.btn-submit-changes:hover { background-color: #000; }
+
+/* Misc */
+.comment-box-container {
+    width: 100%;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.animate-fade-in { animation: fadeIn 0.3s ease-in; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+.slds-badge { font-size: 1rem; padding: 8px 16px; }
+.final-message { font-size: 1.1rem; color: #555; }
+
+/* --- MODAL STYLES --- */
+.slds-modal {
+    z-index: 9001; /* Above backdrops */
+}
+.slds-backdrop {
+    z-index: 9000;
+}
+.slds-modal__header.slds-theme_success {
+    background-color: #04844b;
+    color: white;
+}
+
+/* ========================================= */
+/* MOBILE RESPONSIVENESS (Max Width: 768px)  */
+/* ========================================= */
+@media screen and (max-width: 768px) {
+    .arelia-container {
+        padding: 20px 10px; 
+    }
+
+    .main-title {
+        font-size: 1.8rem;
+    }
+
+    .main-subtitle {
+        font-size: 1rem;
+    }
+
+    .arelia-card {
+        padding: 1.5rem 1rem !important; 
+    }
+
+    /* Stack buttons vertically */
+    .button-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .arelia-btn {
+        width: 100%;
+        min-width: auto;
+        font-size: 1rem; 
+        padding: 14px 20px; 
+    }
+
+    .info-box, .note-box {
+        padding: 1rem !important;
+    }
+    
+    /* Mobile Modal Adjustment */
+    .slds-modal__container {
+        width: 90%;
+        max-width: none;
+        margin: 0 auto;
+        padding: 20px 0;
+    }
+}

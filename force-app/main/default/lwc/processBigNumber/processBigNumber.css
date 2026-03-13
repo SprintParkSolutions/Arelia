@@ -1,0 +1,249 @@
+:host {
+  --accent: #b76a53;     /* terracotta accent */
+  --bg: #fbf8f6;         /* soft beige */
+  --muted: #7b7b7b;
+  --number: rgba(0, 0, 0, 0.08);
+ 
+  display: block;
+  font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+  color: #111;
+}
+ 
+/* section root */
+.process-root {
+  background: var(--bg);
+  padding: 60px 20px;
+}
+ 
+/* inner wrapper */
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+ 
+/* heading */
+.eyebrow {
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  font-family: "Montserrat", sans-serif;
+}
+.title {
+  font-family: "Georgia", serif;
+  font-size: 38px;
+  font-weight: 400;
+  margin: 0 0 10px 0;
+}
+.subtitle {
+  color: var(--muted);
+  max-width: 680px;
+  line-height: 1.6;
+  margin-bottom: 36px;
+}
+ 
+/* grid layout */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 36px;
+}
+ 
+/* step card */
+.step-card {
+  position: relative;
+  padding: 22px 10px 22px 0;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+ 
+/* big number */
+.big-number {
+  font-family: "Georgia", serif;
+  font-size: 62px;
+  font-weight: 600;
+  opacity: 0.10;
+  color: rgba(183, 106, 83, 0.45);
+  line-height: 1;
+  width: 70px;
+}
+ 
+/* step content */
+.content {
+  flex: 1 1 auto;
+  padding-left: 12px;
+  border-left: 3px solid var(--accent);
+}
+.step-title {
+  margin: 0 0 8px 0;
+  font-family: "Georgia", serif;
+  font-size: 20px;
+  color: #111;
+  font-weight: 400;
+}
+.step-desc {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+ 
+/* CTA */
+.cta-row {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+}
+.cta {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 12px 26px;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(183, 106, 83, 0.18);
+}
+.cta:hover {
+  transform: translateY(-2px);
+}
+ 
+/* responsive */
+@media (max-width: 980px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .big-number {
+    font-size: 54px;
+  }
+}
+ 
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .title {
+    font-size: 30px;
+  }
+  .big-number {
+    font-size: 48px;
+  }
+}
+ 
+/* -----------------------------
+   Text Reveal / Luxury Motion
+   ----------------------------- */
+ 
+/* base hidden state for text elements */
+.process-root .eyebrow,
+.process-root .title,
+.process-root .subtitle,
+.process-root .big-number,
+.process-root .step-title,
+.process-root .step-desc {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: transform 720ms cubic-bezier(.16,.84,.33,1), opacity 720ms cubic-bezier(.16,.84,.33,1);
+  will-change: transform, opacity;
+}
+ 
+/* small visual polish for eyebrow letters */
+.process-root .eyebrow {
+  transform: translateY(6px) scale(0.99);
+  letter-spacing: 2.2px;
+  transition-duration: 680ms;
+}
+ 
+/* when the section becomes visible, reveal in staggered sequence */
+.process-root.in-view .eyebrow {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition-delay: 0s;
+}
+ 
+.process-root.in-view .title {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.08s;
+}
+ 
+.process-root.in-view .subtitle {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.18s;
+}
+ 
+/* Grid items reveal: stagger per card for content */
+/* Big number gets a gentle pop + fade (subtle luxury) */
+.process-root .big-number {
+  transform: translateY(12px) scale(0.985);
+  transition: transform 900ms cubic-bezier(.2,.9,.24,1), opacity 900ms;
+  opacity: 0;
+}
+ 
+/* Step content text fade with small delay per item for a flowing motion */
+.grid .step-card:nth-child(1) .big-number,
+.grid .step-card:nth-child(1) .step-title,
+.grid .step-card:nth-child(1) .step-desc {
+  transition-delay: 0.26s;
+}
+.grid .step-card:nth-child(2) .big-number,
+.grid .step-card:nth-child(2) .step-title,
+.grid .step-card:nth-child(2) .step-desc {
+  transition-delay: 0.38s;
+}
+.grid .step-card:nth-child(3) .big-number,
+.grid .step-card:nth-child(3) .step-title,
+.grid .step-card:nth-child(3) .step-desc {
+  transition-delay: 0.50s;
+}
+.grid .step-card:nth-child(4) .big-number,
+.grid .step-card:nth-child(4) .step-title,
+.grid .step-card:nth-child(4) .step-desc {
+  transition-delay: 0.62s;
+}
+.grid .step-card:nth-child(5) .big-number,
+.grid .step-card:nth-child(5) .step-title,
+.grid .step-card:nth-child(5) .step-desc {
+  transition-delay: 0.74s;
+}
+.grid .step-card:nth-child(6) .big-number,
+.grid .step-card:nth-child(6) .step-title,
+.grid .step-card:nth-child(6) .step-desc {
+  transition-delay: 0.86s;
+}
+ 
+/* Visible states when section is in view */
+.process-root.in-view .big-number,
+.process-root.in-view .step-title,
+.process-root.in-view .step-desc {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+ 
+/* small extra for big-number: give a subtle contrast pop after appearing */
+.process-root.in-view .big-number {
+  transform: translateY(0) scale(1);
+}
+ 
+/* Hover micro-interaction (optional micro-luxury) - non-distracting */
+.step-card:hover .step-title {
+  transform: translateY(-2px);
+  transition: transform 300ms ease;
+}
+ 
+/* Accessibility: respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .process-root .eyebrow,
+  .process-root .title,
+  .process-root .subtitle,
+  .process-root .big-number,
+  .process-root .step-title,
+  .process-root .step-desc {
+    transition: none;
+    transform: none;
+    opacity: 1;
+  }
+}

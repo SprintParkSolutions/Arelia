@@ -1,0 +1,26 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hello&nbsp;<strong>{{{Recipient.FirstName}}}</strong> <strong>{{{Recipient.LastName}}}</strong>,<br />
+<br />
+Your appointment has been&nbsp;<strong>{{{Recipient.Appointment_Status__c}}} </strong>as you requested.<br />
+<br />
+<strong>New Rescheduled Appointment Details:</strong></span></span>
+<ul>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Rescheduled Appointment date:&nbsp;<strong>{{{Recipient.Appointment_Rescheduled_Time__c}}}</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Time Slots:&nbsp;<strong>{{{Recipient.Time_Slots__c}}}</strong></span></span></li>
+</ul>
+<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"> Please make a note of the updated schedule and reach out if any clarification is needed.<br />
+<br />
+<strong>Supervisor Details:</strong></span></span>
+
+<ul>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Supervisor Name:&nbsp;<strong>{{{Recipient.Supervisor_User__c}}}</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Email<strong>:</strong>&nbsp;<strong>{{{Recipient.Supervisor_User_Email__c}}}</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Phone:&nbsp;<strong>{{{Recipient.Supervisor_User_Phone__c}}}</strong></span></span></li>
+</ul>
+<br />
+<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Thanks,<br />
+Arelia Living Team</span></span></body>
+</html>

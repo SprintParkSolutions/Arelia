@@ -1,0 +1,29 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p>Dear {{CLIENT_NAME}},</p>
+
+<p>Thank you for your prompt response.</p>
+
+<p>We are writing to confirm that we have successfully received your <strong>APPROVAL</strong> for the <strong>{{OPPORTUNITY_NAME}}</strong> project budget and payment terms.</p>
+
+<p><strong>Next Steps:</strong></p>
+
+<ol>
+	<li>Our internal management team will perform a final compliance check.</li>
+	<li>Once verified, we will generate the official contract agreements.</li>
+	<li>Your Project Manager will reach out to you within 24-48 hours to schedule the kickoff meeting.</li>
+</ol>
+
+<p>You can view the approved details at any time using the link below:</p>
+<br />
+<a href="{{APPROVAL_LINK}}" style="background-color:#2e844a; color:#ffffff; display:inline-block; padding:12px 24px; text-decoration:none; border-radius:4px; font-weight:bold; font-family:Arial, sans-serif;">View Approved Budget</a><br />
+&nbsp;
+<p>We are excited to begin this journey with you!</p>
+
+<p>Warm regards,<br />
+<strong>Arelia Living</strong></p>
+</body>
+</html>

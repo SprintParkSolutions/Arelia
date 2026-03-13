@@ -1,0 +1,28 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p>Dear {{CLIENT_NAME}},</p>
+
+<p>Thank you for your valuable feedback regarding the initial budget proposal.</p>
+
+<p>Our team has carefully reviewed your comments and concerns. We have updated the project estimates and payment terms to better align with your requirements for <strong>{{OPPORTUNITY_NAME}}</strong>.</p>
+
+<p><strong>Summary of Changes:</strong><br />
+We have addressed the specific points mentioned in your previous feedback:</p>
+
+<blockquote><em>"{{CLIENT_REMARKS}}"</em></blockquote>
+
+<p>Please click the button below to view the revised breakdown. We believe this updated proposal now fully meets your expectations.</p>
+<br />
+<a href="{{APPROVAL_LINK}}" style="background-color:#0070d2; color:#ffffff; display:inline-block; padding:14px 28px; text-decoration:none; border-radius:4px; font-weight:bold; font-family:Arial, sans-serif; font-size:16px;">Review Revised Proposal</a><br />
+&nbsp;
+<p>Once approved, we will proceed immediately with the contract finalization.</p>
+
+<p>Best regards,<br />
+<strong>{{SUPERVISOR_NAME}}</strong><br />
+Project Supervisor<br />
+Arelia Living</p>
+</body>
+</html>

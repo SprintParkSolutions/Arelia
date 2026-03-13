@@ -1,0 +1,28 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Hello <strong>{{{Recipient.FirstName}}}&nbsp;{{{Recipient.LastName}}}</strong>,<br />
+<br />
+Great News! Your site visit appointment has been <strong>{{{Recipient.Appointment_Status__c}}}</strong>.<br />
+<br />
+<strong>Appointment Details:</strong></span></span></p>
+
+<ul>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Scheduled Date:&nbsp;<strong>{{{Recipient.Appointment_Date__c}}}</strong></span></span></li>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Time Slot:&nbsp;<strong>{{{Recipient.Appointment_Time_Slots__c}}}</strong></span></span></li>
+</ul>
+<span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">If you have any queries, please contact supervisor.&nbsp;<br />
+<br />
+<strong>Supervisor Details:</strong></span></span>
+
+<ul>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Supervisor Name:&nbsp;<strong>{{{Recipient.Supervisor_User__c}}}</strong></span></span></li>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Email<strong>:</strong>&nbsp;<strong>{{{Recipient.Supervisor_User_Email__c}}}</strong></span></span></li>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Phone:&nbsp;<strong>{{{Recipient.Supervisor_User_Phone__c}}}</strong></span></span></li>
+</ul>
+<br />
+<span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Thank you,<br />
+Arelia Living Team</span></span></body>
+</html>

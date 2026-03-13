@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Owner_of_Vendor_Assignments</fullName>
+    <columns>NAME</columns>
+    <columns>Vendor_Category__c</columns>
+    <columns>Supervisor_User__c</columns>
+    <columns>Project__c</columns>
+    <columns>Vendor_Work_Start_Date__c</columns>
+    <columns>Vendor_Work_End_Date__c</columns>
+    <columns>Completion__c</columns>
+    <filterScope>Mine</filterScope>
+    <label>Owner of Vendor Assignments</label>
+</ListView>

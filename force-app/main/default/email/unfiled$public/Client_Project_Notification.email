@@ -1,0 +1,21 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Dear <strong>{{{Project__r.Client__r.Name}}}</strong>,<br />
+<br />
+We are delighted to inform you that Arelia team has accepted your project and your username is </span><strong>{{{Project__r.Client__r.Email}}}</strong><span style="font-family:Times New Roman,Times New Roman,Times,serif;"> and password is&nbsp;</span><strong>{{{Project__r.Client__r.Password__c}}}</strong><span style="font-family:Times New Roman,Times New Roman,Times,serif;"> . Kindly do not share your project code with anyone. You can use this code to track progress of the work.<br />
+<br />
+<strong>Project Details:</strong></span></span>
+<ul>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Project Name:</strong>&nbsp;{{{Project__c.Name}}}</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Project Status:</strong>&nbsp;{{{Project__c.Status__c}}}</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Project Request Type:</strong> {{{Project__c.Project_Request_Quotation_Type__c}}}</span></span></li>
+</ul>
+<br />
+<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Thank You for choosing Arelia Living.<br />
+<br />
+<br />
+Kind Regards<br />
+Arelia Living</span></span></body>
+</html>

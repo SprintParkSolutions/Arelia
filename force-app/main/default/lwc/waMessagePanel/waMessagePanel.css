@@ -1,0 +1,249 @@
+:host {
+  display: block;
+}
+
+.app {
+  width: 100%;
+  padding: .25rem 1rem 1rem;
+  box-sizing: border-box;
+  /* Ensure visible height on Experience Cloud Project pages where containers can collapse */
+  min-height: 120px;
+}
+
+/* toolbar */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .25rem 0 .5rem;
+}
+
+.toolbar .label {
+  font-size: .75rem;
+  letter-spacing: .06em;
+  color: #5f6b7a;
+}
+
+.toolbar .updated {
+  font-size: .75rem;
+  color: #8a96a3;
+  margin-left: .25rem;
+}
+
+.toolbar .dot {
+  width: 6px;
+  height: 6px;
+  background: #28a745;
+  border-radius: 50%;
+  display: inline-block;
+  margin: 0 .25rem 0 .5rem;
+}
+
+/* chat */
+.chat-wrap {
+  position: relative;
+}
+
+.chat {
+  height: min(60vh, 520px);
+  background: #f7f9fb;
+  border: 1px solid #e5eaf0;
+  border-radius: 12px;
+  padding: .75rem;
+  overflow-y: auto;
+  /* Prevent zero-height rendering in some Experience Cloud themes */
+  min-height: 160px;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* bubbles */
+.row {
+  display: flex;
+  margin: .25rem 0;
+}
+
+.row-in {
+  justify-content: flex-start;
+}
+
+.row-out {
+  justify-content: flex-end;
+}
+
+.bubble {
+  box-sizing: border-box;
+  max-width: min(72%, 520px);
+  border-radius: 16px;
+  padding: .55rem .75rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  overflow: hidden;
+}
+
+.bubble-in {
+  background: #fff;
+  border: 1px solid #e6ebf1;
+}
+
+.bubble-out {
+  background: linear-gradient(180deg, #e9f3ff 0%, #ddeeff 100%);
+  border: 1px solid #cfe2ff;
+}
+
+.msg {
+  font-size: .95rem;
+  line-height: 1.35;
+  font-family: system-ui, -apple-system, "Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol", "Apple Color Emoji", "Noto Color Emoji", Arial, sans-serif;
+}
+
+.meta {
+  font-size: .7rem;
+  color: #697386;
+  margin-top: .25rem;
+}
+
+.file {
+  display: inline-block;
+  margin-top: .35rem;
+  font-size: .85rem;
+  text-decoration: underline;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty {
+  color: #8e99a6;
+  text-align: center;
+  padding: 2rem 0;
+}
+
+/* images inside bubble never overflow */
+.bubble img,
+.img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  max-height: 60vh;
+  object-fit: contain;
+  margin-top: .35rem;
+  border-radius: 10px;
+  border: 1px solid #e6ebf1;
+}
+
+/* panels */
+.panel {
+  margin-top: 1rem;
+}
+
+.panel-title {
+  font-size: .8rem;
+  color: #5f6b7a;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-bottom: .5rem;
+}
+
+/* textarea */
+.text-textarea textarea {
+  min-height: 64px;
+}
+
+/* single file card */
+.file-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border: 1px solid #e5eaf0;
+  border-radius: 12px;
+  padding: .75rem .9rem;
+  margin-top: .5rem;
+}
+
+.file-card__left {
+  min-width: 0;
+}
+
+.file-card__name {
+  font-size: .95rem;
+  font-weight: 600;
+  color: #1f2d3d;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-card__meta {
+  font-size: .8rem;
+  color: #677489;
+  margin-top: .2rem;
+}
+
+.ok-badge,
+.todo-badge {
+  border-radius: 999px;
+  padding: .15rem .5rem;
+  font-size: .7rem;
+  vertical-align: middle;
+}
+
+.ok-badge {
+  background: #e7f6ec;
+  color: #246b35;
+}
+
+.todo-badge {
+  background: #fff4e5;
+  color: #8a5a00;
+}
+
+.file-card__right {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.url-chip {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: .8rem;
+  padding: .35rem .5rem;
+  border-radius: 8px;
+  background: #f4f6f9;
+  border: 1px dashed #e1e6ee;
+  margin-top: .4rem;
+}
+
+/* responsive */
+@media (max-width: 600px) {
+  .chat {
+    height: 52vh;
+  }
+
+  .bubble {
+    max-width: calc(100% - 2rem);
+  }
+
+  .file-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: .6rem;
+  }
+
+  .file-card__right {
+    justify-content: flex-start;
+  }
+}

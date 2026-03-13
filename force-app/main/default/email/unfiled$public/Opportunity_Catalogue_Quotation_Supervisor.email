@@ -1,0 +1,17 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hello <strong>{{{SupervisorName}}},</strong><br />
+<br />
+A new catalogue request has been submitted by customer <strong>{{{CustomerName}}}.</strong><br />
+<br />
+Please review the attached catalogue PDF document.<br />
+<br />
+Client Email: <strong>{{{CustomerEmail}}}</strong><br />
+Client Phone: <strong>{{{CustomerPhone}}}</strong><br />
+<br />
+Best Regards,<br />
+Arelia Living</span></span><br />
+&nbsp;</body>
+</html>

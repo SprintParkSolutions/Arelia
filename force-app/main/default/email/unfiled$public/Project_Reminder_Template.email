@@ -1,0 +1,37 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p><span style="font-family:Arial,Helvetica,sans-serif;">Dear <strong>{{RecipientName}}</strong>,<br />
+<br />
+This is an official reminder regarding the ongoing project "<strong>{{ProjectName}}</strong>".<br />
+<br />
+Please review the project details below:<br />
+<br />
+<strong>Project Information:</strong></span></p>
+
+<ul>
+	<li><span style="font-family:Arial,Helvetica,sans-serif;">&nbsp;<strong>Project Name:</strong> {{ProjectName}}</span></li>
+	<li><span style="font-family:Arial,Helvetica,sans-serif;">&nbsp;<strong>Client:</strong> {{ClientName}}</span></li>
+	<li><span style="font-family:Arial,Helvetica,sans-serif;">&nbsp;<strong>Completion Status:</strong> {{CompletionStatus}}</span></li>
+	<li><span style="font-family:Arial,Helvetica,sans-serif;">&nbsp;<strong>Type of Project: </strong>{{TypeOfProject}}</span></li>
+	<li><span style="font-family:Arial,Helvetica,sans-serif;">&nbsp;<strong>Start Date:</strong> {{StartDate}}</span></li>
+	<li><span style="font-family:Arial,Helvetica,sans-serif;">&nbsp;<strong>End Date</strong>: {{EndDate}}</span></li>
+</ul>
+
+<p><br />
+<span style="font-family:Arial,Helvetica,sans-serif;"><strong>Supervisor Information:</strong></span></p>
+
+<ul>
+	<li><span style="font-family:Arial,Helvetica,sans-serif;">&nbsp;<strong>Supervisor Name:</strong> {{SupervisorName}}</span></li>
+	<li><span style="font-family:Arial,Helvetica,sans-serif;">&nbsp;<strong>Supervisor Contact:</strong> {{SupervisorContact}}</span></li>
+</ul>
+
+<p><br />
+<span style="font-family:Arial,Helvetica,sans-serif;">Please ensure the necessary actions are taken to keep the project on track.<br />
+<br />
+Thank you, &nbsp;<br />
+Arelia Living Team.</span></p>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="font-family: Arial, sans-serif; font-size: 14px; color: rgb(51, 51, 51); height: auto; min-height: auto;">
+<p>Dear Manager,</p>
+
+<p>A new payment schedule has been defined for the Opportunity listed below. As part of our compliance process, your authorization is required before these terms can be sent to the client.</p>
+
+<p>Please review the client details and installment breakdown to ensure they align with the project scope.</p>
+
+<table border="0" cellpadding="10" cellspacing="0" style="background-color: #f9f9f9; border: 1px solid #dddddd; margin: 20px 0;" width="100%">
+	
+		<tr>
+			<td width="30%"><strong>Opportunity Name:</strong></td>
+			<td>{{OPPORTUNITY_NAME}}</td>
+		</tr>
+		<tr>
+			<td><strong>Client Name:</strong></td>
+			<td>{{CLIENT_NAME}}</td>
+		</tr>
+		<tr>
+			<td><strong>Client Phone:</strong></td>
+			<td>{{CLIENT_PHONE}}</td>
+		</tr>
+		<tr>
+			<td><strong>Client Email:</strong></td>
+			<td>{{CLIENT_EMAIL}}</td>
+		</tr>
+		<tr>
+			<td><strong>Supervisor In-Charge:</strong></td>
+			<td>{{SUPERVISOR_NAME}}</td>
+		</tr>
+	
+</table>
+
+<p>To proceed, please click the button below to view the detailed terms and submit your decision (Approve or Request Changes).</p>
+
+<p><a href="{{APPROVAL_LINK}}" style="background-color: #005fb2; color: #ffffff; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Review &amp; Approve Terms </a></p>
+
+<p>If you reject these terms, the supervisor will be notified immediately to make the necessary revisions.</p>
+
+<p>Best Regards,<br />
+Arelia Living</p>
+</body>
+</html>

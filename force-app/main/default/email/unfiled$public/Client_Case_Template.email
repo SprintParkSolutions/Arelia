@@ -1,0 +1,22 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Dear&nbsp;<strong>{{{Case.Project_Client_Name__c}}}</strong>,</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Thank you for contacting <strong>Arelia Living.</strong></span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">We would like to inform you that your recently raised support case regarding your project : <strong>{{{Case.Project__c}}}&nbsp;</strong>has been successfully registered in our system.<br />
+Your assigned Project Supervisor has been notified and will review the issue at the earliest possible convenience to ensure a timely resolution.<br />
+<br />
+In the meantime, if you have any additional information to share or require further assistance, please feel free to get in touch with your Project Supervisor directly. We are committed to providing you with prompt support and ensuring a smooth project experience.<br />
+<br />
+Supervisor Contact Mail :&nbsp;<strong>{{{Case.Supervisor_Email__c}}}</strong>,</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">We thank you for your time and patience.</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Best Regards,<br />
+Arelia Living</span></span></p>
+</body>
+</html>

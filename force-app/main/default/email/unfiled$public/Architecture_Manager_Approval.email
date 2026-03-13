@@ -1,0 +1,58 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hello Arelia Manager,</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">This is to inform you that the client has <strong>formally approved the 3D Design Proposal</strong> for the following project. The design is now submitted for your <strong>final managerial approval</strong> to proceed to the next phase.</span></span></p>
+
+<hr style="border: 0; border-top: 1px solid #ddd;" />
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Project Summary</strong></span></span></p>
+
+<ul>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Project Reference:&nbsp;</strong>[PROJECT_NAME]</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Project Description:&nbsp;</strong>[PROJECT_DESCRIPTION]</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Site Space:&nbsp;</strong>[SITE_SPACE]</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Client Name:&nbsp;</strong>[CLIENT_NAME]</span></span></li>
+</ul>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Client Approval Status</strong></span></span></p>
+
+<ul>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Client Decision:</strong>&nbsp;[CLIENT_DECISION]</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Client Feedback / Remarks :&nbsp;</strong>[CLIENT_REMARKS]</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Client&nbsp;Email:</strong> [CLIENT_EMAIL]</span></span></li>
+</ul>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Supervisor Info</strong></span></span></p>
+
+<ul>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Supervisor</strong> <strong>Name:</strong> [SUPERVISOR_NAME]</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Supervisor </strong><strong>Email:</strong> [SUPERVISOR_EMAIL]</span></span></li>
+</ul>
+
+<hr style="border: 0; border-top: 1px solid #ddd;" />
+<p>&nbsp;</p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Please click the button below to review the design and provide your final approval.</span></span></p>
+
+<table border="0" cellpadding="0" cellspacing="0" style="margin: 20px 0;">
+	
+		<tr>
+			<td align="center" bgcolor="#0070d2" style="border-radius: 4px;"><a href="[APPROVAL_LINK]" style="font-family: Arial, sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; padding: 12px 24px; display: inline-block; border: 1px solid #0070d2; border-radius: 4px;">Review &amp; Take Action </a></td>
+		</tr>
+	
+</table>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Kindly review the approved 3D design and provide your final approval to enable further execution and planning activities.</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Please let us know if any additional clarification or changes are required at this stage.</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Sincerely,<br />
+Arelia Living</span></span></p>
+
+<p style="font-size: 11px; color: #666;">If the button above does not work, copy and paste this link:<br />
+<a href="[APPROVAL_LINK]">[APPROVAL_LINK]</a></p>
+</body>
+</html>

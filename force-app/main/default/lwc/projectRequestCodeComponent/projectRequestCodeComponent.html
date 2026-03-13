@@ -1,0 +1,64 @@
+<template>
+    <section class="page-shell">
+        <!-- SCREEN 1: QUOTATION TYPE SELECTOR -->
+        <template if:true={showScreen1}>
+            <div class="center-card animate-fade-in">
+                <h1 class="title animate-slide-up">
+
+                    Choose Your Project Type
+                </h1>
+
+                <p class="subtitle animate-slide-up">
+
+                    Select how you’d like us to prepare your Project Type. You can share
+
+                    project details in the next step.
+                </p>
+
+                <template if:true={options}>
+                    <fieldset class="slds-form-element animate-slide-up">
+                        <legend class="fieldset-label">Project Type Options</legend>
+
+                        <div class="options-container">
+                            <template for:each={options} for:item="opt">
+                                <div key={opt.value} class={opt.cssClass} data-value={opt.value}
+                                    onclick={handleRowClick}>
+                                    <label class="radio-label">
+                                        <input type="radio" name="quoteType" value={opt.value} checked={opt.selected}
+                                            onchange={handleChange} />
+
+                                        <!-- ✅ Show LABEL to user -->
+                                        <span class="label-text">{opt.label}</span>
+
+                                        <template if:true={opt.selected}>
+                                            <span class="check-icon">✓ Selected</span>
+                                        </template>
+
+                                        <span class="ripple"></span>
+                                    </label>
+                                </div>
+                            </template>
+                        </div>
+                    </fieldset>
+                </template>
+
+                <div class="next-button-wrapper animate-slide-up">
+                    <lightning-button variant="brand" label="Next" onclick={goNext}
+                        disabled={disableNext}></lightning-button>
+                </div>
+            </div>
+        </template>
+
+        <!-- SCREEN 2: MANUAL PROJECT REQUEST -->
+        <template if:true={showManualScreen}>
+            <c-arelia-manual-project-request-comp lead-id={leadId} quotation-type={value}
+                onprevious={handlePrevious}></c-arelia-manual-project-request-comp>
+        </template>
+
+        <!-- SCREEN 3: AUTOMATIC PROJECT REQUEST -->
+        <template if:true={showAutomaticScreen}>
+            <c-arelia-automatic-project-request-comp lead-id={leadId} quotation-type={value}
+                onprevious={handlePrevious}></c-arelia-automatic-project-request-comp>
+        </template>
+    </section>
+</template>

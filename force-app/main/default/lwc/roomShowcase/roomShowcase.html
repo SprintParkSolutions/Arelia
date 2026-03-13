@@ -1,0 +1,89 @@
+<template>
+  <section class="rs-root" aria-labelledby="rs-title">
+    <div class="wrap">
+      <h2 id="rs-title" class="rs-hero">Rooms & Design <span>Showcase</span></h2>
+      <p class="rs-lead">Explore room types — click any card to open a focused gallery and see what we deliver.</p>
+
+      <div class="rs-grid">
+        <template for:each={rooms} for:item="room">
+          <article key={room.key} class="rs-card" data-key={room.key}>
+            <button class="rs-thumb" data-key={room.key} onclick={openRoom} aria-label={room.title}>
+              <img src={room.placeholder} alt={room.title} class="rs-img" />
+            </button>
+
+            <div class="rs-copy">
+              <h3 class="rs-title">{room.title}</h3>
+
+              <ul class="rs-features">
+                <template for:each={room.features} for:item="f">
+                  <li key={f} class="rs-feature">{f}</li>
+                </template>
+              </ul>
+
+              <div class="rs-actions">
+                <button class="rs-btn" data-key={room.key} onclick={openRoom}>Open Gallery</button>
+              </div>
+            </div>
+          </article>
+        </template>
+      </div>
+    </div>
+
+    <!-- POPUP MODAL -->
+    <template if:true={modalOpen}>
+      <div class="rs-backdrop" onclick={handleBackdrop}>
+        <div class="rs-modal" role="dialog" aria-modal="true" tabindex="-1" onkeydown={modalKeydown}>
+          <button class="rs-close" onclick={closeModal} aria-label="Close">&times;</button>
+
+          <header class="rs-modal-head">
+            <h3 class="rs-modal-title">{activeRoom.title}</h3>
+            <p class="rs-modal-sub">{activeRoom.tagline}</p>
+          </header>
+
+          <!-- modal body: carousel + thumbnails + side panel -->
+          <div class="rs-modal-body">
+            <!-- Carousel + thumbnail strip -->
+            <div class="carousel">
+              <button class="car-nav car-prev" onclick={prevImage} aria-label="Previous image">&#10094;</button>
+
+              <div class="car-stage" part="car-stage">
+                <img src={currentImage} alt={currentCaption} class="car-img" />
+                <p class="car-caption">{currentCaption}</p>
+              </div>
+
+              <button class="car-nav car-next" onclick={nextImage} aria-label="Next image">&#10095;</button>
+
+              <!-- Thumbnail strip: shows all images for the active room -->
+              <div class="thumb-strip" role="list" aria-label="Image thumbnails">
+                <template if:true={activeRoom}>
+                  <template for:each={activeRoom.images} for:item="imgSrc" for:index="idx">
+                    <!-- key must be stable — use image src (imgSrc) instead of idx -->
+                    <button key={imgSrc} class="thumb-btn" data-idx={idx} onclick={handleThumbClick} role="listitem"
+                      aria-label="View image">
+                      <img src={imgSrc} alt="Thumbnail" />
+                    </button>
+                  </template>
+                </template>
+              </div>
+            </div>
+            <!-- Side Panel -->
+            <!-- Side Panel -->
+            <aside class="rs-panel">
+              <h4>What we deliver</h4>
+              <ul class="deliver-list">
+                <template for:each={activeRoom.deliverables} for:item="d">
+                  <li key={d}>{d}</li>
+                </template>
+              </ul>
+
+              <div class="modal-actions">
+                <button class="rs-primary" data-key={activeRoom.key} onclick={handleModalAction}>Book
+                  Consultation</button>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </template>
+  </section>
+</template>

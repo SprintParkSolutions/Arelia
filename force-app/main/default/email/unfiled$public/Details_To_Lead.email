@@ -1,0 +1,22 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Dear&nbsp;<strong>{{{Recipient.FirstName}}},</strong><br />
+<br />
+Thank you for providing the details of your project request. Here is a summary of the information you have submitted for our review and consideration.<br />
+<br />
+Company :&nbsp;<strong>{{{Recipient.Company}}}</strong>,<br />
+Plan:&nbsp;<strong>{{{Recipient.Plan_Level__c}}},</strong><br />
+Site Space:&nbsp;<strong>{{{Recipient.Site_Space__c}}},</strong><br />
+Description :&nbsp;<strong>{{{Recipient.Project_Description__c}}},</strong><br />
+Project Request Type :&nbsp;<strong>{{{Recipient.Project_Request_Quotation_Type__c}}}</strong><strong>,</strong><br />
+Estimated Budget :&nbsp;<strong>{{{Recipient.Customer_Budget__c}}}</strong><br />
+<br />
+Should you have any further questions or require additional information, please do not hesitate to contact our management team.<br />
+<br />
+<br />
+Best Regards,</span></span><br />
+Arelia Living Team<br />
+&nbsp;</body>
+</html>

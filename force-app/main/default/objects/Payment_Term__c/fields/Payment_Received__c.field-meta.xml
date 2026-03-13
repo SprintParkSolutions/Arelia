@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Payment_Received__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Supervisor checks when the payment is recieved from the client</description>
+    <inlineHelpText>Is the payment for this term recieved or not?</inlineHelpText>
+    <label>Payment Received</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

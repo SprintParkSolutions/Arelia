@@ -1,0 +1,216 @@
+<template>
+    <template if:true={isOpen}>
+        <section role="dialog" aria-modal="true" class="modal-backdrop">
+            <div class="modal">
+
+                <!-- Header -->
+                <header class="modal-header">
+                    <div class="header-left">
+                        <span class="badge-pill">Customer Portal</span>
+                        <h1 class="modal-title">Customer Enquiry</h1>
+                        <p class="modal-subtitle">
+                            Complete your profile and verify your email in two guided steps.
+                        </p>
+                    </div>
+
+                    <button class="close-btn" type="button" onclick={closeModal} title="Close">
+                        &times;
+                    </button>
+                </header>
+
+                <!-- Stepper -->
+                <div class="stepper-shell">
+                    <ol class="stepper">
+                        <li class={step1Class}>
+                            <div class="step-circle">1</div>
+                            <div class="step-label">Customer Details</div>
+                        </li>
+                        <li class={step2Class}>
+                            <div class="step-circle">2</div>
+                            <div class="step-label">Email Verification</div>
+                        </li>
+                    </ol>
+                    <div class="stepper-base-line"></div>
+                    <div class="stepper-highlight-line"></div>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body">
+                    <div class="body-layout">
+                        <!-- Decorative / info panel -->
+                        <div class="info-panel">
+                            <div class="info-icon-wrap">
+                                <div class="info-icon">✉</div>
+                                <div class="info-glow"></div>
+                            </div>
+                            <h2 class="info-title">Secure Registration</h2>
+                            <p class="info-text">
+                                We use one-time email verification to keep your
+                                enquiry secure and ensure we can reach you with
+                                project updates.
+                            </p>
+                            <ul class="info-list">
+                                <li>Safe and encrypted process</li>
+                                <li>No spam, only project updates</li>
+                                <li>Quick 60 second verification</li>
+                            </ul>
+                        </div>
+
+                        <!-- Step content -->
+                        <div class="step-content">
+                            <!-- STEP 1: Customer details -->
+                            <template if:true={isStep1}>
+                                <div class="slds-grid slds-wrap slds-gutters_small">
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                        <lightning-input label="First Name" name="firstName" value={firstName}
+                                            onchange={handleInputChange} required>
+                                        </lightning-input>
+                                    </div>
+
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                        <lightning-input label="Last Name" name="lastName" value={lastName}
+                                            onchange={handleInputChange} required>
+                                        </lightning-input>
+                                    </div>
+
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                        <lightning-input label="Email" name="email" data-id="emailInput" type="email"
+                                            value={email} onchange={handleInputChange} required>
+                                        </lightning-input>
+                                    </div>
+
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                        <lightning-input label="Company Name (Optional)" name="companyName"
+                                            value={companyName} onchange={handleInputChange}>
+                                        </lightning-input>
+                                        <div class="field-help">If not provided, we'll use <b>Self</b>.</div>
+                                    </div>
+
+
+                                    <div class="slds-col slds-size_1-of-1">
+                                        <div class="phone-row">
+                                            <lightning-combobox name="countryCode" label="Country Code"
+                                                class="country-code" value={countryCode} options={countryCodeOptions}
+                                                onchange={handleCountryChange}>
+                                            </lightning-combobox>
+
+                                            <lightning-input label="Mobile Number" name="phone" data-id="phoneInput"
+                                                type="tel" class="mobile-input" value={phone}
+                                                onchange={handleInputChange} required>
+                                            </lightning-input>
+                                        </div>
+                                        <div class="field-help">
+                                            Enter a 10-digit mobile number (example: 9876543210).
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- STEP 2: Email verification -->
+                            <template if:true={isStep2}>
+                                <div class="verification-section">
+                                    <p class="section-help">
+                                        We’ve sent a 6-digit verification code to your email. Enter it and click
+                                        <strong>Verify Code</strong> to continue.
+                                    </p>
+
+
+                                    <div class="summary-block">
+                                        <div class="summary-label">Email to verify</div>
+                                        <div class="summary-value">
+                                            <template if:true={email}>{email}</template>
+                                            <template if:false={email}>Go back and enter your email.</template>
+                                        </div>
+                                    </div>
+
+                                    <div class="slds-grid slds-wrap slds-gutters_small verification-row">
+                                        <div class="slds-col slds-size_1-of-1">
+                                            <lightning-input label="Verification Code" name="otpInput" value={otpInput}
+                                                onchange={handleOtpChange} maxlength="6" pattern="[0-9]*">
+                                            </lightning-input>
+                                        </div>
+
+                                        <div class="slds-col slds-size_1-of-1">
+                                            <div class="verification-buttons">
+                                                <lightning-button label={sendCodeButtonLabel} variant="brand"
+                                                    onclick={handleSendCode} disabled={isSendCodeDisabled}>
+                                                </lightning-button>
+
+                                                <lightning-button label="Verify Code" variant="neutral"
+                                                    onclick={handleVerifyCode} disabled={disableVerifyButton}>
+                                                </lightning-button>
+                                            </div>
+                                        </div>
+
+                                        <template if:true={emailVerified}>
+                                            <div class="slds-col slds-size_1-of-1 slds-m-top_small">
+                                                <span class="verified-label">
+                                                    ✔ Email verified and secure
+                                                </span>
+                                            </div>
+                                        </template>
+                                    </div>
+
+                                    <div class="verification-info">
+                                        <template if:true={resendTimerActive}>
+                                            <span>Resend available in {resendTimer} seconds.</span>
+                                        </template>
+                                        <template if:false={resendTimerActive}>
+                                            <span>Didn’t receive the code? You can <b>Resend Code</b> now.</span>
+                                        </template>
+
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <footer class="modal-footer">
+                    <template if:true={isStep1}>
+                        <lightning-button label="Cancel" variant="neutral" onclick={closeModal}
+                            class="slds-m-right_small">
+                        </lightning-button>
+
+                        <lightning-button label="Next: Verify Email" variant="brand" onclick={handleNextFromDetails}>
+                        </lightning-button>
+                    </template>
+
+                    <template if:true={isStep2}>
+                        <lightning-button label="Back" variant="neutral" onclick={handleBackToDetails}
+                            class="slds-m-right_small">
+                        </lightning-button>
+
+                        <lightning-button label="Complete Registration" variant="brand" onclick={handleSubmit}
+                            disabled={isRegisterDisabled}>
+                        </lightning-button>
+                    </template>
+                </footer>
+
+                <!-- Success overlay -->
+                <template if:true={showSuccessScreen}>
+                    <div class="success-overlay">
+                        <div class="success-box">
+                            <div class="success-icon-wrap">
+                                <div class="success-icon">✔</div>
+                                <div class="success-glow"></div>
+                            </div>
+                            <h2 class="success-title">Registration Successful</h2>
+                            <p class="success-message">
+                                Thank you for registering. We’ve created your profile and sent a confirmation email
+                                with your details.
+                            </p>
+                            <p class="success-secondary">
+                                Our team will review your enquiry and contact you soon with the next steps for your
+                                interior project.
+                            </p>
+                            <lightning-button label="Close" variant="brand" onclick={handleCloseSuccess}>
+                            </lightning-button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </section>
+    </template>
+</template>

@@ -1,0 +1,97 @@
+/* ===============================
+   RESPONSIVE TABLE / GRID
+=============================== */
+.table-row {
+    align-items: center;
+}
+
+.table-header {
+    padding-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.slds-text-title_caps {
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+}
+
+.responsive-table {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* ===============================
+   MOBILE SPECIFIC (Max Width 768px)
+=============================== */
+@media screen and (max-width: 768px) {
+    
+    /* 1. Force Hide Desktop Elements */
+    .desktop-only {
+        display: none !important;
+    }
+
+    /* 2. Show Mobile Elements */
+    .mobile-only {
+        display: block !important;
+    }
+
+    /* 3. Mobile Card Styling */
+    .mobile-card {
+        background-color: #f8f9fa; 
+        border: 1px solid #dddbda;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+        padding: 1rem;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    /* 4. Card Title */
+    .mobile-card-title {
+        width: 100%;
+        font-weight: bold;
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+        color: #0176d3; 
+        border-bottom: 1px solid #e5e5e5;
+        padding-bottom: 0.5rem;
+    }
+
+    /* 5. Inputs */
+    .mobile-field {
+        margin-bottom: 0.75rem;
+    }
+
+    .mobile-label {
+        color: #696969;
+        margin-bottom: 4px;
+        font-size: 0.75rem;
+    }
+
+    .mobile-card lightning-input {
+        --slds-c-input-spacing-horizontal-start: 0;
+        --slds-c-input-spacing-horizontal-end: 0;
+    }
+
+    /* 6. Footer (Paid + Delete) */
+    .mobile-card-footer {
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+        border-top: 1px dashed #dddbda;
+    }
+}
+
+/* ===============================
+   DESKTOP TWEAKS
+=============================== */
+@media screen and (min-width: 769px) {
+    /* Hide mobile-specific labels/titles on desktop */
+    .mobile-only {
+        display: none !important;
+    }
+
+    /* Add spacing between inputs */
+    .table-row lightning-input {
+        --slds-c-input-spacing-horizontal-start: 0.5rem;
+        --slds-c-input-spacing-horizontal-end: 0.5rem;
+    }
+}

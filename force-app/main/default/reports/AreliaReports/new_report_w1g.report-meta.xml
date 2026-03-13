@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <chart>
+        <backgroundColor1>#FFFFFF</backgroundColor1>
+        <backgroundColor2>#FFFFFF</backgroundColor2>
+        <backgroundFadeDir>Diagonal</backgroundFadeDir>
+        <chartSummaries>
+            <axisBinding>y</axisBinding>
+            <column>RowCount</column>
+        </chartSummaries>
+        <chartType>VerticalColumn</chartType>
+        <enableHoverLabels>false</enableHoverLabels>
+        <expandOthers>true</expandOthers>
+        <groupingColumn>FK_NAME</groupingColumn>
+        <location>CHART_BOTTOM</location>
+        <showAxisLabels>false</showAxisLabels>
+        <showPercentage>false</showPercentage>
+        <showTotal>false</showTotal>
+        <showValues>false</showValues>
+        <size>Medium</size>
+        <summaryAxisRange>Auto</summaryAxisRange>
+        <textColor>#000000</textColor>
+        <textSize>12</textSize>
+        <titleColor>#000000</titleColor>
+        <titleSize>18</titleSize>
+    </chart>
+    <columns>
+        <field>Vendor_Assignment__c.Vendor__c</field>
+    </columns>
+    <columns>
+        <field>CUST_NAME</field>
+    </columns>
+    <columns>
+        <field>CDF1</field>
+    </columns>
+    <columns>
+        <field>Vendor_Assignment__c.Vendor_Actual_Completion_Date__c</field>
+    </columns>
+    <columns>
+        <field>Vendor_Assignment__c.Vendor_Work_End_Date__c</field>
+    </columns>
+    <customDetailFormulas>
+        <calculatedFormula>IF(
+  ISPICKVAL(Vendor_Assignment__c.Status__c, &quot;Completed&quot;),
+  &quot;Verified&quot;,
+  IF(
+    AND(
+      TODAY() &gt; Vendor_Assignment__c.Vendor_Work_End_Date__c,
+      OR(
+        ISPICKVAL(Vendor_Assignment__c.Status__c, &quot;In-Progress&quot;),
+        ISPICKVAL(Vendor_Assignment__c.Status__c, &quot;Initiated&quot;),
+        ISPICKVAL(Vendor_Assignment__c.Status__c, &quot;Abscond&quot;)
+      )
+    ),
+    &quot;Delayed&quot;,
+    &quot;Planned&quot;
+  )
+)</calculatedFormula>
+        <dataType>Text</dataType>
+        <developerName>CDF1</developerName>
+        <label>Verification Status</label>
+        <scale>2</scale>
+    </customDetailFormulas>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>FK_NAME</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>Verified vs Planned Vendor Work</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>CustomEntity$Vendor_Assignment__c@Vendor_Assignment__c.Project__c</reportType>
+    <scope>user</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>false</showGrandTotal>
+    <showSubTotals>false</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>Vendor_Assignment__c.Vendor_Actual_Completion_Date__c</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

@@ -1,0 +1,36 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="font-family: Arial, sans-serif; font-size: 14px; color: rgb(51, 51, 51); height: auto; min-height: auto;">
+<p>Hello {{OWNER_NAME}},</p>
+
+<p>This is an automated notification regarding the payment terms for Opportunity: <strong>{{OPPORTUNITY_NAME}}</strong>.</p>
+
+<p>The status of the approval process has changed. Please review the details below:</p>
+
+<table border="0" cellpadding="10" cellspacing="0" style="border: 1px solid #dddddd; margin: 20px 0;" width="100%">
+	
+		<tr style="background-color: #f3f3f3;">
+			<td width="30%"><strong>Current Status:</strong></td>
+			<td>{{CURRENT_STATUS}}</td>
+		</tr>
+		<tr>
+			<td><strong>Manager Remarks:</strong></td>
+			<td>{{MANAGER_REMARKS}}</td>
+		</tr>
+		<tr>
+			<td><strong>Client Remarks:</strong></td>
+			<td>{{CLIENT_REMARKS}}</td>
+		</tr>
+	
+</table>
+
+<p><strong>Next Steps:</strong></p>
+
+<ul>
+	<li>If the status is <strong>Requested Changes</strong>, please log in to Salesforce, edit the payment terms according to the remarks, and resubmit.</li>
+	<li>If the status is <strong>Client Approved</strong>, no further action is required on the terms. You may proceed with the project execution.</li>
+</ul>
+</body>
+</html>

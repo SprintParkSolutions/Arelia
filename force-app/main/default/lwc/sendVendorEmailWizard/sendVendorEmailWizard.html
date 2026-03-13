@@ -1,0 +1,261 @@
+<template>
+  <div class="container">
+    <template if:true={isLoading}>
+      <div class="slds-align_absolute-center" style="height: 10rem">
+        <lightning-spinner
+          alternative-text="Processing..."
+          size="medium"
+        ></lightning-spinner>
+      </div>
+    </template>
+
+    <template if:false={isLoading}>
+      <template if:true={isStepOne}>
+        <div class="slds-card">
+          <div class="slds-card__header slds-grid">
+            <h2 class="slds-text-heading_medium">
+              Step 1: Select Tendor Invitation Type
+            </h2>
+          </div>
+          <div class="slds-card__body slds-card__body_inner">
+            <lightning-radio-group
+              name="tenderTypeRadio"
+              label="Type of invitation?"
+              options={tenderTypeOptions}
+              value={tenderType}
+              onchange={handleTenderTypeChange}
+              type="radio"
+              required
+            ></lightning-radio-group>
+            <div class="slds-m-top_medium slds-text-align_right">
+              <lightning-button
+                label="Next"
+                variant="brand"
+                onclick={goToStepTwo}
+              ></lightning-button>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <template if:true={isStepTwo}>
+        <div class="slds-card">
+          <div class="slds-card__header slds-grid">
+            <h2 class="slds-text-heading_medium">
+              Step 2: Review Opportunity & Files
+            </h2>
+          </div>
+          <div class="slds-card__body slds-card__body_inner">
+            <lightning-record-view-form
+              record-id={recordId}
+              object-api-name="Opportunity"
+            >
+              <div class="slds-grid slds-wrap">
+                <div class="slds-col slds-size_1-of-2 slds-p-around_x-small">
+                  <lightning-output-field
+                    field-name="Name"
+                  ></lightning-output-field>
+                </div>
+                
+              </div>
+            </lightning-record-view-form>
+            <h3 class="slds-text-heading_small slds-m-top_medium">
+              Select Files
+            </h3>
+            <lightning-datatable
+              key-field="Id"
+              data={files}
+              columns={fileColumns}
+              selected-rows={selectedFileIds}
+              onrowselection={handleFileSelection}
+              onrowaction={handleRowAction}
+            ></lightning-datatable>
+            <div class="slds-m-top_medium slds-grid slds-grid_align-spread">
+              <lightning-button
+                label="Previous"
+                variant="neutral"
+                onclick={goToStepOne}
+              ></lightning-button>
+              <lightning-button
+                label="Next"
+                variant="brand"
+                onclick={goToStepThree}
+              ></lightning-button>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <template if:true={isStepThree}>
+        <div class="slds-card">
+          <div class="slds-card__header slds-grid">
+            <h2 class="slds-text-heading_medium">
+              Step 3: Select Vendors & Review Details
+            </h2>
+          </div>
+          <div class="slds-card__body slds-card__body_inner">
+            <lightning-combobox
+              label="Vendor Category"
+              value={selectedCategory}
+              options={categoryOptions}
+              placeholder="Select Category"
+              onchange={handleCategoryChange}
+            ></lightning-combobox>
+
+            <template if:true={selectedCategory}>
+              <template if:true={isBackupFlow}>
+                <div class="slds-m-top_medium">
+                  <h3 class="slds-text-heading_small slds-text-color_error">
+                    Absconded Vendor Details
+                  </h3>
+                  <template if:true={isLoadingAbscondedTasks}>
+                    <div
+                      class="slds-align_absolute-center"
+                      style="height: 5rem"
+                    >
+                      <lightning-spinner size="small"></lightning-spinner>
+                    </div>
+                  </template>
+                  <template if:false={isLoadingAbscondedTasks}>
+                    <template if:true={abscondedTasks.length}>
+                      <div class="slds-m-bottom_small">
+                        <p>
+                          <strong>Completion: </strong
+                          ><lightning-formatted-number
+                            value={overallAssignmentCompletionPercentage}
+                            format-style="percent"
+                            minimum-fraction-digits="2"
+                          ></lightning-formatted-number>
+                        </p>
+                        <p>
+                          <strong>Start: </strong
+                          ><lightning-formatted-date-time
+                            value={overallAssignmentStartDate}
+                          ></lightning-formatted-date-time>
+                        </p>
+                        <p>
+                          <strong>End: </strong
+                          ><lightning-formatted-date-time
+                            value={overallAssignmentEndDate}
+                          ></lightning-formatted-date-time>
+                        </p>
+                      </div>
+                      <lightning-datatable
+                        key-field="taskId"
+                        data={abscondedTasks}
+                        columns={abscondedTaskColumns}
+                        hide-checkbox-column
+                      ></lightning-datatable>
+                    </template>
+                    <template if:false={abscondedTasks.length}>
+                      <div class="slds-text-color_weak">
+                        No absconded details found.
+                      </div>
+                    </template>
+                  </template>
+                </div>
+              </template>
+
+              <template if:false={isBackupFlow}>
+                <template if:true={showSpecificationTable}>
+                  <div class="slds-m-top_medium">
+                    <h3 class="slds-text-heading_small">
+                      Project Requirements for {selectedCategory}
+                    </h3>
+                    <div class="slds-scrollable_y" style="max-height: 200px">
+                      <table
+                        class="slds-table slds-table_bordered slds-table_cell-buffer"
+                      >
+                        <thead>
+                          <tr class="slds-text-title_caps">
+                            <th>Interior Product</th>
+                            <th>Quality</th>
+                            <th>Qty</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <template for:each={specifications} for:item="spec">
+                            <tr key={spec.Id}>
+                              <td>{spec.Interior_Product__r.Name}</td>
+                              <td>{spec.Quality__c}</td>
+                              <td>{spec.Quantity__c}</td>
+                            </tr>
+                          </template>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </template>
+                </template>
+
+              <div class="slds-m-top_medium">
+                <h3 class="slds-text-heading_small">Available Vendors</h3>
+                <lightning-datatable
+                  key-field="Id"
+                  data={vendors.data}
+                  columns={vendorColumns}
+                  selected-rows={selectedVendorIds}
+                  onrowselection={handleVendorSelection}
+                ></lightning-datatable>
+              </div>
+            </template>
+
+            <div class="slds-m-top_medium slds-grid slds-grid_align-spread">
+              <lightning-button
+                label="Previous"
+                variant="neutral"
+                onclick={goToStepTwo}
+              ></lightning-button>
+              <lightning-button
+                label="Send Email"
+                variant="brand"
+                onclick={handleSendEmail}
+                disabled={isSendDisabled}
+              ></lightning-button>
+            </div>
+          </div>
+        </div>
+      </template>
+    </template>
+    <template if:true={showPreview}>
+      <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+          <header class="slds-modal__header">
+            <button
+              class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+              title="Close"
+              onclick={closePreview}
+            >
+              <lightning-icon
+                icon-name="utility:close"
+                size="small"
+                alternative-text="Close"
+              ></lightning-icon>
+            </button>
+            <h2 class="slds-text-heading_medium">Preview: {previewFileName}</h2>
+          </header>
+          <div class="slds-modal__content slds-p-around_medium">
+            <template if:true={isImagePreview}
+              ><img src={previewUrl} class="preview-image"
+            /></template>
+            <template if:false={isImagePreview}
+              ><div class="slds-align_absolute-center slds-text-heading_medium">
+                <lightning-button
+                  variant="brand"
+                  label="Download File"
+                  onclick={handleDownloadFile}
+                ></lightning-button></div
+            ></template>
+          </div>
+          <footer class="slds-modal__footer">
+            <lightning-button
+              label="Close"
+              onclick={closePreview}
+            ></lightning-button>
+          </footer>
+        </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+  </div>
+</template>

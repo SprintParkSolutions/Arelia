@@ -1,0 +1,79 @@
+/* --- DESKTOP FIRST STYLES --- */
+.approval-card {
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    border: 1px solid #dddbda;
+    background-color: #ffffff;
+}
+
+/* Default spacing for Desktop */
+.custom-margin-top {
+    margin-top: 4rem; 
+}
+
+.company-title {
+    color: #0176d3; /* Arelia Brand Blue */
+    letter-spacing: 1px;
+}
+
+/* Typography for fields */
+.field-label {
+    font-size: 0.75rem;
+    color: #696969;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.field-value {
+    font-size: 1rem;
+    color: #181818;
+}
+
+.grand-total {
+    font-size: 2.2rem;
+    color: #0176d3;
+    line-height: 1.2;
+}
+
+/* Button enhancements */
+.action-btn {
+    height: 50px; /* Taller for better visual weight */
+    font-weight: bold;
+    font-size: 1.1rem;
+    border-radius: 6px;
+}
+
+.status-box {
+    border: 1px dashed #dddbda;
+    background-color: #f3f2f2;
+}
+
+.success-modal {
+    border-radius: 8px;
+}
+
+/* --- MOBILE RESPONSIVENESS --- */
+@media screen and (max-width: 768px) {
+    /* Reduce top margin so the card doesn't sit too low on small phone screens */
+    .custom-margin-top {
+        margin-top: 1.5rem; 
+    }
+
+    /* Scale down the grand total text slightly */
+    .grand-total {
+        font-size: 1.8rem;
+    }
+    
+    /* Ensure the card breathes slightly off the edges of the phone screen */
+    .approval-card {
+        margin-left: 10px;
+        margin-right: 10px;
+        width: auto; 
+    }
+
+    /* Tweak padding for modal content on mobile */
+    .success-modal {
+        padding: 1.5rem;
+    }
+}

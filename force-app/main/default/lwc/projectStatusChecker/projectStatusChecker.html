@@ -1,0 +1,369 @@
+<template>
+    <section class="wrap">
+        <!-- LOGIN VIEW -->
+        <template if:false={isLoggedIn}>
+            <div class="bg">
+                <div class="glow g1"></div>
+                <div class="glow g2"></div>
+            </div>
+
+            <div class="shell shell-login">
+                <div class="card loginCard">
+                    <header class="cardHeader">
+                        <div class="titleRow">
+                            <div class="iconBadge">
+                                <lightning-icon icon-name="standard:goals" size="small"></lightning-icon>
+                            </div>
+                            <div>
+                                <h1 class="cardTitle">Project Status</h1>
+                                <p class="cardSubtitle">
+                                    Enter the email and password you used with your interior project.
+                                </p>
+                            </div>
+                        </div>
+                    </header>
+
+                    <div class="cardBody">
+                        <div class="fieldRow">
+                            <lightning-input type="email" label="Email" value={email} placeholder="you@example.com"
+                                onchange={handleEmailChange} required>
+                            </lightning-input>
+                        </div>
+
+                        <div class="fieldRow">
+                            <lightning-input type="password" label="Password" value={password}
+                                placeholder="Password used for your project" onchange={handlePasswordChange} required>
+                            </lightning-input>
+                        </div>
+
+                        <template if:true={errorMessage}>
+                            <div class="msg msgError">
+                                {errorMessage}
+                            </div>
+                        </template>
+
+                        <div class="btnRow">
+                            <lightning-button variant="brand" label="Login & Check Project Status" onclick={handleLogin}
+                                disabled={isLoading}>
+                            </lightning-button>
+                        </div>
+
+                        <template if:true={isLoading}>
+                            <div class="spinnerWrap">
+                                <lightning-spinner alternative-text="Verifying"></lightning-spinner>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- PROJECT VIEW -->
+        <template if:true={isLoggedIn}>
+            <div class="shell shell-data">
+                <div class="card projectsCard">
+                    <header class="cardHeader">
+                        <div class="titleRow">
+                            <div class="iconBadge">
+                                <lightning-icon icon-name="standard:goals" size="small"></lightning-icon>
+                            </div>
+                            <div>
+                                <h1 class="cardTitle">Project Status</h1>
+                                <p class="cardSubtitle">
+                                    Track your project, vendors, and tasks in real time.
+                                </p>
+                            </div>
+                        </div>
+
+                        <button class="iconButton" type="button" title="Close" onclick={handleLogout}>
+                            <lightning-icon icon-name="utility:close" size="small" alternative-text="Close">
+                            </lightning-icon>
+                        </button>
+                    </header>
+
+                    <div class="cardBody">
+                        <h2 class="sectionTitle">Your Projects</h2>
+
+                        <!-- ✅ CUSTOMER HEADER + TOTAL/ACTIVE/INACTIVE -->
+                        <template if:true={hasCustomer}>
+                            <div class="clientInfoCard">
+                                <div class="clientRow">
+                                    <div class="clientCol">
+                                        <div class="clientLabel">Client</div>
+                                        <div class="clientValue linkLike">{customer.name}</div>
+                                    </div>
+
+                                    <div class="clientCol">
+                                        <div class="clientLabel">Client Email</div>
+                                        <div class="clientValue linkLike">{customer.email}</div>
+                                    </div>
+                                </div>
+
+                                <div class="clientRow">
+                                    <div class="clientCol">
+                                        <div class="clientLabel">Quotation Type</div>
+                                        <div class="clientValue">{customer.quotationType}</div>
+                                    </div>
+
+                                    <div class="clientCol">
+                                        <div class="clientLabel">Client Phone</div>
+                                        <div class="clientValue linkLike">{customer.phone}</div>
+                                    </div>
+                                </div>
+
+                                <div class="projectSummaryBar">
+                                    <span class="summaryTotal">Total Projects: {totalProjects}</span>
+                                    <span class="summaryPill active">Active: <b>{activeProjects}</b></span>
+                                    <span class="summaryPill inactive">Inactive: <b>{inactiveProjects}</b></span>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- ✅ SCREEN 1: PROJECT LIST ONLY -->
+                        <template if:true={isProjectListView}>
+                            <template if:true={hasProjects}>
+                                <div class="projectGrid">
+                                    <template for:each={projects} for:item="proj">
+                                        <article key={proj.id} class={proj.listCardClass}>
+                                            <div class="listTopRow">
+                                                <div class="listTitleBlock">
+                                                    <div class="listProjectName">{proj.name}</div>
+                                                    <div class="listSubLine">
+                                                        <span class={proj.badgeClass}>{proj.status}</span>
+                                                        <span class="listDot">•</span>
+                                                        <span class="listMeta">Start: {proj.startDate}</span>
+                                                        <span class="listDot">•</span>
+                                                        <span class="listMeta">Duration: {proj.estimatedDuration}</span>
+                                                    </div>
+
+                                                    <template if:true={proj.quotationType}>
+                                                        <div class="listSubLine">
+                                                            <span class="listMeta">
+                                                                Quotation Type: <b>{proj.quotationType}</b>
+                                                            </span>
+                                                        </div>
+                                                    </template>
+                                                </div>
+
+                                                <div class="listGaugeWrap">
+                                                    <div class="gaugeRing small" style={proj.circleStyle}>
+                                                        <div class="gaugeInner smallInner">
+                                                            <span
+                                                                class="gaugeValue smallVal">{proj.progressPercent}%</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="miniGaugeLabel">Overall</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="listFooterRow">
+                                                <div class="listKpis">
+                                                    <span class="listKpiPill">Vendors:
+                                                        <b>{proj.vendorAssignments.length}</b></span>
+                                                    <span class="listKpiPill">Progress:
+                                                        <b>{proj.progressPercent}%</b></span>
+                                                </div>
+
+                                                <button class="viewBtn" type="button" data-id={proj.id}
+                                                    onclick={handleSelectProject}>
+                                                    View Details →
+                                                </button>
+                                            </div>
+                                        </article>
+                                    </template>
+                                </div>
+                            </template>
+
+                            <template if:false={hasProjects}>
+                                <p class="noData">No projects found for this account.</p>
+                            </template>
+                        </template>
+
+                        <!-- ✅ SCREEN 2: SELECTED PROJECT FULL DASHBOARD -->
+                        <template if:true={isProjectDetailView}>
+                            <div class="backTopRow">
+                                <button class="backLink backLinkHighlight" type="button" onclick={handleBackToProjects}>
+                                    ← Back to Projects
+                                </button>
+                            </div>
+
+
+                            <template if:true={selectedProject}>
+                                <section class="projCard">
+                                    <div class="projHeaderTop">
+                                        <div class="sectionChipRow">
+                                            <span class="sectionChip">Project Details</span>
+                                        </div>
+                                        <div class="projTag">
+                                            <span class="projTagDot"></span>
+                                            Live dashboard
+                                        </div>
+                                    </div>
+
+                                    <div class="projHeader">
+                                        <div class="projInfo">
+                                            <h3 class="projName">{selectedProject.name}</h3>
+
+                                            <div class="projMeta">
+                                                <span class="statusChip">
+                                                    Project Status: {selectedProject.status}
+                                                </span>
+                                                <span class="datePill">
+                                                    Project Start Date: {selectedProject.startDate}
+                                                </span>
+                                                <span class="datePill">
+                                                    Estimated Duration: {selectedProject.estimatedDuration}
+                                                </span>
+
+                                                <template if:true={selectedProject.quotationType}>
+                                                    <span class="datePill">
+                                                        Quotation Type: {selectedProject.quotationType}
+                                                    </span>
+                                                </template>
+                                            </div>
+
+                                            <div class="projStatsRow">
+                                                <div class="kpi">
+                                                    <div class="kpiLabel">Vendors</div>
+                                                    <div class="kpiValue">{selectedProject.vendorAssignments.length}
+                                                    </div>
+                                                </div>
+                                                <div class="kpi">
+                                                    <div class="kpiLabel">Overall Progress</div>
+                                                    <div class="kpiValue">{selectedProject.progressPercent}%</div>
+                                                </div>
+                                                <div class="kpi">
+                                                    <div class="kpiLabel">Duration</div>
+                                                    <div class="kpiValue">{selectedProject.estimatedDuration}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="projCircleWrap">
+                                            <div class="gaugeCard">
+                                                <div class="gaugeRing" style={selectedProject.circleStyle}>
+                                                    <div class="gaugeInner">
+                                                        <span
+                                                            class="gaugeValue">{selectedProject.progressPercent}%</span>
+                                                        <span class="gaugeCaption">Overall</span>
+                                                    </div>
+                                                </div>
+                                                <div class="gaugeFooter">
+                                                    <span class="gaugeLegendDot legendDone"></span>
+                                                    <span class="gaugeLegendLabel">Completed</span>
+                                                    <span class="gaugeLegendDot legendPlanned"></span>
+                                                    <span class="gaugeLegendLabel">Planned</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="projTimeline">
+                                        <div class="projTimelineTrack"></div>
+                                        <div class="projTimelineDot start"></div>
+                                        <div class="projTimelineDot end"></div>
+                                    </div>
+
+                                    <div class="vendorsWrap">
+                                        <template for:each={selectedProject.vendorAssignments} for:item="va">
+                                            <article key={va.id} class="vaCard">
+                                                <button class="vaHeader" type="button" data-id={va.id}
+                                                    onclick={toggleVendor}>
+                                                    <div class="vaAccentBar"></div>
+
+                                                    <div class="vaInfo">
+                                                        <div class="sectionChipRow subtle">
+                                                            <span class="sectionChip subtleChip">Vendor Details</span>
+                                                        </div>
+
+                                                        <div class="vaName">
+                                                            {va.vendorName}
+                                                            <span class="vaCategory">({va.category})</span>
+                                                        </div>
+
+                                                        <div class="vaMeta">
+                                                            <span class="vaStatusChip">Status: {va.status}</span>
+
+                                                            <span class="vaDateChip vaDateRangeChip">
+                                                                Vendor work Start date: {va.workStartDate}
+                                                            </span>
+                                                            <span class="vaDateChip vaDateRangeChip">
+                                                                Estimated End date: {va.workEndDate}
+                                                            </span>
+
+                                                            <template if:true={va.workDuration}>
+                                                                <span class="vaDateChip vaDaysChip">
+                                                                    Estimated Duration: {va.workDuration} days
+                                                                </span>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="vaCircleWrap">
+                                                        <div class="miniGauge">
+                                                            <div class="gaugeRing small" style={va.circleStyle}>
+                                                                <div class="gaugeInner smallInner">
+                                                                    <span
+                                                                        class="gaugeValue smallVal">{va.progressPercent}%</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="miniGaugeLabel">Vendor</div>
+                                                        </div>
+                                                        <span class={va.chevronClass}>▾</span>
+                                                    </div>
+                                                </button>
+
+                                                <div class={va.tasksClass}>
+                                                    <div class="tableSectionRow">
+                                                        <span class="sectionChip subtleChip">Task Details</span>
+                                                    </div>
+
+                                                    <template if:true={va.tasks}>
+                                                        <div class="tableWrap">
+                                                            <table class="taskTable">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Task Name</th>
+                                                                        <th>Status</th>
+                                                                        <th>Start Date</th>
+                                                                        <th>Due Date</th>
+                                                                        <th>Duration</th>
+                                                                        <th>Final Completed</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <template for:each={va.tasks} for:item="t">
+                                                                        <tr key={t.id}>
+                                                                            <td>{t.subject}</td>
+                                                                            <td>{t.status}</td>
+                                                                            <td>{t.startDate}</td>
+                                                                            <td>{t.dueDate}</td>
+                                                                            <td>{t.numberOfDays}</td>
+                                                                            <td>{t.finalCompletedDate}</td>
+                                                                        </tr>
+                                                                    </template>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </template>
+
+                                                    <template if:false={va.tasks}>
+                                                        <p class="noData">No tasks found for this vendor.</p>
+                                                    </template>
+                                                </div>
+                                            </article>
+                                        </template>
+                                    </div>
+                                </section>
+                            </template>
+                        </template>
+
+                        <div class="footerCloseRow">
+                            <lightning-button variant="brand" label="Logout" onclick={handleLogout}></lightning-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </section>
+</template>

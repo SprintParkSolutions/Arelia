@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Estimated_End_Date__c</fullName>
+    <formula>IF(
+AND(
+NOT(ISBLANK(Start_Date__c)),
+NOT(ISBLANK(TEXT(Estimated_Project_Duration__c)))
+),
+
+/* End Date = Start Date + extracted months */
+ADDMONTHS(
+Start_Date__c,
+
+IF(
+/* If duration contains &quot;Year&quot; or &quot;Years&quot; */
+CONTAINS(TEXT(Estimated_Project_Duration__c), &quot;Year&quot;),
+
+/* Convert years to months */
+12 * VALUE(
+LEFT(
+TEXT(Estimated_Project_Duration__c),
+FIND(&quot; &quot;, TEXT(Estimated_Project_Duration__c)) - 1
+)
+),
+
+/* Else assume number in months */
+VALUE(
+LEFT(
+TEXT(Estimated_Project_Duration__c),
+FIND(&quot; &quot;, TEXT(Estimated_Project_Duration__c)) - 1
+)
+)
+)
+),
+
+/* else no value */
+NULL
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Estimated End Date</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>

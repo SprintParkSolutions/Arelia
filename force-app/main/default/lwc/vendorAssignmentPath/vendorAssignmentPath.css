@@ -1,0 +1,25 @@
+/* Fix the link cursor */
+.slds-path__link {
+    cursor: default;
+    text-decoration: none;
+}
+
+/* 1. HIDE icons by default so they don't break the layout */
+.slds-path__stage lightning-icon {
+    display: none;
+}
+
+/* 2. SHOW icon only when the step is "Complete" */
+.slds-is-complete .slds-path__stage lightning-icon {
+    display: block;
+}
+
+/* 3. SHOW icon when the step is "Won" (Final Stage) */
+.slds-is-won .slds-path__stage lightning-icon {
+    display: block;
+}
+
+/* 4. Ensure the path has height */
+.slds-path__nav {
+    min-height: 2rem;
+}

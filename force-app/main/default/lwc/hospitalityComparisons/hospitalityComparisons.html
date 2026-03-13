@@ -1,0 +1,48 @@
+<template>
+    <section class="ba-root">
+
+        <!-- Category Tabs -->
+        <div class="ba-tabs">
+            <template for:each={categories} for:item="cat">
+                <button
+                    key={cat.label}
+                    class="ba-tab {cat.label === activeCategory ? 'active' : ''}"
+                    data-category={cat.label}
+                    onclick={handleCategoryClick}>
+                    {cat.label}
+                </button>
+            </template>
+        </div>
+
+        <!-- Before / After Slider -->
+        <div class="ba-container">
+
+            <!-- AFTER image (base image) -->
+            <img
+                src={currentCategory.after}
+                alt="After Design"
+                class="ba-image ba-after" />
+
+            <!-- BEFORE image (clipped by width) -->
+            <div class="ba-before-wrapper" style={beforeStyle}>
+                <img
+                    src={currentCategory.before}
+                    alt="Before Design"
+                    class="ba-image ba-before" />
+            </div>
+
+            <!-- Slider Handle -->
+            <div
+                class="ba-handle"
+                style={handleStyle}
+                onmousedown={startDrag}
+                ontouchstart={startDrag}>
+
+                <span class="ba-line"></span>
+                <span class="ba-circle"></span>
+            </div>
+
+        </div>
+
+    </section>
+</template>

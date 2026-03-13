@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Enforce_Vendor_Opportunity_Match</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+    NOT(ISBLANK(Vendor_Opportunity__c)),
+   Vendor_Opportunity__r.Opportunity__c  &lt;&gt; Opportunity__c
+)</errorConditionFormula>
+    <errorMessage>Selected Vendor Opportunity does not belong to the selected Opportunity.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Architect 3D Design Approval Email</name>
+    <relatedEntityType>Opportunity</relatedEntityType>
+    <style>none</style>
+    <subject>Great News — Requirements Approved, We’re Moving Ahead with the Design Process</subject>
+    <type>custom</type>
+    <uiType>SFX</uiType>
+</EmailTemplate>

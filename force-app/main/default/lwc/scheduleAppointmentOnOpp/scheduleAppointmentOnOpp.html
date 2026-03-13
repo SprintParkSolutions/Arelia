@@ -1,0 +1,28 @@
+<template>
+    <lightning-card title="Re-Visit Site Schedule Appointment" icon-name="utility:event">
+        <div class="slds-grid slds-wrap slds-gutters slds-p-around_medium">
+            <div class="slds-col slds-size_2-of-2 slds-m-top_small">
+                <lightning-combobox name="AppointmentType" label="Re-Visit Appointment Type" value={selectedAppointmentType}
+                    placeholder="Select Re-Visit appointment type" options={appointmentTypeOptions}
+                    onchange={handleAppointmentTypeChange}>
+                </lightning-combobox>
+            </div>
+
+            <div class="slds-col slds-size_1-of-2">
+                <lightning-input type="date" label="Re-Visit Appointment Date" value={appointmentDate}
+                    onchange={handleDateChange} min={todayDate}>
+                </lightning-input>
+            </div>
+
+            <div class="slds-col slds-size_1-of-2">
+                <lightning-combobox name="TimeSlot" label="Re-Visit Appointment Time Slot" value={selectedTimeSlot}
+                    placeholder="Select a time slot" options={timeSlotOptions} onchange={handleTimeSlotChange}>
+                </lightning-combobox>
+            </div>
+        </div>
+
+        <div class="slds-p-around_medium slds-align_absolute-center">
+            <lightning-button label="Schedule Re-Visit Appointment" variant="brand" onclick={handleSchedule}></lightning-button>
+        </div>
+    </lightning-card>
+</template>

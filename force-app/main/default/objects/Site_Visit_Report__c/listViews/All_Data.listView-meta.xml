@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>All_Data</fullName>
+    <columns>NAME</columns>
+    <columns>Lead__c</columns>
+    <columns>Supervisor_User__c</columns>
+    <columns>Site_Visit_Date__c</columns>
+    <columns>Site_Visit_Time_Slot__c</columns>
+    <columns>Estimated_Completion_Date__c</columns>
+    <columns>Total_Estimated_Cost__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>All Data</label>
+    <sharedTo></sharedTo>
+</ListView>

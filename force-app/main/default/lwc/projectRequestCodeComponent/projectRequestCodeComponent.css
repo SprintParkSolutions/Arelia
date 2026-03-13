@@ -1,0 +1,209 @@
+:host {
+    display: block;
+}
+
+/* Background based on your site palette */
+.page-shell {
+    min-height: 60vh;
+    padding: 3rem 1rem 4rem;
+    background: linear-gradient(180deg, #c0b38d 0%, #f6ecd0 45%, #f6ecd0 100%);
+}
+
+/* Main card */
+.center-card {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2.2rem 2.5rem 2.4rem;
+    border-radius: 18px;
+    background: #fffaf0;
+    border: 1px solid rgba(120, 96, 60, 0.2);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+    position: relative;
+}
+
+/* Accent border */
+.center-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border-top: 4px solid #756344;
+    opacity: 0.9;
+    pointer-events: none;
+}
+
+/* Typography */
+.title {
+    font-size: 1.6rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    color: #3f3422;
+    letter-spacing: 0.03em;
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 0.98rem;
+    color: #6b5b3e;
+    margin-bottom: 1.8rem;
+}
+
+.fieldset-label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #8c7a56;
+    margin-bottom: 0.75rem;
+}
+
+/* Options */
+.options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.radio-row {
+    position: relative;
+    border-radius: 12px;
+    padding: 0.85rem 1.1rem;
+    border: 1px solid rgba(117, 99, 68, 0.22);
+    background: rgba(255, 252, 244, 0.9);
+    cursor: pointer;
+    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease,
+        border-color 0.2s ease;
+}
+
+.radio-row:hover {
+    background: #f3e6c4;
+    box-shadow: 0 10px 22px rgba(56, 45, 27, 0.18);
+    transform: translateY(-1px);
+}
+
+.radio-row_selected {
+    background: #f0e1bb;
+    border-color: #7a6541;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    width: 100%;
+}
+
+.radio-label input[type='radio'] {
+    accent-color: #7a6541;
+}
+
+.label-text {
+    font-size: 1rem;
+    color: #3f3422;
+}
+
+.check-icon {
+    margin-left: auto;
+    font-size: 0.85rem;
+    color: #4f773c;
+    font-weight: 600;
+}
+
+/* Ripple */
+.ripple {
+    position: absolute;
+    background: rgba(122, 101, 65, 0.25);
+    border-radius: 999px;
+    transform: scale(0);
+    opacity: 0;
+    pointer-events: none;
+    width: 220%;
+    height: 260%;
+    top: -80%;
+    left: -60%;
+}
+
+.ripple.run {
+    animation: rippleAnim 0.55s ease-out forwards;
+}
+
+/* Button wrapper */
+.next-button-wrapper {
+    margin-top: 1.8rem;
+    text-align: center;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.animate-slide-up {
+    animation: slideUp 0.5s ease-out;
+}
+
+.animate-stagger {
+    opacity: 0;
+    animation: fadeIn 0.6s forwards;
+}
+
+.stagger-0 {
+    animation-delay: 0.02s;
+}
+
+.stagger-1 {
+    animation-delay: 0.12s;
+}
+
+.stagger-2 {
+    animation-delay: 0.22s;
+}
+
+.stagger-3 {
+    animation-delay: 0.32s;
+}
+
+@keyframes rippleAnim {
+    0% {
+        transform: scale(0);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 0;
+    }
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .center-card {
+        padding: 1.6rem 1.3rem 1.8rem;
+    }
+
+    .title {
+        font-size: 1.35rem;
+    }
+}

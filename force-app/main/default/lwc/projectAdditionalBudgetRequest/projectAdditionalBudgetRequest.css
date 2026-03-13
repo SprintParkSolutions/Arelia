@@ -1,0 +1,13 @@
+.qaSimpleShell { padding: 12px; }
+.qaSimpleCard { background:#fff; border:1px solid #d8dde6; border-radius:12px; padding:16px; }
+.qaHeaderSimple { font-size:18px; font-weight:800; padding-bottom:12px; border-bottom:1px solid #eef1f6; margin-bottom:14px; }
+.qaBodySimple { display:flex; flex-direction:column; gap:14px; }
+.mt { margin-top: 8px; }
+.qaFooterSimple { display:flex; justify-content:flex-end; gap:10px; padding-top:14px; margin-top:16px; border-top:1px solid #eef1f6; }
+
+.uploadBox { border: 1px dashed #d0d5dd; border-radius: 10px; padding: 12px; background: #fafbff; }
+.uploadTitle { font-weight: 800; color:#101828; margin-bottom: 8px; }
+.fileList { margin: 10px 0 0; padding-left: 18px; }
+.fileItem { margin: 6px 0; color:#344054; font-size: 13px; }
+
+.alert { background:#fdecea; border:1px solid #f5c6cb; color:#611a15; padding:10px 12px; border-radius:8px; margin-bottom:12px; }

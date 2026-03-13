@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Opportunity_Site_Visit_Report</fullName>
+    <active>true</active>
+    <description>It is Used to create Site Visit Report at Opportunity level.</description>
+    <label>Opportunity Site Visit Report</label>
+    <picklistValues>
+        <picklist>Estimated_Completion_Months__c</picklist>
+        <values>
+            <fullName>1 Month</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 1 Month</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 2 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 3 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 4 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 5 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 6 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>10 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>11 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>12 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>2 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>3 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>4 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>5 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>6 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>7 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>8 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>9 Months</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Site_Visit_Report_Status__c</picklist>
+        <values>
+            <fullName>Approved</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Negotiable</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pending</fullName>
+            <default>true</default>
+        </values>
+        <values>
+            <fullName>Rejected</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Site_Visit_Time_Slot__c</picklist>
+        <values>
+            <fullName>10AM-11AM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>11AM-12PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>12PM-1PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1PM-2PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>2PM-3PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>3PM-4PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>4PM-5PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>5PM-6PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>9AM-10AM</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Site_Visit_Type__c</picklist>
+        <values>
+            <fullName>Re Visit Follow up</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Re-Budget</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Re-Design</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

@@ -1,0 +1,21 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">Dear <b>{{{ManagerName}}},</b><br />
+<br />
+Congratulations! Arelia team has recevied new Project. Below are the Project details.<br />
+<br />
+<strong>Project Details:</strong>
+<ul>
+	<li><strong>Project Name:</strong>&nbsp;{{{Project__c.Name}}}</li>
+	<li><strong>Project Status:</strong>&nbsp;{{{Project__c.Status__c}}}</li>
+	<li><strong>Project Request Type:&nbsp;</strong>{{{Project__c.Project_Request_Quotation_Type__c}}}</li>
+</ul>
+<br />
+Thank You for choosing Arelia Living.<br />
+<br />
+<br />
+Kind Regards<br />
+Arelia Living</body>
+</html>

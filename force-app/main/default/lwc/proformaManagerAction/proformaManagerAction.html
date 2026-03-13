@@ -1,0 +1,161 @@
+<template>
+    <div class="arelia-container">
+
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Processing..." size="medium" class="submit-spinner"></lightning-spinner>
+        </template>
+
+        <template if:true={error}>
+            <div class="slds-notify slds-notify_alert slds-theme_error slds-m-bottom_medium" role="alert">
+                <h2>{error}</h2>
+            </div>
+        </template>
+
+        <template if:false={invoiceData}>
+            <template if:false={error}>
+                <div class="slds-p-around_large">
+                    <lightning-spinner alternative-text="Loading..." size="medium"></lightning-spinner>
+                </div>
+            </template>
+        </template>
+
+        <template if:true={invoiceData}>
+
+            <div class="slds-text-align_center slds-m-bottom_x-large page-header-content">
+                <h1 class="main-title">Manager Proforma Sign-Off</h1>
+                <p class="main-subtitle slds-m-top_small">
+                    Reviewing <strong>{invoiceData.projectName}</strong>. The client has approved this invoice.
+                    Your final authorization is required to proceed.
+                </p>
+            </div>
+
+            <div class="arelia-card slds-p-around_x-large slds-align_absolute-center slds-text-align_center">
+                <div class="slds-grid slds-grid_vertical slds-align_absolute-center card-inner-content">
+
+                    <h2 class="card-title slds-m-bottom_medium">Submit Decision</h2>
+
+                    <template if:true={isLocked}>
+                        <div class="info-box slds-m-bottom_large slds-p-around_medium">
+                             <p class="client-status-label slds-m-bottom_small">CLIENT STATUS</p>
+                            <div class="slds-grid slds-grid_vertical-align-center slds-grid_align-center">
+                                <lightning-icon icon-name="utility:success" size="small" variant="success" class="slds-m-right_small"></lightning-icon>
+                                <div class="slds-text-align_left">
+                                    <p class="value-text success-text slds-m-bottom_none">Approved by {invoiceData.clientName}</p>
+                                    <p class="sub-label">on {invoiceData.clientApprovedDate}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="note-box slds-m-bottom_large slds-p-around_medium slds-grid slds-grid_vertical-align-center">
+                            <lightning-icon icon-name="utility:warning" size="medium" class="note-icon slds-m-right_small"></lightning-icon>
+                            <div class="slds-text-align_left">
+                                <p><strong>Compliance Check:</strong> Ensure invoice details match the agreed proforma terms.</p>
+                            </div>
+                        </div>
+
+                        <div class={statusBadgeClass}>
+                            Manager Decision: {managerStatusDisplay}
+                        </div>
+                        <template if:true={invoiceData.comments}>
+                            <p class="slds-m-top_small slds-text-color_weak">"{invoiceData.comments}"</p>
+                        </template>
+                        <p class="final-message slds-m-top_large">
+                            Thank you. You will be redirected shortly.
+                        </p>
+                    </template>
+
+                    <template if:false={isLocked}>
+                        
+                        <div class="info-box slds-m-bottom_large slds-p-around_medium">
+                            <div class="slds-grid slds-grid_vertical-align-center slds-grid_align-center">
+                                <lightning-icon icon-name="utility:success" size="small" variant="success" class="slds-m-right_small"></lightning-icon>
+                                <div class="slds-text-align_left">
+                                    <p class="client-status-label slds-m-bottom_small">CLIENT STATUS</p>
+                                    <p class="value-text success-text slds-m-bottom_none">Approved by {invoiceData.clientName}</p>
+                                    <p class="sub-label">on {invoiceData.clientApprovedDate}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="note-box slds-m-bottom_large slds-p-around_medium slds-grid slds-grid_vertical-align-center">
+                            <lightning-icon icon-name="utility:warning" size="medium" class="note-icon slds-m-right_small"></lightning-icon>
+                            <div class="slds-text-align_left">
+                                <p><strong>Compliance Check:</strong> Ensure invoice details match the agreed proforma terms.</p>
+                            </div>
+                        </div>
+
+                        <div class="button-container slds-m-bottom_large">
+                            <button class="arelia-btn btn-approve" onclick={handleApproveClick}>
+                                <lightning-icon icon-name="utility:signature" size="small" variant="inverse" class="slds-m-right_x-small"></lightning-icon>
+                                Final Sign-Off
+                            </button>
+                            
+                            <button class="arelia-btn btn-request" onclick={toggleComments}>
+                                <lightning-icon icon-name="utility:error" size="small" variant="inverse" class="slds-m-right_x-small"></lightning-icon>
+                                Reject / Revise
+                            </button>
+                        </div>
+
+                        <template if:true={showCommentBox}>
+                            <div class="comment-box-container slds-m-top_medium slds-text-align_left animate-fade-in">
+                                <lightning-textarea 
+                                    label="Manager Remarks / Revision Notes:" 
+                                    value={comments} 
+                                    onchange={handleCommentChange}
+                                    required
+                                    class="custom-textarea">
+                                </lightning-textarea>
+                                <div class="slds-clearfix slds-m-top_small">
+                                     <button class="arelia-btn btn-submit-changes slds-float_right" onclick={handleSubmitRejectionClick}>
+                                        Submit Decision
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+                    </template>
+
+                </div>
+            </div>
+        </template>
+
+        <template if:true={showConfirmationModal}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 class="slds-text-heading_medium slds-hyphenate">Confirmation</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium slds-text-align_center">
+                        <p>{confirmationMessage}</p>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick={closeConfirmationModal}>No, Cancel</button>
+                        <button class="slds-button slds-button_brand" onclick={handleConfirmYes}>Yes, Confirm</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <template if:true={showSuccessModal}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header slds-theme_success slds-theme_alert-texture">
+                        <h2 class="slds-text-heading_medium slds-hyphenate" style="color:white;">Success</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium slds-text-align_center">
+                        <div class="slds-m-bottom_small">
+                            <lightning-icon icon-name="action:approval" size="medium" variant="success"></lightning-icon>
+                        </div>
+                        <h2 class="slds-text-heading_medium slds-m-bottom_small">Thank You!</h2>
+                        <p class="slds-text-body_regular">{successMessage}</p>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_brand" onclick={handleSuccessClose}>Close</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+    </div>
+</template>

@@ -1,0 +1,26 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p>Hello {{CLIENT_NAME}},</p>
+
+<p>Thank you for approving the budget estimation for <strong>{{OPPORTUNITY_NAME}}</strong>.</p>
+
+<p>We have successfully recorded your approval. The budget has now been forwarded to our Manager for the <strong>final sign-off</strong>.</p>
+
+<p>You will receive a final confirmation email once the Manager validates and locks the budget.</p>
+
+<p><strong>Next Steps:</strong></p>
+
+<ul>
+	<li>Manager Review (In Progress)</li>
+	<li>Final Confirmation Email (Pending)</li>
+</ul>
+
+<p>If you have any questions in the meantime, please reach out to your supervisor.</p>
+
+<p>Best Regards,<br />
+Arelia Living</p>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>IDC_Company__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Interior Designing Company managing the project</description>
+    <inlineHelpText>Interior Designing Company managing the project</inlineHelpText>
+    <label>IDC Company</label>
+    <referenceTo>Account</referenceTo>
+    <relationshipLabel>Project</relationshipLabel>
+    <relationshipName>Project</relationshipName>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

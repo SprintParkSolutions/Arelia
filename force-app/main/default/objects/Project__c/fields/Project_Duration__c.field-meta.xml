@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Project_Duration__c</fullName>
+    <description>Calculating project duration</description>
+    <externalId>false</externalId>
+    <formula>IF(
+  AND(
+    NOT(ISBLANK(Start_Date__c)),
+    NOT(ISBLANK(Estimated_End_Date__c))
+  ),
+  Estimated_End_Date__c - Start_Date__c,
+  NULL
+)</formula>
+    <inlineHelpText>Project Duration in Days (End Date - Start Date)</inlineHelpText>
+    <label>Project Duration</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

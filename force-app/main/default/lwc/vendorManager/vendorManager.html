@@ -1,0 +1,162 @@
+<template>
+    <lightning-quick-action-panel header="Manage Vendor Opportunities">
+
+        <div class="slds-var-m-bottom_medium">
+            <lightning-progress-indicator current-step={currentStep} type="path" variant="base">
+                <lightning-progress-step label="Start" value="start"></lightning-progress-step>
+                <lightning-progress-step label="Draft Records" value="draft"></lightning-progress-step>
+                <lightning-progress-step label="Review & Attach" value="review"></lightning-progress-step>
+            </lightning-progress-indicator>
+        </div>
+
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </template>
+
+        <template if:true={showLanding}>
+            <div class="slds-align_absolute-center slds-text-align_center slds-var-p-around_medium">
+                <div>
+                    <lightning-icon icon-name="action:record" size="medium"></lightning-icon>
+                    <h2 class="slds-text-heading_medium slds-var-m-top_small">Records Found</h2>
+                    <p class="slds-text-color_weak">Vendor Opportunities already exist.</p>
+                    <div class="slds-var-m-top_medium">
+                        <lightning-button variant="brand" label="View & Edit Records"
+                            onclick={goToPreview}></lightning-button>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template if:true={showCreation}>
+            <div class="slds-scrollable_y" style="max-height: 400px; padding-bottom: 2rem;">
+                <template for:each={rows} for:item="row" for:index="index">
+
+                    <lightning-record-edit-form key={row.key} object-api-name="Vendor_Opportunity__c" density="compact">
+
+                        <div class="slds-box slds-theme_shade slds-var-m-bottom_small">
+                            <div class="slds-grid slds-grid_align-spread slds-var-m-bottom_x-small">
+                                <h3 class="slds-text-heading_small">
+                                    <lightning-icon icon-name="standard:record" size="small"
+                                        class="slds-var-m-right_x-small"></lightning-icon>
+                                    <strong>Vendor Opportunity </strong>
+                                </h3>
+                                <template if:true={isMultipleRows}>
+                                    <lightning-button-icon icon-name="utility:delete" variant="bare"
+                                        alternative-text="Delete Row" data-index={index} onclick={deleteRow}>
+                                    </lightning-button-icon>
+                                </template>
+                            </div>
+
+                            <div class="slds-grid slds-wrap">
+                                <template for:each={createFields} for:item="field">
+                                    <div key={field.fieldPath}
+                                        class="slds-col slds-size_1-of-1 slds-var-p-horizontal_small">
+                                        <template if:true={field.isOppField}>
+                                            <lightning-input-field field-name={field.fieldPath} value={recordId}
+                                                disabled></lightning-input-field>
+                                        </template>
+                                        <template if:false={field.isOppField}>
+                                            <lightning-input-field field-name={field.fieldPath} data-row-index={index}
+                                                onchange={handleFieldChange}
+                                                required={field.required}></lightning-input-field>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <div class="slds-var-m-top_small slds-border_top slds-var-p-top_small">
+                                <div class="slds-grid slds-grid_vertical-align-center">
+                                    <lightning-file-upload label="Upload Quotation" name="fileUploader"
+                                        record-id={recordId} onuploadfinished={handleUploadFinished}
+                                        data-row-index={index}></lightning-file-upload>
+                                    <template if:true={row.fileName}>
+                                        <div class="slds-var-m-left_medium">
+                                            <lightning-badge label={row.fileName}
+                                                icon-name="utility:success"></lightning-badge>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </lightning-record-edit-form>
+                </template>
+
+                <lightning-button label="Add Another Record" icon-name="utility:add" variant="neutral" onclick={addRow}
+                    class="slds-var-m-top_x-small"></lightning-button>
+            </div>
+        </template>
+
+        <template if:true={showPreview}>
+            <div class="slds-grid slds-grid_align-spread slds-var-m-bottom_small">
+                <div class="slds-notify slds-notify_alert slds-alert_warning" role="alert" style="width: 70%;">
+                    <h2>Review Mode: Edit fields or upload files, then click <strong>"Save All Changes"</strong>.</h2>
+                </div>
+                <div class="slds-var-m-left_small">
+                    <lightning-button label="Add New Record" icon-name="utility:add" variant="neutral"
+                        onclick={handleAddNewFromPreview}></lightning-button>
+                </div>
+            </div>
+
+            <div class="slds-scrollable_y" style="max-height: 400px;">
+                <template for:each={previewData} for:item="rec">
+                    <div key={rec.Id} class="slds-box slds-var-m-bottom_small">
+
+                        <div class="slds-var-m-bottom_small slds-border_bottom slds-var-p-bottom_x-small">
+                            <h3 class="slds-text-heading_small">
+                                <strong>Vendor Opportunity #{rec.serialNumber}</strong>
+                            </h3>
+                        </div>
+
+                        <lightning-record-edit-form record-id={rec.Id} object-api-name="Vendor_Opportunity__c">
+                            <div class="slds-grid slds-wrap">
+                                <template for:each={previewFieldSet} for:item="field">
+                                    <div key={field.fieldPath}
+                                        class="slds-col slds-size_1-of-1 slds-var-p-horizontal_small">
+                                        <template if:true={field.isEditable}>
+                                            <lightning-input-field field-name={field.fieldPath}></lightning-input-field>
+                                        </template>
+                                        <template if:false={field.isEditable}>
+                                            <lightning-output-field
+                                                field-name={field.fieldPath}></lightning-output-field>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                        </lightning-record-edit-form>
+
+                        <div class="slds-border_top slds-var-m-top_small slds-var-p-top_small">
+                            <div class="slds-grid slds-grid_vertical-align-center">
+                                <lightning-file-upload label={rec.uploadLabel} record-id={rec.Id}
+                                    onuploadfinished={handlePreviewUpload} data-id={rec.Id}> </lightning-file-upload>
+
+                                <template if:true={rec.existingFileName}>
+                                    <div class="slds-var-m-left_medium">
+                                        <div class="slds-text-body_small slds-text-color_weak">Current File:</div>
+                                        <lightning-badge label={rec.existingFileName}
+                                            icon-name="doctype:attachment"></lightning-badge>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <div slot="footer">
+        <template if:true={showCreation}>
+            <lightning-button variant="brand" label="Create & Preview" onclick={handleCreate}></lightning-button>
+            
+            <template if:true={showBackButton}>
+                <lightning-button label="Back to List" onclick={goToPreview} class="slds-var-m-left_small"></lightning-button>
+            </template>
+        </template>
+        
+        <template if:true={showPreview}>
+            <lightning-button variant="brand" label="Save All Changes" onclick={handleFinalSave}></lightning-button>
+        </template>
+        
+        <lightning-button label="Cancel" onclick={closeAction} class="slds-var-m-left_small"></lightning-button>
+    </div>
+</lightning-quick-action-panel>
+</template>

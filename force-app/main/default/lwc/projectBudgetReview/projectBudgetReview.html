@@ -1,0 +1,121 @@
+<template>
+    <lightning-card icon-name="standard:currency">
+        <h1 slot="title" class="slds-text-heading_small slds-truncate">Budget Review Summary</h1>
+        
+        <div class="slds-p-horizontal_medium slds-p-bottom_medium">
+            
+            <div class="slds-grid slds-wrap slds-gutters_large">
+                <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2">
+                    
+                    <div class="row-item">
+                        <div class="label-wrapper">
+                            <span class="slds-form-element__label">Project Final Approval Budget</span>
+                        </div>
+                        <div class="value-wrapper">
+                            <lightning-formatted-number value={estBudget} format-style="currency" currency-code="INR"></lightning-formatted-number>
+                        </div>
+                    </div>
+
+                    <div class="row-item">
+                        <div class="label-wrapper">
+                            <span class="slds-form-element__label">Company Share of Project</span>
+                            <lightning-helptext content="This field shows 20% of the project final Budget as the company's profit."></lightning-helptext>
+                        </div>
+                        <div class="value-wrapper">
+                            <lightning-formatted-number value={companyShare} format-style="currency" currency-code="INR"></lightning-formatted-number>
+                        </div>
+                    </div>
+
+                    <div class="row-item">
+                        <div class="label-wrapper">
+                            <span class="slds-form-element__label">Remaining Project Budget</span>
+                            <lightning-helptext content="This field displays the remaining budget after 20% company share is deducted from the estimated budget."></lightning-helptext>
+                        </div>
+                        <div class="value-wrapper">
+                            <lightning-formatted-number value={remProjBudget} format-style="currency" currency-code="INR"></lightning-formatted-number>
+                        </div>
+                    </div>
+
+                    <div class="row-item highlight-row">
+                        <div class="label-wrapper">
+                            <span class="slds-form-element__label">Budget allocation for vendors</span>
+                            <lightning-helptext content="Budget allocation for Vendors."></lightning-helptext>
+                        </div>
+                        <div class="value-wrapper">
+                            <lightning-formatted-number value={remBudgetPending} format-style="currency" currency-code="INR"></lightning-formatted-number>
+                        </div>
+                    </div>
+
+                    <div class="row-item highlight-row">
+                        <div class="label-wrapper">
+                            <span class="slds-form-element__label">Total Approved Expenses</span>
+                        </div>
+                        <div class="value-wrapper">
+                            <lightning-formatted-number value={totalExpenses} format-style="currency" currency-code="INR"></lightning-formatted-number>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2">
+                    
+                    <div class="row-item">
+                        <div class="label-wrapper">
+                            <span class="slds-form-element__label">Project Completion Status</span>
+                        </div>
+                        <div class="value-wrapper">
+                            <lightning-formatted-number value={completionStatus} format-style="percent" maximum-fraction-digits="2"></lightning-formatted-number>
+                        </div>
+                    </div>
+
+                    <div class="row-item">
+                        <div class="label-wrapper">
+                            <span class="slds-form-element__label">Supervisor Profit Percentage</span>
+                            <lightning-helptext content="Percentage of the remaining project budget saved by the supervisor that contributes to the company's profit."></lightning-helptext>
+                        </div>
+                        <div class="value-wrapper">
+                            <lightning-formatted-number value={supervisorProfitPct} format-style="percent" maximum-fraction-digits="2"></lightning-formatted-number>
+                        </div>
+                    </div>
+
+                    <div class="row-item">
+                        <div class="label-wrapper">
+                            <span class="slds-form-element__label">Total Profit</span>
+                            <lightning-helptext content="Total Profit = Company Share of the Project, when status is completed"></lightning-helptext>
+                        </div>
+                        <div class="value-wrapper">
+                            <lightning-formatted-number value={totalProfit} format-style="currency" currency-code="INR"></lightning-formatted-number>
+                        </div>
+                    </div>
+
+                    <div class="row-item">
+                        <div class="label-wrapper">
+                            <span class="slds-form-element__label">Total Profit Percentage</span>
+                        </div>
+                        <div class="value-wrapper">
+                            <lightning-formatted-number value={totalProfitPct} format-style="percent" maximum-fraction-digits="2"></lightning-formatted-number>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class={resultCardClass}>
+                <div class="slds-grid slds-grid_vertical-align-center">
+                    <div class="slds-col">
+                        <h3 class="slds-text-heading_small slds-text-color_weak slds-m-bottom_none">Final Remaining Budget</h3>
+                    </div>
+                    <div class="slds-col slds-text-align_right">
+                        <div>
+                            <lightning-formatted-number 
+                                value={finalRemainingBudget} 
+                                format-style="currency" 
+                                currency-code="INR"
+                                class="big-number">
+                            </lightning-formatted-number>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </lightning-card>
+</template>

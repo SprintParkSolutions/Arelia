@@ -1,0 +1,72 @@
+<template>
+    <lightning-card title="Milestone Completion Overview" icon-name="utility:chart">
+
+        <template if:true={hasRecordId}>
+            <div class="slds-p-around_medium">
+
+                <div class="progress-legend slds-m-bottom_small">
+                    <div class="legend-item">
+                        <span class="legend-color legend-warning"></span>
+                        <span>Early Stage</span>
+                    </div>
+
+                    <div class="legend-item">
+                        <span class="legend-color legend-info"></span>
+                        <span>In Progress</span>
+                    </div>
+
+                    <div class="legend-item">
+                        <span class="legend-color legend-success"></span>
+                        <span>Completed</span>
+                    </div>
+                </div>
+
+                <!-- Progress Container -->
+                <div class="progress-container">
+                    <div class={progressBarClass}></div>
+                </div>
+
+                <div class="slds-text-align_center slds-m-top_small slds-text-title_bold">
+                    {progressLabel}
+                </div>
+
+                <!-- Milestones Table -->
+                <div class="slds-m-top_medium table-wrapper">
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_fixed-layout">
+                        <thead>
+                            <tr>
+                                <th>Payment Stage</th>
+                                <th>%</th>
+                                <th>Achievement %</th>
+                                <th>Milestone Status</th>
+                                <th class="slds-text-align_center">Payment Received</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <template for:each={milestones} for:item="mile">
+                                <tr key={mile.paymentTermId} class={mile.rowClass}>
+                                    <td>{mile.name}</td>
+                                    <td>{mile.percentage}%</td>
+                                    <td>{mile.cumulativePercentage}%</td>
+                                    <td>
+                                        <span class={mile.badgeClass}>
+                                            {mile.statusLabel}
+                                        </span>
+                                    </td>
+                                    <td class="slds-text-align_center">
+                                        <lightning-icon icon-name={mile.paymentIcon} size="small">
+                                        </lightning-icon>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+
+
+            </div>
+        </template>
+
+    </lightning-card>
+</template>

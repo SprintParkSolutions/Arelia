@@ -1,0 +1,157 @@
+/* Main container */
+.arelia-container {
+    background-color: #f9f9f9;
+    padding: 40px 20px;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    position: relative;
+}
+
+.submit-spinner { z-index: 9999; position: absolute; }
+
+/* Headers */
+.main-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.main-subtitle {
+    font-size: 1.1rem;
+    color: #555;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.5;
+}
+
+/* Card */
+.arelia-card {
+    background: white;
+    width: 100%;
+    max-width: 800px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    margin: 0 auto;
+}
+
+.card-inner-content { width: 100%; max-width: 650px; }
+
+.card-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Note Box */
+.note-box {
+    background-color: #f4f3f1;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    width: 100%;
+    color: #444;
+}
+.note-icon { --slds-c-icon-color-foreground: #7f7f7f; }
+.note-box p { margin: 0; line-height: 1.4; font-size: 0.95rem; }
+
+/* Buttons */
+.button-container { display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; width: 100%; }
+
+.arelia-btn {
+    border: none;
+    border-radius: 6px;
+    padding: 12px 24px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 200px;
+}
+
+.btn-approve { background-color: #4f8a55; } /* Green */
+.btn-approve:hover { background-color: #3e7044; }
+
+.btn-request { background-color: #c23934; } /* Red */
+.btn-request:hover { background-color: #a6302c; }
+
+.btn-submit-changes {
+    background-color: #0176d3;
+    font-size: 1rem;
+    padding: 10px 20px;
+    min-width: auto;
+}
+.btn-submit-changes:hover { background-color: #005fb2; }
+
+/* Comment Box */
+.comment-box-container {
+    width: 100%;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.animate-fade-in { animation: fadeIn 0.3s ease-in; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+.slds-badge { font-size: 1rem; padding: 8px 16px; }
+.final-message { font-size: 1.1rem; color: #555; }
+
+/* --- MODAL STYLES (Ensure they appear above everything) --- */
+.slds-modal {
+    z-index: 9001; /* Above backdrops */
+}
+.slds-backdrop {
+    z-index: 9000;
+}
+.slds-modal__header.slds-theme_success {
+    background-color: #04844b;
+    color: white;
+}
+
+/* ========================================= */
+/* MOBILE RESPONSIVENESS (Max Width: 768px)  */
+/* ========================================= */
+@media screen and (max-width: 768px) {
+    .arelia-container {
+        padding: 15px 10px; 
+    }
+
+    .main-title {
+        font-size: 1.8rem;
+    }
+
+    .main-subtitle {
+        font-size: 1rem;
+        padding: 0 10px;
+    }
+
+    .button-container {
+        flex-direction: column; 
+        gap: 15px;
+    }
+
+    .arelia-btn {
+        width: 100%;
+        min-width: unset; 
+    }
+
+    .arelia-card {
+        padding: 1.5rem !important; 
+    }
+
+    .card-inner-content {
+        width: 100%;
+    }
+    
+    /* Mobile Modal Adjustment */
+    .slds-modal__container {
+        width: 90%;
+        max-width: none;
+        margin: 0 auto;
+        padding: 20px 0;
+    }
+}

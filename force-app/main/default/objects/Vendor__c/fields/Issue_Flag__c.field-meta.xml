@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Issue_Flag__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>checkbox that can be checked when there&apos;s an issue or delay</description>
+    <label>Issue Flag</label>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

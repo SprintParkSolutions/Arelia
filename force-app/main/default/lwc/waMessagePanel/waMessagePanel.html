@@ -1,0 +1,169 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 12-18-2025
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<template>
+  <template if:true={isVisible}>
+    <lightning-card title="WhatsApp Messenger" icon-name="utility:chat">
+      <!-- Force visibility for Experience Cloud Project__c where the container may collapse when no initial height -->
+      <div class="app" style="min-height: 120px;">
+        <div class="toolbar">
+          <div class="left">
+            <span class="label">CONVERSATION</span>
+            <template if:true={lastUpdated}>
+              <span class="dot"></span>
+              <span class="updated">Last updated {lastUpdated}</span>
+            </template>
+          </div>
+          <div class="right">
+            <lightning-input type="toggle" message-toggle-active="Auto refresh ON"
+              message-toggle-inactive="Auto refresh OFF" checked={autoRefresh} onchange={toggleAutoRefresh}>
+            </lightning-input>
+            <lightning-button-icon class="slds-m-left_small" icon-name="utility:refresh" alternative-text="Refresh"
+              onclick={manualRefresh}>
+            </lightning-button-icon>
+          </div>
+        </div>
+
+        <section class="chat-wrap">
+          <div class="chat" data-chat>
+            <template if:true={messages.length}>
+              <template for:each={messages} for:item="m">
+                <div key={m.key} class={m.rowClass}>
+                  <div class={m.bubbleClass}>
+                    <template if:true={m.text}>
+                      <div class="msg">{m.text}</div>
+                    </template>
+
+                    <template if:true={m.imageUrl}>
+                      <img class="img" src={m.imageUrl} alt="image message" />
+                    </template>
+
+                    <template if:true={m.fileUrl}>
+                      <a class="file" target="_blank" href={m.fileUrl}>View attachment</a>
+                    </template>
+
+                    <div class="meta"><span>{m.localTs}</span></div>
+                  </div>
+                </div>
+              </template>
+            </template>
+            <template if:false={messages.length}>
+              <div class="empty">No messages yet.</div>
+            </template>
+          </div>
+
+          <template if:true={refreshing}>
+            <div class="overlay">
+              <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+            </div>
+          </template>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">Send Text</div>
+          <lightning-input type="tel" label="Recipient (E.164)" value={toNumber} placeholder="+91XXXXXXXXXX"
+            onchange={onNumberChange}>
+          </lightning-input>
+
+          <lightning-textarea class="slds-m-top_small text-textarea" label="Text message" value={textBody}
+            onchange={onBodyChange} onkeydown={onComposerKeyDown} placeholder="Type a message...">
+          </lightning-textarea>
+
+          <div class="slds-m-top_small">
+            <lightning-button variant="brand" label="Send Text" onclick={sendText} disabled={isSendTextDisabled}>
+            </lightning-button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">Send Template</div>
+          <lightning-input label="Template Name" value={templateName} onchange={onTemplateName}>
+          </lightning-input>
+          <lightning-input class="slds-m-top_small" label="Language Code (e.g., en_US)" value={langCode}
+            onchange={onLang}>
+          </lightning-input>
+          <div class="slds-m-top_small">
+            <lightning-button label="Send Template" onclick={sendTemplate} disabled={isSendTemplateDisabled}>
+            </lightning-button>
+          </div>
+        </section>
+
+        <!-- Attach flow: single file card -->
+        <section class="panel">
+          <div class="panel-title">Attach File &amp; Send</div>
+
+          <template if:true={chatId}>
+            <lightning-file-upload
+              accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.mp3,.m4a,.ogg,.mp4,.3gp,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+              label="Upload file to this chat" record-id={chatId} onuploadfinished={handleUploadFinished}>
+            </lightning-file-upload>
+
+            <lightning-input class="slds-m-top_small" label="Caption (optional)" value={caption}
+              onchange={onCaptionChange}>
+            </lightning-input>
+
+            <template if:true={selectedFile.id}>
+              <div class="file-card slds-m-top_medium">
+                <div class="file-card__left">
+                  <div class="file-card__name">{selectedFile.title}.{selectedFile.ext}</div>
+                  <div class="file-card__meta">
+                    <template if:true={selectedFile.sizeLabel}>{selectedFile.sizeLabel} • </template>
+                    <template if:true={selectedFile.isPublic}>
+                      <span class="ok-badge">Public link ready</span>
+                    </template>
+                    <template if:false={selectedFile.isPublic}>
+                      <span class="todo-badge">Needs public link</span>
+                    </template>
+                  </div>
+                </div>
+                <div class="file-card__right">
+                  <lightning-button variant={makePublicVariant} label={makePublicLabel}
+                    title="Create a public Content Distribution link" disabled={isMakePublicDisabled}
+                    onclick={handleMakePublic}>
+                  </lightning-button>
+
+                  <lightning-button class="slds-m-left_small" variant="brand" label="Public Link &amp; Send"
+                    title="Send via the public link" disabled={isPublicSendDisabled} onclick={handleSendPublic}>
+                  </lightning-button>
+                </div>
+              </div>
+
+              <template if:true={selectedFile.publicUrl}>
+                <div class="url-chip slds-m-top_x-small" title={selectedFile.publicUrl}>
+                  {selectedFile.publicUrl}
+                </div>
+              </template>
+            </template>
+
+            <template if:false={selectedFile.id}>
+              <div class="slds-text-color_weak slds-m-top_small">
+                Upload a file to enable actions.
+              </div>
+            </template>
+          </template>
+
+          <template if:false={chatId}>
+            <div class="slds-text-color_weak slds-m-top_small">
+              Upload panel will appear after the chat is initialized.
+            </div>
+          </template>
+        </section>
+
+        <template if:true={lastResult}>
+          <div class="slds-m-top_medium slds-box slds-theme_default">
+            <strong>Last Result</strong>
+            <pre>{lastResult}</pre>
+          </div>
+        </template>
+      </div>
+    </lightning-card>
+  </template>
+  <template if:false={isVisible}>
+    <!-- Hidden on unsupported objects -->
+    <div class="slds-assistive-text">Component not visible in this context.</div>
+  </template>
+</template>

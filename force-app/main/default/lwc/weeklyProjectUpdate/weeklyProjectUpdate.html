@@ -1,0 +1,98 @@
+<template>
+    <!-- PROJECT LIST -->
+    <template if:true={showProjectList}>
+        <div class="container">
+            <h2 class="title">Your Assigned Projects</h2>
+
+            <div class="project-grid">
+                <template for:each={projects} for:item="proj">
+                    <div key={proj.Id}
+                         class="project-card"
+                         data-id={proj.Id}
+                         onclick={handleProjectSelect}>
+
+                        <h3>{proj.Name}</h3>
+                        <p class="client">{proj.ClientName}</p>
+                        <span class="status">{proj.Status__c}</span>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </template>
+
+    <!-- WEEKLY UPDATE (STYLISH) -->
+    <template if:true={showUpdatePanel}>
+        <section class="update-wrapper">
+
+            <div class="update-card">
+
+                <!-- HEADER -->
+                <div class="update-header">
+                    <div>
+                        <h1>Weekly Project Update</h1>
+                        <p class="project-name">{selectedProjectName}</p>
+                    </div>
+
+                    <span class="week-pill">
+                        Week {weekNumber}
+                    </span>
+                </div>
+
+                <!-- SUMMARY -->
+                <div class="form-group">
+                    <label>Weekly Summary</label>
+                    <lightning-textarea
+                        placeholder="Describe work completed this week..."
+                        value={message}
+                        onchange={handleMessage}
+                        class="summary-box">
+                    </lightning-textarea>
+                </div>
+
+                <!-- UPLOAD -->
+                <div class="upload-section">
+                    <lightning-file-upload
+                        record-id={selectedProjectId}
+                        multiple
+                        accept={acceptedFormats}
+                        onuploadfinished={handleUpload}>
+                    </lightning-file-upload>
+                    
+                    <p class="upload-hint">
+    Upload site photos, videos (MP4), or progress documents (optional)
+</p>
+                </div>
+                <template if:true={uploadedFiles.length}>
+    <div class="uploaded-list">
+        <p class="uploaded-title">Uploaded Files</p>
+        <ul>
+            <template for:each={uploadedFiles} for:item="file">
+                <li key={file.documentId}>
+                    {file.name}
+                </li>
+            </template>
+        </ul>
+    </div>
+</template>
+
+                <!-- ACTIONS -->
+                <div class="action-row">
+                    <lightning-button
+                        variant="neutral"
+                        label="Back"
+                        onclick={goBack}>
+                    </lightning-button>
+
+                    <lightning-button
+                        variant="brand"
+                        label="Send Weekly Update"
+                        class="send-btn"
+                        onclick={sendUpdate}>
+                    </lightning-button>
+                </div>
+
+            </div>
+
+        </section>
+    </template>
+</template>

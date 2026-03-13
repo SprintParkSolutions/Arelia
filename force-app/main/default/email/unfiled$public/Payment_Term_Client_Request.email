@@ -1,0 +1,28 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="font-family: Arial, sans-serif; font-size: 14px; color: rgb(51, 51, 51); height: auto; min-height: auto;">
+<p>Dear {{CLIENT_NAME}},</p>
+
+<p>We are excited to move forward with your project, <strong>{{OPPORTUNITY_NAME}}</strong>. Transparency is a core value at Arelia Living, and we want to ensure you have a clear understanding of the financial milestones for your project.</p>
+
+<p>Our team has finalized the proposed payment schedule based on our recent discussions. We kindly ask that you review these terms to ensure they meet your expectations.</p>
+
+<div style="border-left: 4px solid #2e844a; padding-left: 15px; margin: 20px 0;">
+<p><strong>Project:</strong> {{OPPORTUNITY_NAME}}<br />
+<strong>Supervisor:</strong> {{SUPERVISOR_NAME}}</p>
+</div>
+
+<p>Please click the button below to access your secure project portal. You will be able to see the specific installment dates and provide your digital sign-off.</p>
+
+<p><a href="{{APPROVAL_LINK}}" style="background-color: #2e844a; color: #ffffff; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">View Payment Schedule </a></p>
+
+<p>If you have any questions or require adjustments to the dates, you can request changes directly through the link provided above. Your supervisor will be notified instantly.</p>
+
+<p>Thank you for choosing Arelia Living.</p>
+
+<p>Sincerely,<br />
+Arelia Living</p>
+</body>
+</html>

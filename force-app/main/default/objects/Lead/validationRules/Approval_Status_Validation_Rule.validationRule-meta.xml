@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Approval_Status_Validation_Rule</fullName>
+    <active>true</active>
+    <description>This validation rule prevents users from changing the Approval Status picklist to Approved unless the Project Request Submitted checkbox is checked.</description>
+    <errorConditionFormula>AND(
+    ISCHANGED(Approval_Status__c),
+    ISPICKVAL(Approval_Status__c, &quot;Approved&quot;),
+    NOT(Project_Request_Submitted__c)
+)</errorConditionFormula>
+    <errorMessage>Approval Status cannot be set to Approved until Project Request Submitted is checked.</errorMessage>
+</ValidationRule>

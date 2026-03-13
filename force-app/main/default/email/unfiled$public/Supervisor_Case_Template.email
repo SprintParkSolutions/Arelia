@@ -1,0 +1,27 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Dear&nbsp;<strong>{{{Case.Supervisor_Name__c}}},</strong></span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">We would like to inform you that a new support case has been successfully registered in the system for your assigned project Which requires your review and attention :</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Project Name :&nbsp;<strong>{{{Case.Project__c}}},</strong><br />
+Project Client :&nbsp;<strong>{{{Case.Project_Client_Name__c}}},</strong><br />
+Project Client Contact Email :&nbsp;<strong>{{{Case.Project_Client_Email__c}}}</strong><br />
+<br />
+We kindly request you to evaluate the issue and initiate the necessary steps to ensure a timely resolution. Please find the Case Details provided below for your reference :</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Case Issue Type :&nbsp;<strong>{{{Case.Type}}} </strong>,<br />
+Case Priority :&nbsp;<strong>{{{Case.Priority}}}</strong>,<br />
+Case Subject :&nbsp;<strong>{{{Case.Subject}}}</strong>,<br />
+Case Description :&nbsp;{{{Case.Description}}}<br />
+<br />
+For any additional information required, please feel free to contact the client directly and keep the case updated with your progress.<br />
+We appreciate your cooperation and continued commitment to delivering a smooth and high-quality project experience.<br />
+<br />
+Best Regards,<br />
+Arelia Team</span></span></p>
+</body>
+</html>

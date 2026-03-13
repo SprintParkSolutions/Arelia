@@ -1,0 +1,33 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p>Dear {{CLIENT_NAME}},</p>
+
+<p>We hope this email finds you well.</p>
+
+<p>We are pleased to inform you that our team has completed the comprehensive budget estimation and architectural planning for your upcoming project, <strong>{{OPPORTUNITY_NAME}}</strong>. We have carefully analyzed the requirements to ensure the most accurate and efficient allocation of resources.</p>
+
+<p><strong>What is Included in this Review?</strong><br />
+This budget proposal covers the complete financial breakdown, including:</p>
+
+<ul>
+	<li><strong>Architectural Design Costs:</strong> Detailed line items for design phases.</li>
+	<li><strong>Execution Budget:</strong> Estimated costs for materials and labor.</li>
+	<li><strong>Project Timeline:</strong> An estimated duration of <strong>{{DURATION}} </strong>.</li>
+	<li><strong>Payment Terms:</strong> The proposed schedule for milestone-based payments.</li>
+</ul>
+
+<p>To ensure we stay on schedule, we kindly request you to review these details at your earliest convenience. Your approval will allow us to immediately mobilize our team and begin the execution phase.</p>
+<br />
+<a href="{{APPROVAL_LINK}}" style="background-color:#0070d2; color:#ffffff; display:inline-block; padding:14px 28px; text-decoration:none; border-radius:4px; font-weight:bold; font-family:Arial, sans-serif; font-size:16px;">Review &amp; Approve Proposal</a><br />
+&nbsp;
+<p>If you feel any adjustments are needed, you can request changes directly through the link above by providing your remarks. Our team is standing by to assist with any questions you may have.</p>
+
+<p>We look forward to bringing your vision to life.</p>
+
+<p>Sincerely,<br />
+<strong>Arelia Living</strong></p>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Hi {{{Recipient.Supervisor_User__c}}},<br />
+<br />
+Great news! The appointment for <strong>{{{Recipient.FirstName}}}</strong>&nbsp;<strong>{{{Recipient.LastName}}}</strong> on&nbsp;<strong>{{{Recipient.Appointment_Date__c}}}</strong> at&nbsp;<strong>{{{Recipient.Appointment_Time_Slots__c}}}</strong>&nbsp;has been <strong>{{{Recipient.Appointment_Status__c}}}</strong>.<br />
+<br />
+If you have any further instructions or notes to share, feel free to connect with the client directly.<br />
+<br />
+<br />
+Thanks,<br />
+Arelia Living Team</span></span></body>
+</html>

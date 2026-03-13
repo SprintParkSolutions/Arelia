@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Arelia Automated Project Request Quote Design Submit Template to Management</name>
+    <style>none</style>
+    <subject>New Automated Project Request Quote Details for {{{Recipient.Interior_Project_Type__c}}}</subject>
+    <type>custom</type>
+    <uiType>SFX</uiType>
+</EmailTemplate>

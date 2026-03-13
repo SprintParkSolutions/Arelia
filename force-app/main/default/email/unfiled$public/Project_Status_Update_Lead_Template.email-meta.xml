@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Update to Lead whenever project status is changed</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Project Status Update Lead Template</name>
+    <relatedEntityType>Project__c</relatedEntityType>
+    <style>none</style>
+    <subject>{{{Project__c.Name}}} - Project Progress Update</subject>
+    <type>custom</type>
+    <uiType>SFX</uiType>
+</EmailTemplate>

@@ -1,0 +1,34 @@
+<template>
+    <template if:true={isVisible}>
+        <lightning-card title="Project Path" icon-name="standard:path">
+            <div class="slds-path">
+                <div class="slds-grid slds-path__track">
+                    <div class="slds-grid slds-path__scroller-container">
+                        
+                        <div class="slds-path__scroller" role="application">
+                            
+                            <div class="slds-path__scroller_inner">
+                                <ul class="slds-path__nav" role="listbox" aria-orientation="horizontal">
+
+                                    <template for:each={steps} for:item="step">
+                                        <li key={step.label} class={step.class} role="presentation">
+                                            <a aria-selected={step.selected} class="slds-path__link" href="#" role="option" tabindex="-1">
+                                                <span class="slds-path__stage">
+                                                    <lightning-icon icon-name="utility:check" size="x-small" variant="inverse"></lightning-icon>
+                                                    <span class="slds-assistive-text">Stage Complete</span>
+                                                </span>
+                                                <span class="slds-path__title">{step.label}</span>
+                                            </a>
+                                        </li>
+                                    </template>
+
+                                </ul>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </lightning-card>
+    </template>
+</template>

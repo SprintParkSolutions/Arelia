@@ -1,0 +1,67 @@
+<template>
+    <div class="slds-box slds-theme_default slds-container_small slds-container_center custom-margin-top approval-card">
+        
+        <div class="slds-text-align_center slds-m-bottom_medium">
+            <h1 class="slds-text-heading_medium company-title"><b>Arelia Living</b></h1>
+            <p class="slds-text-color_weak">Expense Approval Portal</p>
+        </div>
+
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Processing..." size="medium"></lightning-spinner>
+        </template>
+
+        <template if:true={error}>
+            <div class="slds-notify slds-notify_alert slds-theme_error" role="alert">{error}</div>
+        </template>
+
+        <template if:true={sheet}>
+            <div class="slds-grid slds-wrap slds-gutters">
+                <div class="slds-col slds-size_1-of-1 slds-small-size_1-of-2 slds-m-bottom_medium">
+                    <div class="field-label">Project</div>
+                    <div class="field-value slds-truncate"><b>{sheet.Project__r.Name}</b></div>
+                </div>
+                
+                <div class="slds-col slds-size_1-of-1 slds-small-size_1-of-2 slds-m-bottom_medium">
+                    <div class="field-label">Client</div>
+                    <div class="field-value slds-truncate"><b>{sheet.Project__r.Client__r.Name}</b></div>
+                </div>
+                
+                <div class="slds-col slds-size_1-of-1 slds-m-bottom_large">
+                    <div class="field-label">Total Payable Amount</div>
+                    <div class="grand-total"><b>₹ {sheet.Grand_Total__c}</b></div>
+                </div>
+            </div>
+
+            <template if:false={isProcessed}>
+                <div class="slds-m-top_small">
+                    <button class="slds-button slds-button_success slds-button_stretch action-btn" onclick={handleApprove}>
+                        Approve Expense
+                    </button>
+                </div>
+            </template>
+
+            <template if:true={isProcessed}>
+                <div class="slds-box slds-theme_shade slds-text-align_center slds-m-top_medium status-box">
+                    <h2 class="slds-text-heading_small">Record Status: <b>{finalStatus}</b></h2>
+                    <p class="slds-m-top_x-small">This expense sheet has already been processed.</p>
+                </div>
+            </template>
+        </template>
+    </div>
+
+    <template if:true={showSuccessModal}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div class="slds-modal__content slds-p-around_large slds-text-align_center success-modal">
+                    <lightning-icon icon-name="action:approval" size="large" class="slds-m-bottom_medium"></lightning-icon>
+                    <h2 class="slds-text-heading_medium slds-text-color_success">Action Completed</h2>
+                    <p class="slds-m-top_small">The expense sheet for <b>{sheet.Project__r.Name}</b> has been <b>Approved</b>.</p>
+                    <div class="slds-m-top_large">
+                        <lightning-button variant="brand" label="Return to Site" onclick={handleFinalClose}></lightning-button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

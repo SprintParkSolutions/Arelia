@@ -1,0 +1,231 @@
+:host {
+    display: block;
+    width: 100%;
+}
+
+/* Section */
+.portfolio-section {
+    /* Background-image handled by JS */
+    background-position: center;
+    background-repeat: repeat;
+    background-size: 500px;
+    padding: 100px 0;
+    color: #FFFFFF;
+    position: relative;
+}
+
+/* Make container fluid but cap to 1342px */
+.container-1342 {
+    max-width: 1342px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+    font-family: 'Lato', sans-serif;
+}
+
+/* Header */
+.header-block {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.sub-heading {
+    color: #AEA18E;
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.main-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    color: #FFFFFF;
+    margin: 0 0 20px 0;
+}
+
+.gold-line {
+    width: 60px;
+    height: 3px;
+    background-color: #AEA18E;
+    margin: 0 auto;
+}
+
+/* Gallery grid: default 3 columns */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-bottom: 60px;
+}
+
+/* Project card basics */
+.project-card {
+    position: relative;        /* ensures overlay positions correctly */
+    overflow: hidden;          /* hides overflowing transforms */
+    opacity: 0;
+    transition: all 1.3s ease;
+    min-height: 320px;         /* baseline height for consistent grid */
+    display: flex;
+    align-items: stretch;
+}
+
+/* small entrance offsets (kept as you had them) */
+.project-card:nth-child(1) { transform: translateX(-40px); }
+.project-card:nth-child(2) { transform: translateY(40px); }
+.project-card:nth-child(3) { transform: translateX(40px); }
+
+/* visible state (restores to neutral) */
+.project-card.is-visible {
+    opacity: 1;
+    transform: translateX(0) translateY(0);
+}
+
+/* stagger delays (kept) */
+.project-card:nth-child(2).is-visible { transition-delay: 0.2s; }
+.project-card:nth-child(3).is-visible { transition-delay: 0.4s; }
+
+/* Keyframes kept exactly as provided (no behavior change) */
+@keyframes zoomOutCenter {
+    0% { opacity: 0; transform: translateY(30px) scale(1.12); }
+    60% { opacity: 1; transform: translateY(-6px) scale(0.99); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes zoomOutLeft {
+    0% { opacity: 0; transform: translate(-40px, 40px) scale(1.14) rotate(-1deg); }
+    60% { opacity: 1; transform: translate(6px, -6px) scale(1.00) rotate(-0.2deg); }
+    100% { opacity: 1; transform: translate(0,0) scale(1) rotate(0deg); }
+}
+@keyframes zoomOutRight {
+    0% { opacity: 0; transform: translate(40px, 40px) scale(1.14) rotate(1deg); }
+    60% { opacity: 1; transform: translate(-6px, -6px) scale(1.00) rotate(0.2deg); }
+    100% { opacity: 1; transform: translate(0,0) scale(1) rotate(0deg); }
+}
+
+/* Project image behavior */
+.project-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1s ease;
+    display: block;
+}
+
+/* Hover zoom - preserved */
+.project-card:hover .project-img {
+    transform: scale(1.05);
+}
+
+/* Overlay (HOVER-ONLY reveal) */
+.card-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 30px;
+    background: linear-gradient(to top, rgba(37, 28, 14, 0.95), transparent);
+
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s ease;
+    pointer-events: none; /* prevents accidental clicks when hidden */
+}
+
+/* STRICTLY hover-only: reveal overlay only on hover */
+.project-card:hover .card-overlay {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* Text inside overlay */
+.project-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    margin: 0 0 5px 0;
+    color: #F5F2EB;
+}
+
+.project-category {
+    font-size: 14px;
+    color: #AEA18E;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Footer button */
+.footer-block {
+    text-align: center;
+}
+
+.view-all-btn {
+    background: transparent;
+    border: 1px solid #AEA18E;
+    color: #AEA18E;
+    padding: 15px 40px;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.view-all-btn:hover {
+    background: #AEA18E;
+    color: #251C0E;
+}
+
+/* ===========================
+   RESPONSIVE RULES (improved)
+   =========================== */
+
+/* Large desktops: keep 3 columns and allow taller cards */
+@media (min-width: 1400px) {
+    .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 36px; }
+    .project-card { min-height: 380px; }
+}
+
+/* Desktop / small desktop */
+@media (max-width: 1350px) and (min-width: 981px) {
+    .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 30px; }
+    .project-card { min-height: 360px; }
+}
+
+/* Medium screens: 2 columns */
+@media (max-width: 980px) and (min-width: 681px) {
+    .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    .project-card { min-height: 340px; }
+}
+
+/* Small screens: 1 column, responsive heights */
+@media (max-width: 680px) {
+    .gallery-grid { grid-template-columns: 1fr; gap: 18px; margin-bottom: 40px; }
+    .project-card {
+        min-height: auto;
+        height: auto;
+        display: block;
+    }
+    .project-img { height: 420px; max-height: 55vh; } /* keep images visible but limited */
+    .card-overlay { padding: 18px; }
+    .project-title { font-size: 22px; }
+    .project-category { font-size: 12px; letter-spacing: .8px; }
+    .main-heading { font-size: 34px; }
+}
+
+/* Very small phones */
+@media (max-width: 420px) {
+    .portfolio-section { padding: 60px 0; }
+    .main-heading { font-size: 28px; line-height: 1.05; }
+    .project-img { height: 300px; max-height: 48vh; }
+    .card-overlay { padding: 14px; }
+    .project-title { font-size: 20px; }
+    .view-all-btn { padding: 12px 28px; font-size: 13px; }
+}
+
+/* keep background-size responsive if you want it to scale down on very small screens (optional) */
+@media (max-width: 480px) {
+    .portfolio-section { background-size: 360px; }
+}
+
+/* End */

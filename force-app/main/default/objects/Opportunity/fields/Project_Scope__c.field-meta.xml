@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Project_Scope__c</fullName>
+    <label>Project Scope</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Fully Office Interiors</fullName>
+                <default>false</default>
+                <label>Fully Office Interiors</label>
+            </value>
+            <value>
+                <fullName>Home Decor</fullName>
+                <default>false</default>
+                <label>Home Decor</label>
+            </value>
+            <value>
+                <fullName>Kitchen</fullName>
+                <default>false</default>
+                <label>Kitchen</label>
+            </value>
+            <value>
+                <fullName>Bed Room</fullName>
+                <default>false</default>
+                <label>Bed Room</label>
+            </value>
+            <value>
+                <fullName>Hall Interior</fullName>
+                <default>false</default>
+                <label>Hall Interior</label>
+            </value>
+            <value>
+                <fullName>Conference Hall</fullName>
+                <default>false</default>
+                <label>Conference Hall</label>
+            </value>
+            <value>
+                <fullName>Office Decor</fullName>
+                <default>false</default>
+                <label>Office Decor</label>
+            </value>
+            <value>
+                <fullName>Office Space</fullName>
+                <default>false</default>
+                <label>Office Space</label>
+            </value>
+            <value>
+                <fullName>Dining Hall</fullName>
+                <default>false</default>
+                <label>Dining Hall</label>
+            </value>
+            <value>
+                <fullName>Cabins</fullName>
+                <default>false</default>
+                <label>Cabins</label>
+            </value>
+            <value>
+                <fullName>Full Home Interiors</fullName>
+                <default>false</default>
+                <label>Full Home Interiors</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

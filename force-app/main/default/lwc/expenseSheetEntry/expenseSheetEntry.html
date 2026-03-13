@@ -1,0 +1,195 @@
+<template>
+    <div class="slds-modal__header slds-theme_shade">
+        <h2 class="slds-text-heading_medium slds-hyphenate">
+            <lightning-icon icon-name="standard:currency" size="small" class="slds-m-right_small"></lightning-icon>
+            Manage Project Expenses
+        </h2>
+    </div>
+
+    <div class="slds-modal__content slds-p-around_medium container" style="min-height: 400px;">
+        
+        <lightning-tabset active-tab-value={activeTab} class="custom-tabset">
+            
+            <lightning-tab label="Entry Form" value="new" onactive={handleTabActive}>
+                
+                <div class="slds-m-top_medium">
+                    
+                    <div class="slds-m-bottom_large">
+                        <div class="section-header">
+                            <lightning-icon icon-name="utility:cart" size="x-small" class="slds-m-right_small"></lightning-icon>
+                            <span class="section-title">1. Materials Purchased</span>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="styled-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 23%">Item Name</th>
+                                        <th style="width: 20%">Description</th>
+                                        <th style="width: 15%">Brand</th>
+                                        <th style="width: 10%">Qty</th>
+                                        <th style="width: 15%">Rate</th>
+                                        <th style="width: 12%">Amount</th>
+                                        <th style="width: 5%"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={materialRows} for:item="row" for:index="index">
+                                        <tr key={row.id}>
+                                            <td><lightning-input variant="label-hidden" class="input-field" data-index={index} data-type="material" name="name" value={row.name} placeholder="Item" onchange={handleMaterialChange}></lightning-input></td>
+                                            <td><lightning-input variant="label-hidden" class="input-field" data-index={index} data-type="material" name="description" value={row.description} placeholder="Desc" onchange={handleMaterialChange}></lightning-input></td>
+                                            <td><lightning-input variant="label-hidden" class="input-field" data-index={index} data-type="material" name="brand" value={row.brand} placeholder="Brand" onchange={handleMaterialChange}></lightning-input></td>
+                                            <td><lightning-input type="number" variant="label-hidden" class="input-field" data-index={index} data-type="material" name="qty" value={row.qty} min="0" onchange={handleMaterialChange}></lightning-input></td>
+                                            <td><lightning-input type="number" variant="label-hidden" class="input-field" data-index={index} data-type="material" name="rate" value={row.rate} formatter="currency" step="0.01" onchange={handleMaterialChange}></lightning-input></td>
+                                            <td>
+                                                <div class="slds-p-top_x-small slds-text-align_right slds-text-title_bold slds-truncate">
+                                                    <lightning-formatted-number value={row.amount} format-style="currency" currency-code="INR"></lightning-formatted-number>
+                                                </div>
+                                            </td>
+                                            <td class="slds-text-align_center">
+                                                <lightning-button-icon icon-name="utility:delete" variant="bare" size="medium" class="slds-text-color_error" data-index={index} onclick={removeMaterialRow}></lightning-button-icon>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                        <lightning-button label="Add Material Row" title="Add Item" icon-name="utility:add" variant="base" class="add-btn slds-m-left_small" onclick={addMaterialRow}></lightning-button>
+                    </div>
+
+                    <div class="slds-m-bottom_large">
+                        <div class="section-header" style="border-left-color: #e67e22;">
+                            <lightning-icon icon-name="utility:moneybag" size="x-small" class="slds-m-right_small"></lightning-icon>
+                            <span class="section-title" style="color: #a05005;">2. Other Expenses</span>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="styled-table small-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 70%">Description</th>
+                                        <th style="width: 25%">Amount</th>
+                                        <th style="width: 5%"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={otherRows} for:item="row" for:index="index">
+                                        <tr key={row.id}>
+                                            <td><lightning-input variant="label-hidden" class="input-field" data-index={index} data-type="other" name="description" value={row.description} placeholder="Desc" onchange={handleOtherChange}></lightning-input></td>
+                                            <td><lightning-input type="number" variant="label-hidden" class="input-field" data-index={index} data-type="other" name="amount" value={row.amount} formatter="currency" step="0.01" onchange={handleOtherChange}></lightning-input></td>
+                                            <td class="slds-text-align_center">
+                                                <lightning-button-icon icon-name="utility:delete" variant="bare" size="medium" class="slds-text-color_error" data-index={index} onclick={removeOtherRow}></lightning-button-icon>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                        <lightning-button label="Add Expense Row" title="Add Expense" icon-name="utility:add" variant="base" class="add-btn slds-m-left_small" onclick={addOtherRow}></lightning-button>
+                    </div>
+
+                    <div class="total-container">
+                        <div class="slds-grid slds-wrap slds-gutters slds-grid_vertical-align-center">
+                            
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-m-bottom_medium slds-medium-m-bottom_none">
+                                <div class="file-upload-section">
+                                    
+                                    <template if:true={existingFiles.length}>
+                                        <div class="slds-box slds-box_xx-small slds-theme_shade slds-m-bottom_small">
+                                            <div class="slds-text-title_caps slds-text-color_weak slds-m-bottom_xx-small">Previously Uploaded:</div>
+                                            <template for:each={existingFiles} for:item="file">
+                                                <div key={file.docId} class="slds-grid slds-grid_vertical-align-center slds-p-vertical_xx-small">
+                                                    <lightning-icon icon-name="doctype:image" size="xx-small" class="slds-m-right_x-small"></lightning-icon>
+                                                    <span class="slds-text-body_small slds-truncate">{file.name}</span>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+
+                                    <lightning-input 
+                                        type="file" 
+                                        label="Attach New Bills" 
+                                        accept=".jpg, .jpeg, .png, .pdf"
+                                        multiple 
+                                        onchange={handleFileChange} 
+                                        variant="label-hidden">
+                                    </lightning-input>
+                                    
+                                    <template if:true={uploadedFiles.length}>
+                                        <div class="slds-m-top_x-small">
+                                            <template for:each={uploadedFiles} for:item="file">
+                                                <div key={file.name} class="slds-text-body_small slds-text-color_success slds-truncate">
+                                                    <lightning-icon icon-name="utility:add" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                    {file.name} (Ready to upload)
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                    
+                                    <template if:false={uploadedFiles.length}>
+                                        <div class="slds-text-body_small slds-text-color_weak slds-m-top_x-small">
+                                            Click above to add more bills...
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-text-align_center slds-medium-text-align_right">
+                                <div class="grand-total-label">Grand Total Payable</div>
+                                <div class="grand-total-amount">
+                                    ₹{grandTotal}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="slds-m-top_large slds-text-align_right action-buttons">
+                        <lightning-button 
+                            label="Cancel" 
+                            onclick={closeAction} 
+                            class="btn-spacing">
+                        </lightning-button>
+                        
+                        <lightning-button 
+                            label="Save as Draft" 
+                            icon-name="utility:save" 
+                            onclick={handleSaveDraft} 
+                            disabled={isSaving}
+                            class="btn-spacing">
+                        </lightning-button>
+
+                        <lightning-button 
+                            variant="brand" 
+                            label="Submit for Approval" 
+                            icon-name="utility:send" 
+                            onclick={handleSubmit} 
+                            disabled={isSaving}>
+                        </lightning-button>
+                    </div>
+                </div>
+            </lightning-tab>
+
+            <lightning-tab label="History" value="history" icon-name="standard:clock" onactive={handleTabActive}>
+                <div class="slds-m-top_medium">
+                    <template if:true={expenseHistory}>
+                        <div style="height: 300px;">
+                            <lightning-datatable
+                                key-field="Id"
+                                data={expenseHistory}
+                                columns={historyColumns}
+                                hide-checkbox-column
+                                onrowaction={handleRowAction}>
+                            </lightning-datatable>
+                        </div>
+                    </template>
+                    <template if:false={expenseHistory}>
+                        <div class="slds-text-align_center slds-m-top_large slds-text-color_weak">
+                            No expense history found for this project.
+                        </div>
+                    </template>
+                </div>
+            </lightning-tab>
+
+        </lightning-tabset>
+    </div>
+</template>

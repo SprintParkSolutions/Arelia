@@ -1,0 +1,167 @@
+<template>
+    <div class="main-container slds-p-around_medium">
+        
+        <div class="header-section slds-media slds-media_center slds-m-bottom_medium">
+            <div class="slds-media__figure">
+                <div class="header-icon-box">
+                    <lightning-icon icon-name="standard:file" size="medium" variant="inverse"></lightning-icon>
+                </div>
+            </div>
+            <div class="slds-media__body">
+                <h1 class="slds-text-heading_medium slds-text-title_bold text-dark">Architecture Design Submission</h1>
+                <p class="slds-text-color_weak">Upload your complete design package <strong>for client approval</strong>.</p>
+            </div>
+        </div>
+
+        <div class="guidelines-card slds-m-bottom_medium">
+            <div class="card-header slds-p-horizontal_medium slds-p-vertical_small">
+                <div class="slds-media slds-media_center">
+                    <div class="slds-media__figure">
+                        <lightning-icon icon-name="utility:success" variant="success" size="small"></lightning-icon>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-text-heading_small"><strong>Submission Guidelines</strong></h2>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body slds-p-horizontal_medium slds-p-bottom_medium">
+                <p class="slds-m-vertical_small slds-text-color_weak">
+                    Please upload the complete architecture design package. Ensure all required files are included before submitting.
+                </p>
+
+                <div class="requirements-box slds-p-around_medium">
+                    <h3 class="slds-text-title_bold slds-m-bottom_x-small brand-text">Required Files</h3>
+                    <ul class="slds-list_vertical slds-m-bottom_medium">
+                        <li class="icon-list-item">
+                            <lightning-icon icon-name="utility:check" size="xx-small" class="check-icon slds-m-right_x-small"></lightning-icon> 
+                            3D Renders (Interior & Exterior)
+                        </li>
+                        <li class="icon-list-item">
+                            <lightning-icon icon-name="utility:check" size="xx-small" class="check-icon slds-m-right_x-small"></lightning-icon> 
+                            PDF Plans / Drawings
+                        </li>
+                        <li class="icon-list-item">
+                            <lightning-icon icon-name="utility:check" size="xx-small" class="check-icon slds-m-right_x-small"></lightning-icon> 
+                            CAD files (if applicable)
+                        </li>
+                    </ul>
+
+                    <h3 class="slds-text-title_bold slds-m-bottom_x-small brand-text">Notes</h3>
+                    <ul class="slds-list_dotted slds-text-color_weak">
+                        <li>Revisions must include all updated documents</li>
+                        <li>Incomplete submissions will not be processed</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="upload-section slds-m-bottom_medium">
+            <div class="dashed-border slds-p-around_medium">
+                <div class="slds-media slds-media_center slds-m-bottom_x-small">
+                    <div class="slds-media__figure">
+                        <lightning-icon icon-name="utility:upload" size="small" class="cloud-icon"></lightning-icon>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-text-heading_small"><strong>Upload Design Files</strong></h2>
+                    </div>
+                </div>
+                
+                <div class="slds-p-left_large">
+                     <lightning-file-upload
+                        label="Drag and drop files here, or click to browse"
+                        name="fileUploader"
+                        record-id={recordId}
+                        accept={acceptedFormats}
+                        multiple
+                        onuploadfinished={handleUploadFinished}
+                        class="file-upload-input">
+                    </lightning-file-upload>
+                    <p class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">Supported formats: PDF, PNG, JPG, DWG, ZIP</p>
+                </div>
+            </div>
+        </div>
+
+        <template if:true={hasUploadedFiles}>
+            <div class="footer-section slds-m-bottom_large bounce-in">
+                <div class="footer-header slds-p-horizontal_medium slds-p-vertical_small">
+                     <h3 class="slds-text-heading_small"><strong>Files Ready ({uploadedFiles.length})</strong></h3>
+                </div>
+               
+                <div class="action-row slds-p-around_medium">
+                    
+                    <div class="file-list-container">
+                        <template for:each={uploadedFiles} for:item="file">
+                            <div key={file.documentId} class="file-item-card">
+                                <div class="file-left-group">
+                                    <div class="file-icon-box">
+                                        <lightning-icon icon-name="doctype:image" size="medium"></lightning-icon>
+                                    </div>
+                                    <div class="file-details slds-p-left_small">
+                                        <div class="file-name-text">{file.name}</div>
+                                        <div class="file-status-text">Ready for upload</div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <lightning-button-icon 
+                                        icon-name="utility:delete" 
+                                        variant="bare" 
+                                        alternative-text="Remove File" 
+                                        title="Remove File"
+                                        class="delete-icon-btn"
+                                        data-id={file.documentId}
+                                        onclick={handleDeleteFile}>
+                                    </lightning-button-icon>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="action-controls">
+                        <div class="budget-input-container slds-m-bottom_small">
+                            <lightning-input 
+                                type="number" 
+                                formatter="currency" 
+                                label="Architecture Budget" 
+                                placeholder="0.00"
+                                value={budget} 
+                                onchange={handleBudgetChange} 
+                                class="budget-field">
+                            </lightning-input>
+                        </div>
+
+                        <lightning-button 
+                            variant="brand" 
+                            label="Submit " 
+                            onclick={handleSendClick}
+                            disabled={isLoading}
+                            class="send-button slds-size_full">
+                        </lightning-button>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template if:true={hasFiles}>
+            <div class="history-section slds-m-top_large">
+                <h3 class="slds-text-heading_small slds-m-bottom_small slds-text-color_weak">
+                    <strong>Submission History</strong>
+                </h3>
+                <div class="table-container dynamic-height">
+                    <lightning-datatable
+                        key-field="id"
+                        data={files}
+                        columns={columns}
+                        hide-checkbox-column>
+                    </lightning-datatable>
+                </div>
+            </div>
+        </template>
+
+        <template if:true={isLoading}>
+            <div class="spinner-overlay">
+                <lightning-spinner alternative-text="Loading" size="medium" variant="brand"></lightning-spinner>
+            </div>
+        </template>
+    </div>
+</template>

@@ -1,0 +1,131 @@
+<template>
+    <div class="arelia-container">
+
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Processing..." size="medium" class="submit-spinner"></lightning-spinner>
+        </template>
+
+        <template if:true={error}>
+            <div class="slds-notify slds-notify_alert slds-theme_error slds-m-bottom_medium" role="alert">
+                <h2>{error}</h2>
+            </div>
+        </template>
+
+        <template if:false={invoiceData}>
+            <template if:false={error}>
+                <div class="slds-p-around_large">
+                    <lightning-spinner alternative-text="Loading..." size="medium"></lightning-spinner>
+                </div>
+            </template>
+        </template>
+
+        <template if:true={invoiceData}>
+
+            <div class="slds-text-align_center slds-m-bottom_x-large page-header-content">
+                <h1 class="main-title">Review Invoice for {invoiceData.projectName}</h1>
+                <p class="main-subtitle slds-m-top_small">
+                    Hello <strong>{invoiceData.clientName}</strong>, please review the proforma invoice attached in your email and provide your decision below.
+                </p>
+            </div>
+
+            <div class="arelia-card slds-p-around_x-large slds-align_absolute-center slds-text-align_center">
+                <div class="slds-grid slds-grid_vertical slds-align_absolute-center card-inner-content">
+
+                    <h2 class="card-title slds-m-bottom_medium">Submit Decision </h2>
+
+                    <div class="note-box slds-m-bottom_large slds-p-around_medium slds-grid slds-grid_vertical-align-center">
+                        <lightning-icon icon-name="utility:light_bulb" size="medium" class="note-icon slds-m-right_small"></lightning-icon>
+                        <div class="slds-text-align_left">
+                            <p><strong>Note:</strong> The invoice PDF is attached in the email you received.</p>
+                            <p>This page is only for submitting your approval decision.</p>
+                        </div>
+                    </div>
+
+                    <template if:true={isSubmitted}>
+                        <div class={statusBadgeClass}>
+                            Status: {invoiceData.status}
+                        </div>
+                        <template if:true={invoiceData.comments}>
+                            <p class="slds-m-top_small slds-text-color_weak">"{invoiceData.comments}"</p>
+                        </template>
+                        <p class="final-message slds-m-top_large">
+                            Thank you. You will be redirected shortly.
+                        </p>
+                    </template>
+
+                    <template if:false={isSubmitted}>
+                        <div class="button-container slds-m-bottom_large">
+                            <button class="arelia-btn btn-approve slds-m-right_medium" onclick={handleApproveClick}>
+                                <lightning-icon icon-name="utility:check" size="small" variant="inverse" class="slds-m-right_x-small"></lightning-icon>
+                                Approve Invoice
+                            </button>
+                            
+                            <button class="arelia-btn btn-request" onclick={handleReject}>
+                                <lightning-icon icon-name="utility:close" size="small" variant="inverse" class="slds-m-right_x-small"></lightning-icon>
+                                Request Changes
+                            </button>
+                        </div>
+
+                        <template if:true={showCommentBox}>
+                            <div class="comment-box-container slds-m-top_medium slds-text-align_left animate-fade-in">
+                                <lightning-textarea 
+                                    label="Please describe the changes needed:" 
+                                    value={comments} 
+                                    onchange={handleCommentChange}
+                                    required
+                                    class="custom-textarea">
+                                </lightning-textarea>
+                                <div class="slds-clearfix slds-m-top_small">
+                                     <button class="arelia-btn btn-submit-changes slds-float_right" onclick={handleSubmitChangesClick}>
+                                        Submit Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+                    </template>
+
+                </div>
+            </div>
+        </template>
+
+        <template if:true={showConfirmationModal}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 class="slds-text-heading_medium slds-hyphenate">Confirmation</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium slds-text-align_center">
+                        <p>{confirmationMessage}</p>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick={closeConfirmationModal}>No, Cancel</button>
+                        <button class="slds-button slds-button_brand" onclick={handleConfirmYes}>Yes, Confirm</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <template if:true={showSuccessModal}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header slds-theme_success slds-theme_alert-texture">
+                        <h2 class="slds-text-heading_medium slds-hyphenate" style="color:white;">Success</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium slds-text-align_center">
+                        <div class="slds-m-bottom_small">
+                            <lightning-icon icon-name="action:approval" size="medium" variant="success"></lightning-icon>
+                        </div>
+                        <h2 class="slds-text-heading_medium slds-m-bottom_small">Thank You!</h2>
+                        <p class="slds-text-body_regular">{successMessage}</p>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_brand" onclick={handleSuccessClose}>Close</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+    </div>
+</template>

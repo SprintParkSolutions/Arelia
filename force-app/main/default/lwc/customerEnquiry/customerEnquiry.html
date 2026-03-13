@@ -1,0 +1,100 @@
+<template>
+    <section class="app-shell">
+        <div class="form-wrap">
+            <header class="page-header">
+                <h1 class="page-title">Request a Consultation</h1>
+                <p class="page-subtitle">Fill out the form below and we'll be in touch within 24 hours.</p>
+                <div class="animated-bar"></div>
+            </header>
+
+            <div class="form-card">
+                <!-- STEP 1 -->
+                <template if:true={showStep1}>
+                    <div class="grid-row">
+                        <div class="col">
+                            <label class="field-label">First Name <span class="req">*</span></label>
+                            <input class="text-input" name="firstName" value={firstName} oninput={handleNativeInput} />
+                        </div>
+
+                        <div class="col">
+                            <label class="field-label">Last Name <span class="req">*</span></label>
+                            <input class="text-input" name="lastName" value={lastName} oninput={handleNativeInput} />
+                        </div>
+
+                        <div class="col full">
+                            <label class="field-label">Email Address <span class="req">*</span></label>
+                            <input class="text-input" type="email" name="email" data-id="emailInput" value={email} oninput={handleNativeInput} />
+                        </div>
+
+                        <!-- tighter side-by-side country + phone -->
+                        <div class="col full phone-row-tight">
+                            <div class="phone-col small">
+                                <label class="field-label">Country</label>
+                                <select class="select-input" name="countryCode" value={countryCode} onchange={handleCountryChange}>
+                                    <template for:each={countryCodeOptions} for:item="opt">
+                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                    </template>
+                                </select>
+                            </div>
+
+                            <div class="phone-col large">
+                                <label class="field-label">Phone Number <span class="req">*</span></label>
+                                <input class="text-input" type="tel" name="phone" data-id="phoneInput" value={phone} oninput={handleNativeInput} />
+                                <div class="field-help">Enter a 10-digit mobile number (example: 9876543210).</div>
+                            </div>
+                        </div>
+
+                        <div class="col full actions-center">
+                            <button class="primary-btn small-btn" onclick={goToVerification} disabled={isNextDisabled}>NEXT</button>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- STEP 2 -->
+                <template if:true={showStep2}>
+                    <div class="verification-wrap">
+                        <div class="summary-block">
+                            <div class="summary-label">Email to verify</div>
+                            <div class="summary-value">{email}</div>
+                        </div>
+
+                        <div class="verification-row">
+                            <label class="field-label">Verification Code</label>
+                            <input class="text-input" name="otpInput" maxlength="6" value={otpInput} oninput={handleNativeOtp} />
+                        </div>
+
+                        <div class="verification-info">
+                            <button class="small-btn secondary-btn" onclick={handleSendCode} disabled={isSendCodeDisabled}>{sendCodeButtonLabel}</button>
+                            <button class="small-btn primary-btn" onclick={handleVerifyCode} disabled={disableVerifyButton}>Verify Code</button>
+                        </div>
+
+                        <div class="verification-info">
+                            <template if:true={resendTimerActive}>
+                                Resend available in {resendTimer} seconds.
+                            </template>
+                            <template if:false={resendTimerActive}>
+                                Didn’t receive the code? Click <b>Send Code</b> again.
+                            </template>
+                        </div>
+
+                        <div class="actions-center step2-actions">
+                            <button class="secondary-btn small-btn" onclick={backToStep1} disabled={isSubmitting}>Back</button>
+                            <button class="primary-btn small-btn" onclick={handleSubmit} disabled={isButtonDisabled}>SEND MESSAGE</button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Success overlay -->
+        <template if:true={showSuccessScreen}>
+            <div class="success-screen" role="dialog" aria-modal="true">
+                <div class="success-box">
+                    <h2 class="success-title">Request Sent</h2>
+                    <p class="success-message">Thanks — we’ve received your enquiry. Our team will be in touch within 24 hours.</p>
+                    <button class="primary-btn small-btn" onclick={handleCloseSuccess}>Close</button>
+                </div>
+            </div>
+        </template>
+    </section>
+</template>

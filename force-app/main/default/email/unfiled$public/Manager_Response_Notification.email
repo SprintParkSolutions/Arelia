@@ -1,0 +1,24 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hello [SUPERVISOR_NAME],</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">The <strong>3D Design Proposal</strong> for the below project has been [DECISION]<strong> by management</strong>.</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Approval Status:</strong></span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Client Name:</strong> [CLIENT_NAME]<br />
+<strong>Project Reference:</strong> [PROJECT_NAME]<br />
+<strong>Manager Decision:</strong> [DECISION]</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Manager Remarks:&nbsp;</strong><br />
+[COMMENTS]</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">You may now proceed with the next phase as per the defined process ,&nbsp;Please ensure all actions are updated <b>&nbsp;</b>for tracking and audit purposes.</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Sincerely,<br />
+Arelia Living&nbsp;</span></span></p>
+</body>
+</html>

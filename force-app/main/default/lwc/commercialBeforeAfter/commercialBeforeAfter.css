@@ -1,0 +1,136 @@
+:host { --accent: #c48b76; --muted: #777; display:block; }
+
+/* root */
+.ba-root { max-width: 1100px; margin: 0 auto; padding: 18px; }
+.ba-stage {
+  position: relative;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 18px 48px rgba(10,10,10,0.08);
+  background: #f8f5f2;
+  outline: none;
+  /* Ensure the stage clips the oversized absolute image */
+  overflow: hidden; 
+}
+
+/* images */
+.ba-img {
+  display: block;
+  width: 100%;
+  height: 420px;       /* consistent with modal look */
+  object-fit: cover;
+}
+
+/* The base image sits normally in the flow to set container height */
+.ba-base {
+    position: relative;
+}
+
+/* CHANGED: Overlay wrapper now anchors RIGHT.
+   Its width is controlled inline via JS. */
+.ba-overlay-wrap {
+  position: absolute;
+  top: 0;
+  right: 0; /* Changed from left: 0 */
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* NEW RULE: Crucial for alignment.
+   The image inside the right-anchored wrapper must itself be absolutely
+   anchored right and forced to full width so it doesn't squash. */
+.ba-overlay-wrap .ba-img {
+   position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  
+  object-fit: cover;
+}
+
+/* Handle */
+.ba-handle {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid rgba(0,0,0,0.08);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.012);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: ew-resize;
+  z-index: 30;
+  transition: transform 120ms ease;
+  touch-action: none;
+  /* Ensure handle is centered over the slider line regardless of direction */
+  margin-left: 0; 
+}
+
+/* inner handle styling */
+.ba-handle-inner { width: 22px; height: 22px; border-radius: 50%; display:flex; align-items:center; justify-content:center; }
+.ba-handle .bar {
+  display:block;
+  width: 2px;
+  height: 14px;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px rgba(196,139,118,0.06);
+}
+
+/* hover/active */
+.ba-handle:hover { transform: translateY(-50%) scale(1.05); }
+.ba-stage:active .ba-handle { transform: translateY(-50%) scale(1.08); }
+
+/* labels - updated class names */
+.ba-label {
+  position: absolute;
+  top: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 999px;
+  z-index: 20;
+  background: rgba(0,0,0,0.45);
+  font-family: "Georgia", serif;
+}
+.ba-label-left { left: 16px; }
+.ba-label-right { right: 16px; }
+
+/* caption */
+.ba-caption { margin-top: 10px; color: var(--muted); font-size: 13px; text-align:center; }
+
+/* responsive */
+@media (max-width: 980px) {
+  .ba-img { height: 360px; }
+}
+@media (max-width: 640px) {
+  .ba-img { height: 240px; }
+  .ba-handle { width: 32px; height: 32px; }
+  .ba-handle .bar { height: 12px; }
+}
+
+/* accessibility: focus */
+.ba-handle:focus,
+.ba-stage:focus {
+  outline: 3px solid rgba(196,139,118,0.18);
+  outline-offset: 3px;
+}
+
+/* reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .ba-handle, .ba-stage, .ba-img { transition: none !important; transform: none !important; }
+}
+/* tabs */
+.ba-tabs { display:flex; gap:8px; margin-bottom:12px; justify-content:center; }
+.ba-tab { background: #fff; border:1px solid rgba(0,0,0,0.06); padding:8px 12px; border-radius:999px; cursor:pointer; font-weight:600; color:#333; }
+.ba-tab.active { background: linear-gradient(180deg,#fff,#f7f3f1); box-shadow: 0 8px 20px rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.08); color: var(--accent); }
+.ba-tab:focus { outline: 3px solid rgba(196,139,118,0.14); outline-offset: 3px; }

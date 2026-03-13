@@ -1,0 +1,17 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">Hi {{{CustomerName}}},<br />
+<br />
+Thank you for choosing Arelia Living for your interior design project.<br />
+<br />
+Please click the link below to open the Inventory Catalogue and select your preferred interior products: <a href="{{{catalogueLink}}}">Link</a><br />
+<br />
+<br />
+Once you finish adding items to the cart and click "Generate Quotation", your quotation will be generated and emailed to you.<br />
+<br />
+Best Regards,<br />
+Arelia Living Team<br />
+&nbsp;</body>
+</html>

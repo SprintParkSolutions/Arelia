@@ -1,0 +1,103 @@
+<template>
+    <section class="shell">
+        <div class="header">
+            <div class="hTitle">
+                <h1 class="title">Budget Review</h1>
+               
+            </div>
+        </div>
+
+        <template if:true={loading}>
+            <div class="center">
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+            </div>
+        </template>
+
+        <template if:false={loading}>
+            <template if:true={errorText}>
+                <div class="error">{errorText}</div>
+            </template>
+
+            <div class="cards">
+                <div class="card">
+                    <div class="cardTop">
+                        <div class="label">Customer Budget</div>
+                    </div>
+                    <div class="money">
+                        <lightning-formatted-number value={customerBudget} format-style="currency" currency-code="INR"></lightning-formatted-number>
+                    </div>
+                    <lightning-input 
+                        data-id="customerBudget" 
+                        type="text" 
+                        label="Edit Customer Budget"
+                        value={customerBudgetText} 
+                        onchange={onCustomerInput} 
+                        disabled={isReadOnly}>
+                    </lightning-input>
+                </div>
+
+                <div class="card">
+                    <div class="cardTop">
+                        <div class="label">Supervisor Estimated Budget</div>
+                    </div>
+                    <div class="money">
+                        <lightning-formatted-number value={supervisorBudget} format-style="currency" currency-code="INR"></lightning-formatted-number>
+                    </div>
+                    <div class="chip">
+                        <span>Duration</span>
+                        <b>{durationLabel}</b>
+                    </div>
+                    <lightning-input 
+                        data-id="supervisorBudget" 
+                        type="text" 
+                        label="Edit Supervisor Budget"
+                        value={supervisorBudgetText} 
+                        onchange={onSupervisorInput} 
+                        disabled={isReadOnly}>
+                    </lightning-input>
+                    <lightning-input 
+                        data-id="duration" 
+                        type="text" 
+                        label="Edit Duration (Months)" 
+                        value={duration}
+                        onchange={onDurationInput} 
+                        disabled={isReadOnly}>
+                    </lightning-input>
+                </div>
+
+                <div class="card final">
+                    <div class="cardTop">
+                        <div class="label">Final Budget</div>
+                    </div>
+                    <div class="finalMoney">
+                        <lightning-formatted-number value={finalBudget} format-style="currency" currency-code="INR"></lightning-formatted-number>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="secTop">
+                    <div class="secTitle">Architecture Design</div>
+                </div>
+                <lightning-datatable key-field="id" data={architectureRows} columns={architectureColumns}
+                    draft-values={architectureDraftValues} hide-checkbox-column oncellchange={onArchChange}>
+                </lightning-datatable>
+            </div>
+
+            <div class="section">
+                <div class="secTop">
+                    <div class="secTitle">Payment Terms</div>
+                </div>
+                <lightning-datatable key-field="id" data={paymentTermRows} columns={paymentTermColumns}
+                    draft-values={paymentTermDraftValues} hide-checkbox-column oncellchange={onTermChange}>
+                </lightning-datatable>
+            </div>
+
+            <div class="footer">
+                <lightning-button variant="neutral" label={editButtonLabel} onclick={toggleEdit}></lightning-button>
+                <lightning-button class="ml" variant="brand" label="Save" onclick={save} disabled={isSaveDisabled}></lightning-button>
+                <lightning-button class="ml" variant="success" label="Send for Client Approval" icon-name="utility:email" onclick={handleSendToClient} disabled={loading}></lightning-button>
+            </div>
+        </template>
+    </section>
+</template>

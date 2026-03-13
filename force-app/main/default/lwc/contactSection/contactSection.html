@@ -1,0 +1,45 @@
+<template>
+  <section class="contact-section">
+    <div class="container">
+      <div class="intro">
+        <h2 class="heading">Let's Start a Conversation</h2>
+        <p class="lead">
+          Whether you already have a vision in mind or need a little guidance, our team is here to help bring your space
+          to life.
+        </p>
+      </div>
+
+      <div class="cards">
+        <template for:each={contactDetails} for:item="detail">
+          <div key={detail.title} class="card">
+            <div class="icon-box">
+              <span class="icon" lwc:dom="manual" data-key={detail.title}></span>
+            </div>
+
+            <div class="card-body">
+              <div class="card-title">{detail.title}</div>
+
+              <template for:each={detail.lines} for:item="line">
+                <p key={line} class="card-text">{line}</p>
+              </template>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <div class="follow">
+        <hr class="divider" />
+
+        <div class="follow-inner">
+          <div class="social">
+            <template for:each={socialLinks} for:item="s">
+              <a key={s.label} href={s.href} target="_blank" rel="noopener" class="social-btn" title={s.label}>
+                <span class="social-icon" lwc:dom="manual" data-key={s.label}></span>
+              </a>
+            </template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>

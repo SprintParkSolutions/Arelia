@@ -1,0 +1,177 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 02-11-2026
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<apex:page controller="PublicApprovalController" showHeader="false" sidebar="false" lightningStylesheets="true" applyHtmlTag="false" applyBodyTag="false" docType="html-5.0">
+
+    <head>
+        <title>Approval Request</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+        <style>
+            /* Base Page Styles */
+            body {
+                font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                background-color: #f4f6f9;
+                margin: 0;
+                padding: 0;
+            }
+
+            /* Card Container */
+            .container {
+                max-width: 600px;
+                margin: 60px auto;
+                background: white;
+                padding: 50px 40px;
+                border-radius: 16px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+                text-align: center;
+            }
+
+            /* Typography */
+            h1 {
+                color: #2c3e50;
+                margin-bottom: 15px;
+                font-size: 28px;
+                font-weight: 600;
+            }
+            p {
+                color: #7f8c8d;
+                font-size: 16px;
+                line-height: 1.5;
+                margin-bottom: 40px;
+            }
+
+            /* Buttons */
+            .btn-action {
+                border: none !important;
+                padding: 14px 40px !important;
+                margin: 10px !important;
+                font-size: 16px !important;
+                font-weight: 600 !important;
+                border-radius: 50px !important;
+                cursor: pointer !important;
+                transition: all 0.3s ease !important;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+                text-decoration: none !important;
+                display: inline-block !important;
+            }
+
+            .btn-action:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
+            }
+
+            .btn-approve {
+                background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%) !important;
+                color: white !important;
+            }
+
+            .btn-reject {
+                background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important;
+                color: white !important;
+            }
+
+            .btn-cancel {
+                background: #ecf0f1 !important;
+                color: #7f8c8d !important;
+            }
+
+            .reject-box {
+                margin-top: 20px;
+                padding-top: 20px;
+                border-top: 1px solid #eee;
+                animation: fadeIn 0.4s ease-out;
+            }
+
+            .reason-input {
+                width: 90%;
+                padding: 15px;
+                border: 2px solid #dfe6e9;
+                border-radius: 12px;
+                font-size: 15px;
+                margin-bottom: 20px;
+            }
+
+            .status-icon { font-size: 64px; margin-bottom: 20px; display: block; }
+            .icon-success { color: #2ecc71; }
+            .icon-reject { color: #e74c3c; }
+
+            .error-msg {
+                background-color: #fee;
+                color: #c0392b;
+                padding: 15px;
+                border-radius: 8px;
+                border: 1px solid #fcc;
+                margin-top: 20px;
+            }
+
+            @keyframes fadeIn {
+                from { opacity:0; transform: translateY(10px); }
+                to { opacity:1; transform: translateY(0); }
+            }
+        </style>
+
+        <script>
+            window.onload = function() {
+                const urlParams = new URLSearchParams(window.top.location.search);
+                const myId = urlParams.get('id');
+                if (myId) {
+                    passIdToController(myId);
+                }
+            };
+        </script>
+    </head>
+
+    <body>
+        <div class="container">
+            <apex:outputPanel id="mainPanel">
+                <apex:form >
+                    <apex:actionFunction name="passIdToController" action="{!setRecordIdFromClient}" reRender="mainPanel">
+                        <apex:param name="pId" value="" />
+                    </apex:actionFunction>
+
+                    <apex:actionStatus id="btnStatus">
+                        <apex:facet name="start">
+                            <p style="color:#2980b9; font-weight:600;">Processing request...</p>
+                        </apex:facet>
+                    </apex:actionStatus>
+
+                    <apex:outputPanel rendered="{!AND(NOT(approved), NOT(rejected), NOT(isRejecting))}">
+                        <h1>Approval Request</h1>
+                        <p>Please review the Catalouge Document sent to your email.</p>
+                        
+                        <apex:commandButton value="Approve" action="{!doApprove}" reRender="mainPanel" status="btnStatus" styleClass="btn-action btn-approve"/>
+                        <apex:commandButton value="Reject" action="{!enableRejectMode}" reRender="mainPanel" status="btnStatus" styleClass="btn-action btn-reject"/>
+                    </apex:outputPanel>
+
+                    <apex:outputPanel rendered="{!isRejecting}" styleClass="reject-box">
+                        <h1>Reason for Rejection</h1>
+                        <apex:inputTextarea value="{!rejectionReason}" styleClass="reason-input" rows="4" html-placeholder="Enter reason here..."/>
+                        <apex:commandButton value="Confirm Reject" action="{!doConfirmReject}" reRender="mainPanel" status="btnStatus" styleClass="btn-action btn-reject"/>
+                        <apex:commandButton value="Cancel" action="{!cancelRejectMode}" reRender="mainPanel" immediate="true" styleClass="btn-action btn-cancel"/>
+                    </apex:outputPanel>
+                </apex:form>
+
+                <apex:outputPanel rendered="{!approved}">
+                    <span class="status-icon icon-success">✔</span>
+                    <h1>Approved!</h1>
+                    <p>The Catalouge Document have been successfully approved.</p>
+                </apex:outputPanel>
+
+                <apex:outputPanel rendered="{!rejected}">
+                    <span class="status-icon icon-reject">✘</span>
+                    <h1>Rejected</h1>
+                    <p>Your feedback has been recorded.</p>
+                </apex:outputPanel>
+
+                <apex:outputPanel rendered="{!hasError}" styleClass="error-msg">
+                    <strong>Error:</strong> {!errorMessage}
+                </apex:outputPanel>
+            </apex:outputPanel>
+        </div>
+    </body>
+</apex:page>

@@ -1,0 +1,178 @@
+<template>
+    <lightning-card title="Site Visit Report">
+        
+        <template if:true={isLoading}>
+            <div class="slds-p-around_large">
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+            </div>
+        </template>
+
+        <template if:false={isLoading}>
+            
+            <template if:false={isLandingView}>
+                <div class="slds-p-around_medium">
+                    <lightning-progress-indicator current-step={currentStepString} type="path" variant="base">
+                        <lightning-progress-step label="Fill Details" value="1"></lightning-progress-step>
+                        <lightning-progress-step label="Upload Documents" value="2"></lightning-progress-step>
+                        <lightning-progress-step label="Preview & Submit" value="3"></lightning-progress-step>
+                    </lightning-progress-indicator>
+                </div>
+            </template>
+
+            <template if:true={isCreateView}>
+                <div class="slds-p-horizontal_medium slds-m-top_medium">
+                    <div class="slds-text-heading_small slds-m-bottom_medium">Create {objectApiName} Report</div>
+                    <lightning-record-edit-form
+                        object-api-name="Site_Visit_Report__c"
+                        onsubmit={handleCreateSubmit}>
+
+                        <div class="slds-grid slds-wrap">
+                            <template for:each={step1EditableFields} for:item="f">
+                                <div key={f} class="slds-col slds-size_1-of-2 slds-p-around_x-small">
+                                    <lightning-input-field field-name={f}></lightning-input-field>
+                                </div>
+                            </template>
+                        </div>
+
+                        <div class="slds-grid slds-grid_align-end slds-m-top_medium">
+                            <lightning-button variant="brand" type="submit" label="Create & Continue"></lightning-button>
+                        </div>
+                    </lightning-record-edit-form>
+                </div>
+            </template>
+
+            <template if:true={isLandingView}>
+                <div class="slds-p-around_large slds-text-align_center slds-box slds-theme_shade slds-m-horizontal_medium">
+                    <h2 class="slds-text-heading_medium slds-m-bottom_medium">Report Exists</h2>
+                    <p class="slds-m-bottom_medium">A Site Visit Report has already been created for this {objectApiName}.</p>
+                    <lightning-button 
+                        variant="brand" 
+                        label="Resume Report" 
+                        onclick={handleStartWizard}
+                        class="slds-m-top_medium">
+                    </lightning-button>
+                </div>
+            </template>
+
+            <template if:true={isWizardView}>
+                
+                <template if:true={isStep2}>
+                    <div class="slds-p-around_medium slds-text-align_center">
+                        <h2 class="slds-text-heading_small slds-m-bottom_medium">Upload Layout Blueprint</h2>
+                        
+                        <template if:false={isReadOnly}>
+                            <div class="file-upload-container">
+                                <lightning-file-upload
+                                    label="Attach Files"
+                                    name="fileUploader"
+                                    record-id={svrId}
+                                    onuploadfinished={handleUploadFinished}
+                                    multiple>
+                                </lightning-file-upload>
+                            </div>
+                        </template>
+                        <template if:true={isReadOnly}>
+                            <p class="slds-text-color_error">Uploads disabled - Manager Approved.</p>
+                        </template>
+
+                        <div class="slds-grid slds-grid_align-end slds-m-top_large">
+                            <lightning-button variant="brand" label="Next: Preview" onclick={goToStep3}></lightning-button>
+                        </div>
+                    </div>
+                </template>
+
+                <template if:true={isStep3}>
+                    <div class="slds-p-horizontal_medium">
+                        
+                        <template if:false={isReadOnly}>
+                            <div class="slds-notify slds-notify_alert slds-alert_warning slds-m-bottom_medium" role="alert">
+                                <span class="slds-assistive-text">warning</span>
+                                <h2>
+                                    <strong>Status: Edit Mode</strong><br/>
+                                    • Use <strong>"Save Draft"</strong> to save changes without notifying the Manager.<br/>
+                                    • Use <strong>"Final Submit"</strong> to set Status to <strong>Approved</strong> and notify the Manager.
+                                </h2>
+                            </div>
+                        </template>
+                        <template if:true={isReadOnly}>
+                             <div class="slds-notify slds-notify_alert slds-theme_success slds-m-bottom_medium" role="alert">
+                                <span class="slds-assistive-text">success</span>
+                                <h2>
+                                    <strong>Locked:</strong> This report has been fully approved by the Manager.
+                                </h2>
+                            </div>
+                        </template>
+
+                        <template if:true={files.length}>
+                            <div class="slds-box slds-theme_shade slds-m-bottom_medium">
+                                <div class="slds-grid slds-wrap slds-gutters">
+                                    <template for:each={files} for:item="f">
+                                        <div key={f.ContentDocumentId} class="slds-col slds-size_1-of-4 slds-text-align_center">
+                                            <template if:true={f.isImage}>
+                                                <img src={f.imageUrl} class="preview-image"/>
+                                            </template>
+                                            <p class="slds-text-body_small">{f.ContentDocument.Title}</p>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+
+                        <lightning-record-edit-form
+                            object-api-name="Site_Visit_Report__c"
+                            record-id={svrId}
+                            onsuccess={handleDraftSuccess}
+                            onerror={handleDraftError}>
+
+                            <div class="slds-grid slds-wrap">
+                                <template for:each={combinedPreviewFields} for:item="f">
+                                    <div key={f.uniqueKey} class="slds-col slds-size_1-of-2 slds-p-horizontal_small">
+                                        
+                                        <template if:true={f.isEditable}>
+                                            <template if:false={isReadOnly}>
+                                                <lightning-input-field field-name={f.apiName}></lightning-input-field>
+                                            </template>
+                                            <template if:true={isReadOnly}>
+                                                <lightning-output-field field-name={f.apiName}></lightning-output-field>
+                                            </template>
+                                        </template>
+
+                                        <template if:false={f.isEditable}>
+                                            <lightning-output-field field-name={f.apiName}></lightning-output-field>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <button class="hidden-submit-btn slds-hide" type="submit"></button>
+
+                            <div class="slds-grid slds-grid_align-spread slds-m-top_medium slds-m-bottom_medium">
+                                <lightning-button label="Back" onclick={goBackToStep2} disabled={isReadOnly}></lightning-button>
+
+                                <div class="slds-grid slds-gutters">
+                                    <template if:false={isReadOnly}>
+                                        <div class="slds-col">
+                                            <lightning-button 
+                                                label="Save Draft" 
+                                                title="Save changes locally (Does not trigger approval)"
+                                                onclick={handleDraftSave}>
+                                            </lightning-button>
+                                        </div>
+                                        <div class="slds-col">
+                                            <lightning-button
+                                                variant="destructive"
+                                                label="Final Submit"
+                                                title="Set Status to Approved & Notify Manager"
+                                                onclick={submitFinal}>
+                                            </lightning-button>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </lightning-record-edit-form>
+                    </div>
+                </template>
+            </template>
+        </template>
+    </lightning-card>
+</template>

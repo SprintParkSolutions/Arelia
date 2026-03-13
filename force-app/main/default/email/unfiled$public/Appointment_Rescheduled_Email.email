@@ -1,0 +1,19 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Hi <strong>{{{Recipient.Supervisor_User__c}}}</strong>,<br />
+<br />
+The appointment for <strong>{{{Recipient.FirstName}}}</strong>&nbsp;<strong>{{{Recipient.LastName}}}</strong>&nbsp;has been <strong>{{{Recipient.Appointment_Status__c}}}</strong>.<br />
+<br />
+<strong>New Rescheduled Appointment Details:</strong></span></span>
+<ul>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Rescheduled Appointment date:&nbsp;<strong>{{{Recipient.Appointment_Rescheduled_Time__c}}}</strong></span></span></li>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Time Slots:&nbsp;<strong>{{{Recipient.Time_Slots__c}}}</strong></span></span></li>
+</ul>
+<span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;"> Please make a note of the updated schedule and reach out if any clarification is needed.<br />
+<br />
+<br />
+Thanks,<br />
+Arelia Living Team</span></span></body>
+</html>

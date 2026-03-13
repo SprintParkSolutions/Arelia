@@ -1,0 +1,29 @@
+<template>
+    <section class="portfolio-cover" aria-label="Residential portfolio hero">
+        <div class="image-container" data-hero>
+
+            <video class="cover-video" src={coverVideo} autoplay muted loop playsinline preload="metadata"
+                poster={posterImage} aria-hidden="true"></video>
+
+            <div class="caption-overlay" role="region" aria-label="Hero message">
+
+                <h1 class="hero-title" style="font-family:'Playfair Display', serif !important;">
+                    Where Luxury Meets Thoughtful Living
+                </h1>
+
+                <!-- HERO SUBTITLE -->
+                <p class="hero-sub" style="font-family:'Lato', sans-serif !important;">
+                    Crafting spaces that feel timeless, warm and effortlessly refined.
+                </p>
+
+                <!-- CTA BUTTON -->
+                <button class="unique-button" onclick={navigateToProjectRequest} aria-label="Talk to our designer"
+                    style="font-family:'Lato', sans-serif !important;">
+                    Talk to Our Designer
+                </button>
+
+            </div>
+        </div>
+    </section>
+
+</template>

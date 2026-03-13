@@ -1,0 +1,26 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<div style="font-family: Arial, sans-serif; font-size: 14px; color: #333; line-height: 1.6;">
+<p>Dear {{CLIENT_NAME}},</p>
+
+<p>Thank you for your valuable feedback regarding the proposal for <b>{{OPPORTUNITY_NAME}}</b>. We understand that flexibility is key, and we have reworked the payment schedule to better align with your requirements.</p>
+
+<div style="background-color: #f8f9fa; border-left: 5px solid #6c757d; padding: 15px; margin: 20px 0; border-radius: 4px;"><strong style="color: #495057;">Based on your request:</strong><br />
+<span style="font-style: italic;">"{{CLIENT_REMARKS}}"</span></div>
+
+<p>We believe this updated schedule meets your expectations. Please click the link below to view the detailed breakdown and confirm your acceptance so we can move forward with the next steps.</p>
+
+<p style="margin-top: 25px;"><a href="{{APPROVAL_LINK}}" style="background-color: #198754; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px;">View &amp; Accept Updated Terms </a></p>
+
+<p>If you have any further questions, please do not hesitate to reach out to your primary contact, <b>{{OWNER_NAME}}</b>.</p>
+
+<hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+<p>Warm regards,<br />
+<b>Arelia Living</b><br />
+&nbsp;</p>
+</div>
+</body>
+</html>

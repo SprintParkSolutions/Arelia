@@ -1,0 +1,25 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p>Dear&nbsp;<strong>{{{Case.Project_Client_Name__c}}},</strong></p>
+
+<p>We are pleased to inform you that the support case you raised regarding your project&nbsp;<strong>{{{Case.Project__c}}}</strong>, has been successfully resolved and closed. Our team has carefully reviewed the issue and taken necessary steps to ensure it has been addressed.<br />
+<br />
+Kindly find the details of the closed support case provided below :</p>
+
+<p>Case ID :&nbsp;<strong>{{{Case.Id}}},</strong><br />
+Case Subject<b> </b>:&nbsp;<strong>&nbsp;{{{Case.Subject}}},</strong><br />
+Case Description :&nbsp;<strong>{{{Case.Description}}}</strong><br />
+<br />
+If you have any additional questions, require further clarification, or would like to discuss any related concerns, we kindly request that you reach out to your assigned project supervisor.<br />
+<br />
+Supervisor Contact Mail : <strong>{{{Case.Supervisor_Email__c}}}</strong><br />
+<br />
+Thank you for your patience, cooperation, and continued trust in our services. We look forward to supporting you throughout the successful completion of your requirement.<br />
+<br />
+Best Regards,<br />
+Arelia Living</p>
+</body>
+</html>

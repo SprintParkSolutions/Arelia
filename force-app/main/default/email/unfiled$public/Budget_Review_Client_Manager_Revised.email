@@ -1,0 +1,33 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hello {{CLIENT_NAME}},</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Our Manager has reviewed the budget estimation for your project <strong>{{OPPORTUNITY_NAME}}</strong> and requested some adjustments to ensure accuracy and alignment with your requirements.</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">The Supervisor has updated the budget based on these inputs. Please review the revised details and provide your approval to proceed.</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Manager Remarks:</strong></span></span><br />
+<em>{{MANAGER_REMARKS}}</em></p>
+
+<table style="border-collapse: collapse; width: 100%; max-width: 600px; margin-top: 15px;">
+	
+		<tr style="background-color: #f3f3f3;">
+			<td style="padding: 10px; border: 1px solid #ddd;"><strong>Final Estimated Budget</strong></td>
+			<td style="padding: 10px; border: 1px solid #ddd;"><strong>{{FINAL_BUDGET}}</strong></td>
+		</tr>
+		<tr>
+			<td style="padding: 10px; border: 1px solid #ddd;"><strong>Estimated Duration</strong></td>
+			<td style="padding: 10px; border: 1px solid #ddd;">{{DURATION}}</td>
+		</tr>
+	
+</table>
+
+<p style="margin-top: 20px;"><a href="{{APPROVAL_LINK}}" style="background-color: #005fb2; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Review &amp; Approve Revised Budget </a></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Best Regards,<br />
+&nbsp;Arelia Living</span></span></p>
+</body>
+</html>

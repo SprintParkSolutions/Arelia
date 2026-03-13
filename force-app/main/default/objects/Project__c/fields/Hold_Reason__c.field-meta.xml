@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Hold_Reason__c</fullName>
+    <inlineHelpText>It shows the Project hold reasons.</inlineHelpText>
+    <label>Hold Reason</label>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Status__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Vendor Abscond</fullName>
+                <default>false</default>
+                <label>Vendor Abscond</label>
+            </value>
+            <value>
+                <fullName>Design Issue</fullName>
+                <default>false</default>
+                <label>Design Issue</label>
+            </value>
+            <value>
+                <fullName>Hold Request from Client</fullName>
+                <default>false</default>
+                <label>Hold Request from Client</label>
+            </value>
+            <value>
+                <fullName>Buddget Issue</fullName>
+                <default>false</default>
+                <label>Buddget Issue</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Hold</controllingFieldValue>
+            <valueName>Vendor Abscond</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Hold</controllingFieldValue>
+            <valueName>Design Issue</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Hold</controllingFieldValue>
+            <valueName>Hold Request from Client</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Hold</controllingFieldValue>
+            <valueName>Buddget Issue</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

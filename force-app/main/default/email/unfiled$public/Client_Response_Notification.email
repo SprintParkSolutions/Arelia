@@ -1,0 +1,38 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hello [SUPERVISOR_NAME],</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">This is to formally inform you that a response has been received from the client regarding the <strong>3D Design Proposal</strong> for the below-mentioned project.</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Project &amp; Client Details</strong></span></span></p>
+
+<ul>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Project Reference:</strong> [PROJECT_NAME]</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Project Description: </strong>[PROJECT_DESCRIPTION]</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Site Space: </strong>[SITE_SPACE]</span></span></li>
+</ul>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Primary Contact Details</strong></span></span></p>
+
+<ul>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Contact Name:&nbsp;</strong>[CLIENT_NAME]</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Email ID:&nbsp;</strong>[CLIENT_EMAIL]</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Mobile Number:&nbsp;</strong>[CLIENT_MOBILE]</span></span></li>
+</ul>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Client Decision on 3D Design</strong></span></span></p>
+
+<ul>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Client Decision:</strong> [DECISION]</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Feedback &amp; Comments:&nbsp;</strong>[COMMENTS]</span></span></li>
+</ul>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Please log in to Salesforce to review the specific design version and prioritize any requested revisions.</span></span></p>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Sincerely,<br />
+Arelia Living&nbsp;</span></span></p>
+</body>
+</html>

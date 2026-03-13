@@ -1,0 +1,145 @@
+<template>
+    <div class="form-wrapper">
+        <template if:true={showForm}>
+            <section class="card-shell">
+                <header class="card-header">
+                    <h2 class="card-title">Interior Project Request – Manual Quotation</h2>
+                    <p class="card-subtitle">
+                        Please verify your details and share more information about your
+                        project so that we can prepare a customised quotation.
+                    </p>
+                </header>
+
+                <div class="card-body">
+                    <div class="slds-grid slds-wrap slds-gutters">
+                        <!-- First Name -->
+                        <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-input label="First Name" value={firstName} onchange={handleChange}
+                                name="firstName" readonly></lightning-input>
+                        </div>
+
+                        <!-- Last Name -->
+                        <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-input label="Last Name" value={lastName} onchange={handleChange} name="lastName"
+                                readonly></lightning-input>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-input label="Email" type="email" value={email} onchange={handleChange}
+                                name="email" readonly></lightning-input>
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
+                            <div class="slds-form-element phone-field">
+                                <label class="slds-form-element__label" for="phoneField">
+                                    Phone
+                                </label>
+                                <div class="slds-form-element__control phone-wrapper" id="phoneField">
+                                    <lightning-combobox name="countryCode" value={countryCode} options={countryOptions}
+                                        onchange={handleCountryChange} class="country-box" disabled>
+                                    </lightning-combobox>
+
+                                    <lightning-input type="tel" placeholder="Phone" value={phoneNumber}
+                                        onchange={handlePhoneInput} class="phone-box" readonly>
+                                    </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Type of Project -->
+                        <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-combobox name="typeOfProject" label="Type of Project" value={typeOfProject}
+                                placeholder="Select Project Type" options={projectTypeOptions}
+                                onchange={handleChange}></lightning-combobox>
+                        </div>
+
+                        <!-- Project Scope -->
+                        <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-combobox name="projectScope" label="Project Scope" value={projectScope}
+                                placeholder="Select Project Scope" options={projectScopeOptions} onchange={handleChange}
+                                disabled={isScopeDisabled}></lightning-combobox>
+                        </div>
+
+                        <!-- Plan Level -->
+                        <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-combobox name="planLevel" label="Plan Level" value={planLevel} placeholder="Select Plan Level"
+                                options={planLevelOptions} onchange={handleChange}>
+                            </lightning-combobox>
+                        </div>
+
+                        <!-- Company -->
+                        <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-input label="Company" value={company} placeholder="Company (optional)"
+                                onchange={handleChange} name="company"></lightning-input>
+                        </div>
+
+                        <!-- Budget -->
+                        <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-input label="Budget" type="number" value={budget} placeholder="Enter Budget in INR"
+                                onchange={handleChange} name="budget"></lightning-input>
+                        </div>
+
+                        <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-input label="Site Space" type="number" value={siteSpace} name="siteSpace"
+                                placeholder="Site area in sq. ft." onchange={handleChange}>
+                            </lightning-input>
+                        </div>
+
+                        <!-- Site Location -->
+                        <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-textarea label="Site Location" value={siteLocation}
+                                placeholder="Full address of project site" onchange={handleChange}
+                                name="siteLocation"></lightning-textarea>
+                        </div>
+
+                        <!-- Project Description -->
+                        <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-textarea label="Project Description" value={projectDescription}
+                                placeholder="Tell us about your space, style preferences and expectations"
+                                onchange={handleChange} name="projectDescription"></lightning-textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <footer class="card-footer">
+                    <div class="footer-left">
+                        <span class="quote-pill">Project Type: {quotationTypeLabel}</span>
+                    </div>
+                    <div class="footer-right">
+                        <lightning-button variant="neutral" label="Previous" onclick={goToPrevious}
+                            class="slds-m-right_small">
+                        </lightning-button>
+                        <lightning-button variant="brand" label="Submit Request" onclick={submitLead}
+                            class="submit-btn">
+                        </lightning-button>
+                    </div>
+                </footer>
+            </section>
+        </template>
+
+        <!-- SUCCESS SCREEN -->
+        <template if:true={showSuccess}>
+            <div class="success-shell">
+                <div class="thank-you-card">
+                    <div class="thank-you-header">
+                        <h2>Thank you for your request</h2>
+                    </div>
+                    <div class="thank-you-body">
+                        <lightning-icon icon-name="utility:success" size="large" class="success-icon"
+                            alternative-text="Success">
+                        </lightning-icon>
+                        <p class="thank-you-text">
+                            Your project details have been received. Our design team will review
+                            your requirements and share a customised quotation with you shortly.
+                        </p>
+                        <lightning-button variant="brand" label="Close" onclick={handleCloseSuccess}
+                            class="thank-you-close-btn">
+                        </lightning-button>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+</template>

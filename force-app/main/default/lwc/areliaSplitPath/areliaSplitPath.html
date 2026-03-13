@@ -1,0 +1,59 @@
+<template>
+    <template if:true={isVisible}>
+        <lightning-card title="Arelia Project Flow" icon-name="standard:opportunity">
+            
+            <div slot="actions">
+                <lightning-button-icon 
+                    icon-name="utility:refresh" 
+                    variant="border-filled" 
+                    alternative-text="Refresh Path" 
+                    onclick={handleRefresh}>
+                </lightning-button-icon>
+            </div>
+
+            <template if:false={isReady}>
+                <div class="slds-p-around_medium">
+                    <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                </div>
+            </template>
+
+            <template if:true={isReady}>
+                
+                <template if:true={hasAccess}>
+                    <div class="slds-path">
+                        <div class="slds-grid slds-path__track">
+                            <div class="slds-grid slds-path__scroller-container">
+                                
+                                <div class="slds-path__scroller" role="application">
+                                    <div class="slds-path__scroller_inner">
+                                        <ul class="slds-path__nav" role="listbox">
+                                            <template for:each={steps} for:item="step">
+                                                <li key={step.key} class={step.class} role="presentation">
+                                                    <a class="slds-path__link" role="option" tabindex="-1">
+                                                        <span class="slds-path__stage">
+                                                            <lightning-icon icon-name={step.icon} size="xx-small"
+                                                                alternative-text={step.label}></lightning-icon>
+                                                        </span>
+                                                        <span class="slds-path__title" title={step.label}>{step.label}</span>
+                                                    </a>
+                                                </li>
+                                            </template>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <template if:false={hasAccess}>
+                    <div class="slds-p-around_medium slds-text-color_error">
+                        We couldn’t load this Opportunity path. The record may not be accessible on this site.
+                    </div>
+                </template>
+
+            </template>
+        </lightning-card>
+    </template>
+</template>

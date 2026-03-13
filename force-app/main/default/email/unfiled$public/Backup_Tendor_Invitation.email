@@ -1,0 +1,35 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<div style="font-family: Arial, sans-serif; font-size: 14px; line-height: 1.5;">
+<p>Dear {{{Vendor__c.Name}}},</p>
+&nbsp;
+
+<p>You are formally invited to participate in the tender process for the <b>{{{Vendor_Category__c}}}</b> requirement under our opportunity titled <b>{{{Opportunity.Name}}}</b>.</p>
+
+<p style="color: #c00; font-weight: bold; background-color: #ffeaea; padding: 10px; border: 1px solid #c00;">Please note: This is a BACKUP tender invitation. The previously assigned vendor was unable to complete the work.</p>
+{{{Absconded_Task_Table}}}
+
+<p><b>We have attached the Proforma Invoice regarding the remaining work.</b></p>
+{{{Specification_Table}}}
+
+<p>If you have any questions or require clarifications regarding the remaining scope, please contact the project supervisor:</p>
+
+<ul>
+	<li><b>Owner Name:</b> {{{Opportunity.SupervisorName}}}</li>
+	<li><b>Email:</b> {{{Opportunity.SupervisorEmail}}}</li>
+	<li><b>Phone:</b> {{{Opportunity.SupervisorPhone}}}</li>
+</ul>
+
+<p>Please find the Proforma Invoice and other relevant files attached for your reference.</p>
+
+<p>Kindly review the details and respond at your earliest convenience.</p>
+
+<p>Sincerely,</p>
+
+<p>Arelia Project Management Team</p>
+</div>
+</body>
+</html>

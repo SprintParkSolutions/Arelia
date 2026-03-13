@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Rejection_Description__c</fullName>
+    <description>Reason for rejection if the lead is being rejected</description>
+    <inlineHelpText>Please provide description for rejection of the lead if the approval status is rejected.</inlineHelpText>
+    <label>Rejection Description</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>TextArea</type>
+</CustomField>

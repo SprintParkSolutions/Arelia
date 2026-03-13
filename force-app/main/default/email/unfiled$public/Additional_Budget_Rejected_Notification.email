@@ -1,0 +1,25 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Hello </span></span><strong>{{{Project__c.Supervisor__r.Name}}}</strong><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">,<br />
+<br />
+<br />
+The additional budget request has been&nbsp;<strong>{{{Project__c.Additional_Request_Status__c}}}</strong> for the project below.<br />
+<br />
+<strong>Project Details:</strong></span></span>
+<ul>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;"><strong>Project Name:</strong>&nbsp;{{{Project__c.Name}}}</span></span></li>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;"><strong>Additional Amount:</strong>&nbsp;{{{Project__c.Pending_Additional_Amount__c}}}</span></span></li>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;"><strong>Additional Amount Request Reason:</strong>&nbsp;{{{Project__c.Pending_Additional_Reason__c}}}</span></span></li>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;"><strong>Rejection Reasion:</strong>&nbsp;{{{rejectionReason}}}</span></span></li>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;"><strong>Status:</strong>&nbsp;{{{Project__c.Additional_Request_Status__c}}}</span></span></li>
+</ul>
+<br />
+<span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Please review and take action using the link below:<br />
+<br />
+<br />
+<br />
+Best Regards,<br />
+Arelia Team</span></span></body>
+</html>

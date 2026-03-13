@@ -1,0 +1,98 @@
+<template>
+  <section class="stats-root" aria-labelledby="stats-title" role="region">
+    <div class="wrap">
+      <div class="layout">
+
+        <!-- LEFT COPY COLUMN -->
+        <div class="copy-col">
+
+          <!-- EYEBROW -->
+          <p class="eyebrow"
+             style="font-family:'Lato', sans-serif !important; font-size:14 px !important; line-height:1.4 !important;">
+            IMPACT IN NUMBERS
+          </p>
+
+          <!-- TITLE -->
+          <h2 id="stats-title" class="title"
+              style="font-family:'Playfair Display', serif !important; font-size:36 px !important; line-height:1.3 !important;">
+            Designing spaces that quietly speak luxury.
+          </h2>
+
+          <!-- SUBTITLE -->
+          <p class="subtitle"
+             style="font-family:'Lato', sans-serif !important; font-size:16px !important; line-height:1.5 !important;">
+            From boutique apartments to large-scale commercial spaces, our numbers reflect projects that are
+            delivered with precision, transparency, and a deeply detailed design process.
+          </p>
+
+        </div>
+
+        <!-- RIGHT STATS COLUMN -->
+        <div class="stats-col">
+
+          <!-- HERO STAT -->
+          <template if:true={primaryStat}>
+            <div class="hero-stat">
+              <div class="hero-ring"></div>
+              <div class="hero-inner">
+
+                <!-- HERO LABEL -->
+                <span class="hero-label"
+                      style="font-family:'Lato', sans-serif !important; font-size:15 px !important; line-height:1.4 !important;">
+                  Flagship Metric
+                </span>
+
+                <!-- HERO NUMBER -->
+                <span class="hero-number"
+                      data-value={primaryStat.value}
+                      aria-label={primaryStatAria}>
+                  0
+                </span>
+
+                <!-- HERO CAPTION -->
+                <span class="hero-caption"
+                      style="font-family:'Lato', sans-serif !important; font-size:16 px !important; line-height:1.4 !important;">
+                  {primaryStat.label}
+                </span>
+
+              </div>
+            </div>
+          </template>
+
+          <!-- SUPPORTING STATS -->
+          <div class="support-grid">
+            <template for:each={secondaryStats} for:item="s">
+              <article key={s.key} class="stat-tile">
+
+                <div class="stat-header">
+                  <span class="stat-pill"></span>
+
+                  <!-- STAT LABEL -->
+                  <span class="stat-label"
+                        style="font-family:'Playfair Display', serif !important; font-size:16 px !important; line-height:1.3 !important;">
+                    {s.label}
+                  </span>
+                </div>
+
+                <!-- STAT NUMBER -->
+                <div class="stat-number"
+                     data-value={s.value}
+                     aria-label={s.aria}>
+                  0
+                </div>
+
+                <!-- STAT NOTE -->
+                <p class="stat-note"
+                   style="font-family:'Lato', sans-serif !important; font-size:16 px !important; line-height:1.5 !important;">
+                  {s.note}
+                </p>
+
+              </article>
+            </template>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+</template>

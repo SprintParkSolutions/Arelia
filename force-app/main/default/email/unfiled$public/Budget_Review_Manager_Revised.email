@@ -1,0 +1,32 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p>Hello Manager,</p>
+
+<p>This is a notification regarding the internal review of project <strong>{{OPPORTUNITY_NAME}}</strong>.</p>
+
+<p><strong>Status: Re-Submitted for Manager Approval</strong><br />
+The Supervisor has updated the budget estimates and payment terms based on your previous feedback.</p>
+
+<p><strong>Context for Revision:</strong><br />
+The following changes were requested during your last review:</p>
+
+<blockquote><em>"{{MANAGER_REMARKS}}"</em></blockquote>
+
+<p>The team has addressed these points. Please review the updated figures to ensure compliance before we finalize the contract for the client.</p>
+<br />
+<a href="{{APPROVAL_LINK}}" style="background-color:#ba0517; color:#ffffff; display:inline-block; padding:14px 28px; text-decoration:none; border-radius:4px; font-weight:bold; font-family:Arial, sans-serif; font-size:16px;">Review Revised Budget</a><br />
+&nbsp;
+<p><strong>Next Steps:</strong></p>
+
+<ul>
+	<li>If <strong>Approved</strong>: The system will lock the budget and notify the Supervisor to proceed.</li>
+	<li>If <strong>Rejected</strong>: You may request further changes if the updates are insufficient.</li>
+</ul>
+
+<p>Thank you,<br />
+Arelia Living</p>
+</body>
+</html>

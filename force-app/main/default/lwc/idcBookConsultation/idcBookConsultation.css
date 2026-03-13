@@ -1,0 +1,193 @@
+:host {
+  --accent: #A8B4A5;
+  --muted: #8c8b8b;
+  --bg: #f5f5dc;
+  --card-bg: linear-gradient(135deg, rgba(248,244,238,1), rgba(242,238,230,1));
+  --text-deep: #3E3B32;
+  --text-soft: #5A5852;
+
+  /* NEW — your terracotta / orange brand */
+  --cta-left: #b76a53;
+  --cta-right: #c48b76;
+
+  display: block;
+  font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+}
+
+/* outer container */
+.consult-strip {
+  padding: 56px 20px;
+}
+
+/* inner card — start hidden */
+.consult-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 40px;
+  align-items: center;
+  background: var(--card-bg);
+  border-radius: 24px;
+  border: 1px solid rgba(168,180,165,0.22);
+  box-shadow: 0 18px 40px rgba(58,54,46,0.12);
+  padding: 32px;
+
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 480ms cubic-bezier(.2,.9,.2,1),
+              transform 480ms cubic-bezier(.2,.9,.2,1);
+  will-change: opacity, transform;
+}
+
+.consult-inner.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* reveal for text */
+.consult-right .reveal {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 420ms ease, transform 420ms cubic-bezier(.2,.9,.2,1);
+  will-change: opacity, transform;
+}
+.consult-right.in-view .reveal {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* image container */
+.image-column {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* image card */
+.image-card {
+  max-width: 460px;
+  width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(168,180,165,0.14);
+  box-shadow: 0 20px 48px rgba(58,54,46,0.12);
+  background: #fff;
+  animation: floatCard 6s ease-in-out infinite;
+  transition: transform .25s ease, box-shadow .25s ease;
+  position: relative;
+  will-change: transform;
+}
+
+/* pop-in effect */
+.image-card.pop-in {
+  transform: translateY(-6px) scale(1.02);
+  opacity: 1;
+  animation: none !important;
+  transition: transform 360ms cubic-bezier(.2,.9,.2,1),
+              opacity 360ms ease;
+}
+
+/* image */
+.consult-img {
+  width: 100%;
+  height: 340px;
+  object-fit: cover;
+  transition: transform 4200ms ease, opacity 260ms ease;
+  will-change: transform, opacity;
+}
+
+/* float */
+@keyframes floatCard {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+
+/* kenburns */
+@keyframes kenburns-slow {
+  from { transform: scale(1); }
+  to { transform: scale(1.03) translate(6px, -6px); }
+}
+.consult-img.kenburns {
+  animation: kenburns-slow 14s ease-in-out infinite alternate;
+}
+
+/* content column */
+.consult-right {
+  padding: 6px 6px 6px 18px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  font-size: .78rem;
+  letter-spacing: .18em;
+  color: var(--muted);
+  margin: 0 0 8px;
+  opacity: 0.95;
+  font-weight: 600;
+}
+
+.headline {
+  font-size: 1.95rem;
+  color: var(--text-deep);
+  margin: 6px 0 12px;
+  font-weight: 700;
+  line-height: 1.06;
+}
+
+.subtext {
+  font-size: 1rem;
+  color: var(--text-soft);
+  margin: 0 0 20px;
+}
+
+/* NEW Orange CTA button */
+.cta-button {
+  padding: 12px 28px;
+  border-radius: 24px;
+  border: none;
+  background: linear-gradient(90deg, var(--cta-left), var(--cta-right));
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease;
+  box-shadow: 0 10px 22px rgba(183,106,83,0.22);
+  font-size: 0.98rem;
+  outline: none;
+}
+
+.cta-button:hover,
+.cta-button:focus {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 18px 36px rgba(183,106,83,0.28);
+}
+
+/* responsive */
+@media (max-width: 900px) {
+  .consult-inner {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding: 22px;
+  }
+
+  .consult-img {
+    height: 220px;
+  }
+
+  .image-card {
+    max-width: 420px;
+    margin: 18px auto 0;
+  }
+}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .consult-inner,
+  .consult-right .reveal,
+  .image-card,
+  .consult-img {
+    transition: none !important;
+    animation: none !important;
+  }
+}

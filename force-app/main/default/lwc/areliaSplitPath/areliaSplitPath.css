@@ -1,0 +1,55 @@
+/* 1. SCROLL CONTAINER - The window you look through */
+.slds-path__scroller {
+    overflow-x: auto !important;       /* Enable horizontal scroll */
+    overflow-y: hidden;                /* Disable vertical scroll */
+    width: 100%;                       /* Match screen width */
+    display: block;
+    
+    /* MOBILE TOUCH FIXES */
+    -webkit-overflow-scrolling: touch; /* Enables "momentum" scrolling on iOS */
+    touch-action: pan-x;               /* Tells browser: "Horizontal swipes are for this element" */
+    position: relative;                /* Ensures z-index works for touches */
+    z-index: 1;
+    scrollbar-width: thin;             /* Modern browser styling */
+    padding-bottom: 10px;              /* Space for the scrollbar to sit comfortably */
+}
+
+/* 2. INNER WRAPPER - Expands to hold all items */
+.slds-path__scroller_inner {
+    width: max-content !important;     /* Force it to be as wide as the list */
+    min-width: 100%;                   /* Ensure it fills at least the screen */
+    display: block;
+}
+
+/* 3. THE LIST - Rows of items */
+.slds-path__nav {
+    display: flex !important;          /* Align items in a row */   
+    flex-wrap: nowrap !important;      /* FORCE single line (no wrapping) */
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* 4. INDIVIDUAL ITEMS - Fixed width blocks */
+.slds-path__item {
+    flex: 0 0 auto !important;         /* Rigid: Don't shrink, Don't grow */
+    min-width: 9rem;                   /* Minimum width (~144px) to force overflow */
+    max-width: 15rem;                  /* Cap width for consistency */
+}
+
+/* 5. LINK STYLING - Ensure click targets are good */
+.slds-path__link {
+    width: 100%;
+    justify-content: center;
+    text-decoration: none;
+}
+
+/* 6. SCROLLBAR STYLING (Optional polish) */
+.slds-path__scroller::-webkit-scrollbar {
+    height: 4px;                       /* Thin scrollbar */
+    background: transparent;           /* Clear background */
+}
+.slds-path__scroller::-webkit-scrollbar-thumb {
+    background: #dddbda;               /* Salesforce Grey */
+    border-radius: 4px;
+}

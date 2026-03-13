@@ -1,0 +1,29 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; font-size: 14px; line-height: 1.5;">
+<p style="font-size: 20px; color: #2e844a; margin-bottom: 20px; margin-top: 0;"><b>Expense Approved</b></p>
+
+<p>Dear {SupervisorName},</p>
+
+<p>Great news! The expense sheet you submitted has been reviewed and <b>approved</b> by the manager.</p>
+
+<div style="margin: 20px 0;">
+<p style="margin: 5px 0;"><b>Project:</b> {ProjectName}</p>
+
+<p style="margin: 5px 0;"><b>Client:</b> {ClientName}</p>
+
+<p style="margin: 5px 0;"><b>Sheet ID:</b> {SheetName}</p>
+
+<p style="margin: 5px 0;"><b>Authorized Amount:</b> <span style="color: #2e844a; font-weight: bold;">{GrandTotal}</span></p>
+</div>
+&nbsp;
+
+<p style="font-size: 12px; color: #888; border-top: 1px solid #eee; padding-top: 10px;">Regards,<br />
+Arelia Living&nbsp;<br />
+&nbsp;</p>
+</div>
+</body>
+</html>

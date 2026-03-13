@@ -1,0 +1,152 @@
+/* ============================
+   FOOTER – Luxury Premium Theme
+   ============================ */
+
+.footer {
+    background-color: #2E2A26; /* Deep Mocha Charcoal */
+    color: #F2EDE8; /* Soft warm white */
+    padding: 120px 40px 30px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.footer-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+    max-width: 1300px;
+    margin: auto;
+}
+
+.footer-logo {
+    flex: 1.2;
+    min-width: 180px;
+}
+
+.company-logo {
+    width: 135px;
+    height: auto;
+
+    display: block;
+}
+
+
+.tagline {
+    font-size: 0.95rem;
+    color: #F2EDE8;
+}
+
+.footer-section,
+.footer-links,
+.footer-contact,
+.footer-social {
+    flex: 1;
+    min-width: 200px;
+}
+
+/* Headings */
+.footer-section h3,
+.footer-links h3,
+.footer-contact h3,
+.footer-social h3 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #FFFFFF; /* Pure white headings */
+    text-transform: uppercase;
+}
+
+/* Paragraph text */
+.footer-section p {
+    color: #F2EDE8;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Links */
+.footer-links ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links ul li {
+    margin-bottom: 6px;
+}
+
+.footer-links ul li a {
+    color: #F2EDE8; 
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+}
+
+.footer-links ul li a:hover {
+    color: #C08B69; /* Copper Gold Hover */
+    text-decoration: underline;
+}
+
+/* Contact */
+.footer-contact p {
+    margin: 6px 0;
+    color: #F2EDE8;
+    font-size: 0.9rem;
+}
+
+/* Social Media Icons – NO COLOR FILTERS */
+.footer-social .social-icons {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.footer-social a {
+    font-size: 1.2rem;
+    text-decoration: none;
+    transition: transform 0.2s;
+}
+
+/* Hover effect only scales, no color change */
+.footer-social a:hover {
+    transform: scale(1.2);
+}
+
+.social-image {
+    width: 28px;
+    height: 28px;
+    /* No filters, no color override */
+}
+
+/* Footer bottom */
+.footer-bottom {
+    text-align: center;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    font-size: 0.85rem;
+    color: #F2EDE8;
+    margin-top: 30px;
+}
+
+/* ============================
+   RESPONSIVE
+   ============================ */
+@media (max-width: 768px) {
+    .footer-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .footer-logo {
+        margin-bottom: 20px;
+    }
+
+    .footer-section,
+    .footer-links,
+    .footer-contact,
+    .footer-social {
+        margin-bottom: 20px;
+    }
+
+    .footer-bottom {
+        padding-top: 25px;
+    }
+}

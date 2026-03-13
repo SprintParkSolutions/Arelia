@@ -1,0 +1,173 @@
+:host {
+  display: block;
+  --hero-height: 420px; /* tweak if you want taller/shorter */
+}
+
+/* HERO */
+.hero {
+    min-height: 100vh;
+  position: relative;
+  height: var(--hero-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  color: #fff;
+  text-align: center;
+  padding: 48px 20px;
+  box-sizing: border-box;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* a subtle dark overlay to match tone in your screenshot */
+.hero .overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(12,8,6,0.35), rgba(12,8,6,0.25) 35%, rgba(12,8,6,0.45));
+  pointer-events: none;
+}
+
+/* content layering */
+.content {
+  position: relative;
+  z-index: 3;
+  max-width: 980px;
+  padding: 40px 18px;
+}
+
+/* kicker / small caps */
+.kicker {
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  color: rgba(255,255,255,0.9);
+  font-weight: 600;
+}
+
+/* Heading — uses a large serif-like feel similar to the screenshot */
+.title {
+  margin: 0;
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+  font-weight: 600;
+  font-size: clamp(36px, 6.5vw, 72px); /* responsive large title */
+  line-height: 0.98;
+  letter-spacing: 0.5px;
+  color: #fff;
+  text-shadow: 0 6px 20px rgba(0,0,0,0.45);
+}
+
+/* subtitle paragraph */
+.subtitle {
+  margin-top: 18px;
+  font-size: clamp(14px, 1.4vw, 18px);
+  color: rgba(255,255,255,0.92);
+  max-width: 760px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+
+/* bottom fade -- the white animation under the image */
+.bottom-fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -10px; /* slightly overlaps below section */
+  height: 100px;
+  z-index: 2;
+  pointer-events: none;
+
+  /* create a soft white-to-transparent gradient */
+  background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.85) 70%, rgba(255,255,255,1) 100%);
+  filter: blur(6px);
+  transform: translateY(0);
+  opacity: 0.98;
+  /* animate a subtle up-down motion to mimic "flow" */
+  animation: floatFade 5s ease-in-out infinite;
+}
+
+/* optional subtle vignette for realism (behind content) */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(60% 40% at 50% 30%, rgba(0,0,0,0.0), rgba(0,0,0,0.18) 70%);
+}
+
+/* animation keyframes for bottom white soft movement */
+@keyframes floatFade {
+  0% { transform: translateY(0px); opacity: 0.98; }
+  50% { transform: translateY(6px); opacity: 0.92; }
+  100% { transform: translateY(0px); opacity: 0.98; }
+}
+
+/* make component responsive on very small screens */
+@media (max-width: 520px) {
+  :host { --hero-height: 360px; }
+  .kicker { font-size: 11px; letter-spacing: 3px; }
+  .subtitle { font-size: 14px; padding: 0 6px; }
+}
+@media (max-width: 768px) {
+  .hero {
+    min-height: 100svh; /* safe viewport height */
+    height: auto;       /* avoid forced height */
+    padding: 56px 16px;
+  }
+
+
+  .content {
+    padding: 32px 12px;
+  }
+}
+
+/* Phones */
+@media (max-width: 520px) {
+  :host {
+    --hero-height: auto;
+  }
+
+  .title {
+    line-height: 1.08; /* avoid cramped heading */
+  }
+
+  .subtitle {
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  .bottom-fade {
+    height: 64px;      /* prevent overlap */
+    bottom: -6px;
+    filter: blur(4px);
+  }
+}
+
+/* Very small phones */
+@media (max-width: 360px) {
+  .kicker {
+    font-size: 10px;
+    letter-spacing: 2.5px;
+  }
+
+  .title {
+    font-size: 32px;
+  }
+}
+/* MOBILE HEIGHT REDUCTION – keep everything else same */
+@media (max-width: 520px) {
+  .hero {
+    min-height: auto;        /* remove full viewport height */
+    height: auto;            /* content-based height */
+    padding: 32px 14px;      /* reduce vertical padding */
+  }
+
+  .content {
+    padding: 24px 10px;      /* tighter content spacing */
+  }
+}

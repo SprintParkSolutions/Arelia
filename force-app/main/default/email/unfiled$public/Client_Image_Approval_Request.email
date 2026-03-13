@@ -1,0 +1,32 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333333; line-height: 1.6;">
+<p style="font-size: 15px; margin-bottom: 20px;">Dear [CLIENT_NAME],</p>
+
+<p style="font-size: 15px; margin-bottom: 20px;">We are pleased to share the latest 3D design submission for your project. This project document reflects the design specifications and stylistic elements discussed in our recent updates.</p>
+
+<p style="font-size: 15px; margin-bottom: 25px;">Please review the attached PDF/Image carefully. Your timely feedback is essential for us to move forward to the next phase of development and maintain the project schedule.</p>
+
+<table border="0" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+	
+		<tr>
+			<td align="center" bgcolor="#005fb2" style="border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"><a href="[APPROVAL_LINK]" style="font-size: 16px; font-weight: bold; color: #ffffff; text-decoration: none; padding: 14px 28px; display: inline-block; border-radius: 4px; font-family: Arial, sans-serif;">Review &amp; Submit Decision </a></td>
+		</tr>
+	
+</table>
+
+<p style="font-size: 14px; color: #555555; margin-bottom: 20px;"><strong>Next Steps:</strong><br />
+1. View the attached file for full details.<br />
+2. Click the button above to either <strong>Approve</strong> the design or <strong>Request Changes</strong>.</p>
+
+<p style="font-size: 12px; color: #999999; margin-top: 30px; border-top: 1px solid #eeeeee; padding-top: 20px;">If the button above does not work, please copy and paste the following link into your browser:<br />
+<a href="[APPROVAL_LINK]" style="color: #005fb2; text-decoration: none;">[APPROVAL_LINK]</a></p>
+
+<p style="font-size: 14px; margin-top: 20px; color: #333;">Best regards,<br />
+<strong>Arelia Living Team</strong></p>
+</div>
+</body>
+</html>

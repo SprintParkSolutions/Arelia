@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Room_Type__c</fullName>
+    <label>Room Type</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Living Room</fullName>
+                <default>false</default>
+                <label>Living Room</label>
+            </value>
+            <value>
+                <fullName>Dining Hall</fullName>
+                <default>false</default>
+                <label>Dining Hall</label>
+            </value>
+            <value>
+                <fullName>Work Space</fullName>
+                <default>false</default>
+                <label>Work Space</label>
+            </value>
+            <value>
+                <fullName>Bedroom</fullName>
+                <default>false</default>
+                <label>Bedroom</label>
+            </value>
+            <value>
+                <fullName>Kitchen</fullName>
+                <default>false</default>
+                <label>Kitchen</label>
+            </value>
+            <value>
+                <fullName>Bathroom</fullName>
+                <default>false</default>
+                <label>Bathroom</label>
+            </value>
+            <value>
+                <fullName>Cabin Room</fullName>
+                <default>false</default>
+                <label>Cabin Room</label>
+            </value>
+            <value>
+                <fullName>Reception</fullName>
+                <default>false</default>
+                <label>Reception</label>
+            </value>
+            <value>
+                <fullName>Cafeteria</fullName>
+                <default>false</default>
+                <label>Cafeteria</label>
+            </value>
+            <value>
+                <fullName>Washroom</fullName>
+                <default>false</default>
+                <label>Washroom</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

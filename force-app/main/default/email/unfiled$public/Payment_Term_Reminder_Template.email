@@ -1,0 +1,20 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p>Dear {{{Payment_Term__c.Project__r.Client__r.FirstName}}},</p>
+
+<p>This is a friendly reminder regarding the upcoming payment for the project <strong>{{{Payment_Term__c.Project__r.Name}}}</strong>.</p>
+
+<p><strong>Payment Details:</strong><br />
+Term Name: {{{Payment_Term__c.Name}}}<br />
+Due Date: {{{Payment_Term__c.Due_Date__c}}}<br />
+Amount Due: {{{Payment_Term__c.Percentage__c}}}% of Project Value</p>
+
+<p>Please ensure this payment is processed by the due date.</p>
+
+<p>Regards,<br />
+The Arelia Living Accounts Team</p>
+</body>
+</html>

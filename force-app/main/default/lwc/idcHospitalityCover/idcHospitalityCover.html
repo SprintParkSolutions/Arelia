@@ -1,0 +1,19 @@
+<template>
+    <section class="portfolio-cover" aria-label="Hospitality portfolio hero">
+        <div class="image-container" data-hero>
+
+            <!-- VIDEO HERO -->
+            <video class="cover-video" src={coverVideo} autoplay muted loop playsinline preload="metadata"
+                poster={posterImage} aria-hidden="true"></video>
+
+            <div class="caption-overlay" role="region" aria-label="Hero message">
+                <h1 class="hero-title">Transforming Spaces into Unforgettable Stays</h1>
+                <p class="hero-sub">Crafting hospitality environments that feel warm, inviting, and memorable.</p>
+
+                <button class="unique-button" onclick={navigateToProjectRequest} aria-label="Talk to our designer">
+                    Talk to Our Designer
+                </button>
+            </div>
+        </div>
+    </section>
+</template>

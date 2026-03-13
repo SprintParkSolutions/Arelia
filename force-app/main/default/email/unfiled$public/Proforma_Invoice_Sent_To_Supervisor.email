@@ -1,0 +1,26 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Hi <strong>{{{supervisorName}}}</strong>,<br />
+<br />
+The Invoice has been generated to the customer </span></span><strong>{{{primaryContactName}}}. </strong>N<span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">ow you can reviewe and the file has been uploaded/sent to the customer.&nbsp;<br />
+<br />
+<strong>Invoice Details:</strong></span></span>
+<ul>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;"><strong>Invoice ID:</strong> </span></span>{{{invoiceName}}}</li>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;"><strong>Opportunity Name:</strong> </span></span>{{{opportunityName}}}</li>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;"><strong>Invoice Grand Total:</strong> </span></span>₹{{{grandTotal}}}</li>
+</ul>
+<span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;"><strong>Next steps (reminder):</strong></span></span>
+
+<ol>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Upload the Invoice to send the Customer Review.</span></span></span></span></li>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Customer will review the proforma invoice.</span></span></li>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Once customer approval is received, we will proceed to the next steps.</span></span></li>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Please track approval and follow up if needed.</span></span></li>
+</ol>
+<br />
+<span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Thanks,<br />
+<strong>Arelia Living</strong></span></span></body>
+</html>

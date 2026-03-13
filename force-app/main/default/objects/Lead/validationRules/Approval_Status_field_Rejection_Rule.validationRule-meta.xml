@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Approval_Status_field_Rejection_Rule</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+    ISPICKVAL(Approval_Status__c, &quot;Rejected&quot;),
+    OR(
+        ISBLANK(TEXT(Rejection_Reason__c)),
+        ISBLANK(Rejection_Description__c)
+    )
+)</errorConditionFormula>
+    <errorMessage>Please provide both Rejection Reason and Rejection Description when Approval Status is Rejected.</errorMessage>
+</ValidationRule>

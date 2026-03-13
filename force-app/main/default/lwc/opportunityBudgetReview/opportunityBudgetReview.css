@@ -1,0 +1,150 @@
+.shell{
+    background:#fff;
+    border:1px solid #e6eef7;
+    border-radius:18px;
+    padding:14px;
+    max-width:1100px;
+    margin:0 auto;
+}
+
+.header{
+    border:1px solid #d7ecff;
+    background:linear-gradient(180deg,#f3f9ff 0%,#fff 90%);
+    border-radius:16px;
+    padding:14px 14px 10px;
+    margin-bottom:12px;
+}
+
+.hTitle{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.title{
+    margin:0;
+    font-size:20px;
+    font-weight:900;
+}
+
+.pill{
+    font-size:11px;
+    padding:4px 10px;
+    border-radius:999px;
+    border:1px solid #d7ecff;
+    background:#eef7ff;
+    font-weight:800;
+}
+
+.center{
+    padding:22px 0;
+    display:flex;
+    justify-content:center;
+}
+
+.error{
+    border:1px solid #f5c2c7;
+    background:#fff5f5;
+    color:#7a1c1c;
+    padding:10px;
+    border-radius:12px;
+    margin-bottom:10px;
+}
+
+/* cards */
+.cards{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+    margin-bottom:12px;
+}
+
+.card{
+    border:1px solid #edf2f7;
+    border-radius:16px;
+    padding:14px;
+    background:#fff;
+    box-shadow:0 1px 0 rgba(0,0,0,0.03);
+}
+
+.cardTop{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+}
+
+.label{
+    font-weight:900;
+    font-size:13px;
+}
+
+.money{
+    margin:10px 0 8px;
+    font-size:22px;
+    font-weight:900;
+}
+
+.chip{
+    margin:10px 0 10px;
+    padding:8px 10px;
+    border-radius:12px;
+    border:1px solid #edf2f7;
+    background:#fafcff;
+    display:flex;
+    justify-content:space-between;
+    font-size:12px;
+}
+
+.final{
+    grid-column:1 / -1;
+    border:1px solid #cfe6ff;
+    background:linear-gradient(180deg,#f3f9ff 0%,#fff 80%);
+}
+
+.finalMoney{
+    margin-top:10px;
+    text-align:center;
+    font-size:30px;
+    font-weight:900;
+}
+
+/* sections */
+.section{
+    border:1px solid #edf2f7;
+    border-radius:16px;
+    padding:14px;
+    background:#fff;
+    margin-bottom:12px;
+}
+
+.secTop{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:10px;
+}
+
+.secTitle{
+    font-weight:900;
+    font-size:15px;
+}
+
+/* footer buttons centered */
+.footer{
+    position:sticky;
+    bottom:0;
+    background:#fff;
+    border-top:1px solid #edf2f7;
+    padding:12px;
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    border-bottom-left-radius:18px;
+    border-bottom-right-radius:18px;
+}
+
+.ml{ margin-left:8px; }
+
+@media (max-width:900px){
+    .cards{ grid-template-columns:1fr; }
+    .shell{ border-radius:14px; }
+}

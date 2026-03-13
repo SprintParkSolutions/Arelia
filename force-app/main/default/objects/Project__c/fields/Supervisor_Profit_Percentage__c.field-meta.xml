@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Supervisor_Profit_Percentage__c</fullName>
+    <formula>IF(
+    Remaining_Project_Budget__c &gt; 0,
+    Remaining_Budget_Pending__c / Remaining_Project_Budget__c,
+    0
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <inlineHelpText>Percentage of the remaining project budget saved by the supervisor that contributes to the company&apos;s profit.</inlineHelpText>
+    <label>Supervisor Profit Percentage</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Percent</type>
+</CustomField>

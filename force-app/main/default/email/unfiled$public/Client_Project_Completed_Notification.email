@@ -1,0 +1,16 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hello <strong>{{{Project__r.Client__r.Name}}}</strong>,<br />
+<br />
+Congratulations!,&nbsp;We’re pleased to inform you that your project has been completed successfully.<br />
+<br />
+If you have any questions or need anything further, just reply to this email.<br />
+<br />
+<br />
+Thank you<br />
+Arelia Living</span></span></p>
+</body>
+</html>

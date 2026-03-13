@@ -1,0 +1,30 @@
+/* Info box styling */
+.info-box {
+    display: flex;
+    gap: 0.75rem;
+    background: linear-gradient(135deg, #f3f9ff, #eef4ff);
+    border: 1px solid #d8e3ff;
+    border-radius: 12px;
+    padding: 1rem;
+    align-items: flex-start;
+}
+
+/* Icon styling */
+.info-icon {
+    --sds-c-icon-color-foreground-default: #1b96ff;
+    margin-top: 0.2rem;
+}
+
+/* Text content */
+.info-text h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: #032d60;
+}
+
+.info-text p {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #444;
+}

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Budget_Review_Status__c</fullName>
+    <label>Budget Review Status</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Not Sent</fullName>
+                <default>true</default>
+                <label>Not Sent</label>
+            </value>
+            <value>
+                <fullName>Sent for Client Approval</fullName>
+                <default>false</default>
+                <label>Sent for Client Approval</label>
+            </value>
+            <value>
+                <fullName>Client Approved</fullName>
+                <default>false</default>
+                <label>Client Approved</label>
+            </value>
+            <value>
+                <fullName>Client Requested Changes</fullName>
+                <default>false</default>
+                <label>Client Requested Changes</label>
+            </value>
+            <value>
+                <fullName>Manager Approved</fullName>
+                <default>false</default>
+                <label>Manager Approved</label>
+            </value>
+            <value>
+                <fullName>Manager Requested Changes</fullName>
+                <default>false</default>
+                <label>Manager Requested Changes</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

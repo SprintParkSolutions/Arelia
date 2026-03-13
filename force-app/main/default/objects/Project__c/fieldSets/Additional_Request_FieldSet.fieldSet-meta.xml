@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FieldSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Additional_Request_FieldSet</fullName>
+    <description>It is used for Additional Budget Information</description>
+    <displayedFields>
+        <field>Additional_Budget__c</field>
+        <isFieldManaged>false</isFieldManaged>
+        <isRequired>false</isRequired>
+    </displayedFields>
+    <displayedFields>
+        <field>Additional_Budget_History__c</field>
+        <isFieldManaged>false</isFieldManaged>
+        <isRequired>false</isRequired>
+    </displayedFields>
+    <label>Additional_Request_FieldSet</label>
+</FieldSet>

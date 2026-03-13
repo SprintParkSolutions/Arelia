@@ -1,0 +1,16 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hello {{{Site_Visit_Report__c.Supervisor_User__r.Name}}},<br />
+<br />
+Great News! The Site Visit Report submitted for the following lead has been approved by the manager.</span></span>
+<ul>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Client Name::</strong>&nbsp;{{{Site_Visit_Report__c.Lead__r.Name}}}</span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Site Visit Report Name:</strong>:&nbsp;{{{Site_Visit_Report__c.Name}}}</span></span></li>
+</ul>
+<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Now it is ready to convert the lead.<br />
+<br />
+Thanks,<br />
+Arelia Living</span></span></body>
+</html>

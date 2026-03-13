@@ -1,0 +1,189 @@
+.arelia-container {
+    max-width: 950px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* --- Header & Title --- */
+.main-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1a237e;
+    margin-bottom: 10px;
+}
+
+.message-box {
+    background-color: #e8eaf6;
+    border-left: 4px solid #1a237e;
+    padding: 16px;
+    border-radius: 4px;
+    text-align: left;
+    color: #333;
+    margin-bottom: 20px;
+}
+.message-box.manager-msg {
+    background-color: #e0f2f1;
+    border-left-color: #00897b;
+}
+
+/* --- Main Card --- */
+.arelia-card {
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    overflow: hidden; /* Important for rounding corners */
+    border: 1px solid #e0e0e0;
+}
+
+/* --- Left Column: Project Details --- */
+.project-details-col {
+    background-color: #ffffff;
+    padding: 30px;
+    border-right: 1px solid #f0f0f0;
+}
+
+.details-wrapper .section-label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    color: #888;
+    letter-spacing: 1px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    display: block;
+}
+
+.detail-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 25px;
+}
+
+.detail-item:last-child { margin-bottom: 0; }
+
+.icon-box {
+    background-color: #f5f7fa;
+    border-radius: 8px;
+    padding: 8px;
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.info-content label {
+    display: block;
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 2px;
+}
+
+.info-content .value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a237e;
+}
+
+.info-content .sub-value {
+    font-size: 0.9rem;
+    color: #777;
+    margin-top: 2px;
+}
+
+/* --- Right Column: Budget Summary --- */
+.budget-summary-col {
+    background-color: #fafbfc; /* Subtle grey background for numbers */
+    padding: 30px;
+}
+
+.budget-wrapper .section-label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    color: #888;
+    letter-spacing: 1px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    display: block;
+}
+
+.budget-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size: 1rem;
+    color: #444;
+}
+
+.budget-row .lbl { color: #555; }
+.budget-row .val { font-weight: 600; color: #333; }
+
+.divider {
+    height: 1px;
+    background-color: #e0e0e0;
+    margin: 20px 0;
+}
+
+.final-row {
+    text-align: right;
+}
+
+.final-row label {
+    display: block;
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.big-number {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #2e7d32; /* Green */
+    line-height: 1.1;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .project-details-col {
+        border-right: none;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .budget-summary-col {
+        background-color: #fff; /* White on mobile to blend */
+    }
+    .final-row {
+        text-align: center;
+    }
+}
+
+/* --- Buttons & Modals (Existing) --- */
+.arelia-btn {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 0 10px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.arelia-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+.btn-approve { background-color: #2e7d32; color: white; }
+.btn-approve:hover { background-color: #1b5e20; }
+.btn-request { background-color: #f1f3f5; color: #333; border: 1px solid #ddd; }
+.btn-request:hover { background-color: #e9ecef; }
+
+.custom-modal-backdrop {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex; align-items: center; justify-content: center; z-index: 9999;
+}
+.custom-modal-box {
+    background: white; padding: 40px; border-radius: 16px;
+    text-align: center; max-width: 420px; width: 90%;
+    animation: popIn 0.3s ease-out;
+}
+@keyframes popIn {
+    0% { transform: scale(0.9); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}

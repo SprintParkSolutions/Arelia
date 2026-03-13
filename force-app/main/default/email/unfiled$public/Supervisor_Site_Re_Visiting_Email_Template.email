@@ -1,0 +1,28 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hi {{{Recipient.Name}}},<br />
+<br />
+Revisit Appointment has been scheduled for the Client/Lead mentioned below. Please review the details and ensure your availability for the upcoming site visit.<br />
+<br />
+<strong>Client Details :</strong></span></span></p>
+
+<ul>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Client Name:&nbsp;<strong>{{{leadName}}}</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Client Email:&nbsp;<strong>{{{leadEmail}}}</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Appointment Type:<strong>&nbsp;{{{appointmentType}}}</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Appointment Date:&nbsp;<strong>{{{appointmentDate}}}</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Appointment Time Slot:<strong>&nbsp;{{{timeSlot}}}</strong></span></span></li>
+</ul>
+
+<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Please ensure you are available for this revisit appointment and take note of the Client preferences.<br />
+If there are any issues or adjustments needed, kindly reach out to the Client directly via the contact details above or feel free to contact us.<br />
+<br />
+We appreciate your continued dedication to providing excellent service and support to our clients.<br />
+<br />
+Best regards,<br />
+Arelia Living</span></span></p>
+</body>
+</html>

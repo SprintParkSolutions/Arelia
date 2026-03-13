@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Architect_Contact__c</fullName>
+    <description>Contact number of the architect</description>
+    <inlineHelpText>Contact number of the architect</inlineHelpText>
+    <label>Architect Contact</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Phone</type>
+</CustomField>

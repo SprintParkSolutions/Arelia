@@ -1,0 +1,67 @@
+<template>
+    <div class="ba-root">
+
+        <!-- CATEGORY TABS -->
+        <nav class="ba-tabs" role="tablist" aria-label="Room selections">
+            <button class={livingTabClass} data-pair="living" role="tab" aria-selected={isSelectedLiving}
+                onclick={onSelectPair}>
+                Living
+            </button>
+            <button class={bedroomTabClass} data-pair="bedroom" role="tab" aria-selected={isSelectedBedroom}
+                onclick={onSelectPair}>
+                Bedroom
+            </button>
+            <button class={kitchenTabClass} data-pair="kitchen" role="tab" aria-selected={isSelectedKitchen}
+                onclick={onSelectPair}>
+                Kitchen
+            </button>
+            <button class={bathTabClass} data-pair="bath" role="tab" aria-selected={isSelectedBath}
+                onclick={onSelectPair}>
+                Bathroom
+            </button>
+        </nav>
+
+        <figure role="group" aria-label="Before and After comparison">
+            <div class="ba-stage" 
+                 onpointerdown={handlePointerDown} 
+                 ontouchstart={handlePointerDown} 
+                 tabindex="0"
+                 onkeydown={handleKeyDown} 
+                 data-id="stage">
+
+                <!-- AFTER image (background) -->
+                <img src={computedAfter} alt={afterAlt} class="ba-img ba-background-img" />
+
+                <!-- BEFORE image (foreground, clipped) -->
+                <div class="ba-overlay-wrap" style={overlayStyle}>
+                    <img src={computedBefore} alt={beforeAlt} class="ba-img ba-foreground-img" />
+                </div>
+
+                <!-- HANDLE WITH TWO ARROWS -->
+                <div class="ba-handle" 
+                     role="slider" 
+                     tabindex="0" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100"
+                     aria-valuenow={position} 
+                     aria-label="Before and After slider" 
+                     style={handleStyle}
+                     onpointerdown={handlePointerDown} 
+                     ontouchstart={handlePointerDown} 
+                     data-id="handle">
+                    <div class="ba-handle-inner">
+                        <span class="arrow left-arrow">&#10094;</span>
+                        <span class="bar"></span>
+                        <span class="arrow right-arrow">&#10095;</span>
+                    </div>
+                </div>
+
+                <!-- STATIC TEXT LABELS -->
+                <div class="ba-label ba-label-before">BEFORE</div>
+                <div class="ba-label ba-label-after">AFTER</div>
+            </div>
+
+            <figcaption class="ba-caption">Drag the handle to compare renovation results</figcaption>
+        </figure>
+    </div>
+</template>

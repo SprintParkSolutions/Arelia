@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html style="overflow-y: hidden;">
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+<p>Dear Manager,</p>
+
+<p>An expense sheet has been submitted for your review and approval for the following project:</p>
+
+<div style="margin-left: 20px; border-left: 3px solid #0176d3; padding-left: 15px;">
+<p><strong>Project Name:</strong> {ProjectName}<br />
+<strong>Submitted By:</strong> {SubmitterName}<br />
+<strong>Total Amount:</strong> <span style="color: #2e844a; font-weight: bold;">{GrandTotal}</span></p>
+</div>
+
+<p>Please review the attached PDF report and the original bill image for details. To take action on this request, please click the button below:</p>
+
+<p style="margin-top: 25px;"><a href="{ApprovalLink}" style="background-color: #0176d3; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">Review and Authorize </a></p>
+
+<p style="margin-top: 30px; font-size: 12px; color: #777;">Best Regards,<br />
+<strong>Arelia Living&nbsp;</strong></p>
+</div>
+</body>
+</html>

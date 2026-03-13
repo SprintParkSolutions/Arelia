@@ -1,0 +1,91 @@
+<template>
+    <div class="arelia-container">
+        
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" size="medium" variant="brand" class="submit-spinner"></lightning-spinner>
+        </template>
+
+        <template if:true={approvalData}>
+            <div class="slds-text-align_center slds-m-bottom_large animate-fade-in">
+                <h1 class="main-title">{userType} Payment Term Sign-Off</h1>
+                <p class="main-subtitle">Project: {approvalData.opportunity.Name}</p>
+            </div>
+
+            <div class="arelia-card slds-p-around_large slds-m-bottom_large animate-fade-in">
+                <div class="responsive-table-container">
+                    <div class="slds-grid slds-border_bottom slds-text-title_caps table-header">
+                        <div class="slds-col slds-size_1-of-12">S.No</div>
+                        <div class="slds-col slds-size_4-of-12">Term Name</div>
+                        <div class="slds-col slds-size_3-of-12">Percentage</div>
+                        <div class="slds-col slds-size_4-of-12">Due Date</div>
+                    </div>
+                    <template for:each={terms} for:item="term">
+                         <div key={term.Id} class="slds-grid slds-wrap slds-border_bottom slds-p-vertical_small">
+                            <div class="slds-col slds-size_1-of-12">{term.serialNumber}</div>
+                            <div class="slds-col slds-size_4-of-12">{term.Term_Label__c}</div>
+                            <div class="slds-col slds-size_3-of-12">{term.Percentage__c}%</div>
+                            <div class="slds-col slds-size_4-of-12"><lightning-formatted-date-time value={term.Due_Date__c}></lightning-formatted-date-time></div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <div class="arelia-card slds-p-around_large slds-text-align_center animate-fade-in">
+                
+                <template if:false={isProcessed}>
+                    <div class="button-container">
+                        <button class="arelia-btn btn-approve" onclick={handleApproveClick}>Approve Terms</button>
+                        <button class="arelia-btn btn-request" onclick={handleRequestChangesClick}>Request Changes</button>
+                    </div>
+
+                    <template if:true={showCommentBox}>
+                        <div class="slds-m-top_medium animate-fade-in">
+                            <div class="slds-text-align_left slds-m-bottom_x-small" style="font-weight:600; color:#ba0517;">
+                                Please provide details for the revision:
+                            </div>
+                            <lightning-textarea 
+                                variant="label-hidden" 
+                                value={comments} 
+                                onchange={handleCommentChange} 
+                                placeholder="Enter your remarks here..."
+                                class="custom-textarea">
+                            </lightning-textarea>
+                            <button class="arelia-btn btn-submit-changes slds-m-top_small" onclick={handleRejectClick}>
+                                Submit Request Changes
+                            </button>
+                        </div>
+                    </template>
+                </template>
+
+                <template if:true={isProcessed}>
+                    <div class="info-box slds-theme_success">
+                        <h2>Decision Already Submitted</h2>
+                        <p>Thank you for your response.</p>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <template if:true={error}>
+            <div class="slds-notify slds-notify_alert slds-theme_error">{error}</div>
+        </template>
+
+        <template if:true={showSuccessModal}>
+            <div class="custom-modal-backdrop">
+                <div class="custom-modal-box animate-pop-in">
+                    <div class="slds-m-bottom_medium">
+                        <lightning-icon icon-name="action:approval" alternative-text="Success" size="large"></lightning-icon>
+                    </div>
+                    <h2 class="main-title" style="font-size: 1.8rem;">Thank You!</h2>
+                    <p class="main-subtitle slds-m-bottom_large" style="font-size: 1rem;">
+                        Your decision has been successfully recorded. <br/> The project team has been notified.
+                    </p>
+                    <button class="arelia-btn btn-approve" onclick={handleNavigateHome}>
+                        Go to Arelia Home
+                    </button>
+                </div>
+            </div>
+        </template>
+
+    </div>
+</template>

@@ -1,0 +1,161 @@
+<template>
+    <div class="main-container slds-p-around_medium">
+        
+        <div class="header-section slds-media slds-media_center slds-m-bottom_medium">
+            <div class="slds-media__figure">
+                <div class="header-icon-box">
+                    <lightning-icon icon-name="standard:webcart" size="medium" variant="inverse"></lightning-icon>
+                </div>
+            </div>
+            <div class="slds-media__body">
+                <h1 class="slds-text-heading_medium slds-text-title_bold text-dark">Proforma Invoice Submission</h1>
+                <p class="slds-text-color_weak">Upload your finalized invoice <strong>for client approval</strong>.</p>
+            </div>
+        </div>
+
+        <div class="guidelines-card slds-m-bottom_medium">
+            <div class="card-header slds-p-horizontal_medium slds-p-vertical_small">
+                <div class="slds-media slds-media_center">
+                    <div class="slds-media__figure">
+                        <lightning-icon icon-name="utility:success" variant="success" size="small"></lightning-icon>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-text-heading_small"><strong>Submission Guidelines</strong></h2>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body slds-p-horizontal_medium slds-p-bottom_medium">
+                <p class="slds-m-vertical_small slds-text-color_weak">
+                    Please upload the Proforma Invoice PDF to send for client approval. Ensure the total amount matches the system record before submitting.
+                </p>
+
+                <div class="requirements-box slds-p-around_medium">
+                    <h3 class="slds-text-title_bold slds-m-bottom_x-small brand-text">Required Documents</h3>
+                    <ul class="slds-list_vertical slds-m-bottom_medium">
+                        <li class="icon-list-item">
+                            <lightning-icon icon-name="utility:check" size="xx-small" class="check-icon slds-m-right_x-small"></lightning-icon> 
+                            Proforma Invoice (PDF)
+                        </li>
+                        <li class="icon-list-item">
+                            <lightning-icon icon-name="utility:check" size="xx-small" class="check-icon slds-m-right_x-small"></lightning-icon> 
+                            Cost Breakdown / BOQ
+                        </li>
+                        <li class="icon-list-item">
+                            <lightning-icon icon-name="utility:check" size="xx-small" class="check-icon slds-m-right_x-small"></lightning-icon> 
+                            Tax Exemption Forms (if applicable)
+                        </li>
+                    </ul>
+
+                    <h3 class="slds-text-title_bold slds-m-bottom_x-small brand-text">Notes</h3>
+                    <ul class="slds-list_dotted slds-text-color_weak">
+                        <li>Revisions must include all updated documents</li>
+                        <li>Incomplete submissions will not be processed</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="upload-section slds-m-bottom_medium">
+            <div class="dashed-border slds-p-around_medium">
+                <div class="slds-media slds-media_center slds-m-bottom_x-small">
+                    <div class="slds-media__figure">
+                        <lightning-icon icon-name="utility:upload" size="small" class="cloud-icon"></lightning-icon>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-text-heading_small"><strong>Upload Invoice Files</strong></h2>
+                    </div>
+                </div>
+                
+                <div class="slds-p-left_large">
+                     <lightning-file-upload
+                        label="Drag and drop files here, or click to browse"
+                        name="fileUploader"
+                        record-id={recordId}
+                        accept={acceptedFormats}
+                        multiple
+                        onuploadfinished={handleUploadFinished}
+                        class="file-upload-input">
+                    </lightning-file-upload>
+                    <p class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">Supported formats: PDF, PNG, JPG, XLS</p>
+                </div>
+            </div>
+        </div>
+
+        <template if:true={hasUploadedFiles}>
+            <div class="footer-section slds-m-bottom_large bounce-in">
+                <div class="footer-header slds-p-horizontal_medium slds-p-vertical_small">
+                     <h3 class="slds-text-heading_small"><strong>Files Ready ({uploadedFiles.length})</strong></h3>
+                </div>
+               
+                <div class="action-row slds-p-around_medium">
+                    
+                    <div class="file-list-container">
+                        <template for:each={uploadedFiles} for:item="file">
+                            <div key={file.documentId} class="file-item-card">
+                                <div class="file-left-group">
+                                    <div class="file-icon-box">
+                                        <lightning-icon icon-name={file.iconName} size="medium"></lightning-icon>
+                                    </div>
+                                    <div class="file-details slds-p-left_small">
+                                        <div class="file-name-text">{file.name}</div>
+                                        <div class="file-status-text">Ready for upload</div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <lightning-button-icon 
+                                        icon-name="utility:delete" 
+                                        variant="bare" 
+                                        alternative-text="Remove File" 
+                                        title="Remove File"
+                                        class="delete-icon-btn"
+                                        data-id={file.documentId}
+                                        onclick={handleDeleteFile}>
+                                    </lightning-button-icon>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="action-controls">
+                        <lightning-button 
+                            variant="brand" 
+                            label="Send Invoice for Approval" 
+                            onclick={handleSendClick}
+                            disabled={isLoading}
+                            class="send-button">
+                        </lightning-button>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <div class="history-section slds-m-top_large">
+            <h3 class="slds-text-heading_small slds-m-bottom_small slds-text-color_weak">
+                <strong>Proforma Invoice History</strong>
+            </h3>
+            <div class="table-container dynamic-height">
+                <div if:true={invoices}>
+                    <lightning-datatable
+                        key-field="id"
+                        data={invoices}
+                        columns={columns}
+                        hide-checkbox-column
+                        resize-column-disabled>
+                    </lightning-datatable>
+                </div>
+                <template if:false={hasInvoices}>
+                    <div class="slds-p-around_medium slds-text-align_center slds-text-color_weak">
+                        No invoices found.
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <template if:true={isLoading}>
+            <div class="spinner-overlay">
+                <lightning-spinner alternative-text="Loading" size="medium" variant="brand"></lightning-spinner>
+            </div>
+        </template>
+    </div>
+</template>

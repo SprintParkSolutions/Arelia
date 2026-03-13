@@ -1,0 +1,23 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<div style="font-family: Arial, sans-serif; font-size: 14px; color: #333; line-height: 1.6;">
+<p>Dear Manager,</p>
+
+<p>We have received specific modification requests from the client regarding the payment schedule for <b>{{OPPORTUNITY_NAME}}</b>. To ensure client satisfaction and secure the project, the Supervisor has adjusted the terms to accommodate their preferences.</p>
+
+<div style="background-color: #e7f1ff; border-left: 5px solid #0d6efd; padding: 15px; margin: 20px 0; border-radius: 4px;"><strong style="color: #084298;">Client Modification Request:</strong><br />
+<span style="font-style: italic;">"{{CLIENT_REMARKS}}"</span></div>
+
+<p>Please review these changes to ensure they remain within acceptable business margins. Once you approve, we will automatically notify the client to sign off on the new structure.</p>
+
+<p style="margin-top: 25px;"><a href="{{APPROVAL_LINK}}" style="background-color: #0176d3; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px;">Validate &amp; Approve Revisions </a></p>
+
+<hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+<p>Best regards,<br />
+<b>Arelia Living</b></p>
+</div>
+</body>
+</html>
