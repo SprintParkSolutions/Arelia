@@ -10,10 +10,16 @@
                 <h1 class="hero-title">Transforming Spaces into Unforgettable Stays</h1>
                 <p class="hero-sub">Crafting hospitality environments that feel warm, inviting, and memorable.</p>
 
-                <button class="unique-button" onclick={navigateToProjectRequest} aria-label="Talk to our designer">
+                <button class="unique-button" onclick={handleOpenPopup} aria-label="Talk to our designer">
                     Talk to Our Designer
                 </button>
             </div>
         </div>
     </section>
+
+    <!-- Popup -->
+    <template if:true={showRegistrationPopup}>
+        <c-registration-popup-form onclosepopup={handleClosePopup}>
+        </c-registration-popup-form>
+    </template>
 </template>

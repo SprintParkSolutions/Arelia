@@ -8,10 +8,14 @@
                 <h1 class="hero-title">Designing Business Spaces That Work as Hard as You Do</h1>
                 <p class="hero-sub">Smart, functional interiors crafted for productivity, brand identity and lasting
                     impact.</p>
-                <button class="unique-button" onclick={navigateToCommercialRequest} aria-label="Talk to our designer">
+                <button class="unique-button" onclick={handleOpenPopup} aria-label="Talk to our designer">
                     Talk to Our Designer
                 </button>
             </div>
         </div>
     </section>
+
+    <template if:true={showRegistrationPopup}>
+        <c-registration-popup-form onclosepopup={handleClosePopup}></c-registration-popup-form>
+    </template>
 </template>

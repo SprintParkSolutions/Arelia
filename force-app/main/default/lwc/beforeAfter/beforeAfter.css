@@ -19,38 +19,36 @@
     background: #f8f5f2;
     outline: none;
     user-select: none;
-    /* prevent pinch-zoom / scroll interference while dragging */
-    touch-action: none;
-    overscroll-behavior: contain;
+    touch-action: pan-y;
+    isolation: isolate; 
 }
 
-/* Base Image Styles */
 .ba-img {
     display: block;
     width: 100%;
     height: 500px;
     object-fit: cover;
     user-select: none;
-    pointer-events: none; /* avoids ghost drag + accidental image interactions */
+    pointer-events: none;
 }
 
-/* OVERLAY WRAPPER (FOREGROUND - LEFT SIDE) */
+/* Updated Wrapper: 100% width, uses clip-path via JS */
 .ba-overlay-wrap {
     position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
     height: 100%;
     overflow: hidden;
     z-index: 10;
-    border-right: 1px solid rgba(255,255,255,0.5);
-    will-change: width;
+    will-change: clip-path;
 }
 
-/* Handle Base */
+/* Updated Handle: Centered correctly with translate(-50%, -50%) */
 .ba-handle {
     position: absolute;
     top: 50%;
-    transform: translateY(-50%);
+    transform: translate(-50%, -50%);
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -66,6 +64,20 @@
     touch-action: none;
 }
 
+/* New: Full-height dividing line attached to the handle */
+.ba-handle::before {
+    content: '';
+    position: absolute;
+    top: -1000px; 
+    bottom: -1000px;
+    left: 50%;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.6);
+    transform: translateX(-50%);
+    z-index: -1;
+    pointer-events: none;
+}
+
 .ba-handle-inner {
     width: 100%;
     height: 100%;
@@ -76,7 +88,6 @@
     gap: 4px;
 }
 
-/* Center bar in handle */
 .ba-handle .bar {
     display: block;
     width: 2px;
@@ -85,34 +96,28 @@
     box-shadow: 0 0 0 3px rgba(196, 139, 118, 0.1);
 }
 
-/* Arrows inside handle */
 .arrow {
     font-size: 16px;
     font-weight: bold;
     color: var(--accent);
     user-select: none;
-    pointer-events: none; /* don't block drag events */
+    pointer-events: none;
     line-height: 1;
 }
 
-.left-arrow {
-    margin-right: 2px;
-}
+.left-arrow { margin-right: 2px; }
+.right-arrow { margin-left: 2px; }
 
-.right-arrow {
-    margin-left: 2px;
-}
-
+/* Keep hover and active transform alignments centered */
 .ba-handle:hover {
-    transform: translateY(-50%) scale(1.1);
+    transform: translate(-50%, -50%) scale(1.1);
     border-color: var(--accent);
 }
 
 .ba-stage:active .ba-handle {
-    transform: translateY(-50%) scale(1.15);
+    transform: translate(-50%, -50%) scale(1.15);
 }
 
-/* LABELS */
 .ba-label {
     position: absolute;
     top: 20px;
@@ -127,10 +132,21 @@
     backdrop-filter: blur(4px);
     font-family: sans-serif;
     text-transform: uppercase;
+    transition: opacity 0.2s ease; 
+}
+.scroll-target {
+    /* Set this to the height of your sticky header + a little extra padding */
+    scroll-margin-top: 120px; 
 }
 
-.ba-label-before { left: 20px; }
-.ba-label-after { right: 20px; }
+.hidden-label {
+    opacity: 0;
+    pointer-events: none; /* Prevents hidden labels from blocking clicks */
+}
+
+/* Swapped Label Positioning */
+.ba-label-after { left: 20px; }
+.ba-label-before { right: 20px; }
 
 .ba-caption {
     margin-top: 15px;
@@ -140,7 +156,6 @@
     font-style: italic;
 }
 
-/* TABS */
 .ba-tabs {
     display: flex;
     gap: 12px;

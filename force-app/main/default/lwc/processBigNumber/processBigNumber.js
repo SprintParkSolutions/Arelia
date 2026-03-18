@@ -1,6 +1,5 @@
 import { LightningElement, api } from 'lwc';
-import SITE_BASE_URL from '@salesforce/label/c.Arelia_Site_Label';
-import REGISTRATION_FORM_URL from '@salesforce/label/c.Registration_Form_URL';
+
 export default class ProcessBigNumber extends LightningElement {
   @api steps = [
     {
@@ -42,11 +41,7 @@ export default class ProcessBigNumber extends LightningElement {
   ];
 
   hasObserved = false;
-  baseUrl = SITE_BASE_URL;
-
-  get registrationFormUrl() {
-    return this.baseUrl + REGISTRATION_FORM_URL;
-  }
+  showRegistrationPopup = false;
 
   get stepsWithIndex() {
     return this.steps.map((s, idx) => {
@@ -59,7 +54,6 @@ export default class ProcessBigNumber extends LightningElement {
   }
 
   renderedCallback() {
-    // init observer once
     if (this.hasObserved) return;
     this.hasObserved = true;
 
@@ -70,7 +64,6 @@ export default class ProcessBigNumber extends LightningElement {
       (entries, observer) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            // trigger the CSS reveal
             root.classList.add('in-view');
             observer.unobserve(entry.target);
           }
@@ -86,6 +79,10 @@ export default class ProcessBigNumber extends LightningElement {
   }
 
   handleStart() {
-    window.location.href = this.registrationFormUrl;
+    this.showRegistrationPopup = true;
+  }
+
+  handleClosePopup() {
+    this.showRegistrationPopup = false;
   }
 }

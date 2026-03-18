@@ -6,7 +6,7 @@
 
     <style>
         /* Give real space for header + footer */
-        @page { size: A4; margin: 30mm 10mm 22mm 10mm; }
+        @page { size: A4; margin: 10mm 10mm 14mm 10mm; }
 
         body {
             font-family: Arial;
@@ -17,31 +17,30 @@
 
         /* Avoid split rows in PDF */
         tr { page-break-inside: avoid; }
-        table { page-break-inside: auto; }
+        table { page-break-inside: auto; table-layout: fixed; }
 
         /* Wrap long text nicely */
         td, th { word-break: break-word; white-space: normal; }
 
         /* ================= HEADER (EVERY PAGE) ================= */
         .pdfHeader {
-            position: fixed;
-            top: 0mm;          /* ✅ NO negative values */
-            left: 0mm;
-            right: 0mm;
-            height: 20mm;
+            width: 100%;
+            margin: 0 0 4px 0;
+            padding: 0;
         }
         .headerRow {
             width: 100%;
             border-collapse: collapse;
         }
-        .headerLeft {
+       .headerLeft {
             text-align: left;
             vertical-align: top;
-            padding-left: 0mm;
+            padding: 0;
         }
         .logoTop {
-            height: 10px;      /* ✅ professional size */
-            display: block;    /* ✅ prevents weird inline rendering */
+            width: 150px;
+            height: 60px;
+            display: block;
         }
 
         /* ================= FOOTER (EVERY PAGE) ================= */
@@ -56,18 +55,17 @@
 
         /* Main content sits under fixed header/footer automatically due to @page margins */
         .contentWrap {
-            position: relative;
-            z-index: 1;
+            margin: 0;
+            padding: 0;
         }
     </style>
 
     <!-- ================= HEADER ================= -->
     <div class="pdfHeader">
-        <table class="headerRow">
+        <table class="headerRow" border="0" cellspacing="0" cellpadding="0">
             <tr>
-                <td class="headerLeft">
-                    <!-- ✅ ONE IMAGE ONLY -->
-                    <img class="logoTop" src="{!URLFOR($Resource.AreliaLogo)}" alt="Arelia" />
+                <td class="headerLeft" style="border:none;">
+                    <apex:image value="{!URLFOR($Resource.AreliaLogo)}" width="150" height="150"/>
                 </td>
             </tr>
         </table>
@@ -77,7 +75,7 @@
     <div class="contentWrap">
 
         <!-- TITLE -->
-        <div style="text-align:center; font-size:16px; font-weight:900; margin-bottom:10px;">
+        <div style="text-align:center; font-size:16px; font-weight:900; margin:4px 0 10px 0;">
             FINAL INVOICE
         </div>
 

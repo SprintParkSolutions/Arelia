@@ -58,4 +58,9 @@
       </div>
     </div>
   </section>
+
+  <!-- Popup -->
+  <template if:true={showRegistrationPopup}>
+    <c-registration-popup-form onclosepopup={handleClosePopup}></c-registration-popup-form>
+  </template>
 </template>

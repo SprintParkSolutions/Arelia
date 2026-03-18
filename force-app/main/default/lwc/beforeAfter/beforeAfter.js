@@ -1,5 +1,5 @@
-import { LightningElement, api, track } from 'lwc';
-
+import { LightningElement, api, wire, track } from 'lwc';
+import { CurrentPageReference } from 'lightning/navigation';
 import LIVING_BEFORE from '@salesforce/resourceUrl/LivingRoomBefore';
 import LIVING_AFTER  from '@salesforce/resourceUrl/LivingRoomAfter';
 import BEDROOM_BEFORE from '@salesforce/resourceUrl/BedroomBefore';
@@ -14,8 +14,21 @@ export default class BeforeAfter extends LightningElement {
   @api afterAlt = 'After Renovation';
 
   @track pair = 'living';
+  // Starts on the leftmost side (10% visible)
   @track position = 50; 
   dragging = false;
+  myTargetName = 'beforeAfter'; 
+    
+  hasScrolled = false;
+  urlTargetName = null;
+
+  @wire(CurrentPageReference)
+    getStateParameters(currentPageReference) {
+        if (currentPageReference) {
+            // Grab the c__target value from the URL (e.g., ?c__target=beforeAfter)
+            this.urlTargetName = currentPageReference.state?.c__target;
+        }
+    }
 
   presets = {
     living:  { before: LIVING_BEFORE,  after: LIVING_AFTER },
@@ -30,18 +43,36 @@ export default class BeforeAfter extends LightningElement {
   get computedAfter() {
     return (this.presets[this.pair] && this.presets[this.pair].after) || LIVING_AFTER;
   }
-  
-  // Controls the width of the left (Before) overlay
+  // The AFTER label is on the left. Hide it if the slider goes below 15%
+  get afterLabelClass() {
+      const baseClass = 'ba-label ba-label-after';
+      return this.position < 15 ? `${baseClass} hidden-label` : baseClass;
+  }
+  // The BEFORE label is on the right. Hide it if the slider goes above 85%
+  get beforeLabelClass() {
+      const baseClass = 'ba-label ba-label-before';
+      return this.position > 85 ? `${baseClass} hidden-label` : baseClass;
+  }
+  // Creates an array of all image URLs to force the browser to preload them
+  get preloadUrls() {
+    return [
+        LIVING_BEFORE, LIVING_AFTER,
+        BEDROOM_BEFORE, BEDROOM_AFTER,
+        KITCHEN_BEFORE, KITCHEN_AFTER,
+        BATH_BEFORE, BATH_AFTER
+    ];
+  }
+
+  // Uses CSS clip-path to act as a mask, completely eliminating image zooming/squishing
   get overlayStyle() {
-    return `width: ${this.position}%;`;
+    return `clip-path: polygon(0 0, ${this.position}% 0, ${this.position}% 100%, 0 100%); 
+            -webkit-clip-path: polygon(0 0, ${this.position}% 0, ${this.position}% 100%, 0 100%);`;
   }
   
-  // Controls handle horizontal position
   get handleStyle() {
     return `left: ${this.position}%;`;
   }
 
-  // --- Tab Getters ---
   get livingTabClass() { return this.pair === 'living' ? 'ba-tab active' : 'ba-tab'; }
   get bedroomTabClass() { return this.pair === 'bedroom' ? 'ba-tab active' : 'ba-tab'; }
   get kitchenTabClass() { return this.pair === 'kitchen' ? 'ba-tab active' : 'ba-tab'; }
@@ -52,65 +83,76 @@ export default class BeforeAfter extends LightningElement {
   get isSelectedKitchen() { return String(this.pair === 'kitchen'); }
   get isSelectedBath() { return String(this.pair === 'bath'); }
 
-  // --- Room tab handler ---
+  renderedCallback() {
+        if (this.urlTargetName === this.myTargetName && !this.hasScrolled) {
+            this.hasScrolled = true; // Prevents it from scrolling every time you interact with the page
+
+            // A small timeout ensures the rest of the Experience Cloud page has finished loading its layout
+            setTimeout(() => {
+                const elementToScrollTo = this.template.querySelector('.scroll-target');
+                if (elementToScrollTo) {
+                    elementToScrollTo.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start' 
+                    });
+                }
+            }, 500); 
+        }
+    }
+  
   onSelectPair(evt) {
     const key = evt.currentTarget.dataset.pair;
     if (key) {
         this.pair = key;
-        this.position = 50; // reset slider to center on tab change
+        // Resets the slider to the leftmost side when switching tabs
+        this.position = 50; 
     }
   }
 
-  // --- Drag logic ---
-  handlePointerDown(evt) {
-    evt.preventDefault();
-    this.dragging = true;
-    
-    this._boundMove = this._onMove.bind(this);
-    this._boundUp = this._onUp.bind(this);
+  /* Start dragging */
+  /* Start dragging */
+  /* Start dragging */
+    startDrag(event) {
+        event.preventDefault();
+        this.dragging = true;
 
-    window.addEventListener('pointermove', this._boundMove, { passive: false });
-    window.addEventListener('pointerup', this._boundUp, { passive: false });
-    window.addEventListener('pointercancel', this._boundUp, { passive: false });
-    
-    window.addEventListener('touchmove', this._boundMove, { passive: false });
-    window.addEventListener('touchend', this._boundUp, { passive: false });
-    
-    const clientX = this._extractClientX(evt);
-    this._updatePosition(clientX);
-  }
+        document.addEventListener('mousemove', this.onDrag);
+        document.addEventListener('mouseup', this.stopDrag);
 
-  _onMove(e) {
-    if (!this.dragging) return;
-    e.preventDefault();
-    const clientX = this._extractClientX(e);
-    this._updatePosition(clientX);
-  }
+        document.addEventListener('touchmove', this.onDrag, { passive: false });
+        document.addEventListener('touchend', this.stopDrag);
+    }
 
-  _onUp(e) {
-    this.dragging = false;
-    window.removeEventListener('pointermove', this._boundMove);
-    window.removeEventListener('pointerup', this._boundUp);
-    window.removeEventListener('pointercancel', this._boundUp);
-    window.removeEventListener('touchmove', this._boundMove);
-    window.removeEventListener('touchend', this._boundUp);
-  }
+    /* Drag handler */
+    onDrag = (event) => {
+        if (!this.dragging) return;
+        event.preventDefault(); 
 
-  _extractClientX(evt) {
-    if (evt.touches && evt.touches[0]) return evt.touches[0].clientX;
-    if (evt.changedTouches && evt.changedTouches[0]) return evt.changedTouches[0].clientX;
-    return evt.clientX;
-  }
+        const stage = this.template.querySelector('[data-id="stage"]');
+        if (!stage) return;
+        
+        const rect = stage.getBoundingClientRect();
 
-  _updatePosition(clientX) {
-    const stage = this.template.querySelector('[data-id="stage"]');
-    if (!stage) return;
-    
-    const rect = stage.getBoundingClientRect();
-    let pct = ((clientX - rect.left) / rect.width) * 100;
-    pct = Math.max(0, Math.min(100, pct));
-    this.position = pct;
-  }
+        const clientX = event.touches
+            ? event.touches[0].clientX
+            : event.clientX;
+
+        let percent = ((clientX - rect.left) / rect.width) * 100;
+        percent = Math.max(0, Math.min(100, percent));
+
+        this.position = percent;
+    };
+
+    /* Stop dragging */
+    stopDrag = () => {
+        this.dragging = false;
+
+        document.removeEventListener('mousemove', this.onDrag);
+        document.removeEventListener('mouseup', this.stopDrag);
+
+        document.removeEventListener('touchmove', this.onDrag);
+        document.removeEventListener('touchend', this.stopDrag);
+    };
 
   handleKeyDown(e) {
     const step = 5;

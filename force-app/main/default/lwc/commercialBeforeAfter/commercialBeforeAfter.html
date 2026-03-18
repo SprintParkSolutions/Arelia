@@ -1,4 +1,12 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 03-16-2026
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
 <template>
+  <div class="scroll-target">
   <div class="ba-root">
 
     <nav class="ba-tabs" role="tablist" aria-label="Commercial selections">
@@ -10,39 +18,46 @@
 
     <figure role="group" aria-label="Before and After comparison">
       <div class="ba-stage"
-           onpointerdown={handlePointerDown}
-           ontouchstart={handlePointerDown}
-           tabindex="0"
-           onkeydown={handleKeyDown}
-           data-id="stage">
+        tabindex="0"
+        onkeydown={handleKeyDown}
+        data-id="stage">
 
-        <img src={computedAfter} alt={afterAlt} class="ba-img ba-base" />
+        <img src={computedBefore} alt={beforeAlt} class="ba-img ba-base" />
 
         <div class="ba-overlay-wrap" style={afterWrapStyle} data-id="afterWrap">
-           <img src={computedBefore} alt={beforeAlt} class="ba-img ba-overlay" />
+           <img src={computedAfter} alt={afterAlt} class="ba-img ba-overlay" />
         </div>
 
         <div class="ba-handle"
-             role="slider"
-             tabindex="0"
-             aria-valuemin="0"
-             aria-valuemax="100"
-             aria-valuenow={position}
-             aria-label="Before and After slider"
-             style={handleStyle}
-             onpointerdown={handlePointerDown}
-             ontouchstart={handlePointerDown}
-             data-id="handle">
+            role="slider"
+            tabindex="0"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow={position}
+            aria-label="Before and After slider"
+            style={handleStyle}
+            onmousedown={startDrag}
+            ontouchstart={startDrag}
+            data-id="handle">
           <div class="ba-handle-inner">
+            <span class="arrow left-arrow">&#10094;</span>
             <span class="bar"></span>
+            <span class="arrow right-arrow">&#10095;</span>
           </div>
         </div>
 
-        <div class="ba-label ba-label-left">BEFORE </div>
-        <div class="ba-label ba-label-right">AFTER</div>
+        <div class={afterLabelClass}>AFTER</div>
+        <div class={beforeLabelClass}>BEFORE</div>
       </div>
 
-      <figcaption class="ba-caption">Drag the handle or use arrow keys to compare</figcaption>
+      <figcaption class="ba-caption">Drag the handle to compare renovation results</figcaption>
     </figure>
+
+    <div style="display:none;" aria-hidden="true">
+        <template for:each={preloadUrls} for:item="url">
+            <img key={url} src={url} alt="preload" />
+        </template>
+    </div>
+    </div>
   </div>
 </template>

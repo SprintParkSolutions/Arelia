@@ -1,6 +1,6 @@
-import { LightningElement, api, track } from 'lwc';
-
-// STATIC RESOURCE IMPORTS (replace with your actual static resource names)
+import { LightningElement, api, wire, track } from 'lwc';
+import { CurrentPageReference } from 'lightning/navigation';
+// STATIC RESOURCE IMPORTS
 import RESTAURANT_BEFORE from '@salesforce/resourceUrl/RestaurantBefore';
 import RESTAURANT_AFTER  from '@salesforce/resourceUrl/RestaurantAfter';
 
@@ -14,33 +14,38 @@ import LOBBY_BEFORE from '@salesforce/resourceUrl/LobbyBefore';
 import LOBBY_AFTER  from '@salesforce/resourceUrl/LobbyAfter';
 
 export default class CommercialBeforeAfter extends LightningElement {
-  // optional explicit overrides from parent
   @api beforeImage;
   @api afterImage;
 
   @api beforeAlt = 'Before Image';
   @api afterAlt = 'After Image';
 
-  // which preset is active (tracked so template updates)
   @track pair = 'restaurant';
 
-  // slider position (0..100)
+  // Set default starting position to 25%
   @track position = 50;
 
-  // dragging state
   dragging = false;
+  myTargetName = 'CommercialBeforeAfter'; 
+    
+  hasScrolled = false;
+  urlTargetName = null;
 
-  // preset mapping
+  @wire(CurrentPageReference)
+    getStateParameters(currentPageReference) {
+        if (currentPageReference) {
+            // Grab the c__target value from the URL (e.g., ?c__target=beforeAfter)
+            this.urlTargetName = currentPageReference.state?.c__target;
+        }
+    }
+
   presets = {
-    restaurant: { before: RESTAURANT_AFTER, after: RESTAURANT_BEFORE },
-  bar:        { before: BAR_AFTER,        after: BAR_BEFORE },
-  banquet:    { before: BANQUET_AFTER,    after: BANQUET_BEFORE },
-  lobby:      { before: LOBBY_AFTER,      after: LOBBY_BEFORE }
+    restaurant: { before: RESTAURANT_BEFORE, after: RESTAURANT_AFTER },
+    bar:        { before: BAR_BEFORE,        after: BAR_AFTER },
+    banquet:    { before: BANQUET_BEFORE,    after: BANQUET_AFTER },
+    lobby:      { before: LOBBY_BEFORE,      after: LOBBY_AFTER }
   };
 
-  // -------------------------
-  // Template getters
-  // -------------------------
   get computedBefore() {
     if (this.beforeImage) return this.beforeImage;
     return (this.presets[this.pair] && this.presets[this.pair].before) || RESTAURANT_BEFORE;
@@ -50,109 +55,133 @@ export default class CommercialBeforeAfter extends LightningElement {
     return (this.presets[this.pair] && this.presets[this.pair].after) || RESTAURANT_AFTER;
   }
 
-  // This controls the width of the right-aligned overlay wrap
-  get afterWrapStyle() {
-    return `width: ${100 - this.position}%;`;
+  // Caches all images so tabs load instantly
+  get preloadUrls() {
+    return [
+        RESTAURANT_BEFORE, RESTAURANT_AFTER,
+        BAR_BEFORE, BAR_AFTER,
+        BANQUET_BEFORE, BANQUET_AFTER,
+        LOBBY_BEFORE, LOBBY_AFTER
+    ];
   }
 
-  // This controls the position of the slider handle
+  // Uses CSS clip-path to act as a mask
+  get afterWrapStyle() {
+    return `clip-path: polygon(0 0, ${this.position}% 0, ${this.position}% 100%, 0 100%); 
+            -webkit-clip-path: polygon(0 0, ${this.position}% 0, ${this.position}% 100%, 0 100%);`;
+  }
+
+  // Handle position logic
   get handleStyle() {
-    // Subtract half the handle width (18px) to center it
-    return `left: calc(${this.position}% - 18px);`;
+    return `left: ${this.position}%;`;
+  }
+
+  // --- Label Visibility Getters ---
+  get afterLabelClass() {
+      const baseClass = 'ba-label ba-label-left';
+      return this.position < 15 ? `${baseClass} hidden-label` : baseClass;
+  }
+
+  get beforeLabelClass() {
+      const baseClass = 'ba-label ba-label-right';
+      return this.position > 85 ? `${baseClass} hidden-label` : baseClass;
   }
 
   // tab class getters
   get restaurantTabClass() { return this.pair === 'restaurant' ? 'ba-tab active' : 'ba-tab'; }
-  get barTabClass()       { return this.pair === 'bar' ? 'ba-tab active' : 'ba-tab'; }
-  get banquetTabClass()   { return this.pair === 'banquet' ? 'ba-tab active' : 'ba-tab'; }
-  get lobbyTabClass()     { return this.pair === 'lobby' ? 'ba-tab active' : 'ba-tab'; }
+  get barTabClass()        { return this.pair === 'bar' ? 'ba-tab active' : 'ba-tab'; }
+  get banquetTabClass()    { return this.pair === 'banquet' ? 'ba-tab active' : 'ba-tab'; }
+  get lobbyTabClass()      { return this.pair === 'lobby' ? 'ba-tab active' : 'ba-tab'; }
 
   // aria-selected getters
-  get isSelectedRestaurant() { return this.pair === 'restaurant' ? 'true' : 'false'; }
-  get isSelectedBar()        { return this.pair === 'bar' ? 'true' : 'false'; }
-  get isSelectedBanquet()    { return this.pair === 'banquet' ? 'true' : 'false'; }
-  get isSelectedLobby()      { return this.pair === 'lobby' ? 'true' : 'false'; }
+  get isSelectedRestaurant() { return String(this.pair === 'restaurant'); }
+  get isSelectedBar()        { return String(this.pair === 'bar'); }
+  get isSelectedBanquet()    { return String(this.pair === 'banquet'); }
+  get isSelectedLobby()      { return String(this.pair === 'lobby'); }
 
-  // -------------------------
-  // Tab selection handler
-  // -------------------------
+  renderedCallback() {
+        if (this.urlTargetName === this.myTargetName && !this.hasScrolled) {
+            this.hasScrolled = true; // Prevents it from scrolling every time you interact with the page
+
+            // A small timeout ensures the rest of the Experience Cloud page has finished loading its layout
+            setTimeout(() => {
+                const elementToScrollTo = this.template.querySelector('.scroll-target');
+                if (elementToScrollTo) {
+                    elementToScrollTo.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start' 
+                    });
+                }
+            }, 500); 
+        }
+    }
+    
   onSelectPair(evt) {
     const key = evt.currentTarget.dataset.pair;
     if (!key) return;
     this.pair = key;
-    // reset slider center when switching
+    // reset slider to match default position when switching
     this.position = 50;
   }
 
   // -------------------------
   // Pointer / touch dragging
   // -------------------------
-  handlePointerDown(evt) {
-    evt.preventDefault();
-    this.dragging = true;
+  // -------------------------
+    // Standardized Pointer / touch dragging
+    // -------------------------
+    /* Start dragging */
+  /* Start dragging */
+  /* Start dragging */
+    startDrag(event) {
+        event.preventDefault();
+        this.dragging = true;
 
-    if (!this._boundMove) {
-      this._boundMove = this._onMove.bind(this);
-      this._boundUp = this._onUp.bind(this);
+        document.addEventListener('mousemove', this.onDrag);
+        document.addEventListener('mouseup', this.stopDrag);
+
+        document.addEventListener('touchmove', this.onDrag, { passive: false });
+        document.addEventListener('touchend', this.stopDrag);
     }
 
-    window.addEventListener('pointermove', this._boundMove, { passive: false });
-    window.addEventListener('pointerup', this._boundUp, { passive: false });
-    window.addEventListener('pointercancel', this._boundUp, { passive: false });
+    /* Drag handler */
+    onDrag = (event) => {
+        if (!this.dragging) return;
+        event.preventDefault(); 
 
-    window.addEventListener('touchmove', this._boundMove, { passive: false });
-    window.addEventListener('touchend', this._boundUp, { passive: false });
-    window.addEventListener('touchcancel', this._boundUp, { passive: false });
+        const stage = this.template.querySelector('.ba-stage');
+        if (!stage) return;
+        
+        const rect = stage.getBoundingClientRect();
 
-    const clientX = this._extractClientX(evt);
-    this._updatePositionFromClientX(clientX);
-  }
+        const clientX = event.touches
+            ? event.touches[0].clientX
+            : event.clientX;
 
-  _onMove(e) {
-    e.preventDefault();
-    if (!this.dragging) return;
-    const clientX = this._extractClientX(e);
-    this._updatePositionFromClientX(clientX);
-  }
+        let percent = ((clientX - rect.left) / rect.width) * 100;
+        percent = Math.max(0, Math.min(100, percent));
 
-  _onUp(e) {
-    e.preventDefault();
-    this.dragging = false;
-    try {
-      window.removeEventListener('pointermove', this._boundMove);
-      window.removeEventListener('pointerup', this._boundUp);
-      window.removeEventListener('pointercancel', this._boundUp);
+        this.position = Math.round(percent);
 
-      window.removeEventListener('touchmove', this._boundMove);
-      window.removeEventListener('touchend', this._boundUp);
-      window.removeEventListener('touchcancel', this._boundUp);
-    } catch (err) { /* ignore */ }
+        // Unique to Commercial component: Accessibility & Event firing
+        const handle = this.template.querySelector('.ba-handle');
+        if (handle) handle.setAttribute('aria-valuenow', String(this.position));
+        this._dispatchChangedDebounced();
+    };
 
-    // emit final changed event
-    this.dispatchEvent(new CustomEvent('changed', { detail: { position: this.position }, bubbles: true, composed: true }));
-  }
+    /* Stop dragging */
+    stopDrag = () => {
+        this.dragging = false;
 
-  _extractClientX(evt) {
-    if (!evt) return 0;
-    if (evt.touches && evt.touches[0]) return evt.touches[0].clientX;
-    if (evt.changedTouches && evt.changedTouches[0]) return evt.changedTouches[0].clientX;
-    return evt.clientX || evt.pageX || 0;
-  }
+        document.removeEventListener('mousemove', this.onDrag);
+        document.removeEventListener('mouseup', this.stopDrag);
 
-  _updatePositionFromClientX(clientX) {
-    if (typeof clientX !== 'number') return;
-    const stage = this.template.querySelector('.ba-stage');
-    if (!stage) return;
-    const rect = stage.getBoundingClientRect();
-    let pct = ((clientX - rect.left) / rect.width) * 100;
-    pct = Math.max(0, Math.min(100, pct));
-    this.position = Math.round(pct);
+        document.removeEventListener('touchmove', this.onDrag);
+        document.removeEventListener('touchend', this.stopDrag);
 
-    const handle = this.template.querySelector('.ba-handle');
-    if (handle) handle.setAttribute('aria-valuenow', String(this.position));
-
-    this._dispatchChangedDebounced();
-  }
+        // Emit final changed event on mouse up
+        this.dispatchEvent(new CustomEvent('changed', { detail: { position: this.position }, bubbles: true, composed: true }));
+    };
 
   // -------------------------
   // Keyboard support

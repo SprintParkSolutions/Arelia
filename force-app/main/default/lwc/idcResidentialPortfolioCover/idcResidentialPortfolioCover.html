@@ -11,13 +11,11 @@
                     Where Luxury Meets Thoughtful Living
                 </h1>
 
-                <!-- HERO SUBTITLE -->
                 <p class="hero-sub" style="font-family:'Lato', sans-serif !important;">
                     Crafting spaces that feel timeless, warm and effortlessly refined.
                 </p>
 
-                <!-- CTA BUTTON -->
-                <button class="unique-button" onclick={navigateToProjectRequest} aria-label="Talk to our designer"
+                <button class="unique-button" onclick={handleOpenPopup} aria-label="Talk to our designer"
                     style="font-family:'Lato', sans-serif !important;">
                     Talk to Our Designer
                 </button>
@@ -26,4 +24,7 @@
         </div>
     </section>
 
+    <template if:true={showRegistrationPopup}>
+        <c-registration-popup-form onclosepopup={handleClosePopup}></c-registration-popup-form>
+    </template>
 </template>

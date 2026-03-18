@@ -62,14 +62,14 @@
                             <template if:true={isStep1}>
                                 <div class="slds-grid slds-wrap slds-gutters_small">
                                     <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
-                                        <lightning-input label="First Name" name="firstName" value={firstName}
-                                            onchange={handleInputChange} required>
+                                        <lightning-input label="First Name" name="firstName" data-id="firstNameInput"
+                                            value={firstName} onchange={handleInputChange} required>
                                         </lightning-input>
                                     </div>
 
                                     <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
-                                        <lightning-input label="Last Name" name="lastName" value={lastName}
-                                            onchange={handleInputChange} required>
+                                        <lightning-input label="Last Name" name="lastName" data-id="lastNameInput"
+                                            value={lastName} onchange={handleInputChange} required>
                                         </lightning-input>
                                     </div>
 
@@ -85,7 +85,6 @@
                                         </lightning-input>
                                         <div class="field-help">If not provided, we'll use <b>Self</b>.</div>
                                     </div>
-
 
                                     <div class="slds-col slds-size_1-of-1">
                                         <div class="phone-row">
@@ -113,7 +112,6 @@
                                         We’ve sent a 6-digit verification code to your email. Enter it and click
                                         <strong>Verify Code</strong> to continue.
                                     </p>
-
 
                                     <div class="summary-block">
                                         <div class="summary-label">Email to verify</div>
@@ -158,7 +156,6 @@
                                         <template if:false={resendTimerActive}>
                                             <span>Didn’t receive the code? You can <b>Resend Code</b> now.</span>
                                         </template>
-
                                     </div>
                                 </div>
                             </template>

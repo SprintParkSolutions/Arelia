@@ -10,9 +10,15 @@ import hasExistingTasks from '@salesforce/apex/TaskBulkController.hasExistingTas
 import getExistingTasks from '@salesforce/apex/TaskBulkController.getExistingTasks';
 import getTaskFiles from '@salesforce/apex/TaskBulkController.getTaskFiles';
 
-import OWNER_ID_FIELD from '@salesforce/schema/Vendor_Assignment__c.OwnerId'; 
+import OWNER_ID_FIELD from '@salesforce/schema/Vendor_Assignment__c.OwnerId';
+
+import { getObjectInfo, getPicklistValues } from 'lightning/uiObjectInfoApi';
+import TASK_OBJECT from '@salesforce/schema/Task';
+import STATUS_FIELD from '@salesforce/schema/Task.Status';
 
 export default class VendorTaskCreator extends LightningElement {
+    @track statusOptions = [];
+    
     // FIX 1: Reactive recordId to prevent "Blank Screen"
     _recordId;
     @api 
@@ -43,14 +49,34 @@ export default class VendorTaskCreator extends LightningElement {
 
     get vendorOwnerId() { return getFieldValue(this.vendorRecord.data, OWNER_ID_FIELD); }
 
-    get statusOptions() {
-        return [
-            { label: 'Not Started', value: 'Not Started' },
-            { label: 'In Progress', value: 'In Progress' },
-            { label: 'Completed', value: 'Completed' },
-            { label: 'Waiting on someone else', value: 'Waiting on someone else' },
-            { label: 'Deferred', value: 'Deferred' }
-        ];
+    // get statusOptions() {
+    //     return [
+    //         { label: 'Not Started', value: 'Not Started' },
+    //         { label: 'In Progress', value: 'In Progress' },
+    //         { label: 'Completed', value: 'Completed' },
+    //         { label: 'Waiting on someone else', value: 'Waiting on someone else' },
+    //         { label: 'Deferred', value: 'Deferred' }
+    //     ];
+    // }
+
+    // ---------------- Dynamic Picklist ---------------- //
+
+    @wire(getObjectInfo, { objectApiName: TASK_OBJECT })
+    taskMetadata;
+
+    @wire(getPicklistValues, {
+        recordTypeId: '$taskMetadata.data.defaultRecordTypeId',
+        fieldApiName: STATUS_FIELD
+    })
+    wiredStatusValues({ error, data }) {
+        if (data) {
+            this.statusOptions = data.values.map(item => ({
+                label: item.label,
+                value: item.value
+            }));
+        } else if (error) {
+            console.error('Error fetching Status picklist', error);
+        }
     }
 
     // Initialize only when we have an ID

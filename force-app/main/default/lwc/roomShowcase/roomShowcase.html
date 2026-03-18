@@ -40,9 +40,7 @@
             <p class="rs-modal-sub">{activeRoom.tagline}</p>
           </header>
 
-          <!-- modal body: carousel + thumbnails + side panel -->
           <div class="rs-modal-body">
-            <!-- Carousel + thumbnail strip -->
             <div class="carousel">
               <button class="car-nav car-prev" onclick={prevImage} aria-label="Previous image">&#10094;</button>
 
@@ -53,11 +51,9 @@
 
               <button class="car-nav car-next" onclick={nextImage} aria-label="Next image">&#10095;</button>
 
-              <!-- Thumbnail strip: shows all images for the active room -->
               <div class="thumb-strip" role="list" aria-label="Image thumbnails">
                 <template if:true={activeRoom}>
                   <template for:each={activeRoom.images} for:item="imgSrc" for:index="idx">
-                    <!-- key must be stable — use image src (imgSrc) instead of idx -->
                     <button key={imgSrc} class="thumb-btn" data-idx={idx} onclick={handleThumbClick} role="listitem"
                       aria-label="View image">
                       <img src={imgSrc} alt="Thumbnail" />
@@ -66,8 +62,7 @@
                 </template>
               </div>
             </div>
-            <!-- Side Panel -->
-            <!-- Side Panel -->
+
             <aside class="rs-panel">
               <h4>What we deliver</h4>
               <ul class="deliver-list">
@@ -77,8 +72,9 @@
               </ul>
 
               <div class="modal-actions">
-                <button class="rs-primary" data-key={activeRoom.key} onclick={handleModalAction}>Book
-                  Consultation</button>
+                <button class="rs-primary" data-key={activeRoom.key} onclick={handleModalAction}>
+                  Book Consultation
+                </button>
               </div>
             </aside>
           </div>
@@ -86,4 +82,8 @@
       </div>
     </template>
   </section>
+
+  <template if:true={showRegistrationPopup}>
+    <c-registration-popup-form onclosepopup={handleClosePopup}></c-registration-popup-form>
+  </template>
 </template>

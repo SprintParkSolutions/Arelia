@@ -20,17 +20,8 @@ import BOUTIQUE_1 from '@salesforce/resourceUrl/boutique_1';
 import BOUTIQUE_2 from '@salesforce/resourceUrl/boutique_2';
 import BOUTIQUE_3 from '@salesforce/resourceUrl/boutique_3';
 
-import SITE_BASE_URL from '@salesforce/label/c.Arelia_Site_Label';
-import REGISTRATION_FORM_URL from '@salesforce/label/c.Registration_Form_URL';
-
 export default class HospitalityShowcase extends LightningElement {
-
-  baseUrl = SITE_BASE_URL;
-
-  get registrationFormUrl() {
-    return this.baseUrl + REGISTRATION_FORM_URL;
-  }
-
+  showRegistrationPopup = false;
 
   @api rooms = [
     {
@@ -150,23 +141,21 @@ export default class HospitalityShowcase extends LightningElement {
   _observer = null;
   _observed = false;
   _animatingImage = false;
-
   _onStageMouse = null;
   _onStageLeave = null;
 
   connectedCallback() {
-    // Convert images[] (strings) -> images[] of { src, isVideo } and set placeholder props
-    this.rooms = this.rooms.map(r => {
+    this.rooms = this.rooms.map((r) => {
       const copy = { ...r };
-      copy.images = (copy.images || []).map(s => ({ src: s, isVideo: this.isVideo(s) }));
-      copy.placeholder = (copy.images && copy.images.length) ? copy.images[0].src : '';
-      copy.isVideoPlaceholder = (copy.images && copy.images.length) ? copy.images[0].isVideo : false;
+      copy.images = (copy.images || []).map((s) => ({ src: s, isVideo: this.isVideo(s) }));
+      copy.placeholder = copy.images && copy.images.length ? copy.images[0].src : '';
+      copy.isVideoPlaceholder = copy.images && copy.images.length ? copy.images[0].isVideo : false;
       return copy;
     });
 
     if ('IntersectionObserver' in window) {
       this._observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
           const el = entry.target;
           if (entry.isIntersecting) {
             const cards = Array.from(this.template ? this.template.querySelectorAll('.rs-card') : []);
@@ -174,7 +163,9 @@ export default class HospitalityShowcase extends LightningElement {
             const delay = Math.min(300, Math.max(0, idx * 80));
             el.style.transitionDelay = `${delay}ms`;
             el.classList.add('in-view');
-            if (this._observer && entry.target) this._observer.unobserve(entry.target);
+            if (this._observer && entry.target) {
+              this._observer.unobserve(entry.target);
+            }
           }
         });
       }, { threshold: 0.15 });
@@ -182,11 +173,10 @@ export default class HospitalityShowcase extends LightningElement {
   }
 
   renderedCallback() {
-    // observe cards once
     if (!this._observed) {
       const cards = this.template.querySelectorAll('.rs-card');
       if (cards && cards.length && this._observer) {
-        cards.forEach(c => this._observer.observe(c));
+        cards.forEach((c) => this._observer.observe(c));
         this._observed = true;
       } else if (cards && cards.length && !this._observer) {
         cards.forEach((c, idx) => {
@@ -197,14 +187,18 @@ export default class HospitalityShowcase extends LightningElement {
       }
     }
 
-    // modal open hooks
     if (this.modalOpen) {
       setTimeout(() => {
         const backdrop = this.template.querySelector('.rs-backdrop');
         const modal = this.template.querySelector('.rs-modal');
         const img = this.template.querySelector('.car-img') || this.template.querySelector('.car-stage video');
-        if (backdrop) backdrop.classList.add('open');
-        if (modal) modal.classList.add('open');
+
+        if (backdrop) {
+          backdrop.classList.add('open');
+        }
+        if (modal) {
+          modal.classList.add('open');
+        }
 
         if (img) {
           img.classList.add('pop-in');
@@ -212,25 +206,27 @@ export default class HospitalityShowcase extends LightningElement {
           setTimeout(() => img.classList.remove('pop-in'), 520);
         }
 
-        // parallax on stage
         if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
           const stage = this.template.querySelector('.car-stage');
           if (stage && img) {
             this._onStageMouse = (e) => {
               const rect = stage.getBoundingClientRect();
-              const x = ((e.clientX - rect.left) / rect.width - 0.5);
-              const y = ((e.clientY - rect.top) / rect.height - 0.5);
+              const x = (e.clientX - rect.left) / rect.width - 0.5;
+              const y = (e.clientY - rect.top) / rect.height - 0.5;
               const tx = (x * 8).toFixed(2);
               const ty = (y * 6).toFixed(2);
               img.style.transform = `translate(${tx}px, ${ty}px) scale(1.02)`;
             };
-            this._onStageLeave = () => { if (img) img.style.transform = ''; };
+            this._onStageLeave = () => {
+              if (img) {
+                img.style.transform = '';
+              }
+            };
             stage.addEventListener('mousemove', this._onStageMouse);
             stage.addEventListener('mouseleave', this._onStageLeave);
           }
         }
 
-        // sync thumbnails & scroll
         this.updateThumbs();
         this.scrollThumbIntoView();
       }, 20);
@@ -245,20 +241,25 @@ export default class HospitalityShowcase extends LightningElement {
     this._removeParallaxListeners();
   }
 
-  // open modal for room (from card or btn)
   openRoom(evt) {
     const key = evt.currentTarget.dataset.key;
-    if (!key) return;
-    const room = this.rooms.find(r => r.key === key);
-    if (!room) return;
+    if (!key) {
+      return;
+    }
+    const room = this.rooms.find((r) => r.key === key);
+    if (!room) {
+      return;
+    }
+
     this.activeRoom = room;
     this.activeIndex = 0;
     this.modalOpen = true;
 
-    // after modal is in DOM, focus and sync thumbs and set media
     setTimeout(() => {
       const modal = this.template.querySelector('.rs-modal');
-      if (modal) modal.focus();
+      if (modal) {
+        modal.focus();
+      }
       this.updateThumbs();
       this.scrollThumbIntoView();
       this._applyCurrentMediaToStage();
@@ -275,21 +276,32 @@ export default class HospitalityShowcase extends LightningElement {
     if (img) {
       img.classList.remove('kenburns');
       img.style.transform = '';
-      // pause video if any
       if (img.tagName && img.tagName.toLowerCase() === 'video') {
-        try { img.pause(); } catch (e) { /* ignore */ }
+        try {
+          img.pause();
+        } catch (e) {
+          // ignore
+        }
       }
     }
 
-    if (modal) modal.classList.remove('open');
-    if (backdrop) backdrop.classList.remove('open');
+    if (modal) {
+      modal.classList.remove('open');
+    }
+    if (backdrop) {
+      backdrop.classList.remove('open');
+    }
 
     const onEnd = (e) => {
-      if (e && e.target !== modal) return;
+      if (e && e.target !== modal) {
+        return;
+      }
       this.modalOpen = false;
       this.activeRoom = null;
       this.activeIndex = 0;
-      if (modal) modal.removeEventListener('transitionend', onEnd);
+      if (modal) {
+        modal.removeEventListener('transitionend', onEnd);
+      }
     };
 
     if (modal) {
@@ -308,15 +320,58 @@ export default class HospitalityShowcase extends LightningElement {
     }
   }
 
+  closeModalAndOpenPopup() {
+    this._removeParallaxListeners();
+
+    const modal = this.template.querySelector('.rs-modal');
+    const backdrop = this.template.querySelector('.rs-backdrop');
+    const img = this.template.querySelector('.car-img') || this.template.querySelector('.car-stage video');
+
+    if (img) {
+      img.classList.remove('kenburns');
+      img.style.transform = '';
+      if (img.tagName && img.tagName.toLowerCase() === 'video') {
+        try {
+          img.pause();
+        } catch (e) {
+          // ignore
+        }
+      }
+    }
+
+    if (modal) {
+      modal.classList.remove('open');
+    }
+    if (backdrop) {
+      backdrop.classList.remove('open');
+    }
+
+    this.modalOpen = false;
+    this.activeRoom = null;
+    this.activeIndex = 0;
+
+    requestAnimationFrame(() => {
+      this.showRegistrationPopup = true;
+    });
+  }
+
   _removeParallaxListeners() {
     const stage = this.template ? this.template.querySelector('.car-stage') : null;
     if (stage) {
-      if (this._onStageMouse) stage.removeEventListener('mousemove', this._onStageMouse);
-      if (this._onStageLeave) stage.removeEventListener('mouseleave', this._onStageLeave);
+      if (this._onStageMouse) {
+        stage.removeEventListener('mousemove', this._onStageMouse);
+      }
+      if (this._onStageLeave) {
+        stage.removeEventListener('mouseleave', this._onStageLeave);
+      }
     }
     this._onStageMouse = null;
     this._onStageLeave = null;
-    const img = this.template ? (this.template.querySelector('.car-img') || this.template.querySelector('.car-stage video')) : null;
+
+    const img = this.template
+      ? this.template.querySelector('.car-img') || this.template.querySelector('.car-stage video')
+      : null;
+
     if (img) {
       img.style.transform = '';
       img.classList.remove('pop-in', 'kenburns');
@@ -330,16 +385,26 @@ export default class HospitalityShowcase extends LightningElement {
   }
 
   modalKeydown(evt) {
-    if (!this.modalOpen) return;
-    if (evt.key === 'Escape') this.closeModal();
-    else if (evt.key === 'ArrowRight') this.nextImage();
-    else if (evt.key === 'ArrowLeft') this.prevImage();
+    if (!this.modalOpen) {
+      return;
+    }
+    if (evt.key === 'Escape') {
+      this.closeModal();
+    } else if (evt.key === 'ArrowRight') {
+      this.nextImage();
+    } else if (evt.key === 'ArrowLeft') {
+      this.prevImage();
+    }
   }
 
-  // robust preloading-based image/video swap
   _animateImageChange(newIndex) {
-    if (this._animatingImage) return;
-    if (!this.activeRoom) { this.activeIndex = newIndex; return; }
+    if (this._animatingImage) {
+      return;
+    }
+    if (!this.activeRoom) {
+      this.activeIndex = newIndex;
+      return;
+    }
 
     const stageImg = this.template.querySelector('.car-img');
     const stageVideo = this.template.querySelector('.car-stage video');
@@ -350,14 +415,19 @@ export default class HospitalityShowcase extends LightningElement {
 
     this._animatingImage = true;
 
-    // apply fade out
-    if (stageImg) stageImg.classList.add('fade-out');
-    if (stageVideo) stageVideo.classList.add('fade-out');
+    if (stageImg) {
+      stageImg.classList.add('fade-out');
+    }
+    if (stageVideo) {
+      stageVideo.classList.add('fade-out');
+    }
 
     let didFinish = false;
     const safetyTimeout = 1400;
     const safety = setTimeout(() => {
-      if (didFinish) return;
+      if (didFinish) {
+        return;
+      }
       didFinish = true;
       this.activeIndex = newIndex;
       this._finishAnimate(stageImg, stageVideo, targetIsVideo, targetSrc);
@@ -370,14 +440,18 @@ export default class HospitalityShowcase extends LightningElement {
       v.playsInline = true;
       v.src = targetSrc;
       v.onloadedmetadata = () => {
-        if (didFinish) return;
+        if (didFinish) {
+          return;
+        }
         didFinish = true;
         clearTimeout(safety);
         this.activeIndex = newIndex;
         this._finishAnimate(stageImg, stageVideo, targetIsVideo, targetSrc);
       };
       v.onerror = () => {
-        if (didFinish) return;
+        if (didFinish) {
+          return;
+        }
         didFinish = true;
         clearTimeout(safety);
         this.activeIndex = newIndex;
@@ -387,14 +461,18 @@ export default class HospitalityShowcase extends LightningElement {
       const pre = new Image();
       pre.src = targetSrc;
       pre.onload = () => {
-        if (didFinish) return;
+        if (didFinish) {
+          return;
+        }
         didFinish = true;
         clearTimeout(safety);
         this.activeIndex = newIndex;
         this._finishAnimate(stageImg, stageVideo, targetIsVideo, targetSrc);
       };
       pre.onerror = () => {
-        if (didFinish) return;
+        if (didFinish) {
+          return;
+        }
         didFinish = true;
         clearTimeout(safety);
         this.activeIndex = newIndex;
@@ -414,7 +492,9 @@ export default class HospitalityShowcase extends LightningElement {
         let videoEl = this.template.querySelector('.car-stage video.car-img');
         if (!videoEl) {
           const imgEl = this.template.querySelector('.car-img');
-          if (imgEl) imgEl.remove();
+          if (imgEl) {
+            imgEl.remove();
+          }
           const container = this.template.querySelector('.car-stage');
           const v = document.createElement('video');
           v.className = 'car-img';
@@ -429,7 +509,11 @@ export default class HospitalityShowcase extends LightningElement {
           videoEl.src = targetSrc;
         }
 
-        try { videoEl.play(); } catch (e) { /* ignore */ }
+        try {
+          videoEl.play();
+        } catch (e) {
+          // ignore
+        }
 
         videoEl.classList.remove('fade-out');
         videoEl.classList.add('fade-in', 'pop-in', 'kenburns');
@@ -443,7 +527,9 @@ export default class HospitalityShowcase extends LightningElement {
         let imgEl = this.template.querySelector('.car-img');
         if (!imgEl) {
           const videoEl = this.template.querySelector('.car-stage video');
-          if (videoEl) videoEl.remove();
+          if (videoEl) {
+            videoEl.remove();
+          }
           const img = document.createElement('img');
           img.className = 'car-img';
           img.alt = this.currentCaption;
@@ -467,51 +553,64 @@ export default class HospitalityShowcase extends LightningElement {
   }
 
   nextImage() {
-    if (!this.activeRoom) return;
+    if (!this.activeRoom) {
+      return;
+    }
     const len = this.activeRoom.images.length;
     const newIndex = (this.activeIndex + 1) % len;
     this._animateImageChange(newIndex);
   }
 
   prevImage() {
-    if (!this.activeRoom) return;
+    if (!this.activeRoom) {
+      return;
+    }
     const len = this.activeRoom.images.length;
     const newIndex = (this.activeIndex - 1 + len) % len;
     this._animateImageChange(newIndex);
   }
 
-  // Jump directly to a thumbnail (index)
   goToImage(index) {
-    if (this._animatingImage) return;
-    if (!this.activeRoom) return;
+    if (this._animatingImage) {
+      return;
+    }
+    if (!this.activeRoom) {
+      return;
+    }
     const len = this.activeRoom.images.length;
     const idx = Math.max(0, Math.min(len - 1, index));
     this._animateImageChange(idx);
   }
 
-  // handler wired from template thumbnail buttons
   handleThumbClick(evt) {
     const idx = parseInt(evt.currentTarget.dataset.idx, 10);
-    if (Number.isNaN(idx)) return;
+    if (Number.isNaN(idx)) {
+      return;
+    }
     this.goToImage(idx);
   }
 
-  // update active class on thumbnails
   updateThumbs() {
     const strip = this.template ? this.template.querySelector('.thumb-strip') : null;
-    if (!strip) return;
+    if (!strip) {
+      return;
+    }
     const buttons = Array.from(strip.querySelectorAll('.thumb-btn'));
     buttons.forEach((btn, idx) => {
-      if (idx === this.activeIndex) btn.classList.add('active');
-      else btn.classList.remove('active');
+      if (idx === this.activeIndex) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
     });
   }
 
-  // ensure the active thumbnail is scrolled into view
   scrollThumbIntoView() {
     setTimeout(() => {
       const strip = this.template ? this.template.querySelector('.thumb-strip') : null;
-      if (!strip) return;
+      if (!strip) {
+        return;
+      }
       const btns = strip.querySelectorAll('.thumb-btn');
       const active = btns && btns[this.activeIndex];
       if (active && typeof active.scrollIntoView === 'function') {
@@ -525,6 +624,7 @@ export default class HospitalityShowcase extends LightningElement {
       ? this.activeRoom.images[this.activeIndex].src
       : '';
   }
+
   get currentCaption() {
     return this.activeRoom ? `${this.activeRoom.title} — View ${this.activeIndex + 1}` : '';
   }
@@ -534,11 +634,12 @@ export default class HospitalityShowcase extends LightningElement {
   }
 
   isVideo(src) {
-    if (!src || typeof src !== 'string') return false;
+    if (!src || typeof src !== 'string') {
+      return false;
+    }
     return /\.(mp4|webm|mov)(\?.*)?$/i.test(src);
   }
 
-  // called when video metadata loaded in stage
   onMediaLoaded(evt) {
     const el = evt.currentTarget;
     if (el) {
@@ -547,17 +648,20 @@ export default class HospitalityShowcase extends LightningElement {
     }
   }
 
-  // apply current image/video to stage after opening modal
   _applyCurrentMediaToStage() {
     const stage = this.template ? this.template.querySelector('.car-stage') : null;
-    if (!stage || !this.activeRoom) return;
+    if (!stage || !this.activeRoom) {
+      return;
+    }
 
     const current = this.currentImage;
     if (this.isVideo(current)) {
       let v = stage.querySelector('video.car-img');
       if (!v) {
         const img = stage.querySelector('img.car-img');
-        if (img) img.remove();
+        if (img) {
+          img.remove();
+        }
         v = document.createElement('video');
         v.className = 'car-img';
         v.controls = true;
@@ -567,12 +671,18 @@ export default class HospitalityShowcase extends LightningElement {
         stage.insertBefore(v, stage.querySelector('.car-caption'));
       }
       v.src = current;
-      try { v.play(); } catch (e) { /* ignore */ }
+      try {
+        v.play();
+      } catch (e) {
+        // ignore
+      }
     } else {
       let img = stage.querySelector('img.car-img');
       if (!img) {
         const videoEl = stage.querySelector('video.car-img');
-        if (videoEl) videoEl.remove();
+        if (videoEl) {
+          videoEl.remove();
+        }
         img = document.createElement('img');
         img.className = 'car-img';
         img.alt = this.currentCaption;
@@ -582,24 +692,23 @@ export default class HospitalityShowcase extends LightningElement {
       img.alt = this.currentCaption;
     }
 
-    // update thumbnails
     this.updateThumbs();
     this.scrollThumbIntoView();
   }
 
-  // Book Consultation: close modal then navigate to YOUR registration URL
   handleModalAction(evt) {
-    // close modal first (keeps UX smooth)
-    this.closeModal();
+    const key = evt.currentTarget?.dataset?.key || (this.activeRoom && this.activeRoom.key);
 
-    // navigate after a tiny delay so the modal close animation runs
-    setTimeout(() => {
-      try {
-        window.location.href = this.registrationFormUrl;
-      } catch (e) {
-        // fallback: open new tab if direct nav fails
-        window.open(this.registrationFormUrl, '_blank');
-      }
-    }, 200);
+    this.dispatchEvent(new CustomEvent('bookconsult', {
+      detail: { pillar: 'hospitality', room: key },
+      bubbles: true,
+      composed: true
+    }));
+
+    this.closeModalAndOpenPopup();
+  }
+
+  handleClosePopup() {
+    this.showRegistrationPopup = false;
   }
 }

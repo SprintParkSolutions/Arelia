@@ -5,7 +5,6 @@
       <div class="image-column">
         <div class="image-card" part="image-card">
           <img src={appointmentImg} alt="Interior consultation preview" class="consult-img" />
-          <!-- Book Consultation pill removed from image to avoid visual duplication -->
         </div>
       </div>
 
@@ -17,7 +16,6 @@
           Talk to our design experts and get a personalized plan for your home or workspace.
         </p>
 
-        <!-- main CTA (also present in content column for keyboard users / screen readers) -->
         <div>
           <button class="cta-button reveal" type="button" onclick={handleBookClick} aria-label="Book Consultation">
             Book Consultation
@@ -26,4 +24,8 @@
       </div>
     </div>
   </section>
+
+  <template if:true={showRegistrationPopup}>
+    <c-registration-popup-form onclosepopup={handleClosePopup}></c-registration-popup-form>
+  </template>
 </template>

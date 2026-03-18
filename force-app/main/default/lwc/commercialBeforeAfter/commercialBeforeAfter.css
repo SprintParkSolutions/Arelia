@@ -10,53 +10,45 @@
   box-shadow: 0 18px 48px rgba(10,10,10,0.08);
   background: #f8f5f2;
   outline: none;
-  /* Ensure the stage clips the oversized absolute image */
-  overflow: hidden; 
+  touch-action: pan-y;
+  /* FIX NAV OVERLAP */
+  isolation: isolate; 
 }
 
 /* images */
 .ba-img {
   display: block;
   width: 100%;
-  height: 420px;       /* consistent with modal look */
+  height: 420px;
   object-fit: cover;
 }
 
-/* The base image sits normally in the flow to set container height */
-.ba-base {
-    position: relative;
-}
+.ba-base { position: relative; }
 
-/* CHANGED: Overlay wrapper now anchors RIGHT.
-   Its width is controlled inline via JS. */
+/* Updated Overlay wrapper */
 .ba-overlay-wrap {
   position: absolute;
   top: 0;
-  right: 0; /* Changed from left: 0 */
+  left: 0;
+  width: 100%;
   height: 100%;
   overflow: hidden;
   pointer-events: none;
   z-index: 10;
+  will-change: clip-path;
 }
 
-/* NEW RULE: Crucial for alignment.
-   The image inside the right-anchored wrapper must itself be absolutely
-   anchored right and forced to full width so it doesn't squash. */
 .ba-overlay-wrap .ba-img {
-   position: absolute;
-  top: 0;
-  right: 0;
-  height: 100%;
   width: 100%;
-  
+  height: 100%;
   object-fit: cover;
 }
 
-/* Handle */
+/* Centered Handle with Dividing Line */
 .ba-handle {
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translate(-50%, -50%); /* Centered on both axes */
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -70,12 +62,23 @@
   z-index: 30;
   transition: transform 120ms ease;
   touch-action: none;
-  /* Ensure handle is centered over the slider line regardless of direction */
-  margin-left: 0; 
+}
+
+.ba-handle::before {
+  content: '';
+  position: absolute;
+  top: -1000px; 
+  bottom: -1000px;
+  left: 50%;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.6);
+  transform: translateX(-50%);
+  z-index: -1;
+  pointer-events: none;
 }
 
 /* inner handle styling */
-.ba-handle-inner { width: 22px; height: 22px; border-radius: 50%; display:flex; align-items:center; justify-content:center; }
+.ba-handle-inner { width: 22px; height: 22px; border-radius: 50%; display:flex; align-items:center; justify-content:center; gap: 2px; }
 .ba-handle .bar {
   display:block;
   width: 2px;
@@ -84,11 +87,20 @@
   box-shadow: 0 0 0 3px rgba(196,139,118,0.06);
 }
 
-/* hover/active */
-.ba-handle:hover { transform: translateY(-50%) scale(1.05); }
-.ba-stage:active .ba-handle { transform: translateY(-50%) scale(1.08); }
+.arrow {
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--accent);
+  user-select: none;
+  pointer-events: none;
+  line-height: 1;
+}
 
-/* labels - updated class names */
+/* hover/active */
+.ba-handle:hover { transform: translate(-50%, -50%) scale(1.05); }
+.ba-stage:active .ba-handle { transform: translate(-50%, -50%) scale(1.08); }
+
+/* labels - added transitions */
 .ba-label {
   position: absolute;
   top: 12px;
@@ -101,34 +113,37 @@
   z-index: 20;
   background: rgba(0,0,0,0.45);
   font-family: "Georgia", serif;
+  transition: opacity 0.2s ease;
 }
 .ba-label-left { left: 16px; }
 .ba-label-right { right: 16px; }
+
+.hidden-label {
+  opacity: 0;
+  pointer-events: none;
+}
 
 /* caption */
 .ba-caption { margin-top: 10px; color: var(--muted); font-size: 13px; text-align:center; }
 
 /* responsive */
-@media (max-width: 980px) {
-  .ba-img { height: 360px; }
-}
+@media (max-width: 980px) { .ba-img { height: 360px; } }
 @media (max-width: 640px) {
   .ba-img { height: 240px; }
   .ba-handle { width: 32px; height: 32px; }
   .ba-handle .bar { height: 12px; }
 }
+.scroll-target {
+    /* Set this to the height of your sticky header + a little extra padding */
+    scroll-margin-top: 120px; 
+}
 
 /* accessibility: focus */
-.ba-handle:focus,
-.ba-stage:focus {
-  outline: 3px solid rgba(196,139,118,0.18);
-  outline-offset: 3px;
-}
+.ba-handle:focus, .ba-stage:focus { outline: 3px solid rgba(196,139,118,0.18); outline-offset: 3px; }
 
 /* reduce motion */
-@media (prefers-reduced-motion: reduce) {
-  .ba-handle, .ba-stage, .ba-img { transition: none !important; transform: none !important; }
-}
+@media (prefers-reduced-motion: reduce) { .ba-handle, .ba-stage, .ba-img { transition: none !important; transform: none !important; } }
+
 /* tabs */
 .ba-tabs { display:flex; gap:8px; margin-bottom:12px; justify-content:center; }
 .ba-tab { background: #fff; border:1px solid rgba(0,0,0,0.06); padding:8px 12px; border-radius:999px; cursor:pointer; font-weight:600; color:#333; }

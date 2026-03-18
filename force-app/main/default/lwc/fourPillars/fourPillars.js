@@ -145,23 +145,42 @@ export default class FourPillars extends NavigationMixin(LightningElement) {
     handleModalAction(e) {
         const action = e.currentTarget.dataset.action;
         const pillar = this.activePillar;
-        const targetUrl = this.pillarUrlMap[pillar];
+        const targetUrl = this.pillarUrlMap[pillar]; // Pulls your Custom Label URL
 
         switch (action) {
             case 'styles':
-            case 'beforeafter':
                 this[NavigationMixin.Navigate]({
                     type: 'standard__webPage',
                     attributes: { url: targetUrl }
                 });
                 break;
 
+            case 'beforeafter':
+                // 1. Define which component to target based on the pillar
+                let componentTarget = '';
+                if (pillar === 'residential') {
+                    componentTarget = 'beforeAfter';
+                } else if (pillar === 'commercial') {
+                    componentTarget = 'CommercialBeforeAfter';
+                } else if (pillar === 'hospitality') {
+                    componentTarget = 'HospitalityComparisons';
+                }
+
+                // 2. Safely append the target as a query parameter to your existing URL
+                const separator = targetUrl.includes('?') ? '&' : '?';
+                const finalUrl = `${targetUrl}${separator}c__target=${componentTarget}`;
+
+                // 3. Navigate using the standard web page method
+                this[NavigationMixin.Navigate]({
+                    type: 'standard__webPage',
+                    attributes: { url: finalUrl }
+                });
+                break;
+
             case 'book':
                 this[NavigationMixin.Navigate]({
                     type: 'standard__webPage',
-                    attributes: {
-                        url: this.registrationFormUrl
-                    }
+                    attributes: { url: this.registrationFormUrl }
                 });
                 break;
 

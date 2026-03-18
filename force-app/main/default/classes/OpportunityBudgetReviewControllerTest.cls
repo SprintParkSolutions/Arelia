@@ -2,7 +2,7 @@
  * @description       : Test class for OpportunityBudgetReviewController
  * @group             : Tests
  */
-@isTest
+@IsTest
 private class OpportunityBudgetReviewControllerTest {
 
     @TestSetup
@@ -17,13 +17,16 @@ private class OpportunityBudgetReviewControllerTest {
         Opportunity opp = TestDataUtility.createOpportunity('Test Budget Opp', supervisor.Id);
         opp.Primary_Contact__c = clientContact.Id;
         
+        // Define a default Quotation Type using the correct API Name
+        opp.Project_Request_Quotation_Type__c = 'Manual';
+        
         // Setting up initial budget and duration fields
         opp.Budget__c = 10000;
         opp.Estimated_Budget__c = 12000;
         opp.Supervisor_Estimated_Budget__c = 9000;
         opp.Re_Visit_Site_Supervisor_Estimate_Budget__c = 9500;
         
-        // [FIX APPLIED HERE] Assigned as Strings instead of Integers
+        // Assigned as Strings instead of Integers
         opp.Project_Estimated_Completion_Months__c = '1 Month';
         opp.ReVisit_Site_Estimated_Completion_Months__c = '1 Month';
         update opp;
@@ -47,7 +50,7 @@ private class OpportunityBudgetReviewControllerTest {
         }
     }
 
-    @isTest
+    @IsTest
     static void testGetBudgetReviewWithRevisitData() {
         Opportunity testOpp = [SELECT Id FROM Opportunity WHERE Name = 'Test Budget Opp' LIMIT 1];
         
@@ -65,7 +68,7 @@ private class OpportunityBudgetReviewControllerTest {
         Assert.isFalse(dto.paymentTerms.isEmpty(), 'Payment terms should be fetched');
     }
 
-    @isTest
+    @IsTest
     static void testGetBudgetReviewWithFallbackData() {
         Opportunity testOpp = [SELECT Id FROM Opportunity WHERE Name = 'Test Budget Opp' LIMIT 1];
         // Nullify primary fields to test fallback logic
@@ -84,7 +87,7 @@ private class OpportunityBudgetReviewControllerTest {
         Assert.areEqual('1 Month', dto.estimatedDuration, 'Duration should fallback to Project_Estimated_Completion_Months__c');
     }
 
-    @isTest
+    @IsTest
     static void testGetBudgetReviewNullCheck() {
         Test.startTest();
         OpportunityBudgetReviewController.BudgetReviewResponseDTO dto = OpportunityBudgetReviewController.getBudgetReview(null);
@@ -93,9 +96,14 @@ private class OpportunityBudgetReviewControllerTest {
         Assert.isNull(dto, 'Passing null Opportunity ID should return null DTO');
     }
 
-    @isTest
+    @IsTest
     static void testSaveChildRows() {
         Opportunity testOpp = [SELECT Id FROM Opportunity WHERE Name = 'Test Budget Opp' LIMIT 1];
+        
+        // Ensures the Quotation Type is set to 'Manual' (API Name)
+        testOpp.Project_Request_Quotation_Type__c = 'Manual';
+        update testOpp;
+
         OpportunityBudgetReviewController.BudgetReviewResponseDTO initialDto = OpportunityBudgetReviewController.getBudgetReview(testOpp.Id);
         
         // Prepare Request
@@ -112,18 +120,39 @@ private class OpportunityBudgetReviewControllerTest {
         req.paymentTerms = initialDto.paymentTerms;
 
         Test.startTest();
+        // With Project_Request_Quotation_Type__c == 'Manual', this will correctly update Budget__c
         OpportunityBudgetReviewController.BudgetReviewResponseDTO updatedDto = OpportunityBudgetReviewController.saveChildRows(testOpp.Id, req);
         Test.stopTest();
 
         Assert.isNotNull(updatedDto, 'Updated DTO should not be null');
-        Assert.areEqual(11000, updatedDto.customerBudget, 'Customer budget should be updated');
+        Assert.areEqual(11000, updatedDto.customerBudget, 'Customer budget should be updated via Manual logic');
         Assert.areEqual(9800, updatedDto.supervisorBudget, 'Supervisor budget should be updated');
         Assert.areEqual('1 Month', updatedDto.estimatedDuration, 'Duration should be updated');
         Assert.areEqual(500, updatedDto.architectureRows[0].amount, 'Architecture budget should be updated');
         Assert.areEqual(60, updatedDto.paymentTerms[0].percentage, 'Payment term percentage should be updated');
     }
 
-    @isTest
+    @IsTest
+    static void testSaveChildRowsAutomation() {
+        Opportunity testOpp = [SELECT Id FROM Opportunity WHERE Name = 'Test Budget Opp' LIMIT 1];
+        
+        // Explicitly set the exact API Name 'Automation'
+        testOpp.Project_Request_Quotation_Type__c = 'Automation';
+        testOpp.Budget__c = null; // Force getter to rely on Estimated_Budget__c
+        update testOpp;
+        
+        OpportunityBudgetReviewController.BudgetReviewSaveRequestDTO req = new OpportunityBudgetReviewController.BudgetReviewSaveRequestDTO();
+        req.inputCustomerBudget = 13000;
+
+        Test.startTest();
+        OpportunityBudgetReviewController.BudgetReviewResponseDTO updatedDto = OpportunityBudgetReviewController.saveChildRows(testOpp.Id, req);
+        Test.stopTest();
+
+        Assert.isNotNull(updatedDto, 'Updated DTO should not be null');
+        Assert.areEqual(13000, updatedDto.customerBudget, 'Customer budget should be updated via Automation logic targeting Estimated_Budget__c');
+    }
+
+    @IsTest
     static void testSaveChildRowsNullCheck() {
         Opportunity testOpp = [SELECT Id FROM Opportunity WHERE Name = 'Test Budget Opp' LIMIT 1];
         
@@ -134,7 +163,7 @@ private class OpportunityBudgetReviewControllerTest {
         Assert.isNull(dto, 'Passing null request should return null');
     }
 
-    @isTest
+    @IsTest
     static void testSubmitToClientFresh() {
         Opportunity testOpp = [SELECT Id FROM Opportunity LIMIT 1];
         
@@ -146,7 +175,7 @@ private class OpportunityBudgetReviewControllerTest {
         Assert.areEqual('Sent for Client Approval', updatedOpp.Budget_Review_Status__c, 'Status should be updated after client submission');
     }
 
-    @isTest
+    @IsTest
     static void testSubmitToClientWithRemarks() {
         Opportunity testOpp = [SELECT Id FROM Opportunity LIMIT 1];
         testOpp.Budget_Review_Manager_Remarks__c = 'Please revise the costs';
@@ -160,20 +189,22 @@ private class OpportunityBudgetReviewControllerTest {
         Assert.areEqual('Sent for Client Approval', updatedOpp.Budget_Review_Status__c, 'Status should update properly when remarks are present');
     }
 
-    @isTest
+    @IsTest
     static void testSubmitToClientException() {
         Test.startTest();
         try {
-            // Passing a dummy/invalid ID to force an exception
-            OpportunityBudgetReviewController.submitToClient('006000000000000AAA');
+            // FIX: Generates a valid fake Opportunity ID dynamically instead of hardcoding PMD warnings
+            Id dummyId = (Id)(Opportunity.SObjectType.getDescribe().getKeyPrefix() + '000000000000');
+            
+            OpportunityBudgetReviewController.submitToClient(dummyId);
             Assert.fail('Expected exception was not thrown');
         } catch (Exception e) {
-            Assert.isTrue(e instanceof AuraHandledException, 'Exception should be wrapped in AuraHandledException');
+            Assert.isInstanceOfType(e, AuraHandledException.class, 'Exception should be wrapped in AuraHandledException');
         }
         Test.stopTest();
     }
 
-    @isTest
+    @IsTest
     static void testSubmitDecisionClientApprove() {
         Opportunity testOpp = [SELECT Id FROM Opportunity LIMIT 1];
         OpportunityBudgetReviewController.DecisionInput input = new OpportunityBudgetReviewController.DecisionInput();
@@ -188,7 +219,7 @@ private class OpportunityBudgetReviewControllerTest {
         Assert.areEqual('Client Approved', updatedOpp.Budget_Review_Status__c, 'Opp status should reflect client approval');
     }
 
-    @isTest
+    @IsTest
     static void testSubmitDecisionClientRequestChanges() {
         Opportunity testOpp = [SELECT Id FROM Opportunity LIMIT 1];
         OpportunityBudgetReviewController.DecisionInput input = new OpportunityBudgetReviewController.DecisionInput();
@@ -205,7 +236,7 @@ private class OpportunityBudgetReviewControllerTest {
         Assert.areEqual('Too expensive', updatedOpp.Budget_Review_Client_Remarks__c, 'Client remarks should be saved');
     }
 
-    @isTest
+    @IsTest
     static void testSubmitDecisionManagerApprove() {
         Opportunity testOpp = [SELECT Id FROM Opportunity LIMIT 1];
         OpportunityBudgetReviewController.DecisionInput input = new OpportunityBudgetReviewController.DecisionInput();
@@ -220,7 +251,7 @@ private class OpportunityBudgetReviewControllerTest {
         Assert.areEqual('Manager Approved', updatedOpp.Budget_Review_Status__c, 'Opp status should reflect manager approval');
     }
 
-    @isTest
+    @IsTest
     static void testSubmitDecisionManagerRequestChanges() {
         Opportunity testOpp = [SELECT Id FROM Opportunity LIMIT 1];
         OpportunityBudgetReviewController.DecisionInput input = new OpportunityBudgetReviewController.DecisionInput();
@@ -237,7 +268,7 @@ private class OpportunityBudgetReviewControllerTest {
         Assert.areEqual('Need vendor discounts', updatedOpp.Budget_Review_Manager_Remarks__c, 'Manager remarks should be saved');
     }
 
-    @isTest
+    @IsTest
     static void testSubmitDecisionInvalidUserType() {
         Opportunity testOpp = [SELECT Id FROM Opportunity LIMIT 1];
         OpportunityBudgetReviewController.DecisionInput input = new OpportunityBudgetReviewController.DecisionInput();
@@ -249,13 +280,12 @@ private class OpportunityBudgetReviewControllerTest {
             OpportunityBudgetReviewController.submitDecision(testOpp.Id, input);
             Assert.fail('Expected exception for invalid user type');
         } catch (Exception e) {
-            // AuraHandledException messages are obfuscated in tests, so we assert the exception type instead
             Assert.isInstanceOfType(e, AuraHandledException.class, 'Exception should be an AuraHandledException');
         }
         Test.stopTest();
     }
 
-    @isTest
+    @IsTest
     static void testSubmitDecisionNullValidations() {
         Test.startTest();
         
@@ -267,9 +297,9 @@ private class OpportunityBudgetReviewControllerTest {
         }
 
         try {
-            // Passing a dummy/invalid ID format to ensure it compiles, 
-            // but providing null DecisionInput to trigger the second validation
-            OpportunityBudgetReviewController.submitDecision('006000000000000AAA', null);
+            // FIX: Generates a valid fake Opportunity ID dynamically
+            Id dummyId = (Id)(Opportunity.SObjectType.getDescribe().getKeyPrefix() + '000000000000');
+            OpportunityBudgetReviewController.submitDecision(dummyId, null);
             Assert.fail('Expected exception for missing Decision Data');
         } catch (Exception e) {
             Assert.isInstanceOfType(e, AuraHandledException.class, 'Should throw AuraHandledException for missing Decision Data');
