@@ -1,4 +1,4 @@
-name: Salesforce Apex PMD + LWC Scan
+name: Salesforce PR Code Scan
 
 on:
   pull_request:
@@ -12,14 +12,20 @@ permissions:
   actions: read
 
 jobs:
-  scan-salesforce-code:
-    name: Scan Apex and LWC
+  salesforce-code-scan:
+    name: Apex PMD + LWC Violation Scan
     runs-on: ubuntu-latest
 
     steps:
+      # ------------------------------------------------------------
+      # 1. Checkout PR source code
+      # ------------------------------------------------------------
       - name: Checkout source code
         uses: actions/checkout@v4
 
+      # ------------------------------------------------------------
+      # 2. Setup required runtimes
+      # ------------------------------------------------------------
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -36,22 +42,44 @@ jobs:
         with:
           python-version: "3.11"
 
+      # ------------------------------------------------------------
+      # 3. Install Salesforce CLI and Code Analyzer v5
+      # ------------------------------------------------------------
       - name: Install Salesforce CLI
         run: npm install -g @salesforce/cli@latest
 
       - name: Install Salesforce Code Analyzer v5
-        run: sf plugins install code-analyzer@latest
-
-      - name: Install npm dependencies
-        run: npm ci
-
-      - name: Verify Code Analyzer
         run: |
+          sf plugins install code-analyzer@latest
           sf plugins
-          sf code-analyzer --help
 
-      - name: Run Apex PMD scan using code-analyzer.yml
-        id: run-code-analyzer
+      # ------------------------------------------------------------
+      # 4. Prepare report folder
+      # ------------------------------------------------------------
+      - name: Prepare report folder
+        run: |
+          mkdir -p scan-results
+
+      # ------------------------------------------------------------
+      # 5. Validate code-analyzer.yml exists
+      # ------------------------------------------------------------
+      - name: Validate Code Analyzer config
+        run: |
+          if [ ! -f "code-analyzer.yml" ]; then
+            echo "❌ code-analyzer.yml not found in project root."
+            echo "Please add your Code Analyzer v5 ruleset file as code-analyzer.yml."
+            exit 1
+          fi
+
+          echo "✅ code-analyzer.yml found."
+          echo "========== code-analyzer.yml =========="
+          cat code-analyzer.yml
+
+      # ------------------------------------------------------------
+      # 6. Run Apex PMD scan using your v5 code-analyzer.yml
+      # ------------------------------------------------------------
+      - name: Run Apex PMD scan using Code Analyzer v5
+        id: apex-scan
         uses: forcedotcom/run-code-analyzer@v2
         with:
           run-arguments: >-
@@ -67,59 +95,298 @@ jobs:
           results-artifact-name: apex-pmd-code-analyzer-report
           github-token: ${{ github.token }}
 
+      # ------------------------------------------------------------
+      # 7. Copy Apex reports to common artifact folder
+      # ------------------------------------------------------------
+      - name: Copy Apex PMD reports
+        if: always()
+        run: |
+          mkdir -p scan-results
+
+          if [ -f "apex-pmd-report.csv" ]; then
+            cp apex-pmd-report.csv scan-results/apex-pmd-report.csv
+          fi
+
+          if [ -f "apex-pmd-report.html" ]; then
+            cp apex-pmd-report.html scan-results/apex-pmd-report.html
+          fi
+
+          if [ -f "apex-pmd-report.json" ]; then
+            cp apex-pmd-report.json scan-results/apex-pmd-report.json
+          fi
+
+      # ------------------------------------------------------------
+      # 8. Install LWC ESLint dependencies inside workflow itself
+      #    No local npm install needed from user.
+      # ------------------------------------------------------------
+      - name: Install LWC ESLint dependencies
+        if: always()
+        run: |
+          npm install \
+            eslint@^8 \
+            @babel/core \
+            @babel/eslint-parser \
+            @eslint/js \
+            @lwc/eslint-plugin-lwc \
+            @salesforce/eslint-plugin-aura \
+            @salesforce/eslint-plugin-lightning \
+            eslint-plugin-import \
+            eslint-plugin-jest \
+            --no-save \
+            --legacy-peer-deps
+
+      # ------------------------------------------------------------
+      # 9. Create ESLint config dynamically inside workflow
+      # ------------------------------------------------------------
+      - name: Create LWC ESLint config
+        if: always()
+        run: |
+          cat > .eslintrc.json << 'EOF'
+          {
+            "parser": "@babel/eslint-parser",
+            "parserOptions": {
+              "ecmaVersion": 2023,
+              "sourceType": "module",
+              "requireConfigFile": false,
+              "babelOptions": {
+                "parserOpts": {
+                  "plugins": [
+                    ["decorators", { "decoratorsBeforeExport": false }],
+                    "classProperties"
+                  ]
+                }
+              }
+            },
+            "env": {
+              "browser": true,
+              "node": true,
+              "es2022": true,
+              "jest": true
+            },
+            "plugins": [
+              "@lwc/lwc",
+              "@salesforce/aura",
+              "@salesforce/lightning",
+              "import",
+              "jest"
+            ],
+            "rules": {
+              "no-console": ["error", { "allow": ["warn", "error"] }],
+              "no-debugger": "error",
+              "no-unused-vars": "warn",
+              "no-undef": "error",
+              "eqeqeq": ["error", "always"],
+              "curly": "error",
+              "semi": ["error", "always"],
+
+              "@lwc/lwc/no-async-await-in-wire": "error",
+              "@lwc/lwc/no-deprecated": "warn",
+              "@lwc/lwc/no-inner-html": "error",
+              "@lwc/lwc/no-dupe-class-members": "error"
+            },
+            "ignorePatterns": [
+              "node_modules/**",
+              ".sfdx/**",
+              ".sf/**",
+              "coverage/**",
+              "test-results/**",
+              "scan-results/**"
+            ]
+          }
+          EOF
+
+          echo "✅ Dynamic .eslintrc.json created."
+
+      # ------------------------------------------------------------
+      # 10. Run LWC ESLint scan and generate reports
+      # ------------------------------------------------------------
       - name: Run LWC ESLint scan
         if: always()
         run: |
           mkdir -p scan-results
+
+          echo "Running LWC ESLint JSON report..."
           npx eslint "force-app/main/default/lwc/**/*.js" \
+            --config .eslintrc.json \
             --format json \
             --output-file scan-results/lwc-eslint-report.json \
             --no-error-on-unmatched-pattern || true
 
+          echo "Running LWC ESLint TXT report..."
           npx eslint "force-app/main/default/lwc/**/*.js" \
+            --config .eslintrc.json \
             --format stylish \
-            --no-error-on-unmatched-pattern > scan-results/lwc-eslint-report.txt || true
+            --no-error-on-unmatched-pattern \
+            > scan-results/lwc-eslint-report.txt || true
 
-      - name: Copy Apex reports into scan-results
+          echo "✅ LWC ESLint reports generated."
+
+      # ------------------------------------------------------------
+      # 11. Convert LWC ESLint JSON report to CSV
+      # ------------------------------------------------------------
+      - name: Convert LWC ESLint JSON to CSV
         if: always()
         run: |
-          mkdir -p scan-results
+          python3 << 'PYEOF'
+          import json
+          import csv
+          import os
 
-          if [ -f apex-pmd-report.csv ]; then
-            cp apex-pmd-report.csv scan-results/apex-pmd-report.csv
+          input_file = "scan-results/lwc-eslint-report.json"
+          output_file = "scan-results/lwc-eslint-report.csv"
+
+          headers = [
+              "rule",
+              "engine",
+              "severity",
+              "file",
+              "startLine",
+              "startColumn",
+              "endLine",
+              "endColumn",
+              "message"
+          ]
+
+          if not os.path.exists(input_file):
+              with open(output_file, "w", newline="", encoding="utf-8") as f:
+                  writer = csv.writer(f)
+                  writer.writerow(headers)
+              print("No LWC JSON report found. Empty CSV created.")
+              raise SystemExit(0)
+
+          with open(input_file, "r", encoding="utf-8") as f:
+              try:
+                  data = json.load(f)
+              except Exception:
+                  data = []
+
+          with open(output_file, "w", newline="", encoding="utf-8") as f:
+              writer = csv.writer(f)
+              writer.writerow(headers)
+
+              for file_result in data:
+                  file_path = file_result.get("filePath", "")
+
+                  for msg in file_result.get("messages", []):
+                      rule_id = msg.get("ruleId") or "ParsingError"
+                      eslint_severity = msg.get("severity", 0)
+
+                      # ESLint severity: 2 = error, 1 = warning
+                      # Map to PMD-like style:
+                      # error -> 2, warning -> 4
+                      mapped_severity = 2 if eslint_severity == 2 else 4
+
+                      writer.writerow([
+                          rule_id,
+                          "eslint",
+                          mapped_severity,
+                          file_path,
+                          msg.get("line", ""),
+                          msg.get("column", ""),
+                          msg.get("endLine", ""),
+                          msg.get("endColumn", ""),
+                          msg.get("message", "")
+                      ])
+
+          print("✅ LWC CSV report created:", output_file)
+          PYEOF
+
+      # ------------------------------------------------------------
+      # 12. Create combined summary markdown report
+      # ------------------------------------------------------------
+      - name: Create summary report
+        if: always()
+        run: |
+          APEX_TOTAL="${{ steps.apex-scan.outputs.num-violations }}"
+          APEX_SEV1="${{ steps.apex-scan.outputs.num-sev1-violations }}"
+          APEX_SEV2="${{ steps.apex-scan.outputs.num-sev2-violations }}"
+          APEX_SEV3="${{ steps.apex-scan.outputs.num-sev3-violations }}"
+          APEX_SEV4="${{ steps.apex-scan.outputs.num-sev4-violations }}"
+          APEX_SEV5="${{ steps.apex-scan.outputs.num-sev5-violations }}"
+
+          if [ -f "scan-results/lwc-eslint-report.csv" ]; then
+            LWC_TOTAL=$(tail -n +2 scan-results/lwc-eslint-report.csv | awk 'NF' | wc -l | tr -d ' ')
+            LWC_ERRORS=$(awk -F',' 'NR>1 { gsub(/"/,"",$3); if ($3 == 2) c++ } END { print c+0 }' scan-results/lwc-eslint-report.csv)
+            LWC_WARNINGS=$(awk -F',' 'NR>1 { gsub(/"/,"",$3); if ($3 == 4) c++ } END { print c+0 }' scan-results/lwc-eslint-report.csv)
+          else
+            LWC_TOTAL=0
+            LWC_ERRORS=0
+            LWC_WARNINGS=0
           fi
 
-          if [ -f apex-pmd-report.html ]; then
-            cp apex-pmd-report.html scan-results/apex-pmd-report.html
-          fi
+          cat > scan-results/scan-summary.md << EOF
+          # Salesforce PR Code Scan Summary
 
-          if [ -f apex-pmd-report.json ]; then
-            cp apex-pmd-report.json scan-results/apex-pmd-report.json
-          fi
+          ## Apex PMD Scan
 
-      - name: Upload complete scan reports as PR artifact
+          | Metric | Count |
+          |---|---:|
+          | Total Apex PMD Violations | ${APEX_TOTAL:-0} |
+          | Severity 1 | ${APEX_SEV1:-0} |
+          | Severity 2 | ${APEX_SEV2:-0} |
+          | Severity 3 | ${APEX_SEV3:-0} |
+          | Severity 4 | ${APEX_SEV4:-0} |
+          | Severity 5 | ${APEX_SEV5:-0} |
+
+          ## LWC ESLint Scan
+
+          | Metric | Count |
+          |---|---:|
+          | Total LWC Violations | ${LWC_TOTAL:-0} |
+          | Errors | ${LWC_ERRORS:-0} |
+          | Warnings | ${LWC_WARNINGS:-0} |
+
+          ## Generated Reports
+
+          - apex-pmd-report.csv
+          - apex-pmd-report.html
+          - apex-pmd-report.json
+          - lwc-eslint-report.csv
+          - lwc-eslint-report.json
+          - lwc-eslint-report.txt
+          EOF
+
+          cat scan-results/scan-summary.md
+          cat scan-results/scan-summary.md >> $GITHUB_STEP_SUMMARY
+
+      # ------------------------------------------------------------
+      # 13. Upload all violation reports as artifact
+      # ------------------------------------------------------------
+      - name: Upload complete violation reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: salesforce-apex-lwc-scan-reports
+          name: salesforce-pr-violation-reports
           path: scan-results/
           if-no-files-found: warn
 
-      - name: Show Code Analyzer summary
+      # ------------------------------------------------------------
+      # 14. Block PR only for Severity 1 or Severity 2 issues
+      #     Apex Severity 1/2 and LWC ESLint errors are blocking.
+      # ------------------------------------------------------------
+      - name: Block PR on blocking violations
         if: always()
         run: |
-          echo "Apex PMD total violations: ${{ steps.run-code-analyzer.outputs.num-violations }}"
-          echo "Apex PMD Severity 1 violations: ${{ steps.run-code-analyzer.outputs.num-sev1-violations }}"
-          echo "Apex PMD Severity 2 violations: ${{ steps.run-code-analyzer.outputs.num-sev2-violations }}"
-          echo "Apex PMD Severity 3 violations: ${{ steps.run-code-analyzer.outputs.num-sev3-violations }}"
-          echo "Apex PMD Severity 4 violations: ${{ steps.run-code-analyzer.outputs.num-sev4-violations }}"
-          echo "Apex PMD Severity 5 violations: ${{ steps.run-code-analyzer.outputs.num-sev5-violations }}"
+          APEX_SEV1="${{ steps.apex-scan.outputs.num-sev1-violations }}"
+          APEX_SEV2="${{ steps.apex-scan.outputs.num-sev2-violations }}"
 
-      - name: Block PR on Apex Severity 1 or 2
-        if: |
-          steps.run-code-analyzer.outputs.exit-code > 0 ||
-          steps.run-code-analyzer.outputs.num-sev1-violations > 0 ||
-          steps.run-code-analyzer.outputs.num-sev2-violations > 0
-        run: |
-          echo "PR blocked because Apex PMD scan found Severity 1 or Severity 2 violations."
-          exit 1
+          APEX_SEV1=${APEX_SEV1:-0}
+          APEX_SEV2=${APEX_SEV2:-0}
+
+          if [ -f "scan-results/lwc-eslint-report.csv" ]; then
+            LWC_ERRORS=$(awk -F',' 'NR>1 { gsub(/"/,"",$3); if ($3 == 2) c++ } END { print c+0 }' scan-results/lwc-eslint-report.csv)
+          else
+            LWC_ERRORS=0
+          fi
+
+          echo "Apex Severity 1 violations: $APEX_SEV1"
+          echo "Apex Severity 2 violations: $APEX_SEV2"
+          echo "LWC ESLint errors: $LWC_ERRORS"
+
+          if [ "$APEX_SEV1" -gt 0 ] || [ "$APEX_SEV2" -gt 0 ] || [ "$LWC_ERRORS" -gt 0 ]; then
+            echo "❌ PR blocked because blocking violations were found."
+            echo "Please download the salesforce-pr-violation-reports artifact and fix the issues."
+            exit 1
+          fi
+
+          echo "✅ No blocking violations found. PR can continue."
