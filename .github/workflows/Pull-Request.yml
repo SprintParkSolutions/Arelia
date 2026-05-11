@@ -1,0 +1,86 @@
+name: Salesforce Code Analyzer - PR Scan
+
+on:
+  pull_request:
+    branches:
+      - "**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  actions: read
+
+jobs:
+  salesforce-code-analyzer:
+    name: Scan Apex and LWC
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ">=20.9.0"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ">=3.10"
+
+      - name: Install Salesforce CLI
+        run: npm install -g @salesforce/cli@latest
+
+      - name: Install Salesforce Code Analyzer
+        run: sf plugins install code-analyzer@latest
+
+      - name: Install project npm dependencies
+        run: npm ci
+
+      - name: Verify Code Analyzer installation
+        run: |
+          sf plugins
+          sf code-analyzer --help
+
+      - name: Run Salesforce Code Analyzer
+        id: run-code-analyzer
+        uses: forcedotcom/run-code-analyzer@v2
+        with:
+          run-arguments: >-
+            --workspace force-app/main/default/classes
+            --workspace force-app/main/default/triggers
+            --workspace force-app/main/default/lwc
+            --config-file code-analyzer.yml
+            --view detail
+            --output-file scanner-report.csv
+            --output-file scanner-report.html
+            --output-file scanner-report.json
+          results-artifact-name: salesforce-code-analyzer-report
+          github-token: ${{ github.token }}
+
+      - name: Show violation summary
+        if: always()
+        run: |
+          echo "Total violations: ${{ steps.run-code-analyzer.outputs.num-violations }}"
+          echo "Severity 1 violations: ${{ steps.run-code-analyzer.outputs.num-sev1-violations }}"
+          echo "Severity 2 violations: ${{ steps.run-code-analyzer.outputs.num-sev2-violations }}"
+          echo "Severity 3 violations: ${{ steps.run-code-analyzer.outputs.num-sev3-violations }}"
+          echo "Severity 4 violations: ${{ steps.run-code-analyzer.outputs.num-sev4-violations }}"
+          echo "Severity 5 violations: ${{ steps.run-code-analyzer.outputs.num-sev5-violations }}"
+
+      - name: Block PR on Critical or High violations
+        if: |
+          steps.run-code-analyzer.outputs.exit-code > 0 ||
+          steps.run-code-analyzer.outputs.num-sev1-violations > 0 ||
+          steps.run-code-analyzer.outputs.num-sev2-violations > 0
+        run: |
+          echo "PR blocked because Code Analyzer found Severity 1 or Severity 2 violations."
+          exit 1
