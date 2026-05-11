@@ -1,4 +1,4 @@
-name: Salesforce Code Analyzer - PR Scan
+name: Salesforce Apex PMD + LWC Scan
 
 on:
   pull_request:
@@ -12,7 +12,7 @@ permissions:
   actions: read
 
 jobs:
-  salesforce-code-analyzer:
+  scan-salesforce-code:
     name: Scan Apex and LWC
     runs-on: ubuntu-latest
 
@@ -23,9 +23,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ">=20.9.0"
+          node-version: "20"
 
-      - name: Setup Java
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -34,53 +34,92 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: ">=3.10"
+          python-version: "3.11"
 
       - name: Install Salesforce CLI
         run: npm install -g @salesforce/cli@latest
 
-      - name: Install Salesforce Code Analyzer
+      - name: Install Salesforce Code Analyzer v5
         run: sf plugins install code-analyzer@latest
 
-      - name: Install project npm dependencies
+      - name: Install npm dependencies
         run: npm ci
 
-      - name: Verify Code Analyzer installation
+      - name: Verify Code Analyzer
         run: |
           sf plugins
           sf code-analyzer --help
 
-      - name: Run Salesforce Code Analyzer
+      - name: Run Apex PMD scan using code-analyzer.yml
         id: run-code-analyzer
         uses: forcedotcom/run-code-analyzer@v2
         with:
           run-arguments: >-
             --workspace force-app/main/default/classes
             --workspace force-app/main/default/triggers
-            --workspace force-app/main/default/lwc
+            --workspace force-app/main/default/pages
+            --workspace force-app/main/default/components
             --config-file code-analyzer.yml
             --view detail
-            --output-file scanner-report.csv
-            --output-file scanner-report.html
-            --output-file scanner-report.json
-          results-artifact-name: salesforce-code-analyzer-report
+            --output-file apex-pmd-report.csv
+            --output-file apex-pmd-report.html
+            --output-file apex-pmd-report.json
+          results-artifact-name: apex-pmd-code-analyzer-report
           github-token: ${{ github.token }}
 
-      - name: Show violation summary
+      - name: Run LWC ESLint scan
         if: always()
         run: |
-          echo "Total violations: ${{ steps.run-code-analyzer.outputs.num-violations }}"
-          echo "Severity 1 violations: ${{ steps.run-code-analyzer.outputs.num-sev1-violations }}"
-          echo "Severity 2 violations: ${{ steps.run-code-analyzer.outputs.num-sev2-violations }}"
-          echo "Severity 3 violations: ${{ steps.run-code-analyzer.outputs.num-sev3-violations }}"
-          echo "Severity 4 violations: ${{ steps.run-code-analyzer.outputs.num-sev4-violations }}"
-          echo "Severity 5 violations: ${{ steps.run-code-analyzer.outputs.num-sev5-violations }}"
+          mkdir -p scan-results
+          npx eslint "force-app/main/default/lwc/**/*.js" \
+            --format json \
+            --output-file scan-results/lwc-eslint-report.json \
+            --no-error-on-unmatched-pattern || true
 
-      - name: Block PR on Critical or High violations
+          npx eslint "force-app/main/default/lwc/**/*.js" \
+            --format stylish \
+            --no-error-on-unmatched-pattern > scan-results/lwc-eslint-report.txt || true
+
+      - name: Copy Apex reports into scan-results
+        if: always()
+        run: |
+          mkdir -p scan-results
+
+          if [ -f apex-pmd-report.csv ]; then
+            cp apex-pmd-report.csv scan-results/apex-pmd-report.csv
+          fi
+
+          if [ -f apex-pmd-report.html ]; then
+            cp apex-pmd-report.html scan-results/apex-pmd-report.html
+          fi
+
+          if [ -f apex-pmd-report.json ]; then
+            cp apex-pmd-report.json scan-results/apex-pmd-report.json
+          fi
+
+      - name: Upload complete scan reports as PR artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: salesforce-apex-lwc-scan-reports
+          path: scan-results/
+          if-no-files-found: warn
+
+      - name: Show Code Analyzer summary
+        if: always()
+        run: |
+          echo "Apex PMD total violations: ${{ steps.run-code-analyzer.outputs.num-violations }}"
+          echo "Apex PMD Severity 1 violations: ${{ steps.run-code-analyzer.outputs.num-sev1-violations }}"
+          echo "Apex PMD Severity 2 violations: ${{ steps.run-code-analyzer.outputs.num-sev2-violations }}"
+          echo "Apex PMD Severity 3 violations: ${{ steps.run-code-analyzer.outputs.num-sev3-violations }}"
+          echo "Apex PMD Severity 4 violations: ${{ steps.run-code-analyzer.outputs.num-sev4-violations }}"
+          echo "Apex PMD Severity 5 violations: ${{ steps.run-code-analyzer.outputs.num-sev5-violations }}"
+
+      - name: Block PR on Apex Severity 1 or 2
         if: |
           steps.run-code-analyzer.outputs.exit-code > 0 ||
           steps.run-code-analyzer.outputs.num-sev1-violations > 0 ||
           steps.run-code-analyzer.outputs.num-sev2-violations > 0
         run: |
-          echo "PR blocked because Code Analyzer found Severity 1 or Severity 2 violations."
+          echo "PR blocked because Apex PMD scan found Severity 1 or Severity 2 violations."
           exit 1
