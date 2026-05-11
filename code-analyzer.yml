@@ -1,0 +1,292 @@
+#code-analyzer.yml
+
+# rules:
+#   AvoidDebugStatements:
+#     tags:
+#       - MyScan
+
+engines:
+  pmd:
+    file_extensions: 
+      apex: [".cls", ".trigger"]
+      visualforce: [".page", ".component"]
+  eslint:
+    disable_engine: true
+  retire-js:
+    disable_engine: true
+  regex:
+    disable_engine: true
+  flow:
+    disable_engine: true
+  sfge:
+    disable_engine: true
+  cpd:
+    disable_engine: true
+
+rules:
+  pmd:
+  #Security
+    ApexCRUDViolation:
+      severity: 2
+      tags: ["Security"]
+      
+    ApexBadCrypto:
+        severity: 2
+        tags: ["Security"]
+      
+    ApexDangerousMethods:
+      severity: 2
+      tags: ["Security"]
+      
+    ApexInsecureEndpoint:
+      severity: 3
+      tags: ["Security"]
+      
+    ApexOpenRedirect:
+      severity: 2
+      tags: ["Security"]
+    
+    ApexSharingViolations:
+      severity: 2
+      tags: ["Security"]
+      
+    ApexSOQLInjection:
+      severity: 2
+      tags: ["Security"]
+      
+    ApexSuggestUsingNamedCred:
+      severity: 3
+      tags: ["Security"]
+      
+    ApexXSSFromEscapeFalse:
+      severity: 3
+      tags: ["Security"]
+      
+    ApexXSSFromURLParam:
+      severity: 3
+      tags: ["Security"]
+
+    DebugsShouldUseLoggingLevel:
+      severity: 4
+      tags: ["Security"]
+    
+   #Visualforce security rules
+
+    VfCsrf:
+      severity: 2
+      tags: ["Security","Visualforce"]
+
+    VfUnescapeEl:
+      severity: 2
+      tags: ["Security","Visualforce"]
+
+  #Performance
+    
+    AvoidDebugStatements: 
+      severity: 2
+      tags: ["Performance"]
+
+    AvoidNonRestrictiveQueries:
+      severity: 1
+      tags: ["Performance"]
+      
+    EagerlyLoadedDescribeSObjectResult:
+      severity: 3
+      tags: ["Performance"]
+
+    OperationWithHighCostInLoop:
+      severity: 3
+      tags: ["Performance"]
+      
+    OperationWithLimitsInLoop:
+      severity: 1
+      tags: ["Performance"]
+    
+  #ErrorProne
+
+    ApexCSRF:
+      severity: 3
+      tags: ["ErrorProne"]
+      
+    AvoidDirectAccessTriggerMap:
+      severity: 2
+      tags: ["ErrorProne"]
+      
+    AvoidHardcodingId:
+      severity: 2
+      tags: ["ErrorProne"]
+      
+    EmptyCatchBlock:
+      severity: 3
+      tags: ["ErrorProne"]
+
+    AvoidNonExistentAnnotations:
+      severity: 3
+      tags: ["ErrorProne"]
+
+    AvoidStatefulDatabaseResult:
+      severity: 2
+      tags: ["ErrorProne"]
+
+    EmptyIfStmt:
+      severity: 4
+      tags: ["ErrorProne"]
+
+    InaccessibleAuraEnabledGetter:
+      severity: 3
+      tags: ["ErrorProne"]
+
+    OverrideBothEqualsAndHashcode:
+      severity: 3
+      tags: ["ErrorProne"]
+
+    TestMethodsMustBeInTestClasses:
+      severity: 3
+      tags: ["ErrorProne"]
+
+    MethodWithSameNameAsEnclosingClass:
+      severity: 4
+      tags: ["ErrorProne"]
+    
+  #BestPractices
+
+    UnusedLocalVariable:
+      severity: 3
+      tags: ["BestPractices"]
+      
+    QueueableWithoutFinalizer:
+      severity: 3
+      tags: ["BestPractices"]
+
+    ApexUnitTestShouldNotUseSeeAllDataTrue:
+      severity: 2
+      tags: ["BestPractices"]
+
+    ApexUnitTestClassShouldHaveAsserts:
+      severity: 2
+      tags: ["BestPractices"]
+    
+    AvoidGlobalModifier:
+      severity: 4
+      tags: ["BestPractices"]
+      
+    ApexAssertionsShouldIncludeMessage:
+      severity: 5
+      tags: ["BestPractices"]
+
+    ApexUnitTestClassShouldHaveRunAs:
+      severity: 3
+      tags: ["BestPractices"]
+
+    ApexUnitTestMethodShouldHaveIsTestAnnotation:
+      severity: 4
+      tags: ["BestPractices"]
+
+    AvoidLogicinTrigger:
+      severity: 4
+      tags: ["BestPractices"]
+      
+  #CodeStyles
+
+    IfElseStmtsMustUseBraces:
+      severity: 5
+      tags: ["CodeStyles"]
+
+    ForLoopsMustUseBraces:
+      severity: 5
+      tags: ["CodeStyles"]
+
+    AvoidDeeplyNestedIfStmts:
+      severity: 2
+      tags: ["CodeStyles"]
+
+    EmptyStatementBlock:
+      severity: 4
+      tags: ["CodeStyles"]
+
+    EmptyTryOrFinallyBlock:
+      severity: 4
+      tags: ["CodeStyles"]
+
+    WhileLoopsMustUseBraces:
+      severity: 3
+      tags: ["CodeStyles"]
+
+    EmptyWhileStmt:
+      severity: 3
+      tags: ["CodeStyles"]
+
+    ClassNamingConventions:
+      severity: 5
+      tags: ["CodeStyles"]
+
+    FieldNamingConventions:
+      severity: 5
+      tags: ["CodeStyles"]
+
+    FieldDeclarationsShouldBeAtStart:
+      severity: 5
+      tags: ["CodeStyles"]
+
+    LocalVariableNamingConventions: 
+      severity: 5
+      tags: ["CodeStyles"]
+
+    MethodNamingConventions:
+      severity: 5
+      tags: ["CodeStyles"]
+
+    IfStmtsMustUseBraces:
+      severity: 5
+      tags: ["CodeStyles"]
+	  
+  #CodeMetrics
+
+    CognitiveComplexity:
+      severity: 2
+      tags: ["CodeMetrics"]
+
+    TooManyFields:
+      severity: 3
+      tags: ["CodeMetrics"]
+
+    ExcessiveParameterList:
+      severity: 3
+      tags: ["CodeMetrics"]
+
+    ExcessiveClassLength:
+      severity: 3
+      tags: ["CodeMetrics"]
+
+    NcssConstructorCount:
+      severity: 3
+      tags: ["CodeMetrics"]
+
+    NcssMethodCount:
+      severity: 2
+      tags: ["CodeMetrics"]
+
+    NcssTypeCount:
+      severity: 3
+      tags: ["CodeMetrics"]
+
+    ExcessivePublicCount:
+      severity: 3
+      tags: ["CodeMetrics"]
+
+    CyclomaticComplexity:
+      severity: 3
+      tags: ["CodeMetrics"]
+
+    StdCyclomaticComplexity:
+      severity: 2
+      tags: ["CodeMetrics"]
+    
+    UnusedMethod:
+      severity: 3
+      tags: ["CodeMetrics"]
+
+  #Documentation
+    ApexDoc:
+      severity: 5
+      tags: ["Documentation"]
