@@ -513,13 +513,21 @@ jobs:
         run: |
           APEX_SEV1="${APEX_SEV1:-0}"
           APEX_SEV2="${APEX_SEV2:-0}"
+          APEX_SEV3="${APEX_SEV3:-0}"
+          APEX_SEV4="${APEX_SEV4:-0}"
+          APEX_SEV5="${APEX_SEV5:-0}"
           LWC_SEV2="${LWC_SEV2:-0}"
+          LWC_SEV4="${LWC_SEV4:-0}"
 
           echo "Apex Severity 1 violations: $APEX_SEV1"
           echo "Apex Severity 2 violations: $APEX_SEV2"
+          echo "Apex Severity 3 violations: $APEX_SEV3"
+          echo "Apex Severity 4 violations: $APEX_SEV4"
+          echo "Apex Severity 5 violations: $APEX_SEV5"
           echo "LWC ESLint errors: $LWC_SEV2"
+          echo "LWC ESLint warnings: $LWC_SEV4"
 
-          if [ "$APEX_SEV1" -gt 0 ] || [ "$APEX_SEV2" -gt 0 ] || [ "$LWC_SEV2" -gt 0 ]; then
+          if [ "$APEX_SEV1" -gt 0 ] || [ "$APEX_SEV2" -gt 0 ] ||  [ "$LWC_SEV2" -gt 0 ] || [ "$APEX_SEV3" -gt 0 ] || [ "$APEX_SEV4" -gt 0 ] || [ "$APEX_SEV5" -gt 0 ] || [ "$LWC_SEV4" -gt 0 ]; then
             echo "❌ PR blocked because blocking violations were found."
             echo "Download the salesforce-pr-violation-reports artifact and fix the issues."
             exit 1
