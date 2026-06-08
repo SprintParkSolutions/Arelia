@@ -1,9 +1,9 @@
 /**
  * @description       : Test class for ArchitectureDesignTriggerHandler
- * @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+ * @author            : 
  * @group             : Tests
- * @last modified on  : 02-24-2026
- * @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+ * @last modified on  : 
+ * @last modified by  : 
 **/
 @isTest
 private class ArchitectureDesignTriggerHandlerTest {
