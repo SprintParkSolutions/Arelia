@@ -1,20 +1,24 @@
 /**
  * @name        LeadAssignmentEmailHandler
  * @description Sends an email to the assigned Supervisor (custom object) when a Lead is updated.
- * Uses a Lightning Email Template and merges Lead data.
- * Optimized to reduce cognitive complexity and comply with PMD best practices.
+ *              Uses a Lightning Email Template and merges Lead data.
+ *              Optimized to reduce cognitive complexity and comply with PMD best practices.
  * @version     1.0
  */
 public without sharing class LeadAssignmentEmailHandler {
 
     /**
      * @description Main method to handle logic after Lead update.
-     * Checks if a Supervisor_User__c was newly assigned, builds the email, and sends it.
+     *              Checks if a Supervisor_User__c was newly assigned, builds the email, and sends it.
      * @param newList List of updated Lead records.
      * @param oldMap  Map of old Lead records keyed by Id.
      * @pmd.reducesCognitiveComplexity True
      */
     public static void handleSupervisorAssignment(List<Lead> newList, Map<Id, Lead> oldMap) {
+        if (newList == null || newList.isEmpty() || oldMap == null) {
+            return;
+        }
+
         List<Messaging.SingleEmailMessage> emailsToSend = new List<Messaging.SingleEmailMessage>();
         EmailTemplate template = getEmailTemplate();
 
@@ -23,6 +27,10 @@ public without sharing class LeadAssignmentEmailHandler {
         }
 
         for (Lead newLead : newList) {
+            if (!LeadEmailHandler.isAreliaLead(newLead)) {
+                continue;
+            }
+
             Lead oldLead = oldMap.get(newLead.Id);
 
             if (isSupervisorNewlyAssigned(oldLead, newLead)) {
@@ -30,6 +38,8 @@ public without sharing class LeadAssignmentEmailHandler {
                 if (email != null) {
                     emailsToSend.add(email);
                 }
+            } else {
+                System.debug('No supervisor assignment change for Lead: ' + newLead.Id);
             }
         }
 
@@ -43,15 +53,15 @@ public without sharing class LeadAssignmentEmailHandler {
      */
     private static EmailTemplate getEmailTemplate() {
         try {
-            // WITH SYSTEM_MODE ensures we ignore user permissions for this setup object, resolving CRUD violations
             EmailTemplate template = [
                 SELECT Id FROM EmailTemplate
                 WHERE DeveloperName =: Label.Arelia_Living_Supervisor_Email_Template
-                WITH SYSTEM_MODE
                 LIMIT 1
             ];
+            System.debug('Fetched Email Template: ' + template.Id);
             return template;
         } catch (Exception ex) {
+            System.debug(LoggingLevel.ERROR, 'Error fetching Email Template: ' + ex.getMessage());
             return null;
         }
     }
@@ -64,12 +74,14 @@ public without sharing class LeadAssignmentEmailHandler {
      * @pmd.comment Isolates logical condition for readability and testing
      */
     private static Boolean isSupervisorNewlyAssigned(Lead oldLead, Lead newLead) {
-        return oldLead.Supervisor_User__c == null && newLead.Supervisor_User__c != null;
+        return (oldLead == null || oldLead.Supervisor_User__c == null)
+            && newLead != null
+            && newLead.Supervisor_User__c != null;
     }
 
     /**
      * @description Builds a Messaging.SingleEmailMessage using the template and supervisor's email.
-     * Uses Lead as the targetObjectId for template merge field context.
+     *              Uses Lead as the targetObjectId for template merge field context.
      * @param template EmailTemplate to be used.
      * @param newLead Lead record for merge field context.
      * @return Messaging.SingleEmailMessage object or null if supervisor email is missing or an exception occurs.
@@ -77,8 +89,10 @@ public without sharing class LeadAssignmentEmailHandler {
      */
     private static Messaging.SingleEmailMessage buildEmail(EmailTemplate template, Lead newLead) {
         Id supervisorId = newLead.Supervisor_User__c;
+        System.debug('Lead ID: ' + newLead.Id + ' to Supervisor User Id: ' + supervisorId + ' Supervisor Email: ' + newLead.Supervisor_User_Email__c);
         try {
             if (String.isBlank(newLead.Supervisor_User_Email__c)) {
+                System.debug(LoggingLevel.WARN, 'Supervisor has no email: ' + newLead.Supervisor_User_Email__c);
                 return null;
             }
 
@@ -92,18 +106,20 @@ public without sharing class LeadAssignmentEmailHandler {
             return mail;
 
         } catch (Exception ex) {
+            System.debug(LoggingLevel.ERROR, 'Error preparing email: ' + ex.getMessage());
             return null;
         }
     }
 
     /**
-     * @description Sends a list of SingleEmailMessages.
-     * Throws AuraHandledException if any email fails.
+     * @description Sends a list of SingleEmailMessages and logs success/failure.
+     *              Throws AuraHandledException if any email fails.
      * @param emailsToSend List of Messaging.SingleEmailMessage to send.
      * @pmd.comment Extracted to reduce complexity of send logic
      */
     private static void sendEmails(List<Messaging.SingleEmailMessage> emailsToSend) {
         if (emailsToSend.isEmpty()) {
+            System.debug('No emails to send.');
             return;
         }
 
@@ -111,10 +127,16 @@ public without sharing class LeadAssignmentEmailHandler {
             Messaging.SendEmailResult[] results = Messaging.sendEmail(emailsToSend, false);
             for (Messaging.SendEmailResult res : results) {
                 if (!res.isSuccess()) {
+                    for (Messaging.SendEmailError err : res.getErrors()) {
+                        System.debug(LoggingLevel.ERROR, 'EMAIL ERROR: ' + err.getMessage());
+                    }
                     throw new AuraHandledException('Email failed: ' + res.getErrors()[0].getMessage());
+                } else {
+                    System.debug('Email sent successfully.');
                 }
             }
         } catch (Exception sendEx) {
+            System.debug(LoggingLevel.ERROR, 'Unexpected error sending email: ' + sendEx.getMessage());
             throw new AuraHandledException('Unexpected error sending email: ' + sendEx.getMessage());
         }
     }
@@ -124,13 +146,8 @@ public without sharing class LeadAssignmentEmailHandler {
      * @return The OrgWideEmailAddress Id if found; otherwise, null.
      */
     private static Id getDefaultOrgWideEmailAddressId() {
-        // WITH SYSTEM_MODE ensures we ignore user permissions for this setup object, resolving CRUD violations
-        List<OrgWideEmailAddress> oweaList = [
-            SELECT Id FROM OrgWideEmailAddress
-            WHERE Address =: Label.Arelia_OWD AND IsAllowAllProfiles = true
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ];
+        List<OrgWideEmailAddress> oweaList = [SELECT Id FROM OrgWideEmailAddress
+                    WHERE Address =: Label.Arelia_OWD LIMIT 1];
         return oweaList.isEmpty() ? null : oweaList[0].Id;
     }
 }

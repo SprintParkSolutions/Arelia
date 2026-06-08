@@ -6,6 +6,8 @@ import { getRecord } from 'lightning/uiRecordApi';
 import APPOINTMENT_STATUS from '@salesforce/schema/Lead.Appointment_Status__c';
 
 import SITE_URL from '@salesforce/label/c.Arelia_Site_Label';
+import Arelia_Site_Redirect_URL_Label from '@salesforce/label/c.Arelia_Site_Redirect_URL_Label';
+
 
 const ACTION_APPROVE = 'APPROVE';
 const ACTION_OPEN_RESCHEDULE = 'OPEN_RESCHEDULE';
@@ -247,7 +249,7 @@ export default class AppointmentApproval extends LightningElement {
 
     // Close navigates to site home
     handleClose() {
-        const url = (SITE_URL || '').trim();
+        const url = (Arelia_Site_Redirect_URL_Label || '').trim();
         if (url) {
             window.location.assign(url);
         } else {

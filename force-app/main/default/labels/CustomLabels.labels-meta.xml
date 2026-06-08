@@ -117,7 +117,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Arelia Living Enrollment Members</shortDescription>
-        <value>mohit.e@sprintpark.com,nareshp@sprintpark.com</value>
+        <value>monikagollu@gmail.com,shyamk@sprintpark.com</value>
     </labels>
     <labels>
         <fullName>Arelia_Living_Lead_Conversion_Approval_Email_Template</fullName>
@@ -342,7 +342,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Arelia Site Label</shortDescription>
-        <value>https://sprintpark.my.site.com/Arelia/s/</value>
+        <value>https://sprintpark--dev4.sandbox.my.site.com/Arelia/s/</value>
     </labels>
     <labels>
         <fullName>Budget_Review_Page_Name</fullName>
@@ -468,21 +468,21 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Footer_Email</shortDescription>
-        <value>info@areliaspace.com</value>
+        <value>spareliaspace@gmail.com</value>
     </labels>
     <labels>
         <fullName>Footer_Location</fullName>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Footer_Location</shortDescription>
-        <value>Unit No 1204, Forest Department, Asian sun city, Block - B, Forest Dept Colony, Kondapur, Hyderabad, Telangana 500084</value>
+        <value>123 Design Ave, Interior City</value>
     </labels>
     <labels>
         <fullName>Footer_Phone</fullName>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Footer_Phone</shortDescription>
-        <value>+91 72078 45556</value>
+        <value>+1 (123) 456-7890, +1 (234) 567-891</value>
     </labels>
     <labels>
         <fullName>Footer_Working_Hours</fullName>
@@ -722,7 +722,7 @@ Sat: By Appointment</value>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>WA_Access_Token</shortDescription>
-        <value>EAA1OS0hDKqEBRJ9MonlYZCqTrNAQkuGZACZCczeVzvKBqWDlzq2PlWrW8eEDMZAUXSisQeVI0L795yhd9DXrl75zw3d7IoLtEI2KnPDjZC2bYYlPz5GqtFZAcM4MNaDXRtOJhJIOVGFjoIjACaahhTnEIGEDv7BKYfs73EP0vQ6rI6eTaB4vGeQKxWsAOpb12M85CLZBcdZAYAbGgTOWosOvJQYZAgOwtTroRujcfP7zAbEQ0ZADufxVTuCg4L1fZAHOLNvCFk2ZAmIrqZBalRMZAfseAAFGgN</value>
+        <value>EAAURDkLToDYBQ2mptwMFVYQxuh2TDnvLTaJEVDGSytty3AVFTfiGKy5x16DyX7WpxZCFZAxZA9IZCMU9ZAl0PmTnODaR5bfr6QPSpuKpPOX5Sw9yHZCOzY5WNy48TZBLRYqsNFZC86Ui9s4BHJSEnNZBug1F2n8NUIHtvaRVtydH9WNZCl2RtekdcG9SwElTKwbBj8mhlbDW8A0Wq768GKvXhcUpAMA8nwTkpNZCmdtvk225Qp37QoqCgYg2UlgkSIw4xSd4eo7ZAaztOKq79KFbsxRr2yfl</value>
     </labels>
     <labels>
         <fullName>WA_Phone_Number_Id</fullName>
@@ -772,5 +772,97 @@ Sat: By Appointment</value>
         <protected>false</protected>
         <shortDescription>Org Wide Email</shortDescription>
         <value>careers@sprintpark.com</value>
+    </labels>
+    <labels>
+        <fullName>ARELIA_SPACE_URL</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>ARELIA_SPACE_URL</shortDescription>
+        <value>https://www.areliaspace.com</value>
+    </labels>
+    <labels>
+        <fullName>Architecture_Manager_Approval_Template</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Architecture Manager Approval Template</shortDescription>
+        <value>Architecture_Manager_Approval</value>
+    </labels>
+    <labels>
+        <fullName>Arelia_Living_Management_Members</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Arelia Living Management Members</shortDescription>
+        <value>p.shyamsaikamal2003@gmail.com,bhavanae@sprintpark.com</value>
+    </labels>
+    <labels>
+        <fullName>Arelia_Site_Redirect_URL_Label</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Arelia_Site_Redirect_URL_Label</shortDescription>
+        <value>https://www.areliaspace.com</value>
+    </labels>
+    <labels>
+        <fullName>Due_In_Days</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Due In Days</shortDescription>
+        <value>3</value>
+    </labels>
+    <labels>
+        <fullName>Enrollment_Email_Addresses</fullName>
+        <categories>It stores all Arelia Enrollment members Email with comma separation</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Enrollment Email Addresses</shortDescription>
+        <value>mohit98409@gmail.com</value>
+    </labels>
+    <labels>
+        <fullName>FORGOT_PASSWORD_PATH</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>FORGOT PASSWORD PATH</shortDescription>
+        <value>forgot-password</value>
+    </labels>
+    <labels>
+        <fullName>FORGOT_PASSWORD_TEMPLATE_ID</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>FORGOT PASSWORD TEMPLATE ID</shortDescription>
+        <value>00XU9000004R4zhMAC</value>
+    </labels>
+    <labels>
+        <fullName>PASSWORD_RESET_PATH</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>PASSWORD RESET PATH</shortDescription>
+        <value>set-password</value>
+    </labels>
+    <labels>
+        <fullName>PASSWORD_RESET_TEMPLATE_ID</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>PASSWORD RESET TEMPLATE ID</shortDescription>
+        <value>00XU9000004R4y5MAC</value>
+    </labels>
+    <labels>
+        <fullName>PASSWORD_RESET_URL</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>PASSWORD RESET URL</shortDescription>
+        <value>https://sprintpark--dev4.sandbox.my.site.com/Arelia/s/</value>
+    </labels>
+    <labels>
+        <fullName>RackTrack</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>RackTrack</shortDescription>
+        <value>tejaswaroop373@gmail.com</value>
+    </labels>
+    <labels>
+        <fullName>Residential_portfolio</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Residential_URL</shortDescription>
+        <value>https://sprintpark--dev4.sandbox.my.site.com/AreliaLiving/s/residential-portfolio</value>
     </labels>
 </CustomLabels>

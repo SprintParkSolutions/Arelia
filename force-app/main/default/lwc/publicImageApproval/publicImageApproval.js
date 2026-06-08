@@ -1,6 +1,6 @@
 import { LightningElement, wire, track } from 'lwc';
 import { CurrentPageReference } from 'lightning/navigation';
-import ARELIA_SITE_URL from '@salesforce/label/c.Arelia_Site_Label'; 
+import Arelia_Site_Redirect_URL_Label from '@salesforce/label/c.Arelia_Site_Redirect_URL_Label';
 import getFileByToken from '@salesforce/apex/ImageApprovalController.getFileByToken';
 import submitDecision from '@salesforce/apex/ImageApprovalController.submitDecision';
 
@@ -147,6 +147,6 @@ export default class PublicImageApproval extends LightningElement {
 
     handleSuccessClose() {
         // Redirect to Site Label URL
-        window.location.href = ARELIA_SITE_URL;
+        window.location.href = Arelia_Site_Redirect_URL_Label;
     }
 }

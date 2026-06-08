@@ -7,7 +7,7 @@
                     <name>actionNames</name>
                     <valueList>
                         <valueListItems>
-                            <value>Opportunity.Architect_Info</value>
+                            <value>Opportunity.Architect_Information</value>
                         </valueListItems>
                         <valueListItems>
                             <value>Opportunity.Upload_Architecture_Design</value>
@@ -26,6 +26,9 @@
                         </valueListItems>
                         <valueListItems>
                             <value>Opportunity.Catalouge_Approval</value>
+                        </valueListItems>
+                        <valueListItems>
+                            <value>Opportunity.Send_Password</value>
                         </valueListItems>
                         <valueListItems>
                             <value>Opportunity.Tendor_Invitation</value>
@@ -74,6 +77,10 @@
                     <value>true</value>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
+                    <name>hideSlackAction</name>
+                    <value>false</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
                     <name>numVisibleActions</name>
                     <value>3</value>
                 </componentInstanceProperties>
@@ -90,6 +97,12 @@
             <componentInstance>
                 <componentName>areliaSplitPath</componentName>
                 <identifier>c_areliaSplitPath</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>opportunityVendorEstimator</componentName>
+                <identifier>c_opportunityVendorEstimator</identifier>
             </componentInstance>
         </itemInstances>
         <mode>Replace</mode>
@@ -192,6 +205,10 @@
         <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
+                    <name>label</name>
+                    <value>Tabs</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
                     <name>tabs</name>
                     <value>tabs</value>
                 </componentInstanceProperties>
@@ -253,11 +270,21 @@
         <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
+                    <name>label</name>
+                    <value>Tabs</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
                     <name>tabs</name>
                     <value>sidebartabs</value>
                 </componentInstanceProperties>
                 <componentName>flexipage:tabset</componentName>
                 <identifier>flexipage_sidebar_tabset</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>waMessagePanel</componentName>
+                <identifier>c_waMessagePanel</identifier>
             </componentInstance>
         </itemInstances>
         <mode>Replace</mode>

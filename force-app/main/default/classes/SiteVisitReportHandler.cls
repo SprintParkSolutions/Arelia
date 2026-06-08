@@ -149,8 +149,8 @@ public without sharing class SiteVisitReportHandler {
     // Utilities & Formatting
     // -------------------------------------------------------------------------
 
-    private static List<String> getManagementEmails() {
-        String mgmtEmails = Label.Arelia_Living_Enrollment_Members;
+    public static List<String> getManagementEmails() {
+        String mgmtEmails = Label.Arelia_Living_Management_Members;
         List<String> emails = new List<String>();
         if (String.isNotBlank(mgmtEmails)) {
             for (String email : mgmtEmails.split(',')) {
@@ -164,10 +164,9 @@ public without sharing class SiteVisitReportHandler {
 
     private static List<String> getManagerEmailsByRole() {
         List<String> managerEmails = new List<String>();
-        for (User u : [
-            SELECT Email FROM User
-            WHERE UserRole.Name LIKE '%Manager%' AND IsActive = true AND Email != null
-        ]) {
+        for (User u : [SELECT Email FROM User
+            WHERE UserRole.Name LIKE '%Manager%' AND IsActive = true AND Email != null])
+        {
             managerEmails.add(u.Email.trim());
         }
         return managerEmails;

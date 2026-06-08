@@ -1,0 +1,394 @@
+<template>
+    <lightning-card title="">
+        <div class="shell-body">
+
+            <div class="bg-orb orb-one"></div>
+            <div class="bg-orb orb-two"></div>
+            <div class="bg-grid"></div>
+
+            <template if:true={isLoading}>
+                <div class="spinner-wrap">
+                    <lightning-spinner size="medium"></lightning-spinner>
+                </div>
+            </template>
+
+            <template if:true={errorMessage}>
+                <div class="error-box">{errorMessage}</div>
+            </template>
+
+            <!-- SCREEN 1 -->
+            <template if:true={isIntro}>
+                <section class="intro-hero">
+                    <div class="hero-badge">AI-Powered Budget Intelligence</div>
+
+                    <h1>AI Budget Planning Assistant</h1>
+
+                    <p class="intro-text">
+                        Analyze the opportunity, estimate vendor-wise budget allocation,
+                        and break each vendor budget into practical execution tasks.
+                    </p>
+
+                    <div class="steps">
+                        <div class="step">
+                            <span class="step-no">01</span>
+                            <span class="step-text">Generate Vendor Allocation</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-no">02</span>
+                            <span class="step-text">Review Budget Distribution</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-no">03</span>
+                            <span class="step-text">Open Task Breakdown</span>
+                        </div>
+                    </div>
+
+                    <div class="hero-note">
+                        This assistant uses the opportunity details and usable budget to estimate
+                        likely vendor categories and task-level budget distribution.
+                    </div>
+
+                    <div style="margin-top:20px;">
+                    <lightning-button
+                        label="✨ Generate AI Estimation"
+                        variant="brand"
+                        onclick={handleEstimate}>
+                    </lightning-button>
+
+                    <lightning-button
+                        label="🖼 Estimate Through Design"
+                        variant="neutral"
+                        onclick={openUpload}
+                        style="margin-left:10px;">
+                    </lightning-button>
+                </div>
+                </section>
+            </template>
+
+            <template if:true={isUpload}>
+                <div style="text-align:center; padding:40px;">
+
+                    <h2>Upload Design Image</h2>
+
+                    <lightning-file-upload
+                        label="Upload Design"
+                        name="fileUploader"
+                        accept=".png,.jpg,.jpeg"
+                        record-id={effectiveRecordId}
+                        onuploadfinished={handleUploadFinished}>
+                    </lightning-file-upload>
+
+                    <br/><br/>
+
+                    <lightning-button
+                        label="✨ Estimate From Image"
+                        variant="brand"
+                        onclick={handleImageEstimate}>
+                    </lightning-button>
+
+                    <br/><br/>
+
+                    <template if:true={uploadedImages.length}>
+                        <div class="preview-grid">
+
+                            <template for:each={uploadedImages} for:item="img">
+                                <div key={img.id} class="preview-card">
+                                    <img src={img.url} />
+                                    <div class="preview-name">{img.name}</div>
+                                </div>
+                            </template>
+
+                        </div>
+                    </template>
+
+                    <br/><br/>
+
+                    <lightning-button
+                        label="⬅ Back"
+                        onclick={handleClose}>
+                    </lightning-button>
+
+                </div>
+            </template>
+
+            <!-- SCREEN 2 -->
+            <template if:true={isVendors}>
+                <div class="top-actions">
+                    <div class="right-actions">
+                        <lightning-button
+                            label="⬅ Back to Estimate"
+                            onclick={handleClose}>
+                        </lightning-button>
+                    </div>
+                </div>
+
+                <section class="glass-panel budget-panel">
+                    <div class="budget-strip">
+                        <div class="budget-item">
+                            <span>Total Budget</span>
+                            <strong>{formattedTotalBudget}</strong>
+                        </div>
+
+                        <div class="budget-line"></div>
+
+                        <div class="budget-item">
+                            <span>Usable Budget (80%)</span>
+                            <strong>{formattedUsableBudget}</strong>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="context-box">
+                    <div class="section-badge">Vendor Estimation</div>
+                    <h2>Vendor Budget Allocation</h2>
+                    <p>
+                        AI has distributed the usable budget across vendor categories based on project needs.
+                    </p>
+                    <ul>
+                        <li>✔ Percentage = share of total usable budget</li>
+                        <li>✔ Amount = estimated budget for that vendor category</li>
+                        <li>✔ Progress bar = visual weight of allocation</li>
+                        <li>✔ Click a vendor card to open task-level breakdown</li>
+                    </ul>
+                </section>
+
+                <div style="text-align:center; margin-bottom:20px;">
+                    <lightning-button
+                        label="📄 Generate Proforma"
+                        variant="brand"
+                        onclick={handleGenerateProforma}>
+                    </lightning-button>
+                </div>
+
+                <div class="vendor-carousel-wrapper">
+                    <button
+                        class="carousel-arrow vendor-arrow vendor-left"
+                        onclick={scrollVendorLeft}
+                        title="Previous vendors">
+                        &#10094;
+                    </button>
+
+                    <div class="vendor-carousel" data-id="vendorScroll">
+                        <template for:each={estimates} for:item="item">
+                            <div
+                                key={item.category}
+                                class="premium-card"
+                                style={item.animationStyle}
+                                data-category={item.category}
+                                data-budget={item.estimatedAmount}
+                                onclick={handleVendorClick}>
+
+                                <div class="card-shine"></div>
+
+                                <div class="card-top">
+                                    <div class="icon-box gold">✦</div>
+                                    <div>
+                                        <div class="estimate-name">{item.category}</div>
+                                        <div class="estimate-sub">Budget Allocation</div>
+                                    </div>
+                                </div>
+
+                                <div class="metric-block">
+                                    <div class="metric-label">Estimated Share</div>
+                                    <div class="percentage">{item.percentage}%</div>
+                                </div>
+
+                                <div class="metric-block amount-block">
+                                    <div class="metric-label">Estimated Budget</div>
+                                    <div class="amount">{item.estimatedAmountFormatted}</div>
+                                </div>
+
+                                <div class="progress-wrap">
+                                    <div class="progress-top">
+                                        <span>Allocation Strength</span>
+                                        <span>{item.percentage}%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill gold-bar" style={item.progressStyle}></div>
+                                    </div>
+                                </div>
+
+                                <div class="card-footer-note">
+                                    Click to view related estimated tasks
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <button
+                        class="carousel-arrow vendor-arrow vendor-right"
+                        onclick={scrollVendorRight}
+                        title="Next vendors">
+                        &#10095;
+                    </button>
+                </div>
+
+                <template if:true={showProforma}>
+                    <div class="proforma-container">
+
+                        <template for:each={proformaData.sections} for:item="section">
+                            <div key={section.name} class="proforma-section">
+
+                                <h3>{section.name}</h3>
+
+                                <table class="proforma-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Item</th>
+                                            <th>Description</th>
+                                            <th>Unit</th>
+                                            <th>Qty</th>
+                                            <th>Area (Sq.Ft)</th>
+                                            <th>Material</th>
+                                            <th>Labour</th>
+                                            <th>GST</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <template for:each={section.items} for:item="item">
+
+                                            <tr key={item.item}>
+
+                                                <td>{item.item}</td>
+
+                                                <td>{item.description}</td>
+
+                                                <td>{item.unit}</td>
+
+                                                <td>{item.qty}</td>
+
+                                                <td>{item.areaSqft}</td>
+
+                                                <td>₹{item.materialCost}</td>
+
+                                                <td>₹{item.laborCost}</td>
+
+                                                <td>₹{item.gst}</td>
+
+                                                <td>₹{item.amount}</td>
+
+                                            </tr>
+
+                                        </template>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </template>
+
+                        <div class="proforma-summary">
+
+                            <p>
+                                Total Material Cost:
+                                ₹{proformaData.totalMaterialCost}
+                            </p>
+
+                            <p>
+                                Total Labour Cost:
+                                ₹{proformaData.totalLaborCost}
+                            </p>
+
+                            <p>
+                                Total GST:
+                                ₹{proformaData.totalGST}
+                            </p>
+
+                            <p class="grand-total">
+                                Grand Total:
+                                ₹{proformaData.grandTotal}
+                            </p>
+
+                        </div>
+
+                    </div>
+                </template>
+            </template>
+
+            <!-- SCREEN 3 -->
+            <template if:true={isTasks}>
+                <div class="top-actions">
+                    <div class="right-actions">
+                        <lightning-button
+                            label="⬅ Back to Vendors"
+                            variant="brand"
+                            onclick={handleCloseTasks}>
+                        </lightning-button>
+                    </div>
+                </div>
+
+                <section class="context-box task-context">
+                    <div class="section-badge">Task Estimation</div>
+                    <h2>{selectedVendor} – Task Breakdown</h2>
+                    <p>
+                        AI has divided the selected vendor budget into task-level execution estimates.
+                    </p>
+                    <ul>
+                        <li>✔ Task % = share of selected vendor budget</li>
+                        <li>✔ Amount = estimated cost for that task</li>
+                        <li>✔ Progress bar = relative effort and cost weight</li>
+                        <li>✔ Use arrows to move through all estimated tasks</li>
+                    </ul>
+                </section>
+
+                <div class="task-carousel-wrapper">
+                    <button
+                        class="carousel-arrow task-arrow task-left"
+                        onclick={scrollLeft}
+                        title="Previous tasks">
+                        &#10094;
+                    </button>
+
+                    <div class="task-carousel premium-carousel" data-id="taskScroll">
+                        <template for:each={taskEstimates} for:item="task">
+                            <div
+                                key={task.taskName}
+                                class="premium-task"
+                                style={task.animationStyle}>
+
+                                <div class="card-shine"></div>
+
+                                <div class="task-top">
+                                    <div class="icon-box gold">⚙</div>
+                                    <div>
+                                        <div class="task-name">{task.taskName}</div>
+                                        <div class="task-sub">Execution Task</div>
+                                    </div>
+                                </div>
+
+                                <div class="metric-block">
+                                    <div class="metric-label">Task Share</div>
+                                    <div class="task-percent">{task.percentage}%</div>
+                                </div>
+
+                                <div class="metric-block amount-block">
+                                    <div class="metric-label">Estimated Cost</div>
+                                    <div class="task-amount">{task.amountFormatted}</div>
+                                </div>
+
+                                <div class="progress-wrap">
+                                    <div class="progress-top">
+                                        <span>Execution Weight</span>
+                                        <span>{task.percentage}%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill gold-bar" style={task.style}></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <button
+                        class="carousel-arrow task-arrow task-right"
+                        onclick={scrollRight}
+                        title="Next tasks">
+                        &#10095;
+                    </button>
+                </div>
+            </template>
+
+        </div>
+    </lightning-card>
+</template>

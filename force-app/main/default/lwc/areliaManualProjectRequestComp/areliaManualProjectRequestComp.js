@@ -5,6 +5,7 @@ import getPlanLevelPicklistValues from '@salesforce/apex/Arelia_ManualProjectReq
 import updateLead from '@salesforce/apex/Arelia_ManualProjectRequestController.updateLead';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import Arelia_Site_Label from '@salesforce/label/c.Arelia_Site_Label';
+import Arelia_Site_Redirect_URL_Label from '@salesforce/label/c.Arelia_Site_Redirect_URL_Label';
 
 // ✅ NEW (for picklist value -> label)
 import { getObjectInfo, getPicklistValues } from 'lightning/uiObjectInfoApi';
@@ -295,7 +296,7 @@ export default class AreliaManualProjectRequestComp extends LightningElement {
     }
 
     handleCloseSuccess() {
-        window.location.href = Arelia_Site_Label;
+        window.location.href = Arelia_Site_Redirect_URL_Label;
     }
 
     goToPrevious() {

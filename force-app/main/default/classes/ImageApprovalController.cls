@@ -6,6 +6,9 @@
 @SuppressWarnings('PMD.ApexCRUDViolation')
 public without sharing class ImageApprovalController {
 
+    private static final String ARELIA_OPPORTUNITY_RECORD_TYPE_NAME = 'Arelia';
+    private static Id cachedAreliaOpportunityRecordTypeId;
+
     // ============================================================================
     // INNER CLASSES & WRAPPERS
     // ============================================================================
@@ -48,6 +51,8 @@ public without sharing class ImageApprovalController {
         }
 
         try {
+            assertAreliaOpportunityRecordType(recordId);
+
             // 1. Create Record with Budget
             Architecture_Design__c designRec = createDesignRecord(recordId, fileIds[0], budget);
             
@@ -237,6 +242,7 @@ public without sharing class ImageApprovalController {
         try {
             Architecture_Design__c design = [
                 SELECT Id, Status__c, Comments__c, Related_File_Id__c,
+                       Opportunity__r.RecordTypeId,
                        Opportunity__r.Name, Opportunity__r.Lead_Name__c, 
                        Opportunity__r.Project_Description__c, Opportunity__r.Site_Space__c,
                        Opportunity__r.Primary_Contact__r.Email, 
@@ -248,6 +254,13 @@ public without sharing class ImageApprovalController {
                 FROM Architecture_Design__c 
                 WHERE Secure_Token__c = :token LIMIT 1
             ];
+
+            if (design.Opportunity__r != null &&
+                !isAreliaOpportunityRecordType(design.Opportunity__r.RecordTypeId)) {
+                throw new AuraHandledException(
+                    'Image approval is supported only for Arelia opportunities.'
+                );
+            }
 
             design.Status__c = status;
             design.Comments__c = String.isNotBlank(comments) ? comments : 'Approved By Client';
@@ -354,6 +367,57 @@ public without sharing class ImageApprovalController {
     // ============================================================================
     // 5. GENERIC HELPERS
     // ============================================================================
+
+    private static void assertAreliaOpportunityRecordType(Id recordId) {
+        if (recordId == null) {
+            return;
+        }
+
+        String sObjName = recordId.getSObjectType().getDescribe().getName();
+        if (sObjName != 'Opportunity') {
+            return;
+        }
+
+        Opportunity opp = [
+            SELECT Id, RecordTypeId
+            FROM Opportunity
+            WHERE Id = :recordId
+            LIMIT 1
+        ];
+
+        if (!isAreliaOpportunityRecordType(opp.RecordTypeId)) {
+            throw new AuraHandledException(
+                'Image approval is supported only for Arelia opportunities.'
+            );
+        }
+    }
+
+    private static Boolean isAreliaOpportunityRecordType(Id recordTypeId) {
+        if (recordTypeId == null) {
+            return false;
+        }
+
+        Id areliaOpportunityRecordTypeId = getAreliaOpportunityRecordTypeId();
+        return areliaOpportunityRecordTypeId != null
+            && recordTypeId == areliaOpportunityRecordTypeId;
+    }
+
+    private static Id getAreliaOpportunityRecordTypeId() {
+        if (cachedAreliaOpportunityRecordTypeId != null) {
+            return cachedAreliaOpportunityRecordTypeId;
+        }
+
+        Schema.RecordTypeInfo recordTypeInfo = Schema.SObjectType.Opportunity
+            .getRecordTypeInfosByName()
+            .get(ARELIA_OPPORTUNITY_RECORD_TYPE_NAME);
+
+        if (recordTypeInfo == null) {
+            return null;
+        }
+
+        cachedAreliaOpportunityRecordTypeId = recordTypeInfo.getRecordTypeId();
+        return cachedAreliaOpportunityRecordTypeId;
+    }
 
     private static void linkDesignToParent(Architecture_Design__c designRec, Id recordId) {
         String sObjName = recordId.getSObjectType().getDescribe().getName();
