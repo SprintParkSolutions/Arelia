@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Final_Task_Completed_Date__c</fullName>
+    <formula>IF(
+    ISPICKVAL(Status, &quot;Completed&quot;),
+    TODAY(),
+    NULL
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <inlineHelpText>It shows the final task complition date.</inlineHelpText>
+    <label>Final Task Completed Date</label>
+    <required>false</required>
+    <type>Date</type>
+</CustomField>
