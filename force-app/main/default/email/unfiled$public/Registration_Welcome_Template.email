@@ -4,7 +4,7 @@
 </head>
 <body style="height: auto; min-height: auto;"><span style="font-size:18px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hi <strong>{{{Recipient.Name}}}</strong>,<br />
 <br />
-Welcome to <strong>Arelia Living!&nbsp;</strong>Your registration is complete and we are excited to help you design your space.<br />
+Welcome to <strong>Arelia !&nbsp;</strong>Your registration is complete and we are excited to help you design your space.<br />
 <br />
 Here is a quick summary of the details we have received:</span></span>
 <ul>
@@ -19,6 +19,6 @@ Here is a quick summary of the details we have received:</span></span>
 
 <p><br />
 <span style="font-size:18px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Best Regards,</span></span><br />
-<span style="font-size:18px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Arelia Living.</span></span></p>
+<span style="font-size:18px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Arelia Team.</span></span></p>
 </body>
 </html>

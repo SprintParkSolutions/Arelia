@@ -8,7 +8,7 @@
 <p>This is a notification regarding the project <strong>{{OPPORTUNITY_NAME}}</strong>.</p>
 
 <p><strong>Current Status: Client Approved</strong><br />
-The client, <strong>{{CLIENT_NAME}}</strong>, has formally reviewed and <strong>APPROVED</strong> the budget and payment terms.</p>
+The client, <strong>{{CLIENT_NAME}}</strong>, has formally reviewed and <strong>APPROVED</strong> the budget.</p>
 
 <p><strong>Why is this required?</strong><br />
 As per our internal compliance protocols, a final Manager sign-off is required to:</p>
@@ -32,6 +32,6 @@ As per our internal compliance protocols, a final Manager sign-off is required t
 
 <p>Regards,</p>
 
-<p>Arelia Living</p>
+<p>Arelia Team.</p>
 </body>
 </html>

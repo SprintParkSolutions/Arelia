@@ -5,7 +5,7 @@
         <accessLevel>Read</accessLevel>
         <label>Arelia Living Guest User Lead Access</label>
         <sharedTo>
-            <guestUser>Arelia_Living</guestUser>
+            <guestUser>Arelia</guestUser>
         </sharedTo>
         <criteriaItems>
             <field>LastName</field>

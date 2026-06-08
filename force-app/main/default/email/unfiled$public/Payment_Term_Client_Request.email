@@ -5,7 +5,7 @@
 <body style="font-family: Arial, sans-serif; font-size: 14px; color: rgb(51, 51, 51); height: auto; min-height: auto;">
 <p>Dear {{CLIENT_NAME}},</p>
 
-<p>We are excited to move forward with your project, <strong>{{OPPORTUNITY_NAME}}</strong>. Transparency is a core value at Arelia Living, and we want to ensure you have a clear understanding of the financial milestones for your project.</p>
+<p>We are excited to move forward with your project, <strong>{{OPPORTUNITY_NAME}}</strong>. Transparency is a core value at Arelia, and we want to ensure you have a clear understanding of the financial milestones for your project.</p>
 
 <p>Our team has finalized the proposed payment schedule based on our recent discussions. We kindly ask that you review these terms to ensure they meet your expectations.</p>
 
@@ -20,9 +20,9 @@
 
 <p>If you have any questions or require adjustments to the dates, you can request changes directly through the link provided above. Your supervisor will be notified instantly.</p>
 
-<p>Thank you for choosing Arelia Living.</p>
+<p>Thank you for choosing Arelia.</p>
 
 <p>Sincerely,<br />
-Arelia Living</p>
+Arelia Team.</p>
 </body>
 </html>

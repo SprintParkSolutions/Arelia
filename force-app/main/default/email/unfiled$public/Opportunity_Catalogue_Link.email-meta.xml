@@ -5,7 +5,7 @@
     <name>Opportunity Catalogue Link</name>
     <relatedEntityType>Opportunity</relatedEntityType>
     <style>none</style>
-    <subject>Interior Product Catalogue – Arelia Living</subject>
+    <subject>Interior Product Catalogue – Arelia</subject>
     <type>custom</type>
     <uiType>SFX</uiType>
 </EmailTemplate>

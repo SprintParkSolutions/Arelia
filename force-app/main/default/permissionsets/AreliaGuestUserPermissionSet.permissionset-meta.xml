@@ -53,6 +53,10 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>MobileClientProfileService</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>MobileDashboardByProjectService</apexClass>
         <enabled>true</enabled>
     </classAccesses>
@@ -604,6 +608,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Lead.Approval_Status__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Lead.Converted_Contact__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

@@ -7,7 +7,7 @@
 
 <p>Thank you for your prompt response.</p>
 
-<p>We are writing to confirm that we have successfully received your <strong>APPROVAL</strong> for the <strong>{{OPPORTUNITY_NAME}}</strong> project budget and payment terms.</p>
+<p>We are writing to confirm that we have successfully received your <strong>APPROVAL</strong> for the <strong>{{OPPORTUNITY_NAME}}</strong> project budget.</p>
 
 <p><strong>Next Steps:</strong></p>
 
@@ -24,6 +24,6 @@
 <p>We are excited to begin this journey with you!</p>
 
 <p>Warm regards,<br />
-<strong>Arelia Living</strong></p>
+<strong>Arelia Team.</strong></p>
 </body>
 </html>

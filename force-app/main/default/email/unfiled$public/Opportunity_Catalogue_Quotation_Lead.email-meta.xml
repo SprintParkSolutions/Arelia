@@ -6,7 +6,7 @@
     <name>Opportunity Catalogue Quotation Lead</name>
     <relatedEntityType>Opportunity</relatedEntityType>
     <style>none</style>
-    <subject>Your Interior Catalogue – Arelia Living</subject>
+    <subject>Your Interior Catalogue – Arelia</subject>
     <type>custom</type>
     <uiType>SFX</uiType>
 </EmailTemplate>

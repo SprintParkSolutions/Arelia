@@ -15,6 +15,6 @@ Amount Due: {{{Payment_Term__c.Percentage__c}}}% of Project Value</p>
 <p>Please ensure this payment is processed by the due date.</p>
 
 <p>Regards,<br />
-The Arelia Living Accounts Team</p>
+Arelia Team.</p>
 </body>
 </html>

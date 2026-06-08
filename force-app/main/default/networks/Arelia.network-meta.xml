@@ -34,7 +34,7 @@
     <gatherCustomerSentimentData>false</gatherCustomerSentimentData>
     <headlessForgotPasswordTemplate>unfiled$public/CommunityHeadlessForgotPasswordTemplate</headlessForgotPasswordTemplate>
     <headlessRegistrationTemplate>unfiled$public/CommunityHeadlessRegistrationTemplate</headlessRegistrationTemplate>
-    <logoutUrl>https://sprintpark.my.site.com/AreliaLiving/s/</logoutUrl>
+    <logoutUrl>https://www.areliaspace.com/s</logoutUrl>
     <networkAuthApiSettings>
         <doesForgotPasswordRequireAuth>false</doesForgotPasswordRequireAuth>
         <doesPwdlessLoginRequireAuth>false</doesPwdlessLoginRequireAuth>
@@ -49,9 +49,11 @@
         <isUniversalClientRgstrAllowed>false</isUniversalClientRgstrAllowed>
         <maxPasswordResetAttempts>5</maxPasswordResetAttempts>
         <recaptchaScoreThreshold>0.0</recaptchaScoreThreshold>
+        <recaptchaSecretKey>ifD6x..Kiq0W5PKh3xE7n0efkzAM8.ZIwqP.Bin2o0o=</recaptchaSecretKey>
     </networkAuthApiSettings>
     <networkMemberGroups>
         <profile>admin</profile>
+        <profile>partner community user</profile>
     </networkMemberGroups>
     <networkPageOverrides>
         <changePasswordPageOverrideSetting>Standard</changePasswordPageOverrideSetting>

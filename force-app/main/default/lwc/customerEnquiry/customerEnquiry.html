@@ -8,7 +8,6 @@
             </header>
 
             <div class="form-card">
-                <!-- STEP 1 -->
                 <template if:true={showStep1}>
                     <div class="grid-row">
                         <div class="col">
@@ -26,7 +25,6 @@
                             <input class="text-input" type="email" name="email" data-id="emailInput" value={email} oninput={handleNativeInput} />
                         </div>
 
-                        <!-- tighter side-by-side country + phone -->
                         <div class="col full phone-row-tight">
                             <div class="phone-col small">
                                 <label class="field-label">Country</label>
@@ -39,8 +37,14 @@
 
                             <div class="phone-col large">
                                 <label class="field-label">Phone Number <span class="req">*</span></label>
-                                <input class="text-input" type="tel" name="phone" data-id="phoneInput" value={phone} oninput={handleNativeInput} />
-                                <div class="field-help">Enter a 10-digit mobile number (example: 9876543210).</div>
+                                <input class={phoneInputClass} type="tel" name="phone" data-id="phoneInput" value={phone} oninput={handleNativeInput} onblur={handleBlur} />
+                                
+                                <template if:true={phoneError}>
+                                    <div class="error-text">Please enter a valid 10-digit number.</div>
+                                </template>
+                                <template if:false={phoneError}>
+                                    <div class="field-help">Enter a 10-digit mobile number (example: 9876543210).</div>
+                                </template>
                             </div>
                         </div>
 
@@ -50,7 +54,6 @@
                     </div>
                 </template>
 
-                <!-- STEP 2 -->
                 <template if:true={showStep2}>
                     <div class="verification-wrap">
                         <div class="summary-block">
@@ -76,17 +79,12 @@
                                 Didn’t receive the code? Click <b>Send Code</b> again.
                             </template>
                         </div>
-
-                        <div class="actions-center step2-actions">
-                            <button class="secondary-btn small-btn" onclick={backToStep1} disabled={isSubmitting}>Back</button>
-                            <button class="primary-btn small-btn" onclick={handleSubmit} disabled={isButtonDisabled}>SEND MESSAGE</button>
+                        
                         </div>
-                    </div>
                 </template>
             </div>
         </div>
 
-        <!-- Success overlay -->
         <template if:true={showSuccessScreen}>
             <div class="success-screen" role="dialog" aria-modal="true">
                 <div class="success-box">

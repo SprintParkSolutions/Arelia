@@ -8,7 +8,7 @@
 <p>This is a notification regarding the internal review of project <strong>{{OPPORTUNITY_NAME}}</strong>.</p>
 
 <p><strong>Status: Re-Submitted for Manager Approval</strong><br />
-The Supervisor has updated the budget estimates and payment terms based on your previous feedback.</p>
+The Supervisor has updated the budget estimates&nbsp; based on your previous feedback.</p>
 
 <p><strong>Context for Revision:</strong><br />
 The following changes were requested during your last review:</p>
@@ -27,6 +27,6 @@ The following changes were requested during your last review:</p>
 </ul>
 
 <p>Thank you,<br />
-Arelia Living</p>
+Arelia Team.</p>
 </body>
 </html>

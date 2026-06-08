@@ -18,7 +18,11 @@ import STATUS_FIELD from '@salesforce/schema/Task.Status';
 
 export default class VendorTaskCreator extends LightningElement {
     @track statusOptions = [];
-    
+
+    get recordTypeId() {
+        return this.taskMetadata?.data?.defaultRecordTypeId || '012000000000000AAA';
+    }
+
     // FIX 1: Reactive recordId to prevent "Blank Screen"
     _recordId;
     @api 
@@ -65,7 +69,7 @@ export default class VendorTaskCreator extends LightningElement {
     taskMetadata;
 
     @wire(getPicklistValues, {
-        recordTypeId: '$taskMetadata.data.defaultRecordTypeId',
+        recordTypeId: '$recordTypeId',
         fieldApiName: STATUS_FIELD
     })
     wiredStatusValues({ error, data }) {

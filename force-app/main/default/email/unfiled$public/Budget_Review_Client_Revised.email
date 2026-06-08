@@ -7,7 +7,7 @@
 
 <p>Thank you for your valuable feedback regarding the initial budget proposal.</p>
 
-<p>Our team has carefully reviewed your comments and concerns. We have updated the project estimates and payment terms to better align with your requirements for <strong>{{OPPORTUNITY_NAME}}</strong>.</p>
+<p>Our team has carefully reviewed your comments and concerns. We have updated the project estimates&nbsp; to better align with your requirements for <strong>{{OPPORTUNITY_NAME}}</strong>.</p>
 
 <p><strong>Summary of Changes:</strong><br />
 We have addressed the specific points mentioned in your previous feedback:</p>
@@ -23,6 +23,6 @@ We have addressed the specific points mentioned in your previous feedback:</p>
 <p>Best regards,<br />
 <strong>{{SUPERVISOR_NAME}}</strong><br />
 Project Supervisor<br />
-Arelia Living</p>
+Arelia Team.</p>
 </body>
 </html>

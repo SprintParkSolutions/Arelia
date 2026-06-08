@@ -5,6 +5,8 @@ import sendVerificationEmail from '@salesforce/apex/RegistrationFormController.s
 import registerLead from '@salesforce/apex/RegistrationFormController.registerLead';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const NAME_REGEX = /^[A-Za-z\s\-']+$/; // Allows only letters, spaces, hyphens, and apostrophes
+const PHONE_REGEX = /^\d{10}$/; // Enforces exactly 10 digits
 const RESEND_COOLDOWN_SECONDS = 60;
 const OTP_VALIDITY_MS = 60 * 1000;
 
@@ -27,6 +29,8 @@ export default class CustomerEnquiry extends LightningElement {
     @track emailVerified = false;
     @track isSendingCode = false;
     @track isSubmitting = false;
+    
+    @track phoneError = false; // Tracks phone field UI state
 
     @track resendTimer = 0;
     timerId;
@@ -34,22 +38,27 @@ export default class CustomerEnquiry extends LightningElement {
     otpExpiresAt;
     showSuccessScreen = false;
 
-    // getters
+    // --- Validation Getters ---
+    get isFirstNameValid() {
+        return this.firstName && NAME_REGEX.test(this.firstName.trim());
+    }
+    get isLastNameValid() {
+        return this.lastName && NAME_REGEX.test(this.lastName.trim());
+    }
     get isEmailValid() {
         return EMAIL_REGEX.test((this.email || '').trim());
     }
     get isPhoneValid() {
-        const digits = (this.phone || '').replace(/\D/g, '');
-        return digits.length === 10;
+        return PHONE_REGEX.test(this.phone || '');
     }
     get isNextDisabled() {
-        return this.isSubmitting || !this.firstName || !this.lastName || !this.isEmailValid || !this.isPhoneValid;
+        return this.isSubmitting || !this.isFirstNameValid || !this.isLastNameValid || !this.isEmailValid || !this.isPhoneValid;
     }
     get isButtonDisabled() {
         return this.isSubmitting || !this.emailVerified;
     }
     get disableVerifyButton() {
-        return !this.generatedOtp || !this.otpInput || this.emailVerified;
+        return !this.generatedOtp || !this.otpInput || this.emailVerified || this.isSubmitting;
     }
     get resendTimerActive() {
         return this.resendTimer > 0;
@@ -61,50 +70,83 @@ export default class CustomerEnquiry extends LightningElement {
     get isSendCodeDisabled() {
         return this.isSendingCode || this.resendTimerActive || !this.isEmailValid;
     }
+    
+    // Dynamic class for phone input
+    get phoneInputClass() {
+        return this.phoneError ? 'text-input input-error' : 'text-input';
+    }
 
-    // native input handlers
+    // --- Input Handlers with Sanitization ---
     handleNativeInput(event) {
         const name = event.target.name;
-        const value = event.target.value;
-        if (name === 'firstName') this.firstName = value;
-        else if (name === 'lastName') this.lastName = value;
-        else if (name === 'email') this.email = value;
-        else if (name === 'phone') this.phone = value;
+        let value = event.target.value;
+ 
+        if (name === 'firstName') {
+            value = value.replace(/[^A-Za-z\s\-']/g, '');
+            event.target.value = value;
+            this.firstName = value;
+        } else if (name === 'lastName') {
+            value = value.replace(/[^A-Za-z\s\-']/g, '');
+            event.target.value = value;
+            this.lastName = value;
+        } else if (name === 'email') {
+            this.email = value;
+        } else if (name === 'phone') {
+            // Capture what they actually typed before we sanitize it
+            const rawValue = value;
+           
+            // Sanitize: Strip non-digits and cap at 10
+            value = value.replace(/\D/g, '').substring(0, 10);
+            event.target.value = value;
+            this.phone = value;
+           
+            // Immediately show error if they typed a letter OR if the length is incomplete
+            if (rawValue !== value || (this.phone.length > 0 && this.phone.length < 10)) {
+                this.phoneError = true;
+            } else {
+                // Clear the error the moment they hit exactly 10 digits
+                this.phoneError = false;
+            }
+        }
     }
 
     handleCountryChange(event) {
-        // select change uses event.target.value with native select
         this.countryCode = event.target.value;
     }
 
     handleNativeOtp(event) {
         this.otpInput = event.target.value;
     }
+    
+    // Blur handler to trigger validation UI
+    handleBlur(event) {
+        if (event.target.name === 'phone') {
+            // Trigger error if they leave the field but it's not exactly 10 digits
+            this.phoneError = this.phone.length > 0 && !this.isPhoneValid;
+        }
+    }
 
-    // navigation
+    // --- Navigation ---
     goToVerification() {
-        // Validate fields and show toast messages if needed
+        let nameMsg = '';
+        if (!this.firstName || !this.lastName) nameMsg = 'First and Last name are required.';
+        else if (!this.isFirstNameValid || !this.isLastNameValid) nameMsg = 'Names can only contain letters, spaces, hyphens, or apostrophes.';
+
         let emailMsg = '';
         if (!this.email) emailMsg = 'Email is required.';
         else if (!this.isEmailValid) emailMsg = 'Enter a valid email address.';
 
-        const digits = (this.phone || '').replace(/\D/g, '');
         let phoneMsg = '';
-        if (!digits) phoneMsg = 'Mobile number is required.';
-        else if (digits.length !== 10) phoneMsg = 'Enter a 10-digit mobile number.';
+        if (!this.phone) phoneMsg = 'Mobile number is required.';
+        else if (!this.isPhoneValid) phoneMsg = 'Enter exactly a 10-digit mobile number.';
 
-        if (emailMsg || phoneMsg || !this.firstName || !this.lastName) {
-            if (!this.firstName || !this.lastName) {
-                this.showToast('Error', 'First and Last name are required.', 'error');
-            } else if (emailMsg) {
-                this.showToast('Error', emailMsg, 'error');
-            } else {
-                this.showToast('Error', phoneMsg, 'error');
-            }
+        if (nameMsg || emailMsg || phoneMsg) {
+            if (nameMsg) this.showToast('Error', nameMsg, 'error');
+            if (emailMsg) this.showToast('Error', emailMsg, 'error');
+            if (phoneMsg) this.showToast('Error', phoneMsg, 'error');
             return;
         }
 
-        // go to step 2
         this.showStep1 = false;
         this.showStep2 = true;
     }
@@ -118,7 +160,7 @@ export default class CustomerEnquiry extends LightningElement {
         this.emailVerified = false;
     }
 
-    // OTP
+    // --- OTP & Submission Logic ---
     handleSendCode() {
         if (!this.isEmailValid) {
             this.showToast('Error', 'Enter a valid email before sending code.', 'error');
@@ -162,23 +204,28 @@ export default class CustomerEnquiry extends LightningElement {
             this.showToast('Error', 'Please enter the verification code.', 'error');
             return;
         }
+        
+        // Check if OTP matches
         if (this.otpInput === this.generatedOtp) {
             this.emailVerified = true;
             this.showToast('Success', 'Email verified successfully.', 'success');
+            
+            // Trigger the Lead Submission automatically right here!
+            this.handleSubmit(); 
+            
         } else {
             this.emailVerified = false;
             this.showToast('Error', 'Invalid verification code. Please try again.', 'error');
         }
     }
 
-    // submit
     handleSubmit() {
         if (!this.emailVerified) {
             this.showToast('Error', 'Please verify your email before sending the enquiry.', 'error');
             return;
         }
-        if (!this.firstName || !this.lastName) {
-            this.showToast('Error', 'First and Last name are required.', 'error');
+        if (!this.isFirstNameValid || !this.isLastNameValid) {
+            this.showToast('Error', 'Valid First and Last name are required.', 'error');
             return;
         }
         this.isSubmitting = true;
@@ -204,7 +251,7 @@ export default class CustomerEnquiry extends LightningElement {
             });
     }
 
-    // timers + utils
+    // --- Utilities ---
     startResendCountdown() {
         this.clearResendTimer();
         this.resendTimer = RESEND_COOLDOWN_SECONDS;
@@ -221,7 +268,6 @@ export default class CustomerEnquiry extends LightningElement {
         const code = Math.floor(100000 + Math.random() * 900000);
         return String(code);
     }
-
     resetForm() {
         this.firstName = '';
         this.lastName = '';
@@ -232,9 +278,9 @@ export default class CustomerEnquiry extends LightningElement {
         this.generatedOtp = null;
         this.otpExpiresAt = null;
         this.emailVerified = false;
+        this.phoneError = false; // Reset error state
         this.clearResendTimer();
     }
-
     handleCloseSuccess() { this.showSuccessScreen = false; }
     handleApexError(error, fallbackMessage) {
         let message = fallbackMessage;
