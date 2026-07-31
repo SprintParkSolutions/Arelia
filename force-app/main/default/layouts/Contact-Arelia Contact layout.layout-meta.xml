@@ -34,7 +34,7 @@
         <customLabel>true</customLabel>
         <detailHeading>true</detailHeading>
         <editHeading>true</editHeading>
-        <label>Client Password</label>
+        <label>Client Password Information</label>
         <layoutColumns>
             <layoutItems>
                 <behavior>Edit</behavior>
