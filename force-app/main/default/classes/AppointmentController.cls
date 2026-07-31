@@ -3,7 +3,6 @@
  * @description Enforces Supervisor/Date/Slot availability across Pending holds, Approved,
  *              and all Rescheduled variants. Also handles approval/reschedule updates and
  *              supervisor email notifications.
- *
  * Slot is BLOCKED when ANY Lead (same Supervisor) has:
  *   - Approved with (Appointment_Date__c + Appointment_Time_Slots__c)
  *   - Rescheduled-like (Rescheduled / Appointment Rescheduled / Appointment RescheduledStatus)
