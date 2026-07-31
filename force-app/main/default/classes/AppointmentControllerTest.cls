@@ -28,11 +28,9 @@ public class AppointmentControllerTest {
             insert new List<EmailTemplate>{t1, t2};
         }
     }
-
     // ==========================================
     // AVAILABILITY LOGIC TESTS
     // ==========================================
-
     @isTest
     static void testGetAvailableTimeSlotsNoConflicts() {
         User supervisor = [SELECT Id FROM User WHERE Alias = 'apptSup' LIMIT 1];
