@@ -11,13 +11,15 @@ global without sharing class PaymentTermRestService {
         }
 
         List<Payment_Term__c> terms = [
-            SELECT Name,
+            SELECT Id,
+                   Name,
                    Percentage__c,
                    Due_Date__c,
                    Payment_Received__c,
                    Term_Label__c
             FROM Payment_Term__c
             WHERE Project__r.Name = :projectName
+            AND Project__r.RecordType.Name = 'Arelia'
             ORDER BY Due_Date__c
         ];
 
@@ -29,6 +31,7 @@ global without sharing class PaymentTermRestService {
     }
 
     global class PaymentTermDTO {
+        public String id;
         public String name;
         public Decimal percentage;
         public Date dueDate;
@@ -36,6 +39,7 @@ global without sharing class PaymentTermRestService {
         public String label;
 
         public PaymentTermDTO(Payment_Term__c t) {
+            id = t.Id;
             name = t.Name;
             percentage = t.Percentage__c;
             dueDate = t.Due_Date__c;
