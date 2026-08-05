@@ -3,7 +3,6 @@ global without sharing class MobileDashboardService {
 
     @HttpGet
     global static DashboardResponse getDashboard() {
-
         String contactId = RestContext.request.params.get('contactId');
         String projectId = RestContext.request.params.get('projectId');
 
@@ -11,7 +10,6 @@ global without sharing class MobileDashboardService {
             throw new AuraHandledException('ContactId is required');
         }
 
-        // ---------- CONTACT ----------
         Contact c = [
             SELECT Name, Email
             FROM Contact
@@ -21,12 +19,10 @@ global without sharing class MobileDashboardService {
 
         Project__c p;
 
-        // ---------- PROJECT (PROJECT-AWARE) ----------
         if (!String.isBlank(projectId)) {
             List<Project__c> projects = [
-                SELECT Name,
-                       Supervisor_Estimated_Budget__c,
-                       Project_Completion_Status__c
+                SELECT Id, Name, Supervisor_Estimated_Budget__c,
+                    Project_Completion_Status__c, Start_Date__c, Estimated_End_Date__c
                 FROM Project__c
                 WHERE Id = :projectId
                   AND Client__c = :contactId
@@ -34,11 +30,9 @@ global without sharing class MobileDashboardService {
             ];
             p = projects.isEmpty() ? null : projects[0];
         } else {
-            // BACKWARD COMPATIBILITY (old behaviour)
             List<Project__c> projects = [
-                SELECT Name,
-                       Supervisor_Estimated_Budget__c,
-                       Project_Completion_Status__c
+                SELECT Id, Name, Supervisor_Estimated_Budget__c,
+                    Project_Completion_Status__c, Start_Date__c, Estimated_End_Date__c
                 FROM Project__c
                 WHERE Client__c = :contactId
                 ORDER BY CreatedDate DESC
@@ -48,17 +42,20 @@ global without sharing class MobileDashboardService {
         }
 
         DashboardResponse res = new DashboardResponse();
-        res.userName  = c.Name;
+        res.userName = c.Name;
         res.userEmail = c.Email;
 
         if (p != null) {
+            res.projectId = p.Id;
             res.projectName = p.Name;
-            res.budget      = p.Supervisor_Estimated_Budget__c;
-            res.progress    = p.Project_Completion_Status__c;
+            res.budget = p.Supervisor_Estimated_Budget__c;
+            res.progress = p.Project_Completion_Status__c;
+            res.startDate = p.Start_Date__c;
+            res.endDate = p.Estimated_End_Date__c;
         } else {
             res.projectName = 'No Active Project';
-            res.budget      = 0;
-            res.progress    = 0;
+            res.budget = 0;
+            res.progress = 0;
         }
 
         return res;
@@ -67,8 +64,11 @@ global without sharing class MobileDashboardService {
     global class DashboardResponse {
         public String userName;
         public String userEmail;
+        public String projectId;
         public String projectName;
         public Decimal budget;
         public Decimal progress;
+        public Date startDate;
+        public Date endDate;
     }
 }
