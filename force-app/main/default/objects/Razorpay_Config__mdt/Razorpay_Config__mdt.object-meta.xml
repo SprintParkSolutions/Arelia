@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Stores Razorpay key/secret values needed for signature verification. Populate the single &quot;Default&quot; record manually in Setup after deploy — do not commit secret values to source control.</description>
+    <label>Razorpay Config</label>
+    <pluralLabel>Razorpay Configs</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>
