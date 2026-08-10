@@ -1,143 +1,196 @@
 <template>
-    <div class="form-wrapper">
+    <div class="form-wrapper animate-fade-in">
         <template if:true={showForm}>
-            <section class="card-shell">
-                <header class="card-header">
-                    <h2 class="card-title">Interior Project Request – Manual Quotation</h2>
-                    <p class="card-subtitle">
-                        Please verify your details and share more information about your
-                        project so that we can prepare a customised quotation.
+            <section class="center-card">
+                
+                <!-- 1. HEADER PARTITION -->
+                <header class="card-header-section">
+                    <div class="header-pill animate-slide-up">Arelia Project Request</div>
+                    <h1 class="title animate-slide-up">Interior Project Request - Manual</h1>
+                    <p class="subtitle animate-slide-up">
+                        Please verify your details and share more information about your project so that we can prepare a customised quotation.
                     </p>
                 </header>
 
-                <div class="card-body">
-                    <div class="slds-grid slds-wrap slds-gutters">
+                <!-- 2. BODY PARTITION -->
+                <div class="card-body-section custom-form-theme">
+                    
+                    <!-- Form Section Title -->
+                    <div class="form-section-title">
+                        <h2>Customer Details</h2>
+                        <p>These details are stored on your Lead and used for communication.</p>
+                    </div>
+
+                    <div class="slds-grid slds-wrap slds-gutters custom-grid-spacing">
+                        
                         <!-- First Name -->
                         <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
-                            <lightning-input label="First Name" value={firstName} onchange={handleChange}
-                                name="firstName" readonly></lightning-input>
+                            <div class="field-card">
+                                <lightning-input label="First Name" value={firstName} onchange={handleChange}
+                                    name="firstName" readonly class="luxury-input"></lightning-input>
+                            </div>
                         </div>
 
                         <!-- Last Name -->
                         <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
-                            <lightning-input label="Last Name" value={lastName} onchange={handleChange} name="lastName"
-                                readonly></lightning-input>
+                            <div class="field-card">
+                                <lightning-input label="Last Name" value={lastName} onchange={handleChange} name="lastName"
+                                    readonly class="luxury-input"></lightning-input>
+                            </div>
                         </div>
 
                         <!-- Email -->
                         <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
-                            <lightning-input label="Email" type="email" value={email} onchange={handleChange}
-                                name="email" readonly></lightning-input>
+                            <div class="field-card">
+                                <lightning-input label="Email" type="email" value={email} onchange={handleChange}
+                                    name="email" readonly class="luxury-input"></lightning-input>
+                            </div>
                         </div>
 
                         <!-- Phone -->
                         <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
-                            <div class="slds-form-element phone-field">
-                                <label class="slds-form-element__label" for="phoneField">
-                                    Phone
-                                </label>
-                                <div class="slds-form-element__control phone-wrapper" id="phoneField">
+                            <div class="field-card phone-card">
+                                <label class="custom-label">Phone</label>
+                                <div class="phone-wrapper">
                                     <lightning-combobox name="countryCode" value={countryCode} options={countryOptions}
-                                        onchange={handleCountryChange} class="country-box" disabled>
+                                        onchange={handleCountryChange} class="country-box luxury-input" disabled>
                                     </lightning-combobox>
-
-                                    <lightning-input type="tel" placeholder="Phone" value={phoneNumber}
-                                        onchange={handlePhoneInput} class="phone-box" readonly>
+                                    <lightning-input type="tel" placeholder="Phone Number" value={phoneNumber}
+                                        onchange={handlePhoneInput} class="phone-box luxury-input" readonly>
                                     </lightning-input>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- Company -->
+                        <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
+                            <div class="field-card">
+                                <lightning-input label="Company Name" value={company} placeholder="e.g. Self-Bhavana"
+                                    onchange={handleChange} name="company" class="luxury-input"></lightning-input>
+                            </div>
+                        </div>
+
+                        <!-- Site Space -->
+                        <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
+                            <div class="field-card">
+                                <lightning-input label="Total Site Space (sq.ft.)" type="number" value={siteSpace} name="siteSpace"
+                                    placeholder="Enter area" onchange={handleChange} class="luxury-input">
+                                </lightning-input>
+                            </div>
+                        </div>
+
                         <!-- Type of Project -->
                         <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
-                            <lightning-combobox name="typeOfProject" label="Type of Project" value={typeOfProject}
-                                placeholder="Select Project Type" options={projectTypeOptions}
-                                onchange={handleChange}></lightning-combobox>
+                            <div class="field-card">
+                                <lightning-combobox name="typeOfProject" label="Type of Project" value={typeOfProject}
+                                    placeholder="Select Project Type" options={projectTypeOptions}
+                                    onchange={handleChange} class="luxury-input"></lightning-combobox>
+                            </div>
                         </div>
 
                         <!-- Project Scope -->
                         <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
-                            <lightning-combobox name="projectScope" label="Project Scope" value={projectScope}
-                                placeholder="Select Project Scope" options={projectScopeOptions} onchange={handleChange}
-                                disabled={isScopeDisabled}></lightning-combobox>
+                            <div class="field-card">
+                                <lightning-combobox name="projectScope" label="Project Scope" value={projectScope}
+                                    placeholder="Select Project Scope" options={projectScopeOptions} onchange={handleChange}
+                                    disabled={isScopeDisabled} class="luxury-input"></lightning-combobox>
+                            </div>
                         </div>
 
                         <!-- Plan Level -->
                         <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
-                            <lightning-combobox name="planLevel" label="Plan Level" value={planLevel} placeholder="Select Plan Level"
-                                options={planLevelOptions} onchange={handleChange}>
-                            </lightning-combobox>
-                        </div>
-
-                        <!-- Company -->
-                        <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
-                            <lightning-input label="Company" value={company} placeholder="Company (optional)"
-                                onchange={handleChange} name="company"></lightning-input>
+                            <div class="field-card">
+                                <lightning-combobox name="planLevel" label="Plan Level" value={planLevel} placeholder="Select Plan Level"
+                                    options={planLevelOptions} onchange={handleChange} class="luxury-input">
+                                </lightning-combobox>
+                            </div>
                         </div>
 
                         <!-- Budget -->
                         <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
-                            <lightning-input label="Budget" type="number" value={budget} placeholder="Enter Budget in INR"
-                                onchange={handleChange} name="budget"></lightning-input>
-                        </div>
-
-                        <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
-                            <lightning-input label="Site Space" type="number" value={siteSpace} name="siteSpace"
-                                placeholder="Site area in sq. ft." onchange={handleChange}>
-                            </lightning-input>
+                            <div class="field-card">
+                                <lightning-input label="Budget (INR)" type="number" value={budget} placeholder="Enter Budget"
+                                    onchange={handleChange} name="budget" class="luxury-input"></lightning-input>
+                            </div>
                         </div>
 
                         <!-- Site Location -->
                         <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
-                            <lightning-textarea label="Site Location" value={siteLocation}
-                                placeholder="Full address of project site" onchange={handleChange}
-                                name="siteLocation"></lightning-textarea>
+                            <div class="field-card text-area-card">
+                                <lightning-textarea label="Full Address" value={siteLocation}
+                                    placeholder="Full address of project site" onchange={handleChange}
+                                    name="siteLocation" class="luxury-input custom-textarea"></lightning-textarea>
+                            </div>
                         </div>
 
                         <!-- Project Description -->
                         <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
-                            <lightning-textarea label="Project Description" value={projectDescription}
-                                placeholder="Tell us about your space, style preferences and expectations"
-                                onchange={handleChange} name="projectDescription"></lightning-textarea>
+                            <div class="field-card text-area-card">
+                                <lightning-textarea label="Project Notes / Expectations" value={projectDescription}
+                                    placeholder="Tell us about your space and expectations"
+                                    onchange={handleChange} name="projectDescription" class="luxury-input custom-textarea"></lightning-textarea>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <footer class="card-footer">
-                    <div class="footer-left">
-                        <span class="quote-pill">Project Type: {quotationTypeLabel}</span>
-                    </div>
-                    <div class="footer-right">
-                        <lightning-button variant="neutral" label="Previous" onclick={goToPrevious}
-                            class="slds-m-right_small">
-                        </lightning-button>
-                        <lightning-button variant="brand" label="Submit Request" onclick={submitLead}
-                            class="submit-btn">
-                        </lightning-button>
-                    </div>
-                </footer>
+                    <!-- Footer Panel -->
+                    <footer class="footer-panel">
+                        <div class="footer-summary">
+                            <span class="summary-label">Project Type:</span>
+                            <span class="summary-value quote-pill">{quotationTypeLabel}</span>
+                        </div>
+
+                        <div class="footer-actions">
+                            <button class="btn-outline" onclick={goToPrevious}>Previous</button>
+                            <button class="btn-luxury" onclick={submitLead}>Next</button>
+                        </div>
+                    </footer>
+                </div>
             </section>
         </template>
 
-        <!-- SUCCESS SCREEN -->
+        <!-- SUCCESS SCREEN (Kept styled to match new theme) -->
         <template if:true={showSuccess}>
-            <div class="success-shell">
-                <div class="thank-you-card">
-                    <div class="thank-you-header">
-                        <h2>Thank you for your request</h2>
+            <div class="center-card success-card animate-fade-in">
+                <div class="card-header-section text-center">
+                    <div class="success-icon-wrapper animate-slide-up">
+                        <span class="checkmark">✓</span>
                     </div>
-                    <div class="thank-you-body">
-                        <lightning-icon icon-name="utility:success" size="large" class="success-icon"
-                            alternative-text="Success">
-                        </lightning-icon>
-                        <p class="thank-you-text">
-                            Your project details have been received. Our design team will review
-                            your requirements and share a customised quotation with you shortly.
-                        </p>
-                        <lightning-button variant="brand" label="Close" onclick={handleCloseSuccess}
-                            class="thank-you-close-btn">
-                        </lightning-button>
+                    <h2 class="title animate-slide-up">Request Received</h2>
+                </div>
+                <div class="card-body-section text-center" style="padding-bottom:4rem;">
+                    <p style="margin-bottom: 2rem; color: #555;">
+                        Your project details have been successfully submitted. Our design team will review your requirements and share a customised quotation with you shortly.
+                    </p>
+                    <button class="btn-luxury btn-wide" onclick={handleCloseSuccess}>Return to Portal</button>
+                </div>
+            </div>
+        </template>
+        <!-- LUXURY POPUP OVERLAY (For Custom Template/Manual Request) -->
+        <template if:true={showSubmittedPopup}>
+            <div class="popup-overlay animate-fade-in">
+                <div class="popup-card animate-scale-up">
+                    
+                    <!-- Premium Gold Icon -->
+                    <div class="popup-icon-wrapper">
+                        <svg class="popup-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
                     </div>
+
+                    <!-- Text Content -->
+                    <h2 class="popup-title">Project Request Submitted</h2>
+                    <p class="popup-message">
+                        Lead details already submitted. If you have any queries contact Arelia Team.
+                    </p>
+
+                    <!-- Luxury Button -->
+                    <button class="btn-popup-close" onclick={closePopup}>
+                        Close
+                    </button>
+
                 </div>
             </div>
         </template>

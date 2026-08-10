@@ -5,6 +5,7 @@ import getPlanLevelPicklistValues from '@salesforce/apex/Arelia_ManualProjectReq
 import updateLead from '@salesforce/apex/Arelia_ManualProjectRequestController.updateLead';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import Arelia_Site_Label from '@salesforce/label/c.Arelia_Site_Label';
+import Arelia_Site_Redirect_URL_Label from '@salesforce/label/c.Arelia_Site_Redirect_URL_Label';
 
 // ✅ NEW (for picklist value -> label)
 import { getObjectInfo, getPicklistValues } from 'lightning/uiObjectInfoApi';
@@ -48,7 +49,13 @@ export default class AreliaManualProjectRequestComp extends LightningElement {
             { label: 'Home Decor', value: 'Home Decor' },
             { label: 'Kitchen', value: 'Kitchen' },
             { label: 'Bed Room', value: 'Bed Room' },
-            { label: 'Hall Interior', value: 'Hall Interior' }
+            { label: 'Hall Interior', value: 'Hall Interior' },
+            { label: '1RK', value: '1RK' },
+            { label: '1BHK', value: '1BHK' },
+            { label: '2BHK', value: '2BHK' },
+            { label: '3BHK', value: '3BHK' },
+            { label: '4BHK', value: '4BHK' },
+            { label: '5BHK', value: '5BHK' }
         ],
         Office: [
             { label: 'Conference Hall', value: 'Conference Hall' },
@@ -295,7 +302,7 @@ export default class AreliaManualProjectRequestComp extends LightningElement {
     }
 
     handleCloseSuccess() {
-        window.location.href = Arelia_Site_Label;
+        window.location.href = Arelia_Site_Redirect_URL_Label;
     }
 
     goToPrevious() {

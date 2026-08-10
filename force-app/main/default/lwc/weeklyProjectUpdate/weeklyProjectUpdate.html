@@ -1,98 +1,293 @@
 <template>
-    <!-- PROJECT LIST -->
-    <template if:true={showProjectList}>
-        <div class="container">
-            <h2 class="title">Your Assigned Projects</h2>
+    <div class="weekly-update-page">
 
-            <div class="project-grid">
-                <template for:each={projects} for:item="proj">
-                    <div key={proj.Id}
-                         class="project-card"
-                         data-id={proj.Id}
-                         onclick={handleProjectSelect}>
-
-                        <h3>{proj.Name}</h3>
-                        <p class="client">{proj.ClientName}</p>
-                        <span class="status">{proj.Status__c}</span>
-                    </div>
-                </template>
-            </div>
-        </div>
-    </template>
-
-    <!-- WEEKLY UPDATE (STYLISH) -->
-    <template if:true={showUpdatePanel}>
-        <section class="update-wrapper">
-
-            <div class="update-card">
-
-                <!-- HEADER -->
-                <div class="update-header">
-                    <div>
-                        <h1>Weekly Project Update</h1>
-                        <p class="project-name">{selectedProjectName}</p>
+        <!-- PROJECT LIST -->
+        <template if:true={showProjectList}>
+            <section class="project-list-shell">
+                <header class="page-header">
+                    <div class="header-badge">
+                        Project Progress
                     </div>
 
-                    <span class="week-pill">
-                        Week {weekNumber}
-                    </span>
-                </div>
+                    <h1 class="page-title">
+                        Your Assigned Projects
+                    </h1>
 
-                <!-- SUMMARY -->
-                <div class="form-group">
-                    <label>Weekly Summary</label>
-                    <lightning-textarea
-                        placeholder="Describe work completed this week..."
-                        value={message}
-                        onchange={handleMessage}
-                        class="summary-box">
-                    </lightning-textarea>
-                </div>
+                    <p class="page-subtitle">
+                        Select a project to prepare and send the weekly progress update
+                        to the respective client.
+                    </p>
+                </header>
 
-                <!-- UPLOAD -->
-                <div class="upload-section">
-                    <lightning-file-upload
-                        record-id={selectedProjectId}
-                        multiple
-                        accept={acceptedFormats}
-                        onuploadfinished={handleUpload}>
-                    </lightning-file-upload>
-                    
-                    <p class="upload-hint">
-    Upload site photos, videos (MP4), or progress documents (optional)
-</p>
+                <div class="project-content-card">
+                    <div class="section-heading-row">
+                        <div>
+                            <p class="section-eyebrow">
+                                Supervisor Workspace
+                            </p>
+
+                            <h2 class="section-title">
+                                Available Projects
+                            </h2>
+                        </div>
+
+                        <div class="heading-line"></div>
+                    </div>
+
+                    <div class="project-grid">
+                        <template for:each={projects} for:item="proj">
+                            <button
+                                key={proj.Id}
+                                type="button"
+                                class="project-card"
+                                data-id={proj.Id}
+                                onclick={handleProjectSelect}>
+
+                                <div class="project-card-top">
+                                    <div class="project-icon">
+                                        <lightning-icon
+                                            icon-name="standard:home"
+                                            size="small"
+                                            alternative-text="Project">
+                                        </lightning-icon>
+                                    </div>
+
+                                    <span class="status">
+                                        {proj.Status__c}
+                                    </span>
+                                </div>
+
+                                <div class="project-details">
+                                    <span class="project-label">
+                                        Project Name
+                                    </span>
+
+                                    <h3>{proj.Name}</h3>
+
+                                    <div class="project-divider"></div>
+
+                                    <div class="client-row">
+                                        <span class="client-label">
+                                            Client
+                                        </span>
+
+                                        <span class="client">
+                                            {proj.ClientName}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="project-card-footer">
+                                    <span>Select Project</span>
+
+                                    <span class="arrow-icon">
+                                        →
+                                    </span>
+                                </div>
+                            </button>
+                        </template>
+                    </div>
                 </div>
-                <template if:true={uploadedFiles.length}>
-    <div class="uploaded-list">
-        <p class="uploaded-title">Uploaded Files</p>
-        <ul>
-            <template for:each={uploadedFiles} for:item="file">
-                <li key={file.documentId}>
-                    {file.name}
-                </li>
-            </template>
-        </ul>
+            </section>
+        </template>
+
+        <!-- WEEKLY UPDATE PANEL -->
+        <template if:true={showUpdatePanel}>
+            <section class="update-wrapper">
+                <div class="update-card">
+
+                    <!-- HEADER -->
+                    <header class="update-header">
+                        <div class="update-header-content">
+                            <div class="header-badge">
+                                Weekly Progress Report
+                            </div>
+
+                            <h1>Weekly Project Update</h1>
+
+                            <p class="project-name">
+                                {selectedProjectName}
+                            </p>
+                        </div>
+
+                        <div class="week-summary-card">
+                            <span class="week-label">
+                                Current Reporting Period
+                            </span>
+
+                            <span class="week-pill">
+                                Week {weekNumber}
+                            </span>
+                        </div>
+                    </header>
+
+                    <div class="report-layout">
+
+                        <!-- SUMMARY SECTION -->
+                        <section class="form-section">
+                            <div class="section-heading-row">
+                                <div>
+                                    <p class="section-eyebrow">
+                                        Progress Information
+                                    </p>
+
+                                    <h2 class="section-title">
+                                        Weekly Summary
+                                    </h2>
+                                </div>
+
+                                <div class="heading-line"></div>
+                            </div>
+
+                            <div class="summary-container">
+                                <label class="field-label" for="weeklySummary">
+                                    Work Completed This Week
+                                </label>
+
+                                <p class="field-help">
+                                    Provide a clear summary of completed activities,
+                                    progress made, pending items, and important observations.
+                                </p>
+
+                                <lightning-textarea
+                                    id="weeklySummary"
+                                    variant="label-hidden"
+                                    placeholder="Describe work completed this week..."
+                                    value={message}
+                                    onchange={handleMessage}
+                                    class="summary-box">
+                                </lightning-textarea>
+                            </div>
+                        </section>
+
+                        <!-- UPLOAD SECTION -->
+                        <section class="form-section upload-form-section">
+                            <div class="section-heading-row">
+                                <div>
+                                    <p class="section-eyebrow">
+                                        Supporting Evidence
+                                    </p>
+
+                                    <h2 class="section-title">
+                                        Progress Attachments
+                                    </h2>
+                                </div>
+
+                                <div class="heading-line"></div>
+                            </div>
+
+                            <div class="upload-section">
+                                <div class="upload-icon">
+                                    <lightning-icon
+                                        icon-name="utility:upload"
+                                        size="medium"
+                                        alternative-text="Upload files">
+                                    </lightning-icon>
+                                </div>
+
+                                <div class="upload-content">
+                                    <h3>Upload Project Files</h3>
+
+                                    <p class="upload-hint">
+                                        Upload site photos, videos, or progress documents.
+                                        Supported formats include PDF, JPG, JPEG, PNG, MP4,
+                                        and MOV.
+                                    </p>
+
+                                    <div class="file-upload-control">
+                                        <lightning-file-upload
+                                            record-id={selectedProjectId}
+                                            multiple
+                                            accept={acceptedFormats}
+                                            onuploadfinished={handleUpload}>
+                                        </lightning-file-upload>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- UPLOADED FILES -->
+                        <template if:true={uploadedFiles.length}>
+                            <section class="uploaded-files-section">
+                                <div class="uploaded-header">
+                                    <div>
+                                        <p class="section-eyebrow">
+                                            Uploaded Documents
+                                        </p>
+
+                                        <h2 class="section-title">
+                                            Files Ready to Send
+                                        </h2>
+                                    </div>
+
+                                    <span class="uploaded-status">
+                                        Uploaded
+                                    </span>
+                                </div>
+
+                                <div class="uploaded-list">
+                                    <template for:each={uploadedFiles} for:item="file">
+                                        <div
+                                            key={file.documentId}
+                                            class="uploaded-file-row">
+
+                                            <div class="file-number"></div>
+
+                                            <div class="file-icon">
+                                                <lightning-icon
+                                                    icon-name="doctype:attachment"
+                                                    size="small"
+                                                    alternative-text="File">
+                                                </lightning-icon>
+                                            </div>
+
+                                            <div class="file-information">
+                                                <span class="file-label">
+                                                    Attachment
+                                                </span>
+
+                                                <span class="file-name">
+                                                    {file.name}
+                                                </span>
+                                            </div>
+
+                                            <div class="file-check">
+                                                ✓
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </section>
+                        </template>
+                    </div>
+
+                    <!-- ACTIONS -->
+                    <footer class="action-footer">
+                        <p class="action-note">
+                            Review the summary and uploaded files before sending the
+                            weekly update.
+                        </p>
+
+                        <div class="action-row">
+                            <button
+                                type="button"
+                                class="weekly-button secondary-button"
+                                onclick={goBack}>
+                                Back
+                            </button>
+
+                            <button
+                                type="button"
+                                class="weekly-button primary-button"
+                                onclick={sendUpdate}>
+                                <span class="send-icon">➤</span>
+                                Send Weekly Update
+                            </button>
+                        </div>
+                    </footer>
+                </div>
+            </section>
+        </template>
+
     </div>
-</template>
-
-                <!-- ACTIONS -->
-                <div class="action-row">
-                    <lightning-button
-                        variant="neutral"
-                        label="Back"
-                        onclick={goBack}>
-                    </lightning-button>
-
-                    <lightning-button
-                        variant="brand"
-                        label="Send Weekly Update"
-                        class="send-btn"
-                        onclick={sendUpdate}>
-                    </lightning-button>
-                </div>
-
-            </div>
-
-        </section>
-    </template>
 </template>

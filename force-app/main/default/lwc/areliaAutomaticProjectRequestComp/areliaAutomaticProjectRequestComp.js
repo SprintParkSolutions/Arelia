@@ -12,6 +12,7 @@ import fetchExistingRequest from '@salesforce/apex/InteriorAutoProjectRequestSer
 
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import SITE_URL from '@salesforce/label/c.Arelia_Site_Label';
+import Arelia_Site_Redirect_URL_Label from '@salesforce/label/c.Arelia_Site_Redirect_URL_Label';
 
 import SUCCESS_IMG from '@salesforce/resourceUrl/Arelia_Projecect_Request_Sucess_Image';
 import ALREADY_SUBMITTED_MSG from '@salesforce/label/c.Arelia_Project_Request_Already_Submitted';
@@ -67,7 +68,7 @@ export default class AreliaAutomaticProjectRequestComp extends LightningElement 
     @track isInitLoading = true;
     hasInitLoaded = false;
 
-    labels = { siteUrl: SITE_URL };
+    labels = { siteUrl: SITE_URL, siteRedirectUrl: Arelia_Site_Redirect_URL_Label };
     AUTO_DEFAULT_ROOMS = true;
 
 
@@ -879,9 +880,9 @@ export default class AreliaAutomaticProjectRequestComp extends LightningElement 
     }
 
     handleClose() {
-        if (this.labels.siteUrl) window.location.href = this.labels.siteUrl;
+        if (this.labels.siteRedirectUrl) window.location.href = this.labels.siteRedirectUrl;
     }
     handleAlreadySubmittedClose() {
-        if (this.labels.siteUrl) window.location.href = this.labels.siteUrl;
+        if (this.labels.siteRedirectUrl) window.location.href = this.labels.siteRedirectUrl;
     }
 }

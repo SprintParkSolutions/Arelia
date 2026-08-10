@@ -1,67 +1,136 @@
 <template>
-    <div class="slds-box slds-theme_default slds-container_small slds-container_center custom-margin-top approval-card">
-        
-        <div class="slds-text-align_center slds-m-bottom_medium">
-            <h1 class="slds-text-heading_medium company-title"><b>Arelia Living</b></h1>
-            <p class="slds-text-color_weak">Expense Approval Portal</p>
-        </div>
+    <div class="arelia-container">
 
         <template if:true={isLoading}>
-            <lightning-spinner alternative-text="Processing..." size="medium"></lightning-spinner>
+            <lightning-spinner
+                alternative-text="Processing..."
+                size="medium"
+                variant="brand"
+                class="submit-spinner">
+            </lightning-spinner>
         </template>
 
         <template if:true={error}>
-            <div class="slds-notify slds-notify_alert slds-theme_error" role="alert">{error}</div>
+            <div class="slds-notify slds-notify_alert slds-theme_error error-alert" role="alert">
+                <h2>{error}</h2>
+            </div>
         </template>
 
         <template if:true={sheet}>
-            <div class="slds-grid slds-wrap slds-gutters">
-                <div class="slds-col slds-size_1-of-1 slds-small-size_1-of-2 slds-m-bottom_medium">
-                    <div class="field-label">Project</div>
-                    <div class="field-value slds-truncate"><b>{sheet.Project__r.Name}</b></div>
-                </div>
-                
-                <div class="slds-col slds-size_1-of-1 slds-small-size_1-of-2 slds-m-bottom_medium">
-                    <div class="field-label">Client</div>
-                    <div class="field-value slds-truncate"><b>{sheet.Project__r.Client__r.Name}</b></div>
-                </div>
-                
-                <div class="slds-col slds-size_1-of-1 slds-m-bottom_large">
-                    <div class="field-label">Total Payable Amount</div>
-                    <div class="grand-total"><b>₹ {sheet.Grand_Total__c}</b></div>
+            <div class="header-section slds-text-align_center slds-m-bottom_large animate-fade-in fade-delay-one">
+                <h1 class="main-title">Expense Approval</h1>
+                <p class="main-subtitle">Arelia Living Premium Portal</p>
+            </div>
+
+            <div class="arelia-card detail-summary-card slds-m-bottom_large animate-fade-in fade-delay-two">
+                <div class="slds-grid slds-wrap">
+
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 project-details-col">
+                        <div class="details-wrapper">
+                            <h3 class="section-label">Project Details</h3>
+
+                            <div class="detail-item">
+                                <div class="icon-box">
+                                    <lightning-icon icon-name="standard:home" size="small" alternative-text="Project"></lightning-icon>
+                                </div>
+                                <div class="info-content">
+                                    <label>Project Name</label>
+                                    <div class="value slds-truncate">{sheet.Project__r.Name}</div>
+                                </div>
+                            </div>
+
+                            <div class="detail-item">
+                                <div class="icon-box">
+                                    <lightning-icon icon-name="standard:user" size="small" alternative-text="Client"></lightning-icon>
+                                </div>
+                                <div class="info-content">
+                                    <label>Client Name</label>
+                                    <div class="value slds-truncate">{sheet.Project__r.Client__r.Name}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 budget-summary-col">
+                        <div class="budget-wrapper">
+                            <h3 class="section-label">Financial Summary</h3>
+                            
+                            <div class="final-row slds-m-top_large">
+                                <label>Total Payable Amount</label>
+                                <div class="big-number">
+                                    <lightning-formatted-number
+                                        value={sheet.Grand_Total__c}
+                                        format-style="currency"
+                                        currency-code="INR">
+                                    </lightning-formatted-number>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
-            <template if:false={isProcessed}>
-                <div class="slds-m-top_small">
-                    <button class="slds-button slds-button_success slds-button_stretch action-btn" onclick={handleApprove}>
-                        Approve Expense
-                    </button>
-                </div>
-            </template>
+            <div class="arelia-card action-card slds-p-around_large slds-text-align_center animate-fade-in fade-delay-three">
 
-            <template if:true={isProcessed}>
-                <div class="slds-box slds-theme_shade slds-text-align_center slds-m-top_medium status-box">
-                    <h2 class="slds-text-heading_small">Record Status: <b>{finalStatus}</b></h2>
-                    <p class="slds-m-top_x-small">This expense sheet has already been processed.</p>
-                </div>
-            </template>
+                <template if:false={isProcessed}>
+                    <div class="button-container">
+                        <button class="arelia-btn btn-approve" onclick={handleApprove}>
+                            <lightning-icon
+                                icon-name="utility:check"
+                                size="small"
+                                class="button-icon approve-icon slds-m-right_x-small">
+                            </lightning-icon>
+                            Approve Expense
+                        </button>
+                    </div>
+                </template>
+
+                <template if:true={isProcessed}>
+                    <div class="info-box">
+                        <h2>Record Status: {finalStatus}</h2>
+                        <p class="processed-message">This expense sheet has already been processed.</p>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <!-- NEW CONFIRMATION MODAL -->
+        <template if:true={showConfirmModal}>
+            <div class="custom-modal-backdrop">
+                <section class="custom-modal-box animate-fade-in" role="dialog" aria-modal="true">
+                    <h2 class="success-title">{confirmTitle}</h2>
+                    <p class="success-message">{confirmMessage}</p>
+
+                    <div class="button-container slds-m-top_medium">
+                        <button class="arelia-btn btn-back" onclick={handleConfirmCancel}>
+                            Cancel
+                        </button>
+                        <button class="arelia-btn btn-approve" onclick={handleConfirmProceed}>
+                            Confirm
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </template>
+
+        <!-- SUCCESS MODAL -->
+        <template if:true={showSuccessModal}>
+            <div class="custom-modal-backdrop">
+                <section class="custom-modal-box" role="dialog" aria-modal="true">
+                    <div class="success-icon">✓</div>
+                    
+                    <h2 class="success-title">Action Completed</h2>
+                    
+                    <p class="success-message">
+                        The expense sheet for <b>{sheet.Project__r.Name}</b> has been <b>Approved</b>.
+                    </p>
+
+                    <button class="arelia-btn btn-approve return-btn" onclick={handleFinalClose}>
+                        Return to Portal
+                    </button>
+                </section>
+            </div>
         </template>
     </div>
-
-    <template if:true={showSuccessModal}>
-        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
-            <div class="slds-modal__container">
-                <div class="slds-modal__content slds-p-around_large slds-text-align_center success-modal">
-                    <lightning-icon icon-name="action:approval" size="large" class="slds-m-bottom_medium"></lightning-icon>
-                    <h2 class="slds-text-heading_medium slds-text-color_success">Action Completed</h2>
-                    <p class="slds-m-top_small">The expense sheet for <b>{sheet.Project__r.Name}</b> has been <b>Approved</b>.</p>
-                    <div class="slds-m-top_large">
-                        <lightning-button variant="brand" label="Return to Site" onclick={handleFinalClose}></lightning-button>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <div class="slds-backdrop slds-backdrop_open"></div>
-    </template>
 </template>
