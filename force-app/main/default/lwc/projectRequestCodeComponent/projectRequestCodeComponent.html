@@ -1,64 +1,123 @@
 <template>
     <section class="page-shell">
-        <!-- SCREEN 1: QUOTATION TYPE SELECTOR -->
+        <!-- SCREEN 1: PROJECT TYPE SELECTOR -->
         <template if:true={showScreen1}>
             <div class="center-card animate-fade-in">
-                <h1 class="title animate-slide-up">
-
-                    Choose Your Project Type
-                </h1>
-
-                <p class="subtitle animate-slide-up">
-
-                    Select how you’d like us to prepare your Project Type. You can share
-
-                    project details in the next step.
-                </p>
-
-                <template if:true={options}>
-                    <fieldset class="slds-form-element animate-slide-up">
-                        <legend class="fieldset-label">Project Type Options</legend>
-
-                        <div class="options-container">
-                            <template for:each={options} for:item="opt">
-                                <div key={opt.value} class={opt.cssClass} data-value={opt.value}
-                                    onclick={handleRowClick}>
-                                    <label class="radio-label">
-                                        <input type="radio" name="quoteType" value={opt.value} checked={opt.selected}
-                                            onchange={handleChange} />
-
-                                        <!-- ✅ Show LABEL to user -->
-                                        <span class="label-text">{opt.label}</span>
-
-                                        <template if:true={opt.selected}>
-                                            <span class="check-icon">✓ Selected</span>
-                                        </template>
-
-                                        <span class="ripple"></span>
-                                    </label>
-                                </div>
-                            </template>
-                        </div>
-                    </fieldset>
-                </template>
-
-                <div class="next-button-wrapper animate-slide-up">
-                    <lightning-button variant="brand" label="Next" onclick={goNext}
-                        disabled={disableNext}></lightning-button>
+                
+                <!-- 1. HEADER PARTITION (DARK) -->
+                <div class="card-header-section flex-col-center">
+                    <div class="header-pill animate-slide-up">Arelia Project Request</div>
+                    <h1 class="title animate-slide-up">Choose Your Project Type</h1>
+                    <p class="subtitle animate-slide-up">
+                        Select how you would like us to prepare your project request. You can share the detailed project information in the next step.
+                    </p>
                 </div>
+
+                <!-- 2. BODY PARTITION (LIGHT) -->
+                <div class="card-body-section">
+                    
+                    <!-- Progress Pill Strip -->
+                    <div class="process-strip animate-slide-up">
+                        <div class="step-pill step-pill_active">
+                            <span class="step-number">1</span>
+                            <span class="step-label">Project Type</span>
+                        </div>
+                        <div class="process-line"></div>
+                        <div class="step-pill">
+                            <span class="step-number">2</span>
+                            <span class="step-label">Project Details</span>
+                        </div>
+                        <div class="process-line"></div>
+                        <div class="step-pill">
+                            <span class="step-number">3</span>
+                            <span class="step-label">Submit</span>
+                        </div>
+                    </div>
+
+                    <!-- Selected Option Banner -->
+                    <div class="selected-info-banner animate-slide-up">
+                        <div class="info-cell">
+                            <span class="info-label">Selected Option</span>
+                            <span class="info-value">
+                                <template if:true={label}>{label}</template>
+                                <template if:false={label}>Please select an option below</template>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Tabular Options -->
+                    <template if:true={options}>
+                        <div class="premium-table-container animate-slide-up">
+                            
+                            <div class="table-header">
+                                <div class="th-col flex-center">Select</div>
+                                <div class="th-col">Design Type</div>
+                                <div class="th-col flex-end">Status</div>
+                            </div>
+
+                            <div class="table-body">
+                                <template for:each={options} for:item="opt">
+                                    <div key={opt.value} class={opt.cssClass} data-value={opt.value} onclick={handleRowClick}>
+                                        <label class="table-row-label">
+                                            
+                                            <!-- Column 1: Radio -->
+                                            <div class="td-col flex-center">
+                                                <input type="radio" name="quoteType" value={opt.value} checked={opt.selected} onchange={handleChange} />
+                                            </div>
+
+                                            <!-- Column 2: Label -->
+                                            <div class="td-col">
+                                                <span class="label-text">{opt.label}</span>
+                                            </div>
+
+                                            <!-- Column 3: Status Badge -->
+                                            <div class="td-col flex-end">
+                                                <template if:true={opt.selected}>
+                                                    <span class="gold-badge animate-fade-in">Selected</span>
+                                                </template>
+                                            </div>
+
+                                        </label>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+
+                </div> <!-- End Body Partition -->
+
+                <!-- Footer Panel -->
+                <div class="footer-panel animate-slide-up">
+                    <div class="footer-left">
+                        <span class="footer-label">Project Type</span>
+                        <span class="footer-white-pill">
+                            <template if:true={label}>{label}</template>
+                            <template if:false={label}>None</template>
+                        </span>
+                    </div>
+
+                    <button class="btn-luxury" onclick={goNext} disabled={disableNext}>
+                        Next
+                    </button>
+                </div>
+
             </div>
         </template>
 
         <!-- SCREEN 2: MANUAL PROJECT REQUEST -->
         <template if:true={showManualScreen}>
-            <c-arelia-manual-project-request-comp lead-id={leadId} quotation-type={value}
-                onprevious={handlePrevious}></c-arelia-manual-project-request-comp>
+            <div class="child-screen-wrapper animate-fade-in">
+                <c-arelia-manual-project-request-comp lead-id={leadId} quotation-type={value} onprevious={handlePrevious}>
+                </c-arelia-manual-project-request-comp>
+            </div>
         </template>
 
         <!-- SCREEN 3: AUTOMATIC PROJECT REQUEST -->
         <template if:true={showAutomaticScreen}>
-            <c-arelia-automatic-project-request-comp lead-id={leadId} quotation-type={value}
-                onprevious={handlePrevious}></c-arelia-automatic-project-request-comp>
+            <div class="child-screen-wrapper animate-fade-in">
+                <c-arelia-automatic-project-request-comp lead-id={leadId} quotation-type={value} onprevious={handlePrevious}>
+                </c-arelia-automatic-project-request-comp>
+            </div>
         </template>
     </section>
 </template>

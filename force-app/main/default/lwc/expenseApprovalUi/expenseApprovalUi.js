@@ -2,8 +2,7 @@ import { LightningElement, wire, track } from 'lwc';
 import { CurrentPageReference } from 'lightning/navigation';
 import getSheetDetails from '@salesforce/apex/ExpenseSheetController.getSheetDetails';
 import updateSheetStatus from '@salesforce/apex/ExpenseSheetController.updateSheetStatus';
-import SITE_LABEL_URL from '@salesforce/label/c.Arelia_Site_Label'; 
-import LightningConfirm from 'lightning/confirm';
+import Arelia_Site_Redirect_URL_Label from '@salesforce/label/c.Arelia_Site_Redirect_URL_Label'; 
 
 export default class ExpenseApprovalUi extends LightningElement {
     recordId;
@@ -15,6 +14,11 @@ export default class ExpenseApprovalUi extends LightningElement {
     @track showSuccessModal = false;
     @track isProcessed = false;
     finalStatus = '';
+
+    // Custom Confirmation Modal Variables
+    @track showConfirmModal = false;
+    @track confirmMessage = '';
+    @track confirmTitle = '';
 
     @wire(CurrentPageReference)
     getStateParameters(currentPageReference) {
@@ -46,18 +50,20 @@ export default class ExpenseApprovalUi extends LightningElement {
             });
     }
 
-    // --- APPROVE FLOW ---
-    async handleApprove() {
-        const result = await LightningConfirm.open({
-            message: 'Are you sure you want to APPROVE this expense sheet?',
-            variant: 'headerless',
-            label: 'Confirm Approval',
-            theme: 'success' 
-        });
+    // --- APPROVE FLOW (CUSTOM MODAL) ---
+    handleApprove() {
+        this.confirmTitle = 'Confirm Approval';
+        this.confirmMessage = 'Are you sure you want to APPROVE this expense sheet?';
+        this.showConfirmModal = true;
+    }
 
-        if(result) {
-            this.processAction('Approved');
-        }
+    handleConfirmCancel() {
+        this.showConfirmModal = false;
+    }
+
+    handleConfirmProceed() {
+        this.showConfirmModal = false;
+        this.processAction('Approved');
     }
 
     processAction(status) {
@@ -77,6 +83,9 @@ export default class ExpenseApprovalUi extends LightningElement {
     }
 
     handleFinalClose() {
-        window.location.href = SITE_LABEL_URL;
+        const redirectUrl = (Arelia_Site_Redirect_URL_Label || '').trim();
+        if (redirectUrl) {
+            window.location.assign(redirectUrl);
+        }
     }
 }
