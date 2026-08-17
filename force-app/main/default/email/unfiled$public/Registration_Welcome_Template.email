@@ -2,7 +2,7 @@
  <head>
   <title></title>
  </head>
- <body aria-readonly="false" style="height:auto;
+ <body style="height:auto;
 			 min-height:auto;
 			 margin:0;
 			 padding:0;
@@ -20,7 +20,7 @@
 							  border-collapse:collapse;" width="100%">
        <tbody>
         <tr>
-         <td style="padding:0;"><img alt="Arelia Email Banner Image" src="{[devName:Arelia_Email_Banner_Image1]}" style="display:block;
+         <td style="padding:0;"><img alt="Arelia Email Banner Image" src="{[devName:Arelia_Email_Banner_Image]}" style="display:block;
 											width:100%;
 											max-width:100%;
 											height:auto;
