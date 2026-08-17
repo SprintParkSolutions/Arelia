@@ -65,6 +65,7 @@ export default class AreliaManualProjectRequestComp extends LightningElement {
             { label: 'Dining Hall', value: 'Dining Hall' },
             { label: 'Cabins', value: 'Cabins' }
         ],
+        'Interior Combo Package': [],
         'Only Project Plan': []
     };
 
