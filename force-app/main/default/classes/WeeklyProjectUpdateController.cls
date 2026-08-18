@@ -1,8 +1,14 @@
+/**
+ * @description Lets a project supervisor view their assigned projects and send a weekly
+ * progress update email to the client, with public (no-login) links to any attached files.
+ */
+@SuppressWarnings('PMD.ApexCRUDViolation')
 public with sharing class WeeklyProjectUpdateController {
 
-    /* ===============================
-       STEP 1: Get Supervisor Projects
-    =============================== */
+    /**
+     * @description Returns the projects supervised by the running user, most recently started first.
+     * @return Project__c records where Supervisor_User__c is the current user.
+     */
     @AuraEnabled(cacheable=true)
     public static List<Project__c> getSupervisorProjects() {
         return [
@@ -20,20 +26,15 @@ public with sharing class WeeklyProjectUpdateController {
         ];
     }
 
-    /* ===============================
-       STEP 2: Send Weekly Update Email
-       (PUBLIC FILE LINKS – NO LOGIN)
-    =============================== */
+    /**
+     * @description Sends the weekly progress update email for a project to its client,
+     * CC'ing the supervisor and the management distribution list.
+     * @param projectId Project__c Id the update is for.
+     * @param weeklySummary Free-text summary of the week's progress.
+     * @param fileIds ContentDocument Ids to share as public file links in the email.
+     */
     @AuraEnabled
-    public static void sendWeeklyEmail(
-        Id projectId,
-        String weeklySummary,
-        List<Id> fileIds
-    ) {
-
-        /* ===============================
-           FETCH PROJECT
-        =============================== */
+    public static void sendWeeklyEmail(Id projectId, String weeklySummary, List<Id> fileIds) {
         Project__c proj = [
             SELECT Id,
                    Name,
@@ -52,17 +53,11 @@ public with sharing class WeeklyProjectUpdateController {
             throw new AuraHandledException('Client email is missing.');
         }
 
-        /* ===============================
-           WEEK CALCULATION
-        =============================== */
         Integer weekNo = 1;
         if (proj.Start_Date__c != null) {
             weekNo = (Date.today().daysBetween(proj.Start_Date__c) / 7) + 1;
         }
 
-        /* ===============================
-           FETCH EMAIL TEMPLATE
-        =============================== */
         EmailTemplate tpl = [
             SELECT Id, HtmlValue, Subject
             FROM EmailTemplate
@@ -70,84 +65,8 @@ public with sharing class WeeklyProjectUpdateController {
             LIMIT 1
         ];
 
-        /* ===============================
-   CREATE PUBLIC FILE LINKS (NO LOGIN)
-=============================== */
-String fileLinksHtml = '';
+        String fileLinksHtml = buildFileLinksHtml(fileIds);
 
-if (fileIds != null && !fileIds.isEmpty()) {
-
-    Map<Id, ContentVersion> versionByVersionId = new Map<Id, ContentVersion>();
-
-    // 1️⃣ Fetch latest versions
-    for (ContentVersion cv : [
-        SELECT Id, Title, FileType
-        FROM ContentVersion
-        WHERE ContentDocumentId IN :fileIds
-        AND IsLatest = true
-    ]) {
-        versionByVersionId.put(cv.Id, cv);
-    }
-
-    // 2️⃣ Create Content Distributions
-    List<ContentDistribution> distList = new List<ContentDistribution>();
-
-    for (ContentVersion cv : versionByVersionId.values()) {
-        ContentDistribution cd = new ContentDistribution();
-        cd.ContentVersionId = cv.Id;
-        cd.Name = cv.Title;
-        cd.PreferencesAllowViewInBrowser = true;
-        cd.PreferencesLinkLatestVersion = true;
-        cd.PreferencesPasswordRequired = false;
-        distList.add(cd);
-    }
-
-    insert distList;
-
-    //  Build HTML (SAFE)
-    for (ContentDistribution dist : [
-        SELECT DistributionPublicUrl, ContentVersionId
-        FROM ContentDistribution
-        WHERE ContentVersionId IN :versionByVersionId.keySet()
-    ]) {
-
-        ContentVersion cv = versionByVersionId.get(dist.ContentVersionId);
-        String fileType = cv.FileType != null ? cv.FileType.toUpperCase() : '';
-
-        /// IMAGE → LINK (EMAIL SAFE)
-if (fileType == 'JPG' || fileType == 'PNG' || fileType == 'JPEG') {
-    fileLinksHtml +=
-        '<div style="margin-bottom:12px;">' +
-        '🖼 <a href="' + dist.DistributionPublicUrl + '" target="_blank">' +
-        'View Image: ' + cv.Title +
-        '</a>' +
-        '</div>';
-}
-        //  VIDEO LINK (EMAIL-SAFE)
-        else if (fileType == 'MP4' || fileType == 'MOV') {
-    fileLinksHtml +=
-        '<div style="margin-bottom:12px;">' +
-        '<a href="' + dist.DistributionPublicUrl + '?download=1" target="_blank">' +
-        '▶️ <strong>Download & Play Video:</strong> ' + cv.Title +
-        '</a>' +
-        '</div>';
-}
-        // 📄 OTHER FILES // 
-        else {
-            fileLinksHtml +=
-                '<div style="margin-bottom:12px;">' +
-                '<a href="' + dist.DistributionPublicUrl + '" target="_blank">' +
-                cv.Title +
-                '</a>' +
-                '</div>';
-        }
-    }
-}
-
-
-        /* ===============================
-           MERGE EMAIL BODY
-        =============================== */
         String body = tpl.HtmlValue
             .replace('{{{ClientName}}}', proj.Client__r != null ? proj.Client__r.Name : '')
             .replace('{{{ProjectName}}}', proj.Name != null ? proj.Name : '')
@@ -155,84 +74,104 @@ if (fileType == 'JPG' || fileType == 'PNG' || fileType == 'JPEG') {
             .replace('{{{ProjectStartDate}}}', proj.Start_Date__c != null ? String.valueOf(proj.Start_Date__c) : '')
             .replace('{{{WeekNumber}}}', String.valueOf(weekNo))
             .replace('{{{WeeklySummary}}}', weeklySummary != null ? weeklySummary : '')
-            .replace('{{{SupervisorName}}}',
-                proj.Supervisor_User__r != null
-                    ? proj.Supervisor_User__r.Name
-                    : UserInfo.getName()
-            )
-            .replace(
-    '{{{FileLinks}}}',
-    fileLinksHtml != ''
-        ? fileLinksHtml
-        : 'No files uploaded'
-);
+            .replace('{{{SupervisorName}}}', proj.Supervisor_User__r != null ? proj.Supervisor_User__r.Name : UserInfo.getName())
+            .replace('{{{FileLinks}}}', String.isNotBlank(fileLinksHtml) ? fileLinksHtml : 'No files uploaded');
 
-        /* ===============================
-           MERGE SUBJECT
-        =============================== */
         String subject = tpl.Subject
             .replace('{{{ProjectName}}}', proj.Name != null ? proj.Name : '')
             .replace('{{{WeekNumber}}}', String.valueOf(weekNo));
 
-        /* ===============================
-           SEND EMAIL
-        =============================== */
         Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-mail.setToAddresses(new List<String>{ proj.Client_Email__c });
+        mail.setToAddresses(new List<String>{ proj.Client_Email__c });
 
-// ===============================
-// CC ADDRESSES (Supervisor + Label)
-// ===============================
-List<String> ccAddresses = new List<String>();
-
-//  Supervisor Email
-if (proj.Supervisor_User__r != null &&
-    String.isNotBlank(proj.Supervisor_User__r.Email)) {
-    ccAddresses.add(proj.Supervisor_User__r.Email.trim());
-}
-
-//  Custom Label Emails
-String labelEmails = Label.Arelia_Living_Enrollment_Members;
-if (String.isNotBlank(labelEmails)) {
-    List<String> extras = labelEmails.split('[,;]');
-    for (String email : extras) {
-        if (String.isNotBlank(email)) {
-            ccAddresses.add(email.trim());
+        List<String> ccAddresses = buildCcAddresses(proj);
+        if (!ccAddresses.isEmpty()) {
+            mail.setCcAddresses(ccAddresses);
         }
-    }
-}
 
-//  REMOVE DUPLICATES
-ccAddresses = new List<String>(new Set<String>(ccAddresses));
-
-//  Set CC if present
-if (!ccAddresses.isEmpty()) {
-    mail.setCcAddresses(ccAddresses);
-}
         mail.setSubject(subject);
         mail.setHtmlBody(body);
         mail.setWhatId(proj.Id);
         mail.setSaveAsActivity(true);
-
-        // Org-Wide Email
-        Id owdId = getOWD();
-        if (owdId != null) {
-            mail.setOrgWideEmailAddressId(owdId);
-        }
+        AreliaUtility.setOrgWideEmailAddress(mail, System.Label.Arelia_OWD);
 
         Messaging.sendEmail(new Messaging.SingleEmailMessage[]{ mail });
     }
 
-    /* ===============================
-       ORG-WIDE EMAIL
-    =============================== */
-    public static Id getOWD() {
-        List<OrgWideEmailAddress> ow = [
-            SELECT Id
-            FROM OrgWideEmailAddress
-            WHERE IsAllowAllProfiles = true
-            LIMIT 1
-        ];
-        return ow.isEmpty() ? null : ow[0].Id;
+    // Creates public (no-login) view links for each file so clients without a portal login can open them.
+    private static String buildFileLinksHtml(List<Id> fileIds) {
+        if (fileIds == null || fileIds.isEmpty()) {
+            return '';
+        }
+
+        Map<Id, ContentVersion> versionByVersionId = new Map<Id, ContentVersion>();
+        for (ContentVersion cv : [
+            SELECT Id, Title, FileType
+            FROM ContentVersion
+            WHERE ContentDocumentId IN :fileIds
+            AND IsLatest = true
+        ]) {
+            versionByVersionId.put(cv.Id, cv);
+        }
+
+        List<ContentDistribution> distList = new List<ContentDistribution>();
+        for (ContentVersion cv : versionByVersionId.values()) {
+            ContentDistribution cd = new ContentDistribution();
+            cd.ContentVersionId = cv.Id;
+            cd.Name = cv.Title;
+            cd.PreferencesAllowViewInBrowser = true;
+            cd.PreferencesLinkLatestVersion = true;
+            cd.PreferencesPasswordRequired = false;
+            distList.add(cd);
+        }
+        insert distList;
+
+        String fileLinksHtml = '';
+        for (ContentDistribution dist : [
+            SELECT DistributionPublicUrl, ContentVersionId
+            FROM ContentDistribution
+            WHERE ContentVersionId IN :versionByVersionId.keySet()
+        ]) {
+            fileLinksHtml += buildFileLinkHtml(dist, versionByVersionId.get(dist.ContentVersionId));
+        }
+        return fileLinksHtml;
+    }
+
+    private static String buildFileLinkHtml(ContentDistribution dist, ContentVersion cv) {
+        String fileType = cv.FileType != null ? cv.FileType.toUpperCase() : '';
+
+        if (fileType == 'JPG' || fileType == 'PNG' || fileType == 'JPEG') {
+            return '<div style="margin-bottom:12px;">' +
+                '🖼 <a href="' + dist.DistributionPublicUrl + '" target="_blank">View Image: ' + cv.Title + '</a>' +
+                '</div>';
+        }
+        if (fileType == 'MP4' || fileType == 'MOV') {
+            return '<div style="margin-bottom:12px;">' +
+                '<a href="' + dist.DistributionPublicUrl + '?download=1" target="_blank">▶️ <strong>Download & Play Video:</strong> ' + cv.Title + '</a>' +
+                '</div>';
+        }
+        return '<div style="margin-bottom:12px;">' +
+            '<a href="' + dist.DistributionPublicUrl + '" target="_blank">' + cv.Title + '</a>' +
+            '</div>';
+    }
+
+    // CC's the supervisor plus the management distribution list, de-duplicated.
+    private static List<String> buildCcAddresses(Project__c proj) {
+        List<String> ccAddresses = new List<String>();
+
+        if (proj.Supervisor_User__r != null && String.isNotBlank(proj.Supervisor_User__r.Email)) {
+            ccAddresses.add(proj.Supervisor_User__r.Email.trim());
+        }
+
+        String labelEmails = Label.Arelia_Living_Management_Members;
+        if (String.isNotBlank(labelEmails)) {
+            for (String email : labelEmails.split('[,;]')) {
+                if (String.isNotBlank(email)) {
+                    ccAddresses.add(email.trim());
+                }
+            }
+        }
+
+        return new List<String>(new Set<String>(ccAddresses));
     }
 }

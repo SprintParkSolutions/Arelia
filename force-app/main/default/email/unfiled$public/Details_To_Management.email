@@ -704,20 +704,21 @@
 }
 	</style>
 </head>
-<body style="height: auto; min-height: auto;">Dear Arelia Team,<br />
+<body style="height: auto; min-height: auto;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Dear Arelia Team,<br />
 <br />
-Very excited to inform you that a project request has been formally submitted. Below are the comprehensive details of the project.<br />
+Very excited to inform you that a project request has been formally submitted. Below are the comprehensive details of the project.</span></span>
+<ul>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Lead Name :&nbsp;<strong>{{{Recipient.Lead_Name__c}}},</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Site Space:&nbsp;<strong>{{{Recipient.Site_Space__c}}},</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Plan:&nbsp;<strong>{{{Recipient.Plan_Level__c}}},</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Description :&nbsp;<strong>{{{Recipient.Project_Description__c}}},</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Project Request Type:&nbsp;<strong>{{{Recipient.Project_Request_Quotation_Type__c}}},</strong></span></span></li>
+	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Estimated Budget :&nbsp;<strong>{{{Recipient.Customer_Budget__c}}}</strong></span></span></li>
+</ul>
 <br />
-Lead Name :&nbsp;<strong>{{{Recipient.Lead_Name__c}}},</strong><br />
-Site Space:&nbsp;<strong>{{{Recipient.Site_Space__c}}},</strong><br />
-Plan:&nbsp;<strong>{{{Recipient.Plan_Level__c}}},</strong><br />
-Description :&nbsp;<strong>{{{Recipient.Project_Description__c}}},</strong><br />
-Project Request Type:&nbsp;<strong>{{{Recipient.Project_Request_Quotation_Type__c}}},</strong><br />
-Estimated Budget :&nbsp;<strong>{{{Recipient.Customer_Budget__c}}}</strong><br />
-<br />
-We hope you have a great and successful experience throughout the course of the project. Wishing you all the best as you move forward with the upcoming milestones.<br />
+<span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">We hope you have a great and successful experience throughout the course of the project. Wishing you all the best as you move forward with the upcoming milestones.<br />
 <br />
 <br />
-Best Regards,<br />
-Arelia Team.</body>
+Best Regards,</span><br />
+Arelia Team.</span></body>
 </html>

@@ -349,6 +349,21 @@
             <field>Additional_Budget_ContentDocumentIds__c</field>
             <table>Project__c</table>
         </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Total_Approved_Expenses__c</field>
+            <table>Project__c</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Final_Remaining_Budget__c</field>
+            <table>Project__c</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Total_Vendor_Assigned__c</field>
+            <table>Project__c</table>
+        </columns>
         <masterLabel>Project</masterLabel>
     </sections>
     <sections>

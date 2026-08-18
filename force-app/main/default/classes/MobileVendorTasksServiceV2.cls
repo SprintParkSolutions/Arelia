@@ -9,6 +9,7 @@ global without sharing class MobileVendorTasksServiceV2 {
         public Date    completedDate;             // ✅ NEW
         public String  status;
         public Decimal assignedPercentage;
+        public String taskId;
     }
 
     // ===================== SUMMARY DTO =====================
@@ -54,26 +55,12 @@ global without sharing class MobileVendorTasksServiceV2 {
                 return resp;
             }
 
-            Vendor_Assignment__c va = [
-                SELECT Id
-                FROM Vendor_Assignment__c
-                WHERE Project__c = :projectId
-                AND Vendor__r.Name = :vendorName
-                LIMIT 1
-            ];
+            Vendor_Assignment__c va = [SELECT Id FROM Vendor_Assignment__c
+                            WHERE Project__c = :projectId AND Vendor__r.Name = :vendorName LIMIT 1];
 
             // 🔹 ONLY ADDING FIELDS – NO LOGIC CHANGE
-            List<Task> tasks = [
-                SELECT
-                    Subject,
-                    Status,
-                    ActivityDate,
-                    Start_Date__c,
-                    Final_Task_Completed_Date__c,
-                    Assigned_Percentage__c
-                FROM Task
-                WHERE WhatId = :va.Id
-            ];
+            List<Task> tasks = [SELECT Id,Subject,Status,ActivityDate,Start_Date__c,
+                        Final_Task_Completed_Date__c,Assigned_Percentage__c FROM Task WHERE WhatId = :va.Id];
 
             Integer total = tasks.size();
             Integer completed = 0;
@@ -90,12 +77,10 @@ global without sharing class MobileVendorTasksServiceV2 {
                     dto.taskName = t.Subject;
                     dto.status   = t.Status;
                     dto.dueDate  = t.ActivityDate;
-
-                    // ✅ NEW MAPPINGS (SAFE)
                     dto.startDate     = t.Start_Date__c;
                     dto.completedDate = t.Final_Task_Completed_Date__c;
-
                     dto.assignedPercentage = t.Assigned_Percentage__c;
+                    dto.taskId = t.Id;
                     resp.tasks.add(dto);
                 }
             }

@@ -86,6 +86,13 @@
             <field>Phone</field>
             <operator>NotEqualTo</operator>
         </filters>
+        <filters>
+            <field>RecordTypeId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>012U9000002B1m1IAC</stringValue>
+            </value>
+        </filters>
         <object>Lead</object>
         <recordTriggerType>Create</recordTriggerType>
         <triggerType>RecordAfterSave</triggerType>

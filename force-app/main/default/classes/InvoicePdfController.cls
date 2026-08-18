@@ -15,7 +15,7 @@
  *   - Keeps logic simple for PDF rendering
  */
 @SuppressWarnings('PMD.CognitiveComplexity,PMD.ApexCRUDViolation,PMD.ExcessiveParameterList')
-public with sharing class InvoicePdfController {
+public without sharing class InvoicePdfController {
 
     public Invoice__c inv { get; private set; }
     public List<SectionWrap> sections { get; private set; }

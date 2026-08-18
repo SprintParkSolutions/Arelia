@@ -46,7 +46,5 @@ trigger VendorAssignmentTrigger on Vendor_Assignment__c (
         }
 
         // if (Trigger.isInsert) {
-        //     vendorAssignmentController.sendVendorAssignmentEmail(Trigger.new);
-        // }
     }
 }

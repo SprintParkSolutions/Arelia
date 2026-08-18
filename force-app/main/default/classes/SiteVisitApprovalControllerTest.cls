@@ -14,8 +14,14 @@ private class SiteVisitApprovalControllerTest {
         User thisUser = [SELECT Id FROM User WHERE Id = :UserInfo.getUserId()];
         
         System.runAs(thisUser) {
-            UserRole managerRole = new UserRole(DeveloperName = 'Arelia_Manager', Name = 'Arelia Manager');
-            insert managerRole;
+            UserRole managerRole;
+            List<UserRole> existingManagerRoles = [SELECT Id FROM UserRole WHERE DeveloperName = 'Arelia_Manager' LIMIT 1];
+            if (!existingManagerRoles.isEmpty()) {
+                managerRole = existingManagerRoles[0];
+            } else {
+                managerRole = new UserRole(DeveloperName = 'Arelia_Manager', Name = 'Arelia Manager');
+                insert managerRole;
+            }
 
             supervisor = TestDataUtility.createSupervisorUser('spvsr');
             supervisor.UserRoleId = managerRole.Id;
@@ -41,7 +47,11 @@ private class SiteVisitApprovalControllerTest {
         insert testOpp;
 
         // Mock Email Templates
-        System.runAs(thisUser) {
+        // Run as the test-specific supervisor (not the shared running user) so these
+        // templates land in a dedicated personal folder instead of the org's default
+        // test-execution user's folder, which many parallel-running test classes
+        // insert into concurrently and can cause UNABLE_TO_LOCK_ROW.
+        System.runAs(supervisor) {
             List<String> labels = new List<String>{
                 Label.Arelia_Living_Site_Visit_Approval_by_Manager_Template,
                 Label.Arelia_Living_Site_Visit_Negotation_by_Manager_Template,

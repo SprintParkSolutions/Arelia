@@ -37,8 +37,6 @@ export default class AreliaManualProjectRequestComp extends LightningElement {
     @track siteSpace = '';
     @track showForm = true;
     @track showSuccess = false;
-    @track countryCode = '+91';
-    @track phoneNumber = '';
 
     hasLoaded = false;
 
@@ -49,7 +47,13 @@ export default class AreliaManualProjectRequestComp extends LightningElement {
             { label: 'Home Decor', value: 'Home Decor' },
             { label: 'Kitchen', value: 'Kitchen' },
             { label: 'Bed Room', value: 'Bed Room' },
-            { label: 'Hall Interior', value: 'Hall Interior' }
+            { label: 'Hall Interior', value: 'Hall Interior' },
+            { label: '1RK', value: '1RK' },
+            { label: '1BHK', value: '1BHK' },
+            { label: '2BHK', value: '2BHK' },
+            { label: '3BHK', value: '3BHK' },
+            { label: '4BHK', value: '4BHK' },
+            { label: '5BHK', value: '5BHK' }
         ],
         Office: [
             { label: 'Conference Hall', value: 'Conference Hall' },
@@ -59,15 +63,9 @@ export default class AreliaManualProjectRequestComp extends LightningElement {
             { label: 'Dining Hall', value: 'Dining Hall' },
             { label: 'Cabins', value: 'Cabins' }
         ],
+        'Interior Combo Package': [],
         'Only Project Plan': []
     };
-
-    countryOptions = [
-        { label: '+91 (India)', value: '+91' },
-        { label: '+1 (USA)', value: '+1' },
-        { label: '+44 (UK)', value: '+44' },
-        { label: '+971 (UAE)', value: '+971' }
-    ];
 
     // ✅ NEW: get Lead record type id
     @wire(getObjectInfo, { objectApiName: LEAD_OBJECT })
@@ -174,17 +172,6 @@ export default class AreliaManualProjectRequestComp extends LightningElement {
                 this.siteLocation = result.Site_Location__c || '';
                 this.siteSpace = result.Site_Space__c || '';
 
-                if (this.phone) {
-                    const match = this.phone.match(/^(\+\d+)\s?(.*)/);
-                    if (match) {
-                        this.countryCode = match[1];
-                        this.phoneNumber = match[2];
-                    } else {
-                        this.countryCode = '+91';
-                        this.phoneNumber = this.phone;
-                    }
-                }
-
                 if (this.typeOfProject) {
                     this.projectScopeOptions = this.scopeMap[this.typeOfProject] || [];
                 }
@@ -209,20 +196,6 @@ export default class AreliaManualProjectRequestComp extends LightningElement {
             this.projectScopeOptions = this.scopeMap[value] || [];
             this.projectScope = '';
         }
-    }
-
-    handleCountryChange(event) {
-        this.countryCode = event.detail.value;
-        this.updatePhone();
-    }
-
-    handlePhoneInput(event) {
-        this.phoneNumber = event.target.value;
-        this.updatePhone();
-    }
-
-    updatePhone() {
-        this.phone = `${this.countryCode} ${this.phoneNumber}`.trim();
     }
 
     get isScopeDisabled() {

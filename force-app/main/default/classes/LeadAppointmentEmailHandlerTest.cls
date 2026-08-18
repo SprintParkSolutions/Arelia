@@ -135,21 +135,13 @@ private class LeadAppointmentEmailHandlerTest {
     static void testSendAppointmentEmailsOnUpdate() {
         User supervisor = [SELECT Id, Email, Phone FROM User WHERE Alias LIKE 'Appt%' LIMIT 1];
 
-        Lead l = new Lead(
-            FirstName = 'Handler',
-            LastName = 'Lead',
-            Company = 'Handler Co',
-            Email = 'handler@test.com',
-            Supervisor_User__c = supervisor.Id,
-            Status = 'Open - Not Contacted'
-        );
-        insert l;
+        Lead l = TestDataUtility.createLead('Handler', 'Lead', supervisor.Id, 'handler@test.com');
 
         update new Lead(
             Id = l.Id,
             Appointment_Date__c = Date.today().addDays(5),
             Appointment_Time_Slots__c = '9AM-10AM',
-            Appointment_Confirmation_Type__c = 'Followup'
+            Appointment_Confirmation_Type__c = 'Follow-up'
         );
 
         Lead refreshed = [
@@ -162,6 +154,6 @@ private class LeadAppointmentEmailHandlerTest {
         ];
 
         System.assertEquals(Date.today(), refreshed.Appointment_Sent_date__c, 'Sent date should be stamped');
-        System.assertEquals('Followup', refreshed.Appointment_Confirmation_Type__c, 'Appointment type should be updated');
+        System.assertEquals('Follow-up', refreshed.Appointment_Confirmation_Type__c, 'Appointment type should be updated');
     }
 }

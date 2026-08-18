@@ -1,172 +1,296 @@
+/**
+ * @description
+ * Tests OpportunityTriggerHandler project synchronization functionality.
+ */
 @IsTest
-public class OpportunityTriggerHandlerTest {
+private class OpportunityTriggerHandlerTest {
+
+    private static final String STAGE_PROSPECTING = 'Prospecting';
+    private static final String STAGE_RESUMED = 'Resumed';
+    private static final String STATUS_INITIATED = 'Initiated';
+    private static final String STATUS_IN_PROGRESS = 'In Progress';
+
+    private static final Decimal QUALIFIED_BUDGET = 50000;
+    private static final Decimal NON_QUALIFIED_BUDGET = 25000;
+    private static final Decimal BULK_BUDGET = 10000;
+    private static final Integer BULK_RECORD_COUNT = 5;
 
     /**
-     * Utility method to create an Opportunity
+     * Creates an Arelia Opportunity using TestDataUtility and places it
+     * in the required initial state.
+     *
+     * @param opportunityName Opportunity name.
+     * @param stageName Initial Opportunity stage.
+     * @param negotiationBudget Initial negotiation budget.
+     * @return Created Opportunity.
      */
-    private static Opportunity createOpportunity(String stage, Decimal budget) {
-        Opportunity opp = new Opportunity(
-            Name = 'Test Opportunity',
-            StageName = stage,
-            CloseDate = Date.today().addDays(30),
-            Negotiation_Review_Budget__c = budget,
-            // Initialize flags to false/null to test distinct transitions
-            All_Vendors_Agreement_Completed__c = false
+    private static Opportunity createOpportunity(
+        String opportunityName,
+        String stageName,
+        Decimal negotiationBudget
+    ) {
+        Opportunity opportunityRecord = TestDataUtility.createOpportunity(
+            opportunityName,
+            UserInfo.getUserId()
         );
-        insert opp;
-        return opp;
+
+        opportunityRecord.StageName = stageName;
+        opportunityRecord.Negotiation_Review_Budget__c = negotiationBudget;
+        opportunityRecord.All_Vendors_Agreement_Completed__c = false;
+
+        update opportunityRecord;
+
+        return opportunityRecord;
     }
 
     /**
-     * Utility method to create a Project linked to Opportunity
+     * Creates an Arelia Project linked to the supplied Opportunity.
+     *
+     * The TestDataUtility project method is not used because it does not
+     * populate Project_Name__c and initializes Status__c as In Progress.
+     *
+     * @param opportunityId Related Opportunity Id.
+     * @return Created Project.
      */
-    private static Project__c createProject(Id oppId) {
-        Project__c project = new Project__c(
-            Project_Name__c = oppId,
-            Status__c = 'Initiated',
-            Supervisor_Estimated_Budget__c = null
+    private static Project__c createProject(Id opportunityId) {
+        Project__c projectRecord = new Project__c(
+            Name = 'Test Project ' + String.valueOf(opportunityId),
+            Project_Name__c = opportunityId,
+            Status__c = STATUS_INITIATED,
+            Supervisor_Estimated_Budget__c = null,
+            RecordTypeId = AreliaUtility.getAreliaProjectRecordTypeId()
         );
-        insert project;
-        return project;
+
+        insert projectRecord;
+
+        return projectRecord;
     }
 
     /**
-     * POSITIVE TEST
-     * Opportunity moved to Resumed stage with budget → Project updated
+     * Verifies that moving an Arelia Opportunity to Resumed with a budget
+     * updates its related Arelia Project.
      */
     @IsTest
-    static void testQualifiedOpportunityUpdatesProject() {
+    private static void testQualifiedOpportunityUpdatesProject() {
+        Opportunity opportunityRecord = createOpportunity(
+            'Qualified Test Opportunity',
+            STAGE_PROSPECTING,
+            null
+        );
 
-        // Create Opportunity (initially NOT Resumed)
-        Opportunity opp = createOpportunity('Prospecting', null);
+        Project__c projectRecord = createProject(opportunityRecord.Id);
 
-        // Create related Project
-        Project__c project = createProject(opp.Id);
-
-        // Update Opportunity to qualified state
-        opp.StageName = 'Resumed';
-        opp.Negotiation_Review_Budget__c = 50000;
-        
-        // FIX: Satisfy Validation Rule ("Stage cannot be set to 'Resumed' until...")
-        opp.All_Vendors_Agreement_Completed__c = true; 
+        opportunityRecord.StageName = STAGE_RESUMED;
+        opportunityRecord.Negotiation_Review_Budget__c = QUALIFIED_BUDGET;
+        opportunityRecord.All_Vendors_Agreement_Completed__c = true;
 
         Test.startTest();
-        update opp;
+        update opportunityRecord;
         Test.stopTest();
 
-        // Fetch updated Project
         Project__c updatedProject = [
             SELECT Status__c, Supervisor_Estimated_Budget__c
             FROM Project__c
-            WHERE Id = :project.Id
+            WHERE Id = :projectRecord.Id
+            LIMIT 1
         ];
 
-        // Assertions
         System.assertEquals(
-            'In Progress',
+            STATUS_IN_PROGRESS,
             updatedProject.Status__c,
-            'Project status should be updated'
+            'The related Arelia Project status should be updated.'
         );
 
         System.assertEquals(
-            50000,
+            QUALIFIED_BUDGET,
             updatedProject.Supervisor_Estimated_Budget__c,
-            'Budget should sync from Opportunity'
+            'The Opportunity budget should be copied to the related Project.'
         );
     }
 
     /**
-     * NEGATIVE TEST
-     * Opportunity not Resumed → Project should NOT update
+     * Verifies that updating an Opportunity without moving it to Resumed
+     * does not update its related Project.
      */
     @IsTest
-    static void testNonQualifiedOpportunityDoesNotUpdateProject() {
+    private static void testNonQualifiedOpportunityDoesNotUpdateProject() {
+        Opportunity opportunityRecord = createOpportunity(
+            'Non-Qualified Test Opportunity',
+            STAGE_PROSPECTING,
+            NON_QUALIFIED_BUDGET
+        );
 
-        Opportunity opp = createOpportunity('Prospecting', 25000);
-        Project__c project = createProject(opp.Id);
+        Project__c projectRecord = createProject(opportunityRecord.Id);
 
-        // Update Opportunity without meeting criteria
-        opp.Name = 'Updated Name Only';
-        // Note: We do NOT set Stage to Resumed or flags here, so it stays in Prospecting
+        opportunityRecord.Name = 'Updated Non-Qualified Opportunity';
 
         Test.startTest();
-        update opp;
+        update opportunityRecord;
         Test.stopTest();
 
         Project__c unchangedProject = [
             SELECT Status__c, Supervisor_Estimated_Budget__c
             FROM Project__c
-            WHERE Id = :project.Id
+            WHERE Id = :projectRecord.Id
+            LIMIT 1
         ];
 
         System.assertEquals(
-            'Initiated',
+            STATUS_INITIATED,
             unchangedProject.Status__c,
-            'Project status should remain unchanged'
+            'The Project status should remain unchanged.'
         );
 
         System.assertEquals(
             null,
             unchangedProject.Supervisor_Estimated_Budget__c,
-            'Budget should not update'
+            'The Project budget should remain unchanged.'
         );
     }
 
     /**
-     * BULK TEST
-     * Multiple Opportunities updated at once
+     * Verifies bulk processing of multiple qualified Arelia Opportunities
+     * and their related Arelia Projects.
      */
     @IsTest
-    static void testBulkOpportunityUpdates() {
+    private static void testBulkOpportunityUpdates() {
+        Id opportunityRecordTypeId =
+            AreliaUtility.getAreliaOpportunityRecordTypeId();
 
-        List<Opportunity> opps = new List<Opportunity>();
-        List<Project__c> projects = new List<Project__c>();
+        List<Opportunity> opportunityRecords = new List<Opportunity>();
 
-        for (Integer i = 0; i < 5; i++) {
-            Opportunity opp = new Opportunity(
-                Name = 'Bulk Opp ' + i,
-                StageName = 'Prospecting',
-                CloseDate = Date.today().addDays(10),
-                Negotiation_Review_Budget__c = null,
-                All_Vendors_Agreement_Completed__c = false
+        for (Integer indexValue = 0;
+            indexValue < BULK_RECORD_COUNT;
+            indexValue++
+        ) {
+            opportunityRecords.add(
+                new Opportunity(
+                    Name = 'Bulk Opportunity ' + indexValue,
+                    StageName = STAGE_PROSPECTING,
+                    CloseDate = Date.today().addDays(30),
+                    Negotiation_Review_Budget__c = null,
+                    All_Vendors_Agreement_Completed__c = false,
+                    RecordTypeId = opportunityRecordTypeId
+                )
             );
-            opps.add(opp);
-        }
-        insert opps;
-
-        for (Opportunity opp : opps) {
-            projects.add(createProject(opp.Id));
         }
 
-        // Qualify all opportunities
-        for (Opportunity opp : opps) {
-            opp.StageName = 'Resumed';
-            opp.Negotiation_Review_Budget__c = 10000;
-            // FIX: Satisfy Validation Rule for Bulk update
-            opp.All_Vendors_Agreement_Completed__c = true;
+        insert opportunityRecords;
+
+        List<Project__c> projectRecords = new List<Project__c>();
+
+        for (Opportunity opportunityRecord : opportunityRecords) {
+            projectRecords.add(
+                new Project__c(
+                    Name = 'Bulk Project ' + opportunityRecord.Id,
+                    Project_Name__c = opportunityRecord.Id,
+                    Status__c = STATUS_INITIATED,
+                    Supervisor_Estimated_Budget__c = null,
+                    RecordTypeId =
+                        AreliaUtility.getAreliaProjectRecordTypeId()
+                )
+            );
+        }
+
+        insert projectRecords;
+
+        Set<Id> projectIds = new Map<Id, Project__c>(
+            projectRecords
+        ).keySet();
+
+        for (Opportunity opportunityRecord : opportunityRecords) {
+            opportunityRecord.StageName = STAGE_RESUMED;
+            opportunityRecord.Negotiation_Review_Budget__c = BULK_BUDGET;
+            opportunityRecord.All_Vendors_Agreement_Completed__c = true;
         }
 
         Test.startTest();
-        update opps;
+        update opportunityRecords;
         Test.stopTest();
 
-        // Verify all projects updated
         List<Project__c> updatedProjects = [
-            SELECT Status__c, Supervisor_Estimated_Budget__c
+            SELECT
+                Status__c,
+                Supervisor_Estimated_Budget__c,
+                Project_Name__c
             FROM Project__c
+            WHERE Id IN :projectIds
         ];
 
-        for (Project__c proj : updatedProjects) {
+        System.assertEquals(
+            BULK_RECORD_COUNT,
+            updatedProjects.size(),
+            'Every test Project should be returned for verification.'
+        );
+
+        for (Project__c projectRecord : updatedProjects) {
             System.assertEquals(
-                'In Progress',
-                proj.Status__c,
-                'Project status should be updated to In Progress for all bulk Opportunities'
+                STATUS_IN_PROGRESS,
+                projectRecord.Status__c,
+                'Every related Arelia Project should be moved to In Progress.'
             );
+
             System.assertEquals(
-                10000,
-                proj.Supervisor_Estimated_Budget__c,
-                'Project budget should be updated to match Opportunity budget for all bulk Opportunities'
+                BULK_BUDGET,
+                projectRecord.Supervisor_Estimated_Budget__c,
+                'Every Project should receive its Opportunity budget.'
             );
         }
+    }
+
+    /**
+     * Verifies that an Arelia Opportunity already in Resumed stage does not
+     * cause another Project update when neither stage nor budget changes.
+     */
+    @IsTest
+    private static void testUnchangedQualifiedValuesDoNotUpdateProject() {
+        Opportunity opportunityRecord = createOpportunity(
+            'Unchanged Qualified Opportunity',
+            STAGE_PROSPECTING,
+            null
+        );
+
+        Project__c projectRecord = createProject(opportunityRecord.Id);
+
+        opportunityRecord.StageName = STAGE_RESUMED;
+        opportunityRecord.Negotiation_Review_Budget__c = QUALIFIED_BUDGET;
+        opportunityRecord.All_Vendors_Agreement_Completed__c = true;
+        update opportunityRecord;
+
+        Project__c projectAfterQualifiedUpdate = [
+            SELECT Status__c, Supervisor_Estimated_Budget__c
+            FROM Project__c
+            WHERE Id = :projectRecord.Id
+            LIMIT 1
+        ];
+
+        projectAfterQualifiedUpdate.Status__c = STATUS_INITIATED;
+        projectAfterQualifiedUpdate.Supervisor_Estimated_Budget__c = null;
+        update projectAfterQualifiedUpdate;
+
+        opportunityRecord.Name = 'Name Changed Only';
+
+        Test.startTest();
+        update opportunityRecord;
+        Test.stopTest();
+
+        Project__c unchangedProject = [
+            SELECT Status__c, Supervisor_Estimated_Budget__c
+            FROM Project__c
+            WHERE Id = :projectRecord.Id
+            LIMIT 1
+        ];
+
+        System.assertEquals(
+            STATUS_INITIATED,
+            unchangedProject.Status__c,
+            'The Project should not update when stage and budget are unchanged.'
+        );
+
+        System.assertEquals(
+            null,
+            unchangedProject.Supervisor_Estimated_Budget__c,
+            'The Project budget should not update when qualifying values are unchanged.'
+        );
     }
 }

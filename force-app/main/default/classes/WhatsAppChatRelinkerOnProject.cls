@@ -43,9 +43,11 @@ public without sharing class WhatsAppChatRelinkerOnProject {
     private static Map<Id, Id> pickProjectPerOpp(List<Project__c> projects) {
         Map<Id, Id> oppToProject = new Map<Id, Id>();
         Map<Id, Datetime> oppToTs = new Map<Id, Datetime>();
+        Id areliaProjectRecordTypeId = AreliaUtility.getAreliaProjectRecordTypeId();
 
         for (Project__c p : projects) {
             if (p.Project_Name__c == null) continue;
+            if (p.RecordTypeId != areliaProjectRecordTypeId) continue;
 
             // If you have Is_Primary__c, you can short-circuit preference here, e.g.:
             // if (p.Is_Primary__c == true) { oppToProject.put(p.Opportunity__c, p.Id); continue; }

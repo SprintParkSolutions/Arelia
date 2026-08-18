@@ -49,6 +49,9 @@ trigger ProjectTrigger on Project__c (before insert, before update, after insert
 
             //project completion status update send emials
             ProjectUpdateHandler.afterUpdate(Trigger.new, Trigger.oldMap);
+
+            //milestone/installment payment reminder emails to client
+            MilestonePaymentReminderHandler.afterUpdate(Trigger.new, Trigger.oldMap);
         } catch (Exception e) {
             System.debug('Failed during after-update: ' + e.getMessage());
         }

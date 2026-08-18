@@ -198,6 +198,13 @@
                 <stringValue>Completed</stringValue>
             </value>
         </filters>
+        <filters>
+            <field>RecordTypeId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>AreliarecordtypeID</elementReference>
+            </value>
+        </filters>
         <getFirstRecordOnly>false</getFirstRecordOnly>
         <object>Task</object>
         <storeOutputAutomatically>true</storeOutputAutomatically>
@@ -462,6 +469,16 @@
         <triggerType>RecordAfterSave</triggerType>
     </start>
     <status>Active</status>
+    <variables>
+        <name>AreliarecordtypeID</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+        <value>
+            <stringValue>012U9000002EjaPIAS</stringValue>
+        </value>
+    </variables>
     <variables>
         <name>colTasksToUpdate</name>
         <dataType>SObject</dataType>

@@ -11,30 +11,21 @@ public without sharing class PasswordManager {
 
     private static final Integer TOKEN_EXPIRY_HOURS = 24;
     private static final Integer MIN_PASSWORD_LENGTH = 6;
+    private static final String ERROR_UNSUPPORTED_RECORD_TYPE =
+        'Password email is supported only for Arelia opportunities.';
 
     // ============================================================
     // QUICK ACTION – Opportunity → Contact
     // ============================================================
     @AuraEnabled
     public static void sendOpportunityPasswordEmail(Id opportunityId, String mode) {
-
-        Opportunity opp = [
-            SELECT Id, Primary_Contact__c // ContactId
-            FROM Opportunity
-            WHERE Id = :opportunityId
-            LIMIT 1
-        ];
+        Opportunity opp = queryAreliaOpportunity(opportunityId);
 
         if (opp.Primary_Contact__c == null) {
             throw new AuraHandledException('No Contact associated.');
         }
 
-        Contact con = [
-            SELECT Id, Email
-            FROM Contact
-            WHERE Id = :opp.Primary_Contact__c
-            LIMIT 1
-        ];
+        Contact con = [SELECT Id, Email FROM Contact WHERE Id = :opp.Primary_Contact__c LIMIT 1];
 
         if (String.isBlank(con.Email)) {
             throw new AuraHandledException('Contact has no email.');
@@ -94,11 +85,7 @@ public without sharing class PasswordManager {
         validatePassword(newPassword);
 
         // Query list to avoid "List has no rows" error
-        List<Contact> contacts = [
-            SELECT Id, Set_Password_Token__c, Set_Password_Expiry__c
-            FROM Contact
-            WHERE Set_Password_Token__c = :token
-        ];
+        List<Contact> contacts = [SELECT Id, Set_Password_Token__c, Set_Password_Expiry__c FROM Contact WHERE Set_Password_Token__c = :token];
 
         if (contacts.isEmpty()) {
             throw new AuraHandledException('Password has been already set or expired token.');
@@ -128,11 +115,7 @@ public without sharing class PasswordManager {
         validatePassword(newPassword);
 
         // Query list to avoid "List has no rows" error
-        List<Contact> contacts = [
-            SELECT Id, Forgot_Password_Token__c, Forgot_Password_Expiry__c
-            FROM Contact
-            WHERE Forgot_Password_Token__c = :token
-        ];
+        List<Contact> contacts = [SELECT Id, Forgot_Password_Token__c, Forgot_Password_Expiry__c FROM Contact WHERE Forgot_Password_Token__c = :token];
 
         if (contacts.isEmpty()) {
             throw new AuraHandledException('Password has been already reset or expired token.');
@@ -156,11 +139,7 @@ public without sharing class PasswordManager {
     @AuraEnabled
     public static String validateSetPasswordToken(String token) {
 
-        List<Contact> contacts = [
-            SELECT Id, Set_Password_Expiry__c
-            FROM Contact
-            WHERE Set_Password_Token__c = :token
-        ];
+        List<Contact> contacts = [SELECT Id, Set_Password_Expiry__c FROM Contact WHERE Set_Password_Token__c = :token];
 
         if (contacts.isEmpty()) {
             return 'ALREADY_USED_OR_INVALID';
@@ -176,11 +155,7 @@ public without sharing class PasswordManager {
     @AuraEnabled
     public static String validateResetPasswordToken(String token) {
 
-        List<Contact> contacts = [
-            SELECT Id, Forgot_Password_Expiry__c
-            FROM Contact
-            WHERE Forgot_Password_Token__c = :token
-        ];
+        List<Contact> contacts = [SELECT Id, Forgot_Password_Expiry__c FROM Contact WHERE Forgot_Password_Token__c = :token];
 
         if (contacts.isEmpty()) {
             return 'ALREADY_USED_OR_INVALID';
@@ -230,7 +205,30 @@ public without sharing class PasswordManager {
 
         mail.setToAddresses(new List<String>{ toEmail });
         mail.setSaveAsActivity(false);
+        AreliaUtility.setOrgWideEmailAddress(mail, System.Label.Arelia_OWD);
 
         Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ mail });
+    }
+
+    private static Opportunity queryAreliaOpportunity(Id opportunityId) {
+        Id areliaOpportunityRecordTypeId = getAreliaOpportunityRecordTypeId();
+
+        // Keep the Arelia Record Type requirement in SOQL so unsupported Opportunities do not proceed.
+        List<Opportunity> opportunities = [SELECT Id, Primary_Contact__c FROM Opportunity WHERE Id = :opportunityId AND RecordTypeId = :areliaOpportunityRecordTypeId LIMIT 1];
+
+        if (opportunities.isEmpty()) {
+            throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+        }
+
+        return opportunities[0];
+    }
+
+    private static Id getAreliaOpportunityRecordTypeId() {
+        Id areliaOpportunityRecordTypeId = AreliaUtility.getAreliaOpportunityRecordTypeId();
+        if (areliaOpportunityRecordTypeId == null) {
+            throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+        }
+
+        return areliaOpportunityRecordTypeId;
     }
 }

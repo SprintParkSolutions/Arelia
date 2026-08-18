@@ -30,11 +30,12 @@ public class TestDataUtility {
     // 2. Create Project
     public static Project__c createProject(String name, Decimal projectBudget, Id contactId) {
         Project__c proj = new Project__c(
-            Name = name, 
+            Name = name,
             Status__c = 'In Progress',
             Project_Status__c='Active',
             Supervisor_Estimated_Budget__c = projectBudget,
-            Client__c = contactId
+            Client__c = contactId,
+            RecordTypeId = AreliaUtility.getAreliaProjectRecordTypeId()
         );
         insert proj;
         return proj;
@@ -47,7 +48,8 @@ public class TestDataUtility {
             StageName = 'Proposal',
             CloseDate = Date.today().addDays(30),
             Supervisor_User__c = supervisorId,
-            Project_Scope__c = 'Dining Hall'
+            Project_Scope__c = 'Dining Hall',
+            RecordTypeId = AreliaUtility.getAreliaOpportunityRecordTypeId()
         );
         insert opp;
         return opp;
@@ -219,9 +221,28 @@ public class TestDataUtility {
     // 11. Create Lead
     public static Lead createLead(String lastName) {
         Lead l = new Lead(
-            LastName = lastName, 
-            Company = 'Test Company', 
-            Status = 'Open - Not Contacted'
+            LastName = lastName,
+            Company = 'Test Company',
+            Status = 'Open - Not Contacted',
+            RecordTypeId = AreliaUtility.getAreliaLeadRecordTypeId()
+        );
+        insert l;
+        return l;
+    }
+
+    // 11b. Create Lead with Supervisor assigned at insert time.
+    // Setting Supervisor_User__c on insert (rather than a later update) avoids
+    // Assign_Supervisor_User_Validation and the Update-triggered
+    // Lead_Update_Supervisor_user_to_owner flow, both of which only fire on change.
+    public static Lead createLead(String firstName, String lastName, Id supervisorId, String email) {
+        Lead l = new Lead(
+            FirstName = firstName,
+            LastName = lastName,
+            Company = 'Test Company',
+            Status = 'Open - Not Contacted',
+            Supervisor_User__c = supervisorId,
+            Email = email,
+            RecordTypeId = AreliaUtility.getAreliaLeadRecordTypeId()
         );
         insert l;
         return l;
@@ -322,7 +343,8 @@ public class TestDataUtility {
             Appointment_Status__c = params.status,
             Appointment_Date__c = params.apptDate,
             Appointment_Time_Slots__c = params.slot,
-            Email = uniqueEmail
+            Email = uniqueEmail,
+            RecordTypeId = AreliaUtility.getAreliaLeadRecordTypeId()
         );
 
         Database.DMLOptions dml = new Database.DMLOptions();
@@ -352,7 +374,8 @@ public class TestDataUtility {
             Re_Visit_Site_Appointment_Status__c = params.status,
             Re_Visit_Appointment_Date__c = params.apptDate,
             Re_Visit_Appointment_Time_Slots__c = params.slot,
-            Primary_Contact__c = params.contactId
+            Primary_Contact__c = params.contactId,
+            RecordTypeId = AreliaUtility.getAreliaOpportunityRecordTypeId()
         );
         insert opp;
         return opp;
@@ -430,8 +453,8 @@ public class TestDataUtility {
             Name = name,
             Room_Type__c = roomType,
             Product_Category__c = category,
-            Unit_Price__c = price,
-            Image_File_Name__c = 'test_image.jpg' // Dummy value for field coverage
+            Unit_Price__c = price
+            
         );
         insert prod;
         return prod;

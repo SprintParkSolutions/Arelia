@@ -1,0 +1,19 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p>Dear [[SUPERVISOR_NAME]],</p>
+
+<p>The Vendor Agreement has been digitally signed by <strong>[[VENDOR_NAME]]</strong>.</p>
+
+<p>The signed Vendor Agreement PDF is attached to this email.</p>
+
+<p>Agreement Reference: <strong>[[AGREEMENT_NAME]]</strong></p>
+
+<p>The signed agreement is also available in the Files related list of the associated Vendor Opportunity record.</p>
+
+<p>Regards,<br />
+Arelia Team</p>
+</body>
+</html>

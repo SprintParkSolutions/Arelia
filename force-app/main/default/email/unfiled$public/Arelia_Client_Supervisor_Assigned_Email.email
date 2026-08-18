@@ -1,0 +1,24 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p>Dear <strong>{{{Recipient.Lead_Name__c}}}</strong>,</p>
+
+<p>We are pleased to inform you that a dedicated supervisor has been assigned to your project with Arelia Space. Your assigned supervisor will contact you shortly to introduce themselves and coordinate the next steps.</p>
+
+<p>Supervisor Details are as follows:&nbsp;</p>
+
+<p>Supervisor Name:&nbsp;<strong>{{{Recipient.Supervisor_User__c}}}</strong><br />
+Email Address:&nbsp;<strong>{{{Recipient.Supervisor_User_Email__c}}}</strong><br />
+Contact Number:&nbsp;<strong>{{{Recipient.Supervisor_User_Phone__c}}}</strong></p>
+
+<p>Please feel free to contact the supervisor using the details provided above if you need any assistance.</p>
+
+<p>We look forward to working with you and providing a smooth and professional project experience.</p>
+
+<p>Best regards,</p>
+
+<p>Arelia Team</p>
+</body>
+</html>

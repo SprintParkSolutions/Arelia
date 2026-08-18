@@ -14,20 +14,6 @@
             <name>Validation_Failed</name>
             <conditionLogic>or</conditionLogic>
             <conditions>
-                <leftValueReference>Get_First_Payment_Term</leftValueReference>
-                <operator>IsNull</operator>
-                <rightValue>
-                    <booleanValue>true</booleanValue>
-                </rightValue>
-            </conditions>
-            <conditions>
-                <leftValueReference>Get_First_Payment_Term.Payment_Received__c</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <booleanValue>false</booleanValue>
-                </rightValue>
-            </conditions>
-            <conditions>
                 <leftValueReference>Get_Opportunity.Client_Agreement_Sent__c</leftValueReference>
                 <operator>EqualTo</operator>
                 <rightValue>
@@ -92,26 +78,31 @@
     </processMetadataValues>
     <processType>Flow</processType>
     <recordLookups>
-        <name>Get_First_Payment_Term</name>
-        <label>Get First Payment Term</label>
+        <name>Get_Arelia_Record_Type</name>
+        <label>Get Arelia Record Type</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
-            <targetReference>Get_Primary_Contact</targetReference>
+            <targetReference>Get_Opportunity</targetReference>
         </connector>
         <filterLogic>and</filterLogic>
         <filters>
-            <field>Opportunity__c</field>
+            <field>DeveloperName</field>
             <operator>EqualTo</operator>
             <value>
-                <elementReference>recordId</elementReference>
+                <stringValue>Arelia</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>SobjectType</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Opportunity</stringValue>
             </value>
         </filters>
         <getFirstRecordOnly>true</getFirstRecordOnly>
-        <object>Payment_Term__c</object>
-        <sortField>Due_Date__c</sortField>
-        <sortOrder>Asc</sortOrder>
+        <object>RecordType</object>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordLookups>
@@ -121,7 +112,7 @@
         <locationY>0</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
-            <targetReference>Get_First_Payment_Term</targetReference>
+            <targetReference>Get_Primary_Contact</targetReference>
         </connector>
         <filterLogic>and</filterLogic>
         <filters>
@@ -129,6 +120,13 @@
             <operator>EqualTo</operator>
             <value>
                 <elementReference>recordId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>RecordTypeId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Get_Arelia_Record_Type.Id</elementReference>
             </value>
         </filters>
         <getFirstRecordOnly>true</getFirstRecordOnly>
@@ -225,28 +223,6 @@
             </visibilityRule>
         </fields>
         <fields>
-            <name>msg_Error_Payment</name>
-            <fieldText>&lt;p&gt;&lt;strong style=&quot;font-size: 14px;&quot;&gt;Payment: The first Payment Term installment must be marked &quot;Payment Received&quot;.&lt;/strong&gt;&lt;/p&gt;</fieldText>
-            <fieldType>DisplayText</fieldType>
-            <visibilityRule>
-                <conditionLogic>or</conditionLogic>
-                <conditions>
-                    <leftValueReference>Get_First_Payment_Term.Id</leftValueReference>
-                    <operator>IsNull</operator>
-                    <rightValue>
-                        <booleanValue>true</booleanValue>
-                    </rightValue>
-                </conditions>
-                <conditions>
-                    <leftValueReference>Get_First_Payment_Term.Payment_Received__c</leftValueReference>
-                    <operator>EqualTo</operator>
-                    <rightValue>
-                        <booleanValue>false</booleanValue>
-                    </rightValue>
-                </conditions>
-            </visibilityRule>
-        </fields>
-        <fields>
             <name>msg_Error_Contact</name>
             <fieldText>&lt;p&gt;&lt;strong style=&quot;font-size: 14px;&quot;&gt;Contact: The Primary Contact is missing or does not have a Password set.&lt;/strong&gt;&lt;/p&gt;</fieldText>
             <fieldType>DisplayText</fieldType>
@@ -296,7 +272,7 @@
         <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>Get_Opportunity</targetReference>
+            <targetReference>Get_Arelia_Record_Type</targetReference>
         </connector>
     </start>
     <status>Active</status>

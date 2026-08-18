@@ -39,15 +39,13 @@ public class ScheduleAppointmentControllerTest {
             insert templates;
         }
 
-        Lead l = new Lead(
-            FirstName = 'Test',
-            LastName = 'Lead',
-            Company = 'Test Company',
-            Email = 'test@lead.com',
-            Supervisor_User__c = supervisor.Id,
-            Status = 'Open - Not Contacted'
-        );
-        insert l;
+        Lead l = TestDataUtility.createLead('Lead');
+        l.FirstName = 'Test';
+        l.Email = 'test@lead.com';
+        l.Project_Request_Submitted__c = true;
+        l.Approval_Status__c = 'Approved';
+        l.Supervisor_User__c = supervisor.Id;
+        update l;
     }
 
     private static String getAnyValidSlot() {
@@ -78,15 +76,13 @@ public class ScheduleAppointmentControllerTest {
             LIMIT 1
         ];
 
-        Lead l = new Lead(
-            FirstName = 'Extra',
-            LastName = 'Lead',
-            Company = 'Extra Company',
-            Email = emailValue,
-            Supervisor_User__c = supervisor.Id,
-            Status = 'Open - Not Contacted'
-        );
-        insert l;
+        Lead l = TestDataUtility.createLead('Lead');
+        l.FirstName = 'Extra';
+        l.Email = emailValue;
+        l.Project_Request_Submitted__c = true;
+        l.Approval_Status__c = 'Approved';
+        l.Supervisor_User__c = supervisor.Id;
+        update l;
         return l;
     }
 
@@ -162,18 +158,12 @@ public class ScheduleAppointmentControllerTest {
         Lead l1 = [SELECT Id, Supervisor_User__c FROM Lead LIMIT 1];
         String conflictSlot = getAnyValidSlot();
 
-        Lead l2 = new Lead(
-            FirstName = 'Conflict',
-            LastName = 'Lead',
-            Company = 'Conflict Co',
-            Email = 'conflict@test.com',
-            Supervisor_User__c = l1.Supervisor_User__c,
-            Appointment_Status__c = 'Approved',
-            Appointment_Date__c = Date.today().addDays(3),
-            Appointment_Time_Slots__c = conflictSlot,
-            Status = 'Open - Not Contacted'
-        );
-        insert l2;
+        TestDataUtility.AppointmentLeadParams conflictParams = new TestDataUtility.AppointmentLeadParams();
+        conflictParams.supervisorId = l1.Supervisor_User__c;
+        conflictParams.status = 'Approved';
+        conflictParams.apptDate = Date.today().addDays(3);
+        conflictParams.slot = conflictSlot;
+        Lead l2 = TestDataUtility.createAppointmentLead(conflictParams);
 
         Test.startTest();
         Boolean exceptionThrown = false;
@@ -258,14 +248,9 @@ public class ScheduleAppointmentControllerTest {
 
     @IsTest
     static void testDataValidationMissingSupervisor() {
-        Lead orphanedLead = new Lead(
-            FirstName = 'Orphan',
-            LastName = 'Lead',
-            Company = 'Orphan Co',
-            Email = 'orphan@test.com',
-            Status = 'Open - Not Contacted'
-        );
-        insert orphanedLead;
+        Lead orphanedLead = TestDataUtility.createLead('Orphan');
+        orphanedLead.Email = 'orphan@test.com';
+        update orphanedLead;
 
         Test.startTest();
         Boolean exceptionThrown = false;

@@ -3,11 +3,11 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getAvailableTimeSlots from '@salesforce/apex/AppointmentControllerToOpp.getAvailableTimeSlots';
 import updateAppointmentStatus from '@salesforce/apex/AppointmentControllerToOpp.updateAppointmentStatus';
 import { getRecord } from 'lightning/uiRecordApi';
+
 import OPP_APPT_STATUS from '@salesforce/schema/Opportunity.Re_Visit_Site_Appointment_Status__c';
 
 import SITE_URL from '@salesforce/label/c.Arelia_Site_Label';
 import Arelia_Site_Redirect_URL_Label from '@salesforce/label/c.Arelia_Site_Redirect_URL_Label';
-
 
 const ACTION_APPROVE = 'APPROVE';
 const ACTION_OPEN_RESCHEDULE = 'OPEN_RESCHEDULE';
@@ -27,14 +27,26 @@ export default class AppointmentApprovalToOpp extends LightningElement {
     @track selectedDate = '';
 
     @track buttonsDisabled = false;
-    @track issubmitting = false; // ✅ lowercase for template safety
+    @track isSubmitting = false;
 
     recordId;
     minDate;
+    
+    // Tracked Record Data
     currentStatus;
+    appointmentDate;
+    appointmentTime;
 
-    get confirmbuttonsdisabled() {
-        return this.issubmitting;
+    get confirmButtonsDisabled() {
+        return this.isSubmitting;
+    }
+
+    get formattedAppointmentDate() {
+        return this.appointmentDate ? this.prettyDate(this.appointmentDate) : 'Not Scheduled';
+    }
+
+    get displayAppointmentTime() {
+        return this.appointmentTime ? this.appointmentTime : '--:--';
     }
 
     connectedCallback() {
@@ -48,21 +60,30 @@ export default class AppointmentApprovalToOpp extends LightningElement {
         this.minDate = `${yyyy}-${mm}-${dd}`;
     }
 
-    @wire(getRecord, { recordId: '$recordId', fields: [OPP_APPT_STATUS] })
+    @wire(getRecord, { 
+        recordId: '$recordId', 
+        fields: [
+            OPP_APPT_STATUS,
+            'Opportunity.Re_Visit_Appointment_Date__c',
+            'Opportunity.Re_Visit_Appointment_Time_Slots__c'
+        ] 
+    })
     wiredOpp({ data, error }) {
         if (data) {
-            this.currentStatus = data.fields.Re_Visit_Site_Appointment_Status__c.value;
+            this.currentStatus = data.fields.Re_Visit_Site_Appointment_Status__c?.value;
+            this.appointmentDate = data.fields.Re_Visit_Appointment_Date__c ? data.fields.Re_Visit_Appointment_Date__c.value : null;
+            this.appointmentTime = data.fields.Re_Visit_Appointment_Time_Slots__c ? data.fields.Re_Visit_Appointment_Time_Slots__c.value : null;
         } else if (error) {
             // eslint-disable-next-line no-console
-            console.error(error);
+            console.error('Error fetching record data:', error);
         }
     }
 
     onApproveClick() {
         if (this.buttonsDisabled) return;
-        this.closereschedulepanel();
+        this.closeReschedulePanel();
 
-        this.openconfirm(
+        this.openConfirm(
             'Confirm Approval',
             'Are you sure you want to approve this site visit appointment?',
             ACTION_APPROVE
@@ -77,7 +98,7 @@ export default class AppointmentApprovalToOpp extends LightningElement {
             return;
         }
 
-        this.openconfirm(
+        this.openConfirm(
             'Confirm Reschedule',
             'Do you want to reschedule this site visit appointment?',
             ACTION_OPEN_RESCHEDULE
@@ -85,10 +106,10 @@ export default class AppointmentApprovalToOpp extends LightningElement {
     }
 
     cancelReschedule() {
-        this.closereschedulepanel();
+        this.closeReschedulePanel();
     }
 
-    closereschedulepanel() {
+    closeReschedulePanel() {
         this.showReschedule = false;
         this.selectedDate = '';
         this.selectedTimeSlot = '';
@@ -102,12 +123,30 @@ export default class AppointmentApprovalToOpp extends LightningElement {
 
         if (!this.selectedDate || !this.recordId) return;
 
+        // --- NEW RESTRICTION: Prevent fetching slots for past dates ---
+        const selected = new Date(this.selectedDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        selected.setHours(0, 0, 0, 0);
+
+        if (selected < today) {
+            return; // Exit early, leaving timeSlotOptions empty
+        }
+
         try {
-            const slots = await getAvailableTimeSlots({
+            let slots = await getAvailableTimeSlots({
                 forDate: this.selectedDate,
                 currentOpportunityId: this.recordId
             });
-            this.timeSlotOptions = (slots || []).map((s) => ({ label: s, value: s }));
+            
+            slots = slots || [];
+
+            if (this.selectedDate === this.minDate) {
+                slots = this.filterPastTimeSlots(slots);
+            }
+
+            this.timeSlotOptions = slots.map((s) => ({ label: s, value: s }));
+            
             if (this.timeSlotOptions.length === 0) {
                 this.showToast('No Slots', 'No time slots available for the selected date.', 'warning');
             }
@@ -115,6 +154,28 @@ export default class AppointmentApprovalToOpp extends LightningElement {
             const msg = e?.body?.message || 'Failed to load time slots.';
             this.showToast('Error', msg, 'error');
         }
+    }
+
+    filterPastTimeSlots(slots) {
+        const currentHour = new Date().getHours();
+        
+        return slots.filter((slot) => {
+            const match = slot.match(/^(\d{1,2})(AM|PM)/i);
+            if (!match) {
+                return true; 
+            }
+            
+            let startHour = parseInt(match[1], 10);
+            const period = match[2].toUpperCase();
+            
+            if (period === 'PM' && startHour !== 12) {
+                startHour += 12;
+            } else if (period === 'AM' && startHour === 12) {
+                startHour = 0;
+            }
+            
+            return startHour > currentHour;
+        });
     }
 
     handleTimeSlotChange(event) {
@@ -138,36 +199,36 @@ export default class AppointmentApprovalToOpp extends LightningElement {
         }
 
         const pretty = this.prettyDate(this.selectedDate);
-        this.openconfirm(
+        this.openConfirm(
             'Confirm Reschedule',
             `Are you sure you want to reschedule to ${pretty} at ${this.selectedTimeSlot}?`,
             ACTION_SUBMIT_RESCHEDULE
         );
     }
 
-    openconfirm(title, message, action) {
+    openConfirm(title, message, action) {
         this.confirmTitle = title;
         this.confirmMessage = message;
         this.pendingAction = action;
-        this.issubmitting = false;
+        this.isSubmitting = false;
         this.showConfirm = true;
     }
 
     confirmNo() {
-        if (this.issubmitting) return;
+        if (this.isSubmitting) return;
         this.showConfirm = false;
         this.pendingAction = null;
-        this.issubmitting = false;
+        this.isSubmitting = false;
     }
 
     confirmYes() {
-        if (this.issubmitting) return;
+        if (this.isSubmitting) return;
 
-        this.issubmitting = true;
+        this.isSubmitting = true;
         this.buttonsDisabled = true;
 
         if (this.pendingAction === ACTION_OPEN_RESCHEDULE) {
-            this.issubmitting = false;
+            this.isSubmitting = false;
             this.buttonsDisabled = false;
             this.showConfirm = false;
             this.showReschedule = true;
@@ -184,7 +245,7 @@ export default class AppointmentApprovalToOpp extends LightningElement {
             return;
         }
 
-        this.issubmitting = false;
+        this.isSubmitting = false;
         this.buttonsDisabled = false;
         this.showConfirm = false;
     }
@@ -198,14 +259,14 @@ export default class AppointmentApprovalToOpp extends LightningElement {
             timeSlot
         })
             .then(() => {
-                this.issubmitting = false;
+                this.isSubmitting = false;
                 this.showConfirm = false;
-                this.closereschedulepanel();
+                this.closeReschedulePanel();
                 this.showThankYou = true;
                 this.currentStatus = status;
             })
             .catch((error) => {
-                this.issubmitting = false;
+                this.isSubmitting = false;
                 this.buttonsDisabled = false;
                 const msg = error?.body?.message || 'Something went wrong.';
                 this.showToast('Error', msg, 'error');

@@ -12,7 +12,7 @@
  *   - Runs asynchronously (Queueable)
  *   - Safe for test context (dummy PDF in test)
  */
-public with sharing class InvoicePdfJob implements Queueable, Database.AllowsCallouts {
+public without sharing class InvoicePdfJob implements Queueable, Database.AllowsCallouts {
     private final Id invoiceId;
 
     // ✅ TEST HOOK (does nothing in prod)

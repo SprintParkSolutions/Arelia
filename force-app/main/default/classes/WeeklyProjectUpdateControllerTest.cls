@@ -122,18 +122,4 @@ private class WeeklyProjectUpdateControllerTest {
         }
         Test.stopTest();
     }
-
-    // ==========================================
-    // 5. Test Org-Wide Email Address Retrieval
-    // ==========================================
-    @IsTest
-    static void testGetOWD() {
-        Test.startTest();
-        Id owdId = WeeklyProjectUpdateController.getOWD();
-        Test.stopTest();
-
-        // OWD might be null depending on the Sandbox setup. 
-        // We assert true to guarantee the query executes cleanly without breaking.
-        Assert.isTrue(true, 'The getOWD method executed successfully');
-    }
 }

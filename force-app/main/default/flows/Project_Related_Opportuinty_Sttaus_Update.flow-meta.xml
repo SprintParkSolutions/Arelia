@@ -43,6 +43,13 @@
                 <stringValue>Closed Won</stringValue>
             </value>
         </filters>
+        <filters>
+            <field>RecordTypeId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>AreliaRecordType</elementReference>
+            </value>
+        </filters>
         <inputAssignments>
             <field>StageName</field>
             <value>
@@ -91,4 +98,14 @@
         <triggerType>RecordAfterSave</triggerType>
     </start>
     <status>Active</status>
+    <variables>
+        <name>AreliaRecordType</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+        <value>
+            <stringValue>012U9000002ER8rIAG</stringValue>
+        </value>
+    </variables>
 </Flow>

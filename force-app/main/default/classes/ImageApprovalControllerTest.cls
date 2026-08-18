@@ -163,6 +163,18 @@ private class ImageApprovalControllerTest {
     }
 
     @isTest
+    static void testExternalSiteGetFileByTokenProject() {
+        Architecture_Design__c design = new Architecture_Design__c();
+        design.putSObject('Project__r', new sf_devops__Project__c(Name = 'Relationship Project'));
+
+        Test.startTest();
+        String projectName = ImageApprovalController.getExternalProjectName(design);
+        Test.stopTest();
+
+        System.assertEquals('Relationship Project', projectName, 'Project relationship name should be resolved for Project designs.');
+    }
+
+    @isTest
     static void testExternalSiteSubmitDecisionSuccess() {
         Opportunity opp = [SELECT Id FROM Opportunity LIMIT 1];
         Architecture_Design__c design = TestDataUtility.createArchitectureDesign(opp.Id, 'file123', 'Sent');
@@ -234,5 +246,33 @@ private class ImageApprovalControllerTest {
         Test.stopTest();
         
         System.assert(exceptionThrown, 'AuraHandledException should be thrown due to invalid parent Id query logic.');
+    }
+
+    @isTest
+    static void testVersionIdEmptyInputsAndNullRecord() {
+        Boolean exceptionThrown = false;
+        Project__c proj = [SELECT Id FROM Project__c LIMIT 1];
+        Boolean projectRecipientExceptionThrown = false;
+        String projectRecipientEmail;
+
+        Test.startTest();
+        List<Id> nullVersionIds = ImageApprovalController.getVersionIds(null);
+        List<Id> emptyVersionIds = ImageApprovalController.getVersionIds(new List<String>());
+        try {
+            ImageApprovalController.sendDesignBundle(null, new List<String>{'069000000000000AAA'}, 1000.00);
+        } catch (AuraHandledException e) {
+            exceptionThrown = true;
+        }
+        try {
+            projectRecipientEmail = ImageApprovalController.getRecipientEmailForTest(proj.Id);
+        } catch (AuraHandledException e) {
+            projectRecipientExceptionThrown = true;
+        }
+        Test.stopTest();
+
+        System.assert(nullVersionIds.isEmpty(), 'Null file ids should return an empty ContentVersion list.');
+        System.assert(emptyVersionIds.isEmpty(), 'Empty file ids should return an empty ContentVersion list.');
+        System.assert(exceptionThrown, 'Null record with files should fail after the null validation branch.');
+        System.assert(projectRecipientExceptionThrown || String.isNotBlank(projectRecipientEmail), 'Project recipient helper should either return an email or reject a project without email.');
     }
 }

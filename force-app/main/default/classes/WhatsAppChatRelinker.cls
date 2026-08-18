@@ -9,9 +9,11 @@ public without sharing class WhatsAppChatRelinker {
     public static void onAfterUpdate(List<Lead> newList, Map<Id, Lead> oldMap) {
         if (newList == null || newList.isEmpty()) return;
 
-        // 1) Collect just-converted leads
+        // 1) Collect just-converted leads (Arelia record type only)
+        Id areliaLeadRecordTypeId = AreliaUtility.getAreliaLeadRecordTypeId();
         Map<Id, Lead> justConverted = new Map<Id, Lead>();
         for (Lead l : newList) {
+            if (l.RecordTypeId != areliaLeadRecordTypeId) continue;
             Lead oldL = oldMap.get(l.Id);
             if (l.IsConverted && (oldL == null || !oldL.IsConverted)) {
                 justConverted.put(l.Id, l);

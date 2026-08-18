@@ -1,0 +1,150 @@
+<template>
+    <div class="vendor-page">
+
+        <template if:true={isLoading}>
+            <div class="loading-overlay">
+                <div class="loading-box">
+                    <lightning-spinner
+                        alternative-text="Loading agreement"
+                        size="medium"
+                        variant="brand">
+                    </lightning-spinner>
+
+                    <p class="loading-text">Preparing vendor agreement...</p>
+                </div>
+            </div>
+        </template>
+
+        <template if:true={errorMessage}>
+            <div class="error-box">
+                <div class="error-title">Error</div>
+                <div class="error-message">{errorMessage}</div>
+            </div>
+        </template>
+
+        <template if:true={showSuccessScreen}>
+            <div class="success-container">
+                <div class="success-card">
+                    <div class="success-icon">✓</div>
+
+                    <p class="success-eyebrow">Agreement Status</p>
+
+                    <h1 class="success-title">
+                        Vendor Agreement Signed Successfully
+                    </h1>
+
+                    <p class="success-message">
+                        Thank you, <strong>{vendorName}</strong>. Your signed Vendor Agreement
+                        has been submitted successfully.
+                    </p>
+
+                    <p class="success-sub-message">
+                        A signed copy has been shared with the concerned supervisor for further processing.
+                    </p>
+
+                    <div class="success-action">
+                        <button
+                            class="primary-button"
+                            onclick={handleRedirect}>
+                            OK
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template if:true={agreementLoaded}>
+            <section class="agreement-card">
+
+                <div class="agreement-header">
+                    <div class="header-badge">Digital Agreement</div>
+
+                    <h1>Vendor Agreement Signing</h1>
+
+                    <p>
+                        Review the vendor agreement carefully, draw your digital signature,
+                        and click <strong>Done</strong> to submit the signed agreement.
+                    </p>
+                </div>
+
+                <div class="vendor-info-panel">
+                    <div class="info-block">
+                        <span class="info-label">Vendor Name</span>
+                        <span class="info-value">{vendorName}</span>
+                    </div>
+
+                    <div class="info-block">
+                        <span class="info-label">Agreement Type</span>
+                        <span class="info-value">Interior Design Vendor / Contractor Agreement</span>
+                    </div>
+                </div>
+
+                <div class="agreement-preview-shell">
+                    <div class="document-ribbon">
+                        <span>Agreement Preview</span>
+                        <span class="document-ribbon-line"></span>
+                    </div>
+
+                    <div class="agreement-preview">
+                        <lightning-formatted-rich-text
+                            value={agreementHtml}>
+                        </lightning-formatted-rich-text>
+                    </div>
+                </div>
+
+                <div class="signature-section">
+                    <div class="signature-header">
+                        <div>
+                            <p class="signature-eyebrow">Vendor Authorization</p>
+                            <h2>Digital Signature</h2>
+                        </div>
+
+                        <div class="signature-status">
+                            Signature Required
+                        </div>
+                    </div>
+
+                    <p class="signature-instruction">
+                        Please sign inside the box below. This signature will be captured
+                        electronically and attached to the signed vendor agreement.
+                    </p>
+
+                    <div class="signature-canvas-wrap">
+                        <canvas
+                            class="signature-canvas"
+                            width="700"
+                            height="190"
+                            onmousedown={startDrawing}
+                            onmousemove={draw}
+                            onmouseup={stopDrawing}
+                            onmouseleave={stopDrawing}
+                            ontouchstart={startDrawing}
+                            ontouchmove={draw}
+                            ontouchend={stopDrawing}>
+                        </canvas>
+
+                        <div class="signature-placeholder">
+                            Sign here
+                        </div>
+                    </div>
+
+                    <div class="button-row">
+                        <button
+                            class="secondary-button"
+                            onclick={clearSignature}>
+                            Clear Signature
+                        </button>
+
+                        <button
+                            class="primary-button"
+                            onclick={handleDone}>
+                            Done
+                        </button>
+                    </div>
+                </div>
+
+            </section>
+        </template>
+
+    </div>
+</template>

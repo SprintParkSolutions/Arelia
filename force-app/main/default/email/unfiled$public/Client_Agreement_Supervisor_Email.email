@@ -1,0 +1,23 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p>Hello,</p>
+
+<p>The client has digitally signed the agreement.</p>
+
+<p><strong>Client Email:</strong> {{CLIENT_EMAIL}}</p>
+
+<p><strong>Supervisor Email:</strong> {{SUPERVISOR_EMAIL}}</p>
+
+<p><strong>Opportunity:</strong> {{OPPORTUNITY_NAME}}</p>
+
+<p><strong>Signed Date:</strong> {{SIGNED_DATE}}</p>
+
+<p>The signed PDF is attached to this email and has also been stored against the Opportunity.</p>
+
+<p>Regards,<br />
+Agreements Team</p>
+</body>
+</html>

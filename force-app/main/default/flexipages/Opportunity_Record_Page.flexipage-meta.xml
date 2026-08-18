@@ -28,6 +28,9 @@
                             <value>Opportunity.Catalouge_Approval</value>
                         </valueListItems>
                         <valueListItems>
+                            <value>Opportunity.Send_Client_Agreement</value>
+                        </valueListItems>
+                        <valueListItems>
                             <value>Opportunity.Send_Password</value>
                         </valueListItems>
                         <valueListItems>

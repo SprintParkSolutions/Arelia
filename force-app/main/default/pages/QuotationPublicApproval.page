@@ -1,177 +1,1010 @@
-<!--
-  @description       : 
-  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
-  @group             : 
-  @last modified on  : 02-11-2026
-  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
--->
-<apex:page controller="PublicApprovalController" showHeader="false" sidebar="false" lightningStylesheets="true" applyHtmlTag="false" applyBodyTag="false" docType="html-5.0">
+<apex:page controller="PublicApprovalController"
+    showHeader="false"
+    sidebar="false"
+    lightningStylesheets="true"
+    applyHtmlTag="false"
+    applyBodyTag="false"
+    docType="html-5.0">
 
     <head>
-        <title>Approval Request</title>
+        <title>Catalogue Approval Request</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
         <style>
-            /* Base Page Styles */
-            body {
-                font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-                background-color: #f4f6f9;
-                margin: 0;
-                padding: 0;
+            :root {
+                --black: #050505;
+                --black-soft: #0b0b0b;
+                --card: #111111;
+                --card-soft: #171717;
+                --gold: #d4af37;
+                --gold-light: #ffdf73;
+                --gold-dark: #8a6514;
+                --pearl: #fdfcf0;
+                --pearl-soft: rgba(253, 252, 240, 0.84);
+                --pearl-muted: rgba(253, 252, 240, 0.6);
+                --green: #22c55e;
+                --red: #ff5757;
+                --border-gold: rgba(212, 175, 55, 0.3);
+
+                --font-main: "Aptos", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                --font-display: "Aptos Display", "Aptos", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             }
 
-            /* Card Container */
-            .container {
-                max-width: 600px;
-                margin: 60px auto;
-                background: white;
-                padding: 50px 40px;
-                border-radius: 16px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            html,
+            body {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                overflow: hidden !important;
+                background: transparent;
+                font-family: var(--font-main);
+            }
+
+            body {
+                color: var(--pearl);
+            }
+
+            .approval-page {
+                width: 100%;
+                padding: 24px 18px 36px;
+                box-sizing: border-box;
+                overflow: visible;
+                background: transparent;
+            }
+
+            .approval-shell {
+                width: 100%;
+                max-width: 980px;
+                margin: 0 auto;
+                padding: 44px 30px 48px;
+                box-sizing: border-box;
+                border-radius: 26px;
+                position: relative;
+                overflow: hidden;
+                background:
+                    radial-gradient(circle at 50% 0%, rgba(255, 223, 115, 0.18), transparent 36%),
+                    radial-gradient(circle at 0% 100%, rgba(212, 175, 55, 0.08), transparent 36%),
+                    linear-gradient(145deg, #050505, #0c0c0c 58%, #020202);
+                border: 1px solid rgba(212, 175, 55, 0.18);
+                box-shadow:
+                    0 26px 72px rgba(0, 0, 0, 0.58),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.045);
+            }
+
+            .approval-shell::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background-image:
+                    radial-gradient(rgba(212, 175, 55, 0.14) 0.6px, transparent 0.6px),
+                    linear-gradient(90deg, rgba(212, 175, 55, 0.03), transparent, rgba(212, 175, 55, 0.02));
+                background-size: 32px 32px, 100% 100%;
+                opacity: 0.16;
+                pointer-events: none;
+            }
+
+            .approval-shell::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 50%;
+                width: 66%;
+                height: 2px;
+                transform: translateX(-50%);
+                background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+                opacity: 0.78;
+                pointer-events: none;
+            }
+
+            .page-content {
+                position: relative;
+                z-index: 1;
+                width: 100%;
+                max-width: 720px;
+                margin: 0 auto;
+            }
+
+            .header-block {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                margin-bottom: 30px;
+            }
+
+            .eyebrow {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: fit-content;
+                max-width: 100%;
+                margin: 0 auto 16px;
+                padding: 8px 18px;
+                border-radius: 999px;
+                border: 1px solid rgba(212, 175, 55, 0.4);
+                color: var(--gold-light);
+                background: rgba(212, 175, 55, 0.08);
+                font-size: 0.7rem;
+                font-weight: 800;
+                letter-spacing: 0.14em;
+                text-transform: uppercase;
+                line-height: 1.1;
+                box-sizing: border-box;
+            }
+
+            .page-title {
+                display: block;
+                width: 100%;
+                margin: 0 auto 14px;
+                font-family: var(--font-display);
+                font-size: 2.42rem;
+                font-weight: 800;
+                line-height: 1.18;
+                letter-spacing: 0.105em;
+                text-transform: uppercase;
+                text-align: center;
+                background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                text-shadow: 0 18px 46px rgba(212, 175, 55, 0.34);
+            }
+
+            .page-subtitle {
+                max-width: 620px;
+                margin: 0 auto;
+                color: var(--pearl-muted);
+                font-size: 0.95rem;
+                line-height: 1.7;
                 text-align: center;
             }
 
-            /* Typography */
-            h1 {
-                color: #2c3e50;
-                margin-bottom: 15px;
-                font-size: 28px;
-                font-weight: 600;
-            }
-            p {
-                color: #7f8c8d;
-                font-size: 16px;
-                line-height: 1.5;
-                margin-bottom: 40px;
+            .eyebrow,
+            .page-title,
+            .card-heading,
+            .summary-title,
+            .btn-action,
+            .reason-label,
+            .success-title,
+            .reject-title,
+            .modal-title {
+                font-family: var(--font-display);
             }
 
-            /* Buttons */
+            .page-subtitle,
+            .summary-text,
+            .card-text,
+            .status-message,
+            .error-msg,
+            .processing-text,
+            .modal-message {
+                font-family: var(--font-main);
+            }
+
+            .approval-card {
+                position: relative;
+                width: 100%;
+                max-width: 620px;
+                margin: 0 auto;
+                padding: 34px 32px;
+                box-sizing: border-box;
+                border-radius: 22px;
+                border: 1px solid var(--border-gold);
+                border-top: 4px solid var(--gold);
+                background:
+                    radial-gradient(circle at top left, rgba(255, 223, 115, 0.09), transparent 32%),
+                    linear-gradient(145deg, rgba(22, 22, 22, 0.98), rgba(7, 7, 7, 0.98));
+                box-shadow:
+                    0 22px 60px rgba(0, 0, 0, 0.72),
+                    0 0 34px rgba(212, 175, 55, 0.08),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.045);
+                text-align: center;
+            }
+
+            .card-inner-border {
+                position: relative;
+                width: 100%;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            .card-heading {
+                margin: 0 auto 36px;
+                color: var(--gold-light);
+                font-size: 1.34rem;
+                font-weight: 800;
+                letter-spacing: 0.085em;
+                text-align: center;
+                text-transform: uppercase;
+                line-height: 1.3;
+                display: block;
+            }
+
+            .review-summary {
+                display: grid;
+                grid-template-columns: 56px minmax(0, 1fr);
+                gap: 18px;
+                align-items: center;
+                margin: 0 auto 28px;
+                padding: 20px 22px;
+                border-radius: 16px;
+                border: 1px solid rgba(212, 175, 55, 0.24);
+                background:
+                    linear-gradient(145deg, rgba(212, 175, 55, 0.095), rgba(255, 255, 255, 0.025)),
+                    #101010;
+                text-align: left;
+                box-sizing: border-box;
+            }
+
+            .review-icon {
+                width: 56px;
+                height: 56px;
+                border-radius: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #070707;
+                font-size: 0.82rem;
+                font-weight: 900;
+                letter-spacing: 0.08em;
+                background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
+                box-shadow: 0 12px 26px rgba(212, 175, 55, 0.25);
+            }
+
+            .summary-title {
+                margin: 0 0 6px;
+                color: var(--gold-light);
+                font-size: 0.9rem;
+                font-weight: 800;
+                letter-spacing: 0.045em;
+                text-transform: uppercase;
+                line-height: 1.3;
+            }
+
+            .summary-text {
+                margin: 0;
+                color: var(--pearl-soft);
+                font-size: 0.94rem;
+                line-height: 1.55;
+            }
+
+            .card-text {
+                max-width: 520px;
+                margin: 0 auto 24px;
+                color: var(--pearl-soft);
+                font-size: 0.98rem;
+                line-height: 1.7;
+                text-align: center;
+            }
+
+            .card-text strong {
+                color: var(--gold-light);
+            }
+
+            .button-row {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 20px;
+                flex-wrap: wrap;
+                margin-top: 22px;
+            }
+
             .btn-action {
-                border: none !important;
-                padding: 14px 40px !important;
-                margin: 10px !important;
-                font-size: 16px !important;
-                font-weight: 600 !important;
-                border-radius: 50px !important;
+                min-width: 190px;
+                border-radius: 10px !important;
+                padding: 14px 24px !important;
+                border: 1px solid transparent !important;
                 cursor: pointer !important;
-                transition: all 0.3s ease !important;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+                font-size: 0.88rem !important;
+                font-weight: 800 !important;
+                letter-spacing: 0.085em !important;
+                text-transform: uppercase !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
                 text-decoration: none !important;
-                display: inline-block !important;
+                box-sizing: border-box !important;
+                line-height: 1.2 !important;
+                transition:
+                    transform 0.25s ease,
+                    box-shadow 0.25s ease,
+                    background-color 0.25s ease,
+                    border-color 0.25s ease,
+                    color 0.25s ease !important;
             }
 
             .btn-action:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
             }
 
             .btn-approve {
-                background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%) !important;
-                color: white !important;
+                color: #060606 !important;
+                border-color: rgba(255, 223, 115, 0.5) !important;
+                background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark)) !important;
+                box-shadow:
+                    0 14px 32px rgba(212, 175, 55, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.38) !important;
             }
 
-            .btn-reject {
-                background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important;
-                color: white !important;
-            }
-
+            .btn-reject,
+            .btn-back,
             .btn-cancel {
-                background: #ecf0f1 !important;
-                color: #7f8c8d !important;
+                color: var(--gold-light) !important;
+                border: 1px solid rgba(212, 175, 55, 0.5) !important;
+                background:
+                    linear-gradient(145deg, rgba(212, 175, 55, 0.09), rgba(255, 255, 255, 0.025)),
+                    #151515 !important;
+                box-shadow: 0 14px 30px rgba(0, 0, 0, 0.36) !important;
+            }
+
+            .btn-icon {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 10px;
+                font-size: 1.32rem;
+                line-height: 1;
+            }
+
+            .icon-approve {
+                color: var(--green);
+            }
+
+            .icon-reject {
+                color: var(--red);
+            }
+
+            .icon-back {
+                color: var(--gold-light);
             }
 
             .reject-box {
-                margin-top: 20px;
-                padding-top: 20px;
-                border-top: 1px solid #eee;
-                animation: fadeIn 0.4s ease-out;
+                width: 100%;
+                box-sizing: border-box;
+                padding: 0;
+                border: none;
+                background: transparent;
+                animation: fadeIn 0.35s ease-in;
+            }
+
+            .reject-content {
+                width: 100%;
+                box-sizing: border-box;
+                padding: 24px;
+                border-radius: 18px;
+                border: 1px solid rgba(212, 175, 55, 0.24);
+                background:
+                    radial-gradient(circle at top left, rgba(212, 175, 55, 0.08), transparent 34%),
+                    linear-gradient(145deg, rgba(255, 255, 255, 0.025), rgba(212, 175, 55, 0.055)),
+                    #0f0f0f;
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            }
+
+            .reason-label {
+                display: block;
+                margin: 0 0 10px;
+                color: var(--gold-light);
+                font-size: 0.9rem;
+                font-weight: 800;
+                letter-spacing: 0.075em;
+                text-align: left;
+                text-transform: uppercase;
+                line-height: 1.3;
+            }
+
+            .required-symbol {
+                color: var(--red);
+                text-decoration: none;
+                margin-right: 4px;
             }
 
             .reason-input {
-                width: 90%;
-                padding: 15px;
-                border: 2px solid #dfe6e9;
+                width: 100% !important;
+                min-height: 130px;
+                resize: vertical;
+                box-sizing: border-box;
                 border-radius: 12px;
-                font-size: 15px;
-                margin-bottom: 20px;
+                border: 1px solid rgba(212, 175, 55, 0.42);
+                background-color: #101010;
+                color: var(--pearl);
+                -webkit-text-fill-color: var(--pearl);
+                caret-color: var(--gold-light);
+                padding: 14px 16px;
+                font-family: var(--font-main);
+                font-size: 0.98rem;
+                line-height: 1.5;
+                outline: none;
+                margin: 0;
             }
 
-            .status-icon { font-size: 64px; margin-bottom: 20px; display: block; }
-            .icon-success { color: #2ecc71; }
-            .icon-reject { color: #e74c3c; }
+            .reason-input::placeholder {
+                color: rgba(253, 252, 240, 0.42);
+                -webkit-text-fill-color: rgba(253, 252, 240, 0.42);
+            }
+
+            .reason-input:focus {
+                border-color: var(--gold);
+                box-shadow: 0 0 0 1px var(--gold), 0 0 20px rgba(212, 175, 55, 0.24);
+            }
+
+            .status-card {
+                animation: fadeIn 0.35s ease-in;
+            }
+
+            .status-icon {
+                width: 68px;
+                height: 68px;
+                margin: 0 auto 20px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 2rem;
+                font-weight: 900;
+                background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
+                color: #060606;
+                box-shadow: 0 16px 36px rgba(212, 175, 55, 0.34);
+            }
+
+            .success-title,
+            .reject-title {
+                margin: 0 0 12px;
+                color: var(--gold-light);
+                font-size: 1.7rem;
+                font-weight: 800;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+            }
+
+            .status-message {
+                color: var(--pearl-soft);
+                font-size: 1rem;
+                line-height: 1.7;
+                margin-bottom: 26px;
+            }
 
             .error-msg {
-                background-color: #fee;
-                color: #c0392b;
-                padding: 15px;
-                border-radius: 8px;
-                border: 1px solid #fcc;
-                margin-top: 20px;
+                margin-top: 22px;
+                padding: 15px 17px;
+                border-radius: 12px;
+                border: 1px solid rgba(255, 87, 87, 0.32);
+                border-left: 4px solid var(--red);
+                background: #160d0d;
+                color: #ffbaba;
+                text-align: left;
+                font-weight: 600;
+                line-height: 1.5;
+            }
+
+            .processing-text {
+                margin: 0 0 16px;
+                color: var(--gold-light);
+                font-weight: 700;
+                letter-spacing: 0.04em;
+                text-align: center;
+            }
+
+            .custom-modal-backdrop {
+                position: fixed;
+                inset: 0;
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                box-sizing: border-box;
+                background: radial-gradient(circle at center, rgba(13, 13, 13, 0.86), rgba(0, 0, 0, 0.96));
+                backdrop-filter: blur(8px);
+            }
+
+            .custom-modal-box {
+                width: 100%;
+                max-width: 480px;
+                padding: 42px 34px;
+                border-radius: 22px;
+                text-align: center;
+                border: 1px solid rgba(212, 175, 55, 0.42);
+                border-top: 4px solid var(--gold);
+                background:
+                    radial-gradient(circle at top, rgba(212, 175, 55, 0.14), transparent 58%),
+                    linear-gradient(145deg, rgba(18, 18, 18, 0.98), rgba(8, 8, 8, 0.98));
+                box-shadow:
+                    0 30px 90px rgba(0, 0, 0, 0.78),
+                    0 0 46px rgba(212, 175, 55, 0.14);
+            }
+
+            .modal-icon {
+                width: 64px;
+                height: 64px;
+                border-radius: 50%;
+                margin: 0 auto 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
+                color: #050505;
+                font-size: 2rem;
+                font-weight: 900;
+                box-shadow: 0 16px 36px rgba(212, 175, 55, 0.34);
+            }
+
+            .modal-title {
+                margin: 0 0 12px;
+                color: var(--gold-light);
+                font-size: 1.55rem;
+                font-weight: 800;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+            }
+
+            .modal-message {
+                margin: 0 auto 26px;
+                color: var(--pearl-soft);
+                font-size: 1rem;
+                line-height: 1.6;
             }
 
             @keyframes fadeIn {
-                from { opacity:0; transform: translateY(10px); }
-                to { opacity:1; transform: translateY(0); }
+                0% {
+                    opacity: 0;
+                    transform: translateY(14px);
+                }
+
+                100% {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @media screen and (max-width: 768px) {
+                html,
+                body {
+                    overflow-x: hidden !important;
+                    overflow-y: hidden !important;
+                }
+
+                .approval-page {
+                    padding: 24px 10px 30px;
+                }
+
+                .approval-shell {
+                    padding: 32px 14px 36px;
+                    border-radius: 20px;
+                }
+
+                .header-block {
+                    margin-bottom: 24px;
+                }
+
+                .eyebrow {
+                    margin-bottom: 14px;
+                    font-size: 0.62rem;
+                    letter-spacing: 0.1em;
+                    padding: 7px 12px;
+                }
+
+                .page-title {
+                    font-size: 1.62rem;
+                    letter-spacing: 0.065em;
+                    line-height: 1.35;
+                }
+
+                .page-subtitle {
+                    font-size: 0.8rem;
+                    margin-bottom: 0;
+                }
+
+                .approval-card {
+                    padding: 26px 16px;
+                    border-radius: 18px;
+                }
+
+                .card-heading {
+                    font-size: 1.15rem;
+                    letter-spacing: 0.065em;
+                    margin-bottom: 30px;
+                }
+
+                .review-summary {
+                    grid-template-columns: 1fr;
+                    gap: 12px;
+                    text-align: center;
+                    padding: 18px 16px;
+                }
+
+                .review-icon {
+                    margin: 0 auto;
+                }
+
+                .summary-title,
+                .summary-text {
+                    text-align: center;
+                }
+
+                .card-text,
+                .summary-text,
+                .status-message {
+                    font-size: 0.92rem;
+                }
+
+                .button-row {
+                    flex-direction: column;
+                    gap: 14px;
+                }
+
+                .btn-action {
+                    width: 100% !important;
+                    min-width: auto;
+                    padding: 14px 18px !important;
+                    font-size: 0.86rem !important;
+                    letter-spacing: 0.075em !important;
+                }
+
+                .reject-content {
+                    padding: 16px;
+                }
+
+                .reason-input {
+                    min-height: 125px;
+                    font-size: 0.94rem;
+                }
+
+                .custom-modal-box {
+                    padding: 34px 22px;
+                }
+
+                .modal-title {
+                    font-size: 1.3rem;
+                }
             }
         </style>
 
         <script>
-            window.onload = function() {
-                const urlParams = new URLSearchParams(window.top.location.search);
-                const myId = urlParams.get('id');
-                if (myId) {
-                    passIdToController(myId);
+            function resizeApprovalFrame() {
+                window.setTimeout(function() {
+                    try {
+                        var approvalPage = document.querySelector('.approval-page');
+                        var pageHeight = Math.max(
+                            document.body.scrollHeight,
+                            document.documentElement.scrollHeight,
+                            approvalPage ? approvalPage.scrollHeight : 0
+                        );
+
+                        if (window.frameElement) {
+                            window.frameElement.style.height = pageHeight + 'px';
+                            window.frameElement.style.minHeight = pageHeight + 'px';
+                            window.frameElement.style.overflow = 'hidden';
+                            window.frameElement.setAttribute('scrolling', 'no');
+                        }
+                    } catch (resizeError) {
+                        return;
+                    }
+                }, 150);
+            }
+
+            function getUrlParameter(urlValue, parameterNames) {
+                if (!urlValue) {
+                    return '';
                 }
-            };
+
+                var queryString = '';
+
+                try {
+                    queryString = new URL(urlValue).search;
+                } catch (urlError) {
+                    var queryStartIndex = urlValue.indexOf('?');
+                    queryString = queryStartIndex >= 0 ? urlValue.substring(queryStartIndex) : '';
+                }
+
+                if (!queryString) {
+                    return '';
+                }
+
+                var searchParams = new URLSearchParams(queryString);
+
+                for (var index = 0; index < parameterNames.length; index++) {
+                    var value = searchParams.get(parameterNames[index]);
+
+                    if (value && /^[a-zA-Z0-9]{15,18}$/.test(value.trim())) {
+                        return value.trim();
+                    }
+                }
+
+                return '';
+            }
+
+            function getQuotationRecordIdFromUrl() {
+                var parameterNames = [
+                    'quoteId',
+                    'recordId',
+                    'pId',
+                    'id',
+                    'c__quoteId',
+                    'c__recordId'
+                ];
+
+                var possibleUrls = [
+                    window.location.href,
+                    document.referrer
+                ];
+
+                try {
+                    if (window.parent && window.parent.location) {
+                        possibleUrls.push(window.parent.location.href);
+                    }
+                } catch (parentUrlError) {
+                    // In Experience Cloud, the Visualforce page can be inside an iframe.
+                    // Browser security may block parent URL access, so document.referrer is used.
+                }
+
+                for (var index = 0; index < possibleUrls.length; index++) {
+                    var recordId = getUrlParameter(possibleUrls[index], parameterNames);
+
+                    if (recordId) {
+                        return recordId;
+                    }
+                }
+
+                return '';
+            }
+
+            function initializeQuotationId() {
+                var quotationRecordId = getQuotationRecordIdFromUrl();
+
+                if (typeof loadQuotationIdFromUrl === 'function') {
+                    loadQuotationIdFromUrl(quotationRecordId);
+                }
+            }
+
+            window.addEventListener('load', function() {
+                resizeApprovalFrame();
+                initializeQuotationId();
+            });
+
+            window.addEventListener('resize', resizeApprovalFrame);
+            document.addEventListener('DOMContentLoaded', resizeApprovalFrame);
         </script>
     </head>
 
     <body>
-        <div class="container">
-            <apex:outputPanel id="mainPanel">
-                <apex:form >
-                    <apex:actionFunction name="passIdToController" action="{!setRecordIdFromClient}" reRender="mainPanel">
-                        <apex:param name="pId" value="" />
-                    </apex:actionFunction>
+        <div class="approval-page">
+            <div class="approval-shell">
+                <div class="page-content">
+                    <div class="header-block">
+                        <div class="eyebrow">Manager Catalogue Review</div>
 
-                    <apex:actionStatus id="btnStatus">
-                        <apex:facet name="start">
-                            <p style="color:#2980b9; font-weight:600;">Processing request...</p>
-                        </apex:facet>
-                    </apex:actionStatus>
+                        <h1 class="page-title">Catalogue Approval</h1>
 
-                    <apex:outputPanel rendered="{!AND(NOT(approved), NOT(rejected), NOT(isRejecting))}">
-                        <h1>Approval Request</h1>
-                        <p>Please review the Catalouge Document sent to your email.</p>
-                        
-                        <apex:commandButton value="Approve" action="{!doApprove}" reRender="mainPanel" status="btnStatus" styleClass="btn-action btn-approve"/>
-                        <apex:commandButton value="Reject" action="{!enableRejectMode}" reRender="mainPanel" status="btnStatus" styleClass="btn-action btn-reject"/>
-                    </apex:outputPanel>
+                        <p class="page-subtitle">
+                            Review the shared catalogue document and submit your decision securely.
+                        </p>
+                    </div>
 
-                    <apex:outputPanel rendered="{!isRejecting}" styleClass="reject-box">
-                        <h1>Reason for Rejection</h1>
-                        <apex:inputTextarea value="{!rejectionReason}" styleClass="reason-input" rows="4" html-placeholder="Enter reason here..."/>
-                        <apex:commandButton value="Confirm Reject" action="{!doConfirmReject}" reRender="mainPanel" status="btnStatus" styleClass="btn-action btn-reject"/>
-                        <apex:commandButton value="Cancel" action="{!cancelRejectMode}" reRender="mainPanel" immediate="true" styleClass="btn-action btn-cancel"/>
-                    </apex:outputPanel>
-                </apex:form>
+                    <div class="approval-card">
+                        <div class="card-inner-border">
+                            <apex:outputPanel id="mainPanel">
+                                <apex:form id="approvalForm">
+                                    <apex:actionFunction name="loadQuotationIdFromUrl"
+                                        action="{!setRecordIdFromClient}"
+                                        reRender="mainPanel"
+                                        oncomplete="resizeApprovalFrame();">
 
-                <apex:outputPanel rendered="{!approved}">
-                    <span class="status-icon icon-success">✔</span>
-                    <h1>Approved!</h1>
-                    <p>The Catalouge Document have been successfully approved.</p>
-                </apex:outputPanel>
+                                        <apex:param name="quoteIdFromUrl"
+                                            assignTo="{!quoteIdValue}"
+                                            value=""/>
+                                    </apex:actionFunction>
 
-                <apex:outputPanel rendered="{!rejected}">
-                    <span class="status-icon icon-reject">✘</span>
-                    <h1>Rejected</h1>
-                    <p>Your feedback has been recorded.</p>
-                </apex:outputPanel>
+                                    <apex:inputHidden value="{!quoteIdValue}" id="recordIdHolder"/>
 
-                <apex:outputPanel rendered="{!hasError}" styleClass="error-msg">
-                    <strong>Error:</strong> {!errorMessage}
-                </apex:outputPanel>
-            </apex:outputPanel>
+                                    <apex:actionStatus id="btnStatus">
+                                        <apex:facet name="start">
+                                            <p class="processing-text">Processing request...</p>
+                                        </apex:facet>
+                                    </apex:actionStatus>
+
+                                    <apex:outputPanel rendered="{!NOT(pageInitialized)}" styleClass="status-card">
+                                        <div class="status-icon">⌛</div>
+                                        <h2 class="success-title">Loading</h2>
+                                        <p class="status-message">
+                                            Please wait while we validate the quotation approval link.
+                                        </p>
+                                    </apex:outputPanel>
+
+                                    <apex:outputPanel rendered="{!AND(pageInitialized, NOT(hasError), NOT(approved), NOT(rejected), NOT(isRejecting), NOT(responseAlreadyRecorded), NOT(showApproveConfirm), NOT(showRejectConfirm))}">
+                                        <h2 class="card-heading">Approval Request</h2>
+
+                                        <div class="review-summary">
+                                            <div class="review-icon">DOC</div>
+
+                                            <div>
+                                                <p class="summary-title">Catalogue Document</p>
+                                                <p class="summary-text">
+                                                    The catalogue file has been shared with you through email. Please review it carefully before approving or requesting changes.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <p class="card-text">
+                                            Choose <strong>Approve</strong> to confirm the catalogue, or choose
+                                            <strong>Reject</strong> to provide revision feedback.
+                                        </p>
+
+                                        <div class="button-row">
+                                            <apex:commandLink action="{!showApproveConfirmation}"
+                                                reRender="mainPanel"
+                                                status="btnStatus"
+                                                styleClass="btn-action btn-approve"
+                                                oncomplete="resizeApprovalFrame();">
+                                                <span class="btn-icon icon-approve">✓</span>
+                                                <span>Approve</span>
+                                            </apex:commandLink>
+
+                                            <apex:commandLink action="{!enableRejectMode}"
+                                                reRender="mainPanel"
+                                                status="btnStatus"
+                                                styleClass="btn-action btn-reject"
+                                                oncomplete="resizeApprovalFrame();">
+                                                <span class="btn-icon icon-reject">✕</span>
+                                                <span>Reject</span>
+                                            </apex:commandLink>
+                                        </div>
+                                    </apex:outputPanel>
+
+                                    <apex:outputPanel rendered="{!AND(pageInitialized, NOT(hasError), isRejecting)}" styleClass="reject-box">
+                                        <div class="reject-content">
+                                            <h2 class="card-heading">Reason for Rejection</h2>
+
+                                            <label class="reason-label">
+                                                <abbr class="required-symbol" title="required">*</abbr>
+                                                Revision Remarks
+                                            </label>
+
+                                            <apex:inputTextarea value="{!rejectionReason}"
+                                                styleClass="reason-input"
+                                                rows="4"
+                                                html-placeholder="Enter reason here..."/>
+
+                                            <div class="button-row">
+                                                <apex:commandLink action="{!cancelRejectMode}"
+                                                    reRender="mainPanel"
+                                                    immediate="true"
+                                                    styleClass="btn-action btn-back"
+                                                    oncomplete="resizeApprovalFrame();">
+                                                    <span class="btn-icon icon-back">←</span>
+                                                    <span>Back</span>
+                                                </apex:commandLink>
+
+                                                <apex:commandLink action="{!showRejectConfirmation}"
+                                                    reRender="mainPanel"
+                                                    status="btnStatus"
+                                                    styleClass="btn-action btn-reject"
+                                                    oncomplete="resizeApprovalFrame();">
+                                                    <span class="btn-icon icon-reject">✕</span>
+                                                    <span>Submit Rejection</span>
+                                                </apex:commandLink>
+                                            </div>
+                                        </div>
+                                    </apex:outputPanel>
+
+                                    <apex:outputPanel rendered="{!AND(pageInitialized, NOT(hasError), showApproveConfirm)}">
+                                        <div class="custom-modal-backdrop">
+                                            <div class="custom-modal-box">
+                                                <div class="modal-icon">?</div>
+                                                <h2 class="modal-title">Confirm Approval</h2>
+                                                <p class="modal-message">
+                                                    Are you sure you want to approve this catalogue document?
+                                                </p>
+
+                                                <div class="button-row">
+                                                    <apex:commandLink action="{!closeApproveConfirmation}"
+                                                        reRender="mainPanel"
+                                                        immediate="true"
+                                                        styleClass="btn-action btn-cancel"
+                                                        oncomplete="resizeApprovalFrame();">
+                                                        <span>No, Cancel</span>
+                                                    </apex:commandLink>
+
+                                                    <apex:commandLink action="{!doApprove}"
+                                                        reRender="mainPanel"
+                                                        status="btnStatus"
+                                                        styleClass="btn-action btn-approve"
+                                                        oncomplete="resizeApprovalFrame();">
+                                                        <span class="btn-icon icon-approve">✓</span>
+                                                        <span>Yes, Approve</span>
+                                                    </apex:commandLink>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </apex:outputPanel>
+
+                                    <apex:outputPanel rendered="{!AND(pageInitialized, NOT(hasError), showRejectConfirm)}">
+                                        <div class="custom-modal-backdrop">
+                                            <div class="custom-modal-box">
+                                                <div class="modal-icon">?</div>
+                                                <h2 class="modal-title">Confirm Rejection</h2>
+                                                <p class="modal-message">
+                                                    Are you sure you want to submit this rejection?
+                                                </p>
+
+                                                <div class="button-row">
+                                                    <apex:commandLink action="{!closeRejectConfirmation}"
+                                                        reRender="mainPanel"
+                                                        immediate="true"
+                                                        styleClass="btn-action btn-cancel"
+                                                        oncomplete="resizeApprovalFrame();">
+                                                        <span>No, Cancel</span>
+                                                    </apex:commandLink>
+
+                                                    <apex:commandLink action="{!doConfirmReject}"
+                                                        reRender="mainPanel"
+                                                        status="btnStatus"
+                                                        styleClass="btn-action btn-reject"
+                                                        oncomplete="resizeApprovalFrame();">
+                                                        <span class="btn-icon icon-reject">✕</span>
+                                                        <span>Yes, Reject</span>
+                                                    </apex:commandLink>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </apex:outputPanel>
+                                </apex:form>
+
+                                <apex:outputPanel rendered="{!approved}" styleClass="status-card">
+                                    <div class="status-icon">✓</div>
+                                    <h2 class="success-title">Approved</h2>
+                                    <p class="status-message">
+                                        The manager approval has been recorded successfully.
+                                    </p>
+
+                                    <a class="btn-action btn-approve"
+                                        href="{!$Label.Arelia_Site_Redirect_URL_Label}"
+                                        target="_top">
+                                            <span class="btn-icon icon-approve">✓</span>
+                                            <span>Close</span>
+                                    </a>
+                                </apex:outputPanel>
+
+                                <apex:outputPanel rendered="{!rejected}" styleClass="status-card">
+                                    <div class="status-icon">✕</div>
+                                    <h2 class="reject-title">Rejected</h2>
+                                    <p class="status-message">
+                                        Your feedback has been recorded successfully.
+                                    </p>
+
+                                    <a class="btn-action btn-approve"
+                                        href="{!$Label.Arelia_Site_Redirect_URL_Label}"
+                                        target="_top">
+                                            <span class="btn-icon icon-approve">✓</span>
+                                            <span>Close</span>
+                                        </a>
+                                </apex:outputPanel>
+
+                                <apex:outputPanel rendered="{!responseAlreadyRecorded}" styleClass="status-card">
+                                    <div class="status-icon">!</div>
+                                    <h2 class="reject-title">Link Expired</h2>
+                                    <p class="status-message">
+                                        A response has already been recorded for this catalogue approval link.
+                                    </p>
+
+                                    <a class="btn-action btn-approve"
+                                        href="{!$Label.Arelia_Site_Redirect_URL_Label}"
+                                        target="_top">
+                                            <span class="btn-icon icon-approve">✓</span>
+                                            <span>Close</span>
+                                    </a>
+                                </apex:outputPanel>
+
+                                <apex:outputPanel rendered="{!hasError}" styleClass="error-msg">
+                                    <strong>Error:</strong> {!errorMessage}
+                                </apex:outputPanel>
+                            </apex:outputPanel>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </body>
 </apex:page>

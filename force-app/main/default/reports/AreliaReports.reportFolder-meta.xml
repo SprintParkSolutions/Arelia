@@ -5,5 +5,10 @@
         <sharedTo>admin-gkt0@force.com</sharedTo>
         <sharedToType>User</sharedToType>
     </folderShares>
+    <folderShares>
+        <accessLevel>View</accessLevel>
+        <sharedTo>SLLCPartnerPersonAccount</sharedTo>
+        <sharedToType>PortalRole</sharedToType>
+    </folderShares>
     <name>Arelia Reports</name>
 </ReportFolder>

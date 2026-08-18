@@ -113,6 +113,7 @@ public without sharing class WhatsAppChatStore {
             SELECT Id, Project_Request_Quotation_Type__c
             FROM Lead
             WHERE (Phone LIKE :('%' + last10) OR MobilePhone LIKE :('%' + last10))
+              AND RecordTypeId = :AreliaUtility.getAreliaLeadRecordTypeId()
             ORDER BY LastModifiedDate DESC
             LIMIT 1
         ];

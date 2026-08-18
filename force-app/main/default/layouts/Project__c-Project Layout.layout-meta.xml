@@ -32,6 +32,10 @@
                 <behavior>Edit</behavior>
                 <field>Actual_Completion_Date__c</field>
             </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Total_Vendor_Assigned__c</field>
+            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>

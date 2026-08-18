@@ -1,490 +1,834 @@
 /**
- * @description Controller for Client Image Approval LWC and Public Site.
- * Handles uploading design bundles, sending emails, and processing client decisions.
- * FIX: Replaced VersionData queries with setEntityAttachments to allow Guest Users to send multiple files.
+ * @description Controller for Architecture Design LWC and Public Site.
+ *
+ * Responsibilities:
+ * - Create Architecture Design
+ * - Link uploaded files
+ * - Retrieve submission history
+ * - Retrieve Architecture Design using secure token
+ * - Capture Approved / Changes Requested response
+ *
+ * IMPORTANT:
+ * No email is sent directly from this controller.
+ *
+ * Emails are handled globally through:
+ *
+ * ArchitectureDesignTrigger
+ *          ↓
+ * ArchitectureDesignNotificationHandler
  */
 @SuppressWarnings('PMD.ApexCRUDViolation')
 public without sharing class ImageApprovalController {
 
-    private static final String ARELIA_OPPORTUNITY_RECORD_TYPE_NAME = 'Arelia';
+    private static final String ERROR_UNSUPPORTED_RECORD_TYPE =
+        'Image approval is supported only for Arelia opportunities.';
+
+    private static final String ERROR_UNSUPPORTED_PARENT =
+        'Architecture Design is supported only for Opportunity or the configured Project object.';
+
+    private static final String STATUS_SENT =
+        'Sent';
+
+    private static final String STATUS_APPROVED =
+        'Approved';
+
+    private static final String STATUS_CHANGES_REQUESTED =
+        'Changes Requested';
+
+    private static final String ARELIA_OPPORTUNITY_RECORD_TYPE_NAME =
+        'Arelia';
+
     private static Id cachedAreliaOpportunityRecordTypeId;
 
-    // ============================================================================
-    // INNER CLASSES & WRAPPERS
-    // ============================================================================
+    // ========================================================================
+    // WRAPPER
+    // ========================================================================
 
     public class DesignWrapper {
-        @AuraEnabled public String id;
-        @AuraEnabled public String title;       
-        @AuraEnabled public String status;      
-        @AuraEnabled public String statusClass;
-        @AuraEnabled public String clientComments;
-        @AuraEnabled public Date createdDate;
-        @AuraEnabled public Boolean managerApproved;
-        @AuraEnabled public String managerComments;
-    }
 
-    private class RecipientInfo {
-        public String email;
-        public String name;
-    }
+        @AuraEnabled
+        public String id;
 
-    private class NotificationData {
-        public Architecture_Design__c design;
+        @AuraEnabled
+        public String title;
+
+        @AuraEnabled
         public String status;
-        public String comments;
+
+        @AuraEnabled
+        public String statusClass;
+
+        @AuraEnabled
+        public String clientComments;
+
+        @AuraEnabled
+        public Date createdDate;
+
+        @AuraEnabled
+        public Boolean managerApproved;
+
+        @AuraEnabled
+        public String managerComments;
     }
 
-    private class ResolvedNames {
-        public String supervisorName;
-        public String clientName;
-    }
-
-    // ============================================================================
-    // 1. INTERNAL: UPLOAD & SEND BUNDLE
-    // ============================================================================
+    // ========================================================================
+    // 1. SUBMIT ARCHITECTURE DESIGN
+    // ========================================================================
 
     @AuraEnabled
-    public static void sendDesignBundle(Id recordId, List<String> fileIds, Decimal budget) {
-        if (fileIds.isEmpty()) {
-            return;
+    public static void sendDesignBundle(
+        Id recordId,
+        List<String> fileIds,
+        Decimal budget
+    ) {
+
+        if (recordId == null) {
+            throw new AuraHandledException(
+                'Parent record Id is required.'
+            );
+        }
+
+        if (
+            fileIds == null ||
+            fileIds.isEmpty()
+        ) {
+            throw new AuraHandledException(
+                'Please upload at least one Architecture Design file.'
+            );
         }
 
         try {
-            assertAreliaOpportunityRecordType(recordId);
 
-            // 1. Create Record with Budget
-            Architecture_Design__c designRec = createDesignRecord(recordId, fileIds[0], budget);
-            
-            // 2. Link Files to new Record
-            linkFilesToDesign(designRec.Id, fileIds);
+            // Validate Opportunity / Project
+            validateParentRecord(recordId);
 
-            // 3. Cleanup (Remove from Opportunity so they don't clutter the parent)
-            cleanupOpportunityFiles(recordId, fileIds);
+            // ================================================================
+            // STEP 1
+            //
+            // Create Architecture Design WITHOUT setting Status__c.
+            //
+            // Do NOT use Draft because Draft is not an allowed value
+            // in your restricted Status__c picklist.
+            // ================================================================
+            Architecture_Design__c design =
+                createDesignRecord(
+                    recordId,
+                    fileIds[0],
+                    budget
+                );
 
-            // 4. Send Email
-            sendEmailToClient(recordId, fileIds, designRec.Secure_Token__c);
-            
-            // 5. Update Opportunity Status
-            updateOpportunityStatus(recordId);
+            // ================================================================
+            // STEP 2
+            // Link all uploaded files to Architecture Design.
+            // ================================================================
+            linkFilesToDesign(
+                design.Id,
+                fileIds
+            );
+
+            // ================================================================
+            // STEP 3
+            // Remove original parent links.
+            // ================================================================
+            cleanupParentFiles(
+                recordId,
+                fileIds
+            );
+
+            // ================================================================
+            // STEP 4
+            //
+            // Set Status = Sent only AFTER files are linked.
+            //
+            // This update fires ArchitectureDesignTrigger.
+            //
+            // Trigger:
+            // old Status = null/default
+            // new Status = Sent
+            //
+            // ArchitectureDesignNotificationHandler sends Customer email.
+            // ================================================================
+            markDesignAsSent(
+                design.Id
+            );
+
+            // ================================================================
+            // STEP 5
+            // Preserve existing Opportunity flag.
+            // ================================================================
+            updateOpportunityStatus(
+                recordId
+            );
+
+        } catch (AuraHandledException e) {
+
+            throw e;
 
         } catch (Exception e) {
-            throw new AuraHandledException('Error sending bundle: ' + e.getMessage());
+
+            throw new AuraHandledException(
+                'Error submitting Architecture Design: ' +
+                e.getMessage()
+            );
         }
     }
 
-    private static Architecture_Design__c createDesignRecord(Id recordId, String mainFileId, Decimal budget) {
-        Architecture_Design__c designRec = new Architecture_Design__c();
-        linkDesignToParent(designRec, recordId);
-        designRec.Secure_Token__c = UUID.randomUUID().toString();
-        designRec.Status__c = 'Sent';
-        designRec.Related_File_Id__c = mainFileId;
-        designRec.Architecture_Budget__c = budget; 
-        insert designRec;
-        return designRec;
+    // ========================================================================
+    // CREATE ARCHITECTURE DESIGN
+    // ========================================================================
+
+    private static Architecture_Design__c createDesignRecord(
+        Id recordId,
+        String mainFileId,
+        Decimal budget
+    ) {
+
+        Architecture_Design__c design =
+            new Architecture_Design__c();
+
+        linkDesignToParent(
+            design,
+            recordId
+        );
+
+        design.Secure_Token__c =
+            UUID.randomUUID().toString();
+
+        design.Related_File_Id__c =
+            mainFileId;
+
+        design.Architecture_Budget__c =
+            budget;
+
+        /*
+         * VERY IMPORTANT
+         *
+         * Do NOT set:
+         *
+         * design.Status__c = 'Draft';
+         *
+         * Draft is not present in the restricted Status__c picklist.
+         *
+         * Status will be set to Sent after all files are linked.
+         */
+
+        insert design;
+
+        return design;
     }
 
-    private static void linkFilesToDesign(Id designId, List<String> fileIds) {
-        List<ContentDocumentLink> linksToInsert = new List<ContentDocumentLink>();
+    // ========================================================================
+    // LINK FILES
+    // ========================================================================
+
+    private static void linkFilesToDesign(
+        Id designId,
+        List<String> fileIds
+    ) {
+
+        if (
+            designId == null ||
+            fileIds == null ||
+            fileIds.isEmpty()
+        ) {
+            return;
+        }
+
+        List<ContentDocumentLink> links =
+            new List<ContentDocumentLink>();
+
         for (String fileId : fileIds) {
-            ContentDocumentLink cdl = new ContentDocumentLink();
-            cdl.LinkedEntityId = designId;
-            cdl.ContentDocumentId = fileId;
-            cdl.ShareType = 'V'; 
-            cdl.Visibility = 'AllUsers'; 
-            linksToInsert.add(cdl);
+
+            if (String.isBlank(fileId)) {
+                continue;
+            }
+
+            ContentDocumentLink link =
+                new ContentDocumentLink();
+
+            link.LinkedEntityId =
+                designId;
+
+            link.ContentDocumentId =
+                fileId;
+
+            link.ShareType =
+                'V';
+
+            link.Visibility =
+                'AllUsers';
+
+            links.add(link);
         }
-        insert linksToInsert;
+
+        if (!links.isEmpty()) {
+            insert links;
+        }
     }
 
-    private static void cleanupOpportunityFiles(Id recordId, List<String> fileIds) {
+    // ========================================================================
+    // REMOVE FILE LINKS FROM ORIGINAL PARENT
+    // ========================================================================
+
+    private static void cleanupParentFiles(
+        Id recordId,
+        List<String> fileIds
+    ) {
+
+        if (
+            recordId == null ||
+            fileIds == null ||
+            fileIds.isEmpty()
+        ) {
+            return;
+        }
+
         List<ContentDocumentLink> linksToDelete = [
-            SELECT Id 
-            FROM ContentDocumentLink 
-            WHERE LinkedEntityId = :recordId 
+            SELECT Id
+            FROM ContentDocumentLink
+            WHERE LinkedEntityId = :recordId
             AND ContentDocumentId IN :fileIds
         ];
+
         if (!linksToDelete.isEmpty()) {
             delete linksToDelete;
         }
     }
 
-    private static void sendEmailToClient(Id recordId, List<String> fileIds, String token) {
-        RecipientInfo recipient = fetchRecipientDetails(recordId);
-        String fullLink = System.Label.Arelia_Site_Label + System.Label.Image_Approval + '?token=' + token;
-        
-        EmailTemplate et = [SELECT Id, Subject, HtmlValue FROM EmailTemplate WHERE DeveloperName = :Label.Client_Image_Approval_Template LIMIT 1];
-        
-        String htmlBody = et.HtmlValue;
-        htmlBody = htmlBody.replace('[APPROVAL_LINK]', fullLink)
-                           .replace('[CLIENT_NAME]', recipient.name);
-        
-        String subject = 'New Design Submission';
-        if (et.Subject != null) {
-            subject = et.Subject.replace('[FILE_TITLE]', 'New Design Submission');
+    // ========================================================================
+    // MARK ARCHITECTURE DESIGN AS SENT
+    // ========================================================================
+
+    private static void markDesignAsSent(
+        Id designId
+    ) {
+
+        if (designId == null) {
+            return;
         }
 
-        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-        setOrgWideAddress(mail);
-        mail.setToAddresses(new String[] { recipient.email });
-        mail.setSubject(subject);
-        mail.setHtmlBody(htmlBody);
-        
-        // FIX: Use setEntityAttachments to securely attach ALL files
-        List<Id> cvIds = getVersionIds(fileIds);
-        if (!cvIds.isEmpty()) {
-            mail.setEntityAttachments(cvIds);
-        }
-        
-        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+        update new Architecture_Design__c(
+            Id = designId,
+            Status__c = STATUS_SENT
+        );
     }
 
-    /**
-     * @description FIX: Retrieves ContentVersion Ids directly. 
-     * Bypasses Guest User 'VersionData' restrictions and heap limits.
-     */
-    private static List<Id> getVersionIds(List<String> fileIds) {
-        List<Id> cvIds = new List<Id>();
-        if (fileIds == null || fileIds.isEmpty()) {
-            return cvIds;
-        }
-
-        for (ContentVersion cv : [SELECT Id FROM ContentVersion WHERE ContentDocumentId IN :fileIds AND IsLatest = true]) {
-            cvIds.add(cv.Id);
-        }
-        return cvIds;
-    }
-
-    // ============================================================================
-    // 2. INTERNAL: GET HISTORY
-    // ============================================================================
+    // ========================================================================
+    // 2. SUBMISSION HISTORY
+    // ========================================================================
 
     @AuraEnabled(cacheable=true)
-    public static List<DesignWrapper> getRelatedImages(Id recordId) {
-        List<DesignWrapper> designList = new List<DesignWrapper>();
-        
+    public static List<DesignWrapper> getRelatedImages(
+        Id recordId
+    ) {
+
+        List<DesignWrapper> designList =
+            new List<DesignWrapper>();
+
+        if (recordId == null) {
+            return designList;
+        }
+
         List<Architecture_Design__c> designs = [
-            SELECT Id, Name, Status__c, Comments__c, CreatedDate, 
-                   Manager_Approval__c, Manager_Comments__c
-            FROM Architecture_Design__c 
-            WHERE Opportunity__c = :recordId OR Project__c = :recordId 
+            SELECT
+                Id,
+                Name,
+                Status__c,
+                Comments__c,
+                CreatedDate,
+                Manager_Approval__c,
+                Manager_Comments__c
+            FROM Architecture_Design__c
+            WHERE Opportunity__c = :recordId
+            OR Project__c = :recordId
             ORDER BY CreatedDate DESC
         ];
-        
-        for (Architecture_Design__c ad : designs) {
-            DesignWrapper wrapper = new DesignWrapper();
-            wrapper.id = ad.Id; 
-            wrapper.title = ad.Name; 
-            wrapper.createdDate = ad.CreatedDate.date();
-            wrapper.status = ad.Status__c;
-            wrapper.clientComments = ad.Comments__c;
-            wrapper.managerApproved = ad.Manager_Approval__c;
-            wrapper.managerComments = ad.Manager_Comments__c;
 
-            wrapper.statusClass = getBadgeClass(ad.Status__c);
+        for (
+            Architecture_Design__c design :
+            designs
+        ) {
+
+            DesignWrapper wrapper =
+                new DesignWrapper();
+
+            wrapper.id =
+                design.Id;
+
+            wrapper.title =
+                design.Name;
+
+            wrapper.createdDate =
+                design.CreatedDate.date();
+
+            wrapper.status =
+                design.Status__c;
+
+            wrapper.clientComments =
+                design.Comments__c;
+
+            wrapper.managerApproved =
+                design.Manager_Approval__c;
+
+            wrapper.managerComments =
+                design.Manager_Comments__c;
+
+            wrapper.statusClass =
+                getBadgeClass(
+                    design.Status__c
+                );
+
             designList.add(wrapper);
         }
+
         return designList;
     }
 
-    private static String getBadgeClass(String status) {
-        if (status == 'Approved') {
+    private static String getBadgeClass(
+        String status
+    ) {
+
+        if (status == STATUS_APPROVED) {
             return 'slds-badge slds-theme_success';
         }
-        if (status == 'Changes Requested') {
+
+        if (
+            status ==
+            STATUS_CHANGES_REQUESTED
+        ) {
             return 'slds-badge slds-theme_error';
         }
+
         return 'slds-badge slds-theme_warning';
     }
 
-    // ============================================================================
-    // 3. EXTERNAL SITE METHODS
-    // ============================================================================
+    // ========================================================================
+    // 3. PUBLIC CUSTOMER APPROVAL PAGE
+    // ========================================================================
 
     @AuraEnabled(cacheable=true)
-    public static Map<String, String> getFileByToken(String token) {
+    public static Map<String, String> getFileByToken(
+        String token
+    ) {
+
+        if (String.isBlank(token)) {
+            throw new AuraHandledException(
+                'Invalid Link or Record Not Found'
+            );
+        }
+
         try {
+
             Architecture_Design__c design = [
-                SELECT Id, Status__c, Comments__c, 
-                       Project__r.Name, 
-                       Opportunity__r.Name, Opportunity__r.Lead_Name__c 
-                FROM Architecture_Design__c 
-                WHERE Secure_Token__c = :token 
+                SELECT
+                    Id,
+                    Status__c,
+                    Comments__c,
+                    Project__r.Name,
+                    Opportunity__r.Name,
+                    Opportunity__r.Lead_Name__c
+                FROM Architecture_Design__c
+                WHERE Secure_Token__c = :token
                 LIMIT 1
             ];
 
-            Map<String, String> result = new Map<String, String>();
-            result.put('status', design.Status__c);
-            result.put('comments', design.Comments__c);
+            Map<String, String> result =
+                new Map<String, String>();
 
-            String projectName = 'Architectural Design'; 
-            if (design.Project__r != null) {
-                projectName = design.Project__r.Name;
-            } else if (design.Opportunity__r != null) {
-                projectName = design.Opportunity__r.Name;
-            }
-            result.put('projectName', projectName);
+            result.put(
+                'status',
+                design.Status__c
+            );
 
-            String clientName = 'Valued Client';
-            if (design.Opportunity__r != null && design.Opportunity__r.Lead_Name__c != null) {
-                clientName = design.Opportunity__r.Lead_Name__c;
+            result.put(
+                'comments',
+                design.Comments__c
+            );
+
+            result.put(
+                'projectName',
+                getExternalProjectName(
+                    design
+                )
+            );
+
+            String clientName =
+                'Valued Client';
+
+            if (
+                design.Opportunity__r != null &&
+                String.isNotBlank(
+                    design.Opportunity__r
+                        .Lead_Name__c
+                )
+            ) {
+                clientName =
+                    design.Opportunity__r
+                        .Lead_Name__c;
             }
-            result.put('clientName', clientName);
+
+            result.put(
+                'clientName',
+                clientName
+            );
 
             return result;
+
         } catch (Exception e) {
-            throw new AuraHandledException('Invalid Link or Record Not Found');
-        }
-    }
 
-    @AuraEnabled
-    public static void submitDecision(String token, String status, String comments) {
-        try {
-            Architecture_Design__c design = [
-                SELECT Id, Status__c, Comments__c, Related_File_Id__c,
-                       Opportunity__r.RecordTypeId,
-                       Opportunity__r.Name, Opportunity__r.Lead_Name__c, 
-                       Opportunity__r.Project_Description__c, Opportunity__r.Site_Space__c,
-                       Opportunity__r.Primary_Contact__r.Email, 
-                       Opportunity__r.Lead_Phone__c,
-                       Opportunity__r.Supervisor_User_Email__c, 
-                       Opportunity__r.Supervisor_User__r.FirstName,
-                       Opportunity__r.Supervisor_User__r.LastName, 
-                       Project__r.Name
-                FROM Architecture_Design__c 
-                WHERE Secure_Token__c = :token LIMIT 1
-            ];
-
-            if (design.Opportunity__r != null &&
-                !isAreliaOpportunityRecordType(design.Opportunity__r.RecordTypeId)) {
-                throw new AuraHandledException(
-                    'Image approval is supported only for Arelia opportunities.'
-                );
-            }
-
-            design.Status__c = status;
-            design.Comments__c = String.isNotBlank(comments) ? comments : 'Approved By Client';
-            update design;
-
-            sendResponseNotification(design, status, comments);
-        } catch (Exception e) {
-            throw new AuraHandledException(e.getMessage());
-        }
-    }
-
-    // ============================================================================
-    // 4. NOTIFICATION LOGIC
-    // ============================================================================
-
-    private static void sendResponseNotification(Architecture_Design__c design, String status, String comments) {
-        try {
-            List<String> toAddresses = getNotificationRecipients(design);
-            
-            if (toAddresses.isEmpty()) {
-                System.debug('No Supervisor Email found. Notification skipped.');
-                return;
-            }
-
-            EmailTemplate et = [SELECT Id, Subject, HtmlValue FROM EmailTemplate WHERE DeveloperName = :Label.Client_Response_Notification_Template LIMIT 1];
-            NotificationData data = new NotificationData();
-            data.design = design;
-            data.status = status;
-            data.comments = comments;
-
-            Messaging.SingleEmailMessage mail = buildNotificationEmail(et, toAddresses, data);
-
-            // Fetch & Attach ALL Files securely
-            Set<Id> docIds = new Set<Id>();
-            for(ContentDocumentLink link : [SELECT ContentDocumentId FROM ContentDocumentLink WHERE LinkedEntityId = :design.Id]) {
-                docIds.add(link.ContentDocumentId);
-            }
-            
-            if (!docIds.isEmpty()) {
-                List<String> fileIdList = new List<String>();
-                for(Id idVal : docIds) {
-                    fileIdList.add((String)idVal);
-                }
-                
-                // FIX: Retrieve IDs and use setEntityAttachments to avoid Guest User binary access error
-                List<Id> cvIds = getVersionIds(fileIdList);
-                if (!cvIds.isEmpty()) {
-                    mail.setEntityAttachments(cvIds);
-                }
-            }
-
-            Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
-        } catch (Exception e) { 
-            System.debug('Failed to send client response notification: ' + e.getMessage()); 
-        }
-    }
-
-    private static Messaging.SingleEmailMessage buildNotificationEmail(EmailTemplate et, List<String> toAddresses, NotificationData data) {
-        String projectName = 'Unknown Project';
-        if (data.design.Opportunity__r != null) {
-            projectName = data.design.Opportunity__r.Name;
-        } else if (data.design.Project__r != null) {
-            projectName = data.design.Project__r.Name;
-        }
-
-        String safeComments = String.isNotBlank(data.comments) ? data.comments : 'No comments provided.';
-        ResolvedNames rNames = resolveNames(data);
-        
-        String oppDesc = (data.design.Opportunity__r != null) ? data.design.Opportunity__r.Project_Description__c : '';
-        String siteSpace = (data.design.Opportunity__r != null) ? data.design.Opportunity__r.Site_Space__c : '';
-        String clientEmail = (data.design.Opportunity__r != null && data.design.Opportunity__r.Primary_Contact__r != null) ? data.design.Opportunity__r.Primary_Contact__r.Email : '';
-        
-        String clientPhone = (data.design.Opportunity__r != null && data.design.Opportunity__r.Lead_Phone__c != null) 
-                             ? data.design.Opportunity__r.Lead_Phone__c : 'N/A';
-
-        String subject = et.Subject.replace('[CLIENT_NAME]', rNames.clientName).replace('[DECISION]', data.status);
-        
-        String htmlBody = et.HtmlValue.replace('[PROJECT_NAME]', projectName)
-                                      .replace('[DECISION]', data.status)
-                                      .replace('[COMMENTS]', safeComments)
-                                      .replace('[SUPERVISOR_NAME]', rNames.supervisorName)
-                                      .replace('[PROJECT_DESCRIPTION]', (oppDesc != null ? oppDesc : ''))
-                                      .replace('[SITE_SPACE]', (siteSpace != null ? siteSpace : ''))
-                                      .replace('[CLIENT_EMAIL]', (clientEmail != null ? clientEmail : ''))
-                                      .replace('[CLIENT_MOBILE]', clientPhone) 
-                                      .replace('[CLIENT_NAME]', rNames.clientName);
-
-        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-        setOrgWideAddress(mail);
-        mail.setToAddresses(toAddresses);
-        mail.setSubject(subject);
-        mail.setHtmlBody(htmlBody);
-        return mail;
-    }
-
-    private static List<String> getNotificationRecipients(Architecture_Design__c design) {
-        List<String> toAddresses = new List<String>();
-        if (design.Opportunity__r != null && String.isNotBlank(design.Opportunity__r.Supervisor_User_Email__c)) {
-            toAddresses.add(design.Opportunity__r.Supervisor_User_Email__c);
-        }
-        return toAddresses;
-    }
-
-    // ============================================================================
-    // 5. GENERIC HELPERS
-    // ============================================================================
-
-    private static void assertAreliaOpportunityRecordType(Id recordId) {
-        if (recordId == null) {
-            return;
-        }
-
-        String sObjName = recordId.getSObjectType().getDescribe().getName();
-        if (sObjName != 'Opportunity') {
-            return;
-        }
-
-        Opportunity opp = [
-            SELECT Id, RecordTypeId
-            FROM Opportunity
-            WHERE Id = :recordId
-            LIMIT 1
-        ];
-
-        if (!isAreliaOpportunityRecordType(opp.RecordTypeId)) {
             throw new AuraHandledException(
-                'Image approval is supported only for Arelia opportunities.'
+                'Invalid Link or Record Not Found'
             );
         }
     }
 
-    private static Boolean isAreliaOpportunityRecordType(Id recordTypeId) {
+    // ========================================================================
+    // 4. CUSTOMER RESPONSE
+    // ========================================================================
+
+    @AuraEnabled
+    public static void submitDecision(
+        String token,
+        String status,
+        String comments
+    ) {
+
+        if (String.isBlank(token)) {
+            throw new AuraHandledException(
+                'Invalid Architecture Design token.'
+            );
+        }
+
+        try {
+
+            validateCustomerDecision(status);
+
+            Architecture_Design__c design = [
+                SELECT
+                    Id,
+                    Status__c,
+                    Comments__c,
+                    Opportunity__c,
+                    Opportunity__r.RecordTypeId
+                FROM Architecture_Design__c
+                WHERE Secure_Token__c = :token
+                LIMIT 1
+            ];
+
+            if (
+                design.Opportunity__r != null &&
+                !isAreliaOpportunityRecordType(
+                    design.Opportunity__r
+                        .RecordTypeId
+                )
+            ) {
+                throw new AuraHandledException(
+                    ERROR_UNSUPPORTED_RECORD_TYPE
+                );
+            }
+
+            // ================================================================
+            // ONLY UPDATE CUSTOMER RESPONSE
+            // ================================================================
+
+            design.Status__c =
+                status;
+
+            if (String.isNotBlank(comments)) {
+
+                design.Comments__c =
+                    comments;
+
+            } else if (
+                status == STATUS_APPROVED
+            ) {
+
+                design.Comments__c =
+                    'Approved By Client';
+
+            } else {
+
+                design.Comments__c =
+                    'Changes Requested By Client';
+            }
+
+            /*
+             * This update fires ArchitectureDesignTrigger.
+             *
+             * Approved
+             *      ↓
+             * Supervisor receives email
+             *
+             * Changes Requested
+             *      ↓
+             * Supervisor receives email
+             */
+
+            update design;
+
+        } catch (AuraHandledException e) {
+
+            throw e;
+
+        } catch (Exception e) {
+
+            throw new AuraHandledException(
+                e.getMessage()
+            );
+        }
+    }
+
+    private static void validateCustomerDecision(
+        String status
+    ) {
+
+        if (
+            status != STATUS_APPROVED &&
+            status != STATUS_CHANGES_REQUESTED
+        ) {
+            throw new AuraHandledException(
+                'Invalid Architecture Design response. ' +
+                'Allowed values are Approved or Changes Requested.'
+            );
+        }
+    }
+
+    // ========================================================================
+    // PROJECT NAME
+    // ========================================================================
+
+    @TestVisible
+    private static String getExternalProjectName(
+        Architecture_Design__c design
+    ) {
+
+        String projectName =
+            'Architectural Design';
+
+        if (
+            design != null &&
+            design.Project__r != null
+        ) {
+
+            projectName =
+                design.Project__r.Name;
+
+        } else if (
+            design != null &&
+            design.Opportunity__r != null
+        ) {
+
+            projectName =
+                design.Opportunity__r.Name;
+        }
+
+        return projectName;
+    }
+
+    // ========================================================================
+    // PARENT VALIDATION
+    // ========================================================================
+
+    private static void validateParentRecord(
+        Id recordId
+    ) {
+
+        String objectApiName =
+            recordId
+                .getSObjectType()
+                .getDescribe()
+                .getName();
+
+        if (objectApiName == 'Opportunity') {
+
+            assertAreliaOpportunityRecordType(
+                recordId
+            );
+
+            return;
+        }
+
+        if (isConfiguredProjectObject(recordId)) {
+            return;
+        }
+
+        throw new AuraHandledException(
+            ERROR_UNSUPPORTED_PARENT
+        );
+    }
+
+    // ========================================================================
+    // RECORD TYPE
+    // ========================================================================
+
+    private static void assertAreliaOpportunityRecordType(
+        Id recordId
+    ) {
+
+        Id areliaRecordTypeId =
+            getAreliaOpportunityRecordTypeId();
+
+        if (areliaRecordTypeId == null) {
+            throw new AuraHandledException(
+                ERROR_UNSUPPORTED_RECORD_TYPE
+            );
+        }
+
+        List<Opportunity> opportunities = [
+            SELECT Id
+            FROM Opportunity
+            WHERE Id = :recordId
+            AND RecordTypeId =
+                :areliaRecordTypeId
+            LIMIT 1
+        ];
+
+        if (opportunities.isEmpty()) {
+            throw new AuraHandledException(
+                ERROR_UNSUPPORTED_RECORD_TYPE
+            );
+        }
+    }
+
+    private static Boolean isAreliaOpportunityRecordType(
+        Id recordTypeId
+    ) {
+
         if (recordTypeId == null) {
             return false;
         }
 
-        Id areliaOpportunityRecordTypeId = getAreliaOpportunityRecordTypeId();
-        return areliaOpportunityRecordTypeId != null
-            && recordTypeId == areliaOpportunityRecordTypeId;
+        Id areliaRecordTypeId =
+            getAreliaOpportunityRecordTypeId();
+
+        return
+            areliaRecordTypeId != null &&
+            recordTypeId == areliaRecordTypeId;
     }
 
     private static Id getAreliaOpportunityRecordTypeId() {
-        if (cachedAreliaOpportunityRecordTypeId != null) {
+
+        if (
+            cachedAreliaOpportunityRecordTypeId != null
+        ) {
             return cachedAreliaOpportunityRecordTypeId;
         }
 
-        Schema.RecordTypeInfo recordTypeInfo = Schema.SObjectType.Opportunity
-            .getRecordTypeInfosByName()
-            .get(ARELIA_OPPORTUNITY_RECORD_TYPE_NAME);
+        Schema.RecordTypeInfo recordTypeInfo =
+            Schema.SObjectType.Opportunity
+                .getRecordTypeInfosByName()
+                .get(
+                    ARELIA_OPPORTUNITY_RECORD_TYPE_NAME
+                );
 
         if (recordTypeInfo == null) {
             return null;
         }
 
-        cachedAreliaOpportunityRecordTypeId = recordTypeInfo.getRecordTypeId();
+        cachedAreliaOpportunityRecordTypeId =
+            recordTypeInfo.getRecordTypeId();
+
         return cachedAreliaOpportunityRecordTypeId;
     }
 
-    private static void linkDesignToParent(Architecture_Design__c designRec, Id recordId) {
-        String sObjName = recordId.getSObjectType().getDescribe().getName();
-        if (sObjName == 'Opportunity') {
-            designRec.Opportunity__c = recordId;
-        } else if (sObjName == 'Project__c') {
-            designRec.Project__c = recordId;
+    // ========================================================================
+    // LINK PARENT
+    // ========================================================================
+
+    private static void linkDesignToParent(
+        Architecture_Design__c design,
+        Id recordId
+    ) {
+
+        String objectApiName =
+            recordId
+                .getSObjectType()
+                .getDescribe()
+                .getName();
+
+        if (objectApiName == 'Opportunity') {
+
+            design.Opportunity__c =
+                recordId;
+
+            return;
         }
+
+        if (isConfiguredProjectObject(recordId)) {
+
+            design.Project__c =
+                recordId;
+
+            return;
+        }
+
+        throw new AuraHandledException(
+            ERROR_UNSUPPORTED_PARENT
+        );
     }
 
-    private static void updateOpportunityStatus(Id recordId) {
-        String sObjName = recordId.getSObjectType().getDescribe().getName();
-        if (sObjName == 'Opportunity') {
-            update new Opportunity(Id = recordId, Architecture_Client_Approval_Sent__c = true);
+    private static Boolean isConfiguredProjectObject(
+        Id recordId
+    ) {
+
+        if (recordId == null) {
+            return false;
         }
+
+        String inputObjectApiName =
+            recordId
+                .getSObjectType()
+                .getDescribe()
+                .getName();
+
+        List<Schema.SObjectType> referenceTypes = Architecture_Design__c.Project__c.getDescribe().getReferenceTo();
+
+        for (
+            Schema.SObjectType referenceType :
+            referenceTypes
+        ) {
+
+            String referencedObjectApiName =
+                referenceType
+                    .getDescribe()
+                    .getName();
+
+            if (
+                inputObjectApiName ==
+                referencedObjectApiName
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    private static RecipientInfo fetchRecipientDetails(Id recordId) {
-        String sObjName = recordId.getSObjectType().getDescribe().getName();
-        RecipientInfo info = new RecipientInfo();
-        if (sObjName == 'Opportunity') { 
-            Opportunity opp = [SELECT Email__c, Lead_Name__c FROM Opportunity WHERE Id = :recordId];
-            if (String.isBlank(opp.Email__c)) {
-                throw new AuraHandledException('No email address found on Opportunity.');
-            }
-            info.email = opp.Email__c;
-            info.name = (opp.Lead_Name__c != null) ? opp.Lead_Name__c : 'Valued Client';
-        } else if (sObjName == 'Project__c') { 
-            SObject proj = Database.query('SELECT Client_Email__c FROM Project__c WHERE Id = :recordId LIMIT 1');
-            String email = (String)proj.get('Client_Email__c');
-            if (String.isBlank(email)) {
-                throw new AuraHandledException('No email address found on Project.');
-            }
-            info.email = email;
-            info.name = 'Valued Client';
-        }
-        return info;
-    }
+    // ========================================================================
+    // OPPORTUNITY FLAG
+    // ========================================================================
 
-    private static void setOrgWideAddress(Messaging.SingleEmailMessage mail) {
-        try {
-            OrgWideEmailAddress[] owd = [SELECT Id FROM OrgWideEmailAddress WHERE Address = :System.Label.Arelia_OWD LIMIT 1];
-            if (!owd.isEmpty()) {
-                mail.setOrgWideEmailAddressId(owd[0].Id);
-            }
-        } catch (Exception ex) { 
-            System.debug('OWD Error: ' + ex.getMessage()); 
-        }
-    }
+    private static void updateOpportunityStatus(
+        Id recordId
+    ) {
 
-    private static ResolvedNames resolveNames(NotificationData data) {
-        ResolvedNames names = new ResolvedNames();
-        names.supervisorName = 'Enrollment Team';
-        names.clientName = 'Valued Client';
-        if (data.design.Opportunity__r != null) {
-            if (data.design.Opportunity__r.Supervisor_User__r != null) {
-                String fname = data.design.Opportunity__r.Supervisor_User__r.FirstName;
-                String lname = data.design.Opportunity__r.Supervisor_User__r.LastName;
-                String fullName = (fname != null ? fname + ' ' : '') + (lname != null ? lname : '');
-                if (String.isNotBlank(fullName)) {
-                    names.supervisorName = fullName.trim();
-                }
-            }
-            if (data.design.Opportunity__r.Lead_Name__c != null) {
-                names.clientName = data.design.Opportunity__r.Lead_Name__c;
-            }
+        if (recordId == null) {
+            return;
         }
-        return names;
+
+        String objectApiName =
+            recordId
+                .getSObjectType()
+                .getDescribe()
+                .getName();
+
+        if (objectApiName != 'Opportunity') {
+            return;
+        }
+
+        update new Opportunity(
+            Id = recordId,
+            Architecture_Client_Approval_Sent__c = true
+        );
     }
 }

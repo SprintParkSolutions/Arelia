@@ -6,6 +6,8 @@
  * @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
 **/
 public with sharing class VendorOpportunityController {
+    private static final String ERROR_UNSUPPORTED_RECORD_TYPE =
+        'Vendor opportunities are supported only for Arelia opportunities.';
 
     /**
      * @description Wrapper class to send Field Set data to LWC
@@ -59,6 +61,8 @@ public with sharing class VendorOpportunityController {
         if (!Schema.sObjectType.Vendor_Opportunity__c.isAccessible()) {
             throw new AuraHandledException('Insufficient permissions to access Vendor Opportunity.');
         }
+
+        validateAreliaOpportunity(opportunityId);
         
         Integer count = [SELECT Count() FROM Vendor_Opportunity__c WHERE Opportunity__c = :opportunityId];
         return count > 0;
@@ -76,6 +80,8 @@ public with sharing class VendorOpportunityController {
         if (!Schema.sObjectType.Vendor_Opportunity__c.isCreateable()) {
             throw new AuraHandledException('Insufficient permissions to create Vendor Opportunity.');
         }
+
+        validateAreliaOpportunity(opportunityId);
 
         for(Vendor_Opportunity__c vo : records) {
             vo.Opportunity__c = opportunityId; // Hard-code link for security
@@ -97,6 +103,8 @@ public with sharing class VendorOpportunityController {
         if (!Schema.sObjectType.Vendor_Opportunity__c.isAccessible()) {
              throw new AuraHandledException('Insufficient permissions to read Vendor Opportunity.');
         }
+
+        validateAreliaOpportunity(opportunityId);
 
         if(!queryFields.contains('Id')) {
             queryFields.add('Id');
@@ -153,12 +161,8 @@ public with sharing class VendorOpportunityController {
         Map<Id, String> fileMap = new Map<Id, String>();
 
         // Query without WITH SECURITY_ENFORCED (Manual check performed above)
-        List<ContentDocumentLink> links = [
-            SELECT LinkedEntityId, ContentDocument.Title, ContentDocument.FileExtension
-            FROM ContentDocumentLink
-            WHERE LinkedEntityId IN :parentIds
-            ORDER BY SystemModstamp DESC
-        ];
+        List<ContentDocumentLink> links = [SELECT LinkedEntityId, ContentDocument.Title, ContentDocument.FileExtension FROM ContentDocumentLink WHERE LinkedEntityId IN :parentIds
+            ORDER BY SystemModstamp DESC];
 
         // Map Parent ID to File Name (taking the most recent one if multiple exist)
         for(ContentDocumentLink link : links) {
@@ -167,5 +171,27 @@ public with sharing class VendorOpportunityController {
             }
         }
         return fileMap;
+    }
+
+    private static void validateAreliaOpportunity(Id opportunityId) {
+        Id areliaOpportunityRecordTypeId = getAreliaOpportunityRecordTypeId();
+
+        // Keep the Arelia Record Type requirement in SOQL so unsupported Opportunities do not proceed.
+        if (
+            [SELECT Id FROM Opportunity WHERE Id = :opportunityId
+                AND RecordTypeId = :areliaOpportunityRecordTypeId LIMIT 1]
+                .isEmpty()
+        ) {
+            throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+        }
+    }
+
+    private static Id getAreliaOpportunityRecordTypeId() {
+        Id areliaOpportunityRecordTypeId = AreliaUtility.getAreliaOpportunityRecordTypeId();
+        if (areliaOpportunityRecordTypeId == null) {
+            throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+        }
+
+        return areliaOpportunityRecordTypeId;
     }
 }

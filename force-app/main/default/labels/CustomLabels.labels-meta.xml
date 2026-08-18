@@ -746,34 +746,6 @@ Sat: By Appointment</value>
         <value>/manager-architecture-approval</value>
     </labels>
     <labels>
-        <fullName>HR_Job_Email_Notification</fullName>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>HR Job Email Notification</shortDescription>
-        <value>HR_Job_Email_Notifications</value>
-    </labels>
-    <labels>
-        <fullName>HR_email</fullName>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>HR email</shortDescription>
-        <value>careers@sprintpark.com</value>
-    </labels>
-    <labels>
-        <fullName>Job_Application_Email_Template</fullName>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Job Application Email Template</shortDescription>
-        <value>Job_Email_to_Candidate</value>
-    </labels>
-    <labels>
-        <fullName>Org_Wide_Email</fullName>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Wide Email</shortDescription>
-        <value>careers@sprintpark.com</value>
-    </labels>
-    <labels>
         <fullName>ARELIA_SPACE_URL</fullName>
         <language>en_US</language>
         <protected>false</protected>
@@ -792,7 +764,7 @@ Sat: By Appointment</value>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Arelia Living Management Members</shortDescription>
-        <value>p.shyamsaikamal2003@gmail.com,bhavanae@sprintpark.com</value>
+        <value>mohit98409@gmail.com,bhavanae@sprintpark.com,shyamk@sprintpark.com</value>
     </labels>
     <labels>
         <fullName>Arelia_Site_Redirect_URL_Label</fullName>
@@ -807,14 +779,6 @@ Sat: By Appointment</value>
         <protected>false</protected>
         <shortDescription>Due In Days</shortDescription>
         <value>3</value>
-    </labels>
-    <labels>
-        <fullName>Enrollment_Email_Addresses</fullName>
-        <categories>It stores all Arelia Enrollment members Email with comma separation</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Enrollment Email Addresses</shortDescription>
-        <value>mohit98409@gmail.com</value>
     </labels>
     <labels>
         <fullName>FORGOT_PASSWORD_PATH</fullName>
@@ -864,5 +828,82 @@ Sat: By Appointment</value>
         <protected>false</protected>
         <shortDescription>Residential_URL</shortDescription>
         <value>https://sprintpark--dev4.sandbox.my.site.com/AreliaLiving/s/residential-portfolio</value>
+    </labels>
+    <labels>
+        <fullName>Agreement_Base_URL</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Agreement Base URL</shortDescription>
+        <value>https://sprintpark--dev4.sandbox.my.site.com/Arelia/s/client-agreement-sign</value>
+    </labels>
+    <labels>
+        <fullName>Agreement_Email_Template</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Agreement Email Template</shortDescription>
+        <value>Client_Agreement_Email</value>
+    </labels>
+    <labels>
+        <fullName>Arelia_OWD_ID</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Arelia OWD ID</shortDescription>
+        <value>0D2U90000001olxKAA</value>
+    </labels>
+    <labels>
+        <fullName>Client_Agreement_Supervisor_Email</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Client Agreement Supervisor Email</shortDescription>
+        <value>Client_Agreement_Supervisor_Email</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Agreement_Signing_Base_URL</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Vendor Agreement Signing Base URL</shortDescription>
+        <value>https://sprintpark--dev4.sandbox.my.site.com/Arelia/s/vendor-agreement-sign</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Agreement_Supervisor_Email_Template_API_Name</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Vendor Agreement Supervisor Email Template API Name</shortDescription>
+        <value>00XU9000005e6dJMAQ</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Agreement_Vendor_Email_Template_API_Name</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Vendor Agreement Vendor Email Template API Name</shortDescription>
+        <value>00XU9000005e6LZMAY</value>
+    </labels>
+    <labels>
+        <fullName>Arelia_Client_Supervisor_Assigned_Email</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Arelia_Client_Supervisor_Assigned_Email</shortDescription>
+        <value>Arelia_Client_Supervisor_Assigned_Email</value>
+    </labels>
+    <labels>
+        <fullName>Arelia_Client_Supervisor_Changed</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>A premium, client-facing introduction of their new dedicated supervisor, assurin</shortDescription>
+        <value>Arelia_Client_Supervisor_Changed</value>
+    </labels>
+    <labels>
+        <fullName>Arelia_New_Supervisor_Assigned_Existing_Lead</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>An internal alert notifying the newly assigned supervisor to take immediate acti</shortDescription>
+        <value>Arelia_New_Supervisor_Assigned_Existing_Lead</value>
+    </labels>
+    <labels>
+        <fullName>Arelia_Old_Supervisor_removed</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>An internal confirmation sent to the previously assigned supervisor to notify th</shortDescription>
+        <value>Arelia_Old_Supervisor_removed</value>
     </labels>
 </CustomLabels>

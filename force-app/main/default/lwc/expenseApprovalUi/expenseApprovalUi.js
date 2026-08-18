@@ -2,7 +2,7 @@ import { LightningElement, wire, track } from 'lwc';
 import { CurrentPageReference } from 'lightning/navigation';
 import getSheetDetails from '@salesforce/apex/ExpenseSheetController.getSheetDetails';
 import updateSheetStatus from '@salesforce/apex/ExpenseSheetController.updateSheetStatus';
-import SITE_LABEL_URL from '@salesforce/label/c.Arelia_Site_Label'; 
+import Arelia_Site_Redirect_URL_Label from '@salesforce/label/c.Arelia_Site_Redirect_URL_Label'; 
 import LightningConfirm from 'lightning/confirm';
 
 export default class ExpenseApprovalUi extends LightningElement {
@@ -77,6 +77,6 @@ export default class ExpenseApprovalUi extends LightningElement {
     }
 
     handleFinalClose() {
-        window.location.href = SITE_LABEL_URL;
+        window.location.href = Arelia_Site_Redirect_URL_Label;
     }
 }

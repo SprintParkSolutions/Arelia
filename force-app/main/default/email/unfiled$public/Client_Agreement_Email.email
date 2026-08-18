@@ -1,0 +1,23 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">
+<p>Hello {{LEAD_NAME}},</p>
+
+<p>Please find attached your Client Agreement PDF.</p>
+
+<p>You can review and digitally sign the agreement using the link below:</p>
+
+<p><a href="{{SIGNING_URL}}">Open and Sign Client Agreement</a></p>
+
+<p><strong>Client Email:</strong> {{CLIENT_EMAIL}}</p>
+
+<p><strong>Supervisor Email:</strong> {{SUPERVISOR_EMAIL}}</p>
+
+<p><strong>Project:</strong> {{OPPORTUNITY_NAME}}</p>
+
+<p>Regards,<br />
+Agreements Team</p>
+</body>
+</html>

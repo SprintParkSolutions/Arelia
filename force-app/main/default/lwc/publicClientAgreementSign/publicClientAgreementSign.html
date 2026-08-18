@@ -1,0 +1,151 @@
+<template>
+    <div class="page-container">
+        <template if:true={isLoading}>
+            <div class="loading-panel">
+                <lightning-spinner
+                    alternative-text="Loading agreement"
+                    size="medium"
+                    variant="brand">
+                </lightning-spinner>
+
+                <p class="loading-text">Preparing agreement...</p>
+            </div>
+        </template>
+
+        <template if:false={isLoading}>
+            <template if:false={isValid}>
+                <div class="message-state">
+                    <div class="message-box">
+                        <div class="message-icon">✓</div>
+
+                        <p class="message-eyebrow">Agreement Status</p>
+
+                        <h1>Agreement Submitted</h1>
+
+                        <p class="message-text">
+                            {message}
+                        </p>
+
+                        <button class="agreement-btn btn-primary ok-button" onclick={handleSubmittedOk}>
+                            OK
+                        </button>
+                    </div>
+                </div>
+            </template>
+
+            <template if:true={isValid}>
+                <div class="agreement-card">
+
+                    <template if:true={isSubmitting}>
+                        <div class="submission-overlay">
+                            <div class="submission-box">
+                                <lightning-spinner
+                                    alternative-text="Submitting signed agreement"
+                                    size="medium"
+                                    variant="brand">
+                                </lightning-spinner>
+
+                                <div class="submission-title">
+                                    Submitting Agreement
+                                </div>
+
+                                <div class="submission-text">
+                                    Please wait. Your signed agreement is being generated and submitted.
+                                    Do not refresh this page or click Done again.
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <template if:true={hasError}>
+                        <div class="error-box">
+                            <div class="error-title">Error</div>
+                            <div class="error-message">{errorMessage}</div>
+
+                            <template if:true={errorDetails}>
+                                <pre class="error-details">{errorDetails}</pre>
+                            </template>
+                        </div>
+                    </template>
+
+                    <div class="agreement-header">
+                        <div class="header-badge">Digital Agreement</div>
+                        <h1>Client Agreement</h1>
+                        <p>
+                            Please review the agreement carefully, draw your digital signature,
+                            and click <strong>Done</strong> to submit.
+                        </p>
+                    </div>
+
+                    <div class="agreement-preview-shell">
+                        <div class="document-ribbon">
+                            <span>Agreement Preview</span>
+                            <span class="document-ribbon-line"></span>
+                        </div>
+
+                        <div class="agreement-preview" lwc:dom="manual"></div>
+                    </div>
+
+                    <div class="signature-section">
+                        <div class="signature-header">
+                            <div>
+                                <p class="signature-eyebrow">Client Authorization</p>
+                                <h2>Digital Signature</h2>
+                            </div>
+
+                            <div class="signature-status">
+                                Signature Required
+                            </div>
+                        </div>
+
+                        <p class="signature-instruction">
+                            Draw your signature inside the box below. This signature will be captured
+                            electronically and attached to the signed agreement.
+                        </p>
+
+                        <div class="signature-canvas-wrap">
+                            <canvas
+                                class="signature-canvas"
+                                width="600"
+                                height="200"
+                                onmousedown={startDrawing}
+                                onmousemove={draw}
+                                onmouseup={stopDrawing}
+                                onmouseleave={stopDrawing}
+                                ontouchstart={startDrawing}
+                                ontouchmove={draw}
+                                ontouchend={stopDrawing}>
+                            </canvas>
+
+                            <div class="signature-placeholder">
+                                Sign here
+                            </div>
+                        </div>
+
+                        <div class="button-row">
+                            <button
+                                class="agreement-btn btn-secondary"
+                                onclick={clearSignature}
+                                disabled={isSubmitting}>
+                                Clear Signature
+                            </button>
+
+                            <button
+                                class="agreement-btn btn-primary"
+                                onclick={handleDone}
+                                disabled={isSubmitting}>
+                                Done
+                            </button>
+                        </div>
+
+                        <template if:true={isSubmitting}>
+                            <div class="submitting-message">
+                                Submitting signed agreement. Please wait...
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+        </template>
+    </div>
+</template>

@@ -1,231 +1,147 @@
-// File: VendorOpportunityAgreementService.cls
-// @Description:
-// - When all Vendor_Opportunity__c under an Opportunity have Vendor_Agreement_Signed__c = true,
-//   mark Opportunity.All_Vendors_Agreement_Completed__c = true.
-// - When it first flips to true, copy all files (ContentDocumentLink) from Vendor_Opportunity__c
-//   records up to the parent Opportunity (skip duplicates).
-// Bulk-safe, CRUD/FLS-aware, PMD-friendly (reduced cognitive complexity, brace style).
-@SuppressWarnings('PMD.CognitiveComplexity,PMD.ApexCRUDViolation,PMD.ExcessiveParameterList')
+/**
+ * @description Service class that recalculates Vendor Agreement completion status
+ * on parent Opportunities based on related Vendor_Opportunity__c records.
+ * When all related Vendor Opportunities are signed, the parent Opportunity is
+ * marked as completed. Vendor Opportunity files are not copied to Opportunity.
+ */
+@SuppressWarnings('PMD.CognitiveComplexity,PMD.ApexCRUDViolation')
 public without sharing class VendorOpportunityAgreementService {
 
-    // ===== Public API =====
+    /**
+     * @description Recalculates All_Vendors_Agreement_Completed__c for the given
+     * Opportunities. This method no longer copies Vendor Opportunity files to
+     * Opportunity Files / Notes & Attachments.
+     * @param opportunityIds Set of Opportunity Ids that need recalculation.
+     */
     public static void recalculateAndCopyFiles(Set<Id> opportunityIds) {
         if (opportunityIds == null || opportunityIds.isEmpty()) {
             return;
         }
 
-        Map<Id, Integer> totalByOpp  = getVendorOppCounts(opportunityIds);
+        Map<Id, Integer> totalByOpp = getVendorOppCounts(opportunityIds);
         Map<Id, Integer> signedByOpp = getSignedVendorOppCounts(opportunityIds);
-        Map<Id, Boolean> desiredState = computeDesiredState(opportunityIds, totalByOpp, signedByOpp);
 
-        UpdatePlan plan = buildOppUpdatePlan(opportunityIds, desiredState);
-        performOppUpdates(plan.toUpdate);
+        Map<Id, Boolean> desiredState = computeDesiredState(
+            opportunityIds,
+            totalByOpp,
+            signedByOpp
+        );
 
-        if (!plan.flippedToTrue.isEmpty()) {
-            copyVendorOppFilesToOpps(plan.flippedToTrue);
-        }
+        List<Opportunity> opportunitiesToUpdate = buildOppUpdates(
+            opportunityIds,
+            desiredState
+        );
+
+        performOppUpdates(opportunitiesToUpdate);
     }
 
-    // ===== Helper DTO =====
-    private class UpdatePlan {
-        List<Opportunity> toUpdate = new List<Opportunity>();
-        Set<Id> flippedToTrue = new Set<Id>();
-    }
-
-    // ===== Aggregation helpers =====
-    private static Map<Id, Integer> getVendorOppCounts(Set<Id> oppIds) {
+    private static Map<Id, Integer> getVendorOppCounts(Set<Id> opportunityIds) {
         Map<Id, Integer> counts = new Map<Id, Integer>();
-        for (AggregateResult ar : [
+
+        for (AggregateResult aggregateRecord : [
             SELECT Opportunity__c oppId, COUNT(Id) cnt
             FROM Vendor_Opportunity__c
-            WHERE Opportunity__c IN :oppIds
+            WHERE Opportunity__c IN :opportunityIds
             GROUP BY Opportunity__c
         ]) {
-            counts.put((Id) ar.get('oppId'), (Integer) ar.get('cnt'));
+            counts.put(
+                (Id) aggregateRecord.get('oppId'),
+                (Integer) aggregateRecord.get('cnt')
+            );
         }
+
         return counts;
     }
 
-    private static Map<Id, Integer> getSignedVendorOppCounts(Set<Id> oppIds) {
+    private static Map<Id, Integer> getSignedVendorOppCounts(
+        Set<Id> opportunityIds
+    ) {
         Map<Id, Integer> counts = new Map<Id, Integer>();
-        for (AggregateResult ar : [
+
+        for (AggregateResult aggregateRecord : [
             SELECT Opportunity__c oppId, COUNT(Id) cnt
             FROM Vendor_Opportunity__c
-            WHERE Opportunity__c IN :oppIds
-              AND Vendor_Agreement_Signed__c = true
+            WHERE Opportunity__c IN :opportunityIds
+            AND Vendor_Agreement_Signed__c = true
             GROUP BY Opportunity__c
         ]) {
-            counts.put((Id) ar.get('oppId'), (Integer) ar.get('cnt'));
+            counts.put(
+                (Id) aggregateRecord.get('oppId'),
+                (Integer) aggregateRecord.get('cnt')
+            );
         }
+
         return counts;
     }
 
     private static Map<Id, Boolean> computeDesiredState(
-        Set<Id> oppIds,
+        Set<Id> opportunityIds,
         Map<Id, Integer> totalByOpp,
         Map<Id, Integer> signedByOpp
     ) {
-        Map<Id, Boolean> desired = new Map<Id, Boolean>();
-        for (Id oppId : oppIds) {
-            Integer total  = totalByOpp.get(oppId);
-            Integer signed = signedByOpp.get(oppId);
-            Boolean allSigned = (total != null && total > 0 && signed != null && signed == total);
-            desired.put(oppId, allSigned);
+        Map<Id, Boolean> desiredStateByOpp = new Map<Id, Boolean>();
+
+        for (Id opportunityId : opportunityIds) {
+            Integer totalCount = totalByOpp.get(opportunityId);
+            Integer signedCount = signedByOpp.get(opportunityId);
+
+            Boolean allSigned = totalCount != null
+                && totalCount > 0
+                && signedCount != null
+                && signedCount == totalCount;
+
+            desiredStateByOpp.put(opportunityId, allSigned);
         }
-        return desired;
+
+        return desiredStateByOpp;
     }
 
-    // ===== Update helpers =====
-    private static UpdatePlan buildOppUpdatePlan(Set<Id> oppIds, Map<Id, Boolean> desiredState) {
-        UpdatePlan plan = new UpdatePlan();
-
-        Map<Id, Opportunity> opps = new Map<Id, Opportunity>([
-            SELECT Id, All_Vendors_Agreement_Completed__c
-            FROM Opportunity
-            WHERE Id IN :oppIds
-        ]);
-
-        for (Opportunity o : opps.values()) {
-            Boolean want = desiredState.get(o.Id);
-            if (want == null) {
-                want = false;
-            }
-            if (o.All_Vendors_Agreement_Completed__c != want) {
-                plan.toUpdate.add(new Opportunity(
-                    Id = o.Id,
-                    All_Vendors_Agreement_Completed__c = want
-                ));
-                if (want) {
-                    plan.flippedToTrue.add(o.Id);
-                }
-            }
-        }
-        return plan;
-    }
-
-
-   private static void performOppUpdates(List<Opportunity> toUpdate) {
-        if (toUpdate == null || toUpdate.isEmpty()) {
-            return;
-        }
-        // Removed Security.stripInaccessible and isUpdateable checks
-        update toUpdate;
-    }
-
-    // ===== File copy (decomposed to keep complexity low) =====
-    private static void copyVendorOppFilesToOpps(Set<Id> oppIds) {
-        if (oppIds == null || oppIds.isEmpty()) {
-            return;
-        }
-        // Removed ContentDocumentLink.isCreateable() check
-
-        List<Vendor_Opportunity__c> vendorOpps = queryVendorOpps(oppIds);
-        if (vendorOpps.isEmpty()) {
-            return;
-        }
-
-        Map<Id, Id> voToOpp = mapVendorOppToOpp(vendorOpps);
-
-        List<ContentDocumentLink> vendorLinks = queryVendorLinks(voToOpp.keySet());
-        if (vendorLinks.isEmpty()) {
-            return;
-        }
-
-        Map<Id, Set<Id>> oppToExistingDocs = queryExistingOppDocs(oppIds, vendorLinks);
-        List<ContentDocumentLink> toInsert = buildLinksToInsert(vendorLinks, voToOpp, oppToExistingDocs);
-
-        insertCdlIfAny(toInsert);
-    }
-    // --- sub-helpers for file copy ---
-    private static List<Vendor_Opportunity__c> queryVendorOpps(Set<Id> oppIds) {
-        return [
-            SELECT Id, Opportunity__c
-            FROM Vendor_Opportunity__c
-            WHERE Opportunity__c IN :oppIds
-        ];
-    }
-
-    private static Map<Id, Id> mapVendorOppToOpp(List<Vendor_Opportunity__c> vos) {
-        Map<Id, Id> voToOpp = new Map<Id, Id>();
-        for (Vendor_Opportunity__c v : vos) {
-            if (v.Opportunity__c != null) {
-                voToOpp.put(v.Id, v.Opportunity__c);
-            }
-        }
-        return voToOpp;
-    }
-
-    private static List<ContentDocumentLink> queryVendorLinks(Set<Id> vendorOppIds) {
-        if (vendorOppIds == null || vendorOppIds.isEmpty()) {
-            return new List<ContentDocumentLink>();
-        }
-        return [
-            SELECT ContentDocumentId, LinkedEntityId
-            FROM ContentDocumentLink
-            WHERE LinkedEntityId IN :vendorOppIds
-        ];
-    }
-
-    private static Map<Id, Set<Id>> queryExistingOppDocs(Set<Id> oppIds, List<ContentDocumentLink> vendorLinks) {
-        Map<Id, Set<Id>> oppToDocs = new Map<Id, Set<Id>>();
-        Set<Id> docIds = new Set<Id>();
-
-        for (ContentDocumentLink l : vendorLinks) {
-            docIds.add(l.ContentDocumentId);
-        }
-        if (docIds.isEmpty()) {
-            return oppToDocs;
-        }
-
-        List<ContentDocumentLink> existing = [
-            SELECT ContentDocumentId, LinkedEntityId
-            FROM ContentDocumentLink
-            WHERE LinkedEntityId IN :oppIds
-              AND ContentDocumentId IN :docIds
-        ];
-
-        for (ContentDocumentLink e : existing) {
-            if (!oppToDocs.containsKey(e.LinkedEntityId)) {
-                oppToDocs.put(e.LinkedEntityId, new Set<Id>());
-            }
-            oppToDocs.get(e.LinkedEntityId).add(e.ContentDocumentId);
-        }
-        return oppToDocs;
-    }
-
-    private static List<ContentDocumentLink> buildLinksToInsert(
-        List<ContentDocumentLink> vendorLinks,
-        Map<Id, Id> voToOpp,
-        Map<Id, Set<Id>> oppToExistingDocs
+    private static List<Opportunity> buildOppUpdates(
+        Set<Id> opportunityIds,
+        Map<Id, Boolean> desiredState
     ) {
-        List<ContentDocumentLink> toInsert = new List<ContentDocumentLink>();
-        for (ContentDocumentLink vLink : vendorLinks) {
-            Id oppId = voToOpp.get(vLink.LinkedEntityId);
-            if (oppId == null) {
-                continue;
+        List<Opportunity> opportunitiesToUpdate = new List<Opportunity>();
+
+        List<Opportunity> opportunityRecords = [
+            SELECT Id,
+                   All_Vendors_Agreement_Completed__c
+            FROM Opportunity
+            WHERE Id IN :opportunityIds
+        ];
+
+        for (Opportunity opportunityRecord : opportunityRecords) {
+            Boolean wantedState = desiredState.get(opportunityRecord.Id);
+
+            if (wantedState == null) {
+                wantedState = false;
             }
 
-            Set<Id> already = oppToExistingDocs.get(oppId);
-            Boolean isDuplicate = (already != null && already.contains(vLink.ContentDocumentId));
-            if (isDuplicate) {
-                continue;
+            if (
+                opportunityRecord.All_Vendors_Agreement_Completed__c
+                != wantedState
+            ) {
+                opportunitiesToUpdate.add(
+                    new Opportunity(
+                        Id = opportunityRecord.Id,
+                        All_Vendors_Agreement_Completed__c = wantedState
+                    )
+                );
             }
-
-            ContentDocumentLink newLink = new ContentDocumentLink(
-                LinkedEntityId    = oppId,
-                ContentDocumentId = vLink.ContentDocumentId,
-                ShareType         = 'V',
-                Visibility        = 'AllUsers'
-            );
-            toInsert.add(newLink);
         }
-        return toInsert;
+
+        return opportunitiesToUpdate;
     }
-    
-    private static void insertCdlIfAny(List<ContentDocumentLink> links) {
-        if (links == null || links.isEmpty()) {
+
+    private static void performOppUpdates(
+        List<Opportunity> opportunitiesToUpdate
+    ) {
+        if (
+            opportunitiesToUpdate == null
+            || opportunitiesToUpdate.isEmpty()
+        ) {
             return;
         }
-        insert links;
+
+        update opportunitiesToUpdate;
     }
 }

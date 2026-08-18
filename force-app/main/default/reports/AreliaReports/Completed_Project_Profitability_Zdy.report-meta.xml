@@ -32,6 +32,13 @@
             <operator>equals</operator>
             <value>Completed</value>
         </criteriaItems>
+        <criteriaItems>
+            <column>CUST_RECORDTYPE</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>Project__c.Arelia</value>
+        </criteriaItems>
     </filter>
     <format>Tabular</format>
     <name>Completed Project Profitability</name>
