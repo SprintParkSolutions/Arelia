@@ -1,28 +1,165 @@
 <html>
-<head>
-	<title></title>
-</head>
-<body style="height: auto; min-height: auto;">
-<p>Dear {{CLIENT_NAME}},</p>
-
-<p>Thank you for your valuable feedback regarding the initial budget proposal.</p>
-
-<p>Our team has carefully reviewed your comments and concerns. We have updated the project estimates&nbsp; to better align with your requirements for <strong>{{OPPORTUNITY_NAME}}</strong>.</p>
-
-<p><strong>Summary of Changes:</strong><br />
-We have addressed the specific points mentioned in your previous feedback:</p>
-
-<blockquote><em>"{{CLIENT_REMARKS}}"</em></blockquote>
-
-<p>Please click the button below to view the revised breakdown. We believe this updated proposal now fully meets your expectations.</p>
-<br />
-<a href="{{APPROVAL_LINK}}" style="background-color:#0070d2; color:#ffffff; display:inline-block; padding:14px 28px; text-decoration:none; border-radius:4px; font-weight:bold; font-family:Arial, sans-serif; font-size:16px;">Review Revised Proposal</a><br />
-&nbsp;
-<p>Once approved, we will proceed immediately with the contract finalization.</p>
-
-<p>Best regards,<br />
-<strong>{{SUPERVISOR_NAME}}</strong><br />
-Project Supervisor<br />
-Arelia Team.</p>
-</body>
+ <head>
+  <title></title>
+ </head>
+ <body aria-readonly="false" style="height:auto;
+			 min-height:auto;
+			 margin:0;
+			 padding:0;
+			 background-color:#ffffff;">
+  <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+			  border-collapse:collapse;
+			  background-color:#ffffff;" width="100%">
+   <tbody>
+    <tr>
+     <td align="center" style="padding:0;">
+      <table border="0" cellpadding="0" cellspacing="0" style="max-width:760px;
+							  width:100%;
+							  background-color:#ffffff;
+							  border:2px solid #c9a75d;
+							  border-collapse:collapse;" width="100%">
+       <!-- Banner -->
+       <tbody>
+        <tr>
+         <td style="padding:0;"><img alt="Arelia Email Banner Image" src="{[devName:Arelia_Email_Banner_Image]}" style="display:block;
+											width:100%;
+											max-width:100%;
+											height:auto;
+											border:0;" title="Arelia Email Banner Image" /></td>
+        </tr> <!-- Main Email Content -->
+        <tr>
+         <td style="padding:30px 34px 32px 34px;"><p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Dear <strong>{{CLIENT_NAME}}</strong>,</p> <p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Thank you for your valuable feedback regarding the initial budget proposal.</p> <p style="margin:0 0 22px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Our team has carefully reviewed your comments and concerns and updated the project estimates to better align with your requirements for <strong>{{OPPORTUNITY_NAME}}</strong>.</p> <!-- Summary of Changes -->
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin-bottom:18px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+													   padding-top:20px;"><p style="margin:0;
+														  font-size:20px;
+														  line-height:1.4;
+														  font-family:Times New Roman,Times,serif;
+														  color:#1f1f1f;"><strong>Summary of Changes</strong></p></td>
+            </tr>
+           </tbody>
+          </table> <p style="margin:0 0 14px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">We have reviewed and addressed the specific points mentioned in your previous feedback.</p> <!-- Client Feedback -->
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin:18px 0 24px 0;" width="100%">
+           <tbody>
+            <tr>
+             <td style="background-color:#fbf8f1;
+													   border-left:4px solid #c9a75d;
+													   padding:15px 18px;"><p style="margin:0;
+														  font-size:17px;
+														  line-height:1.6;
+														  font-family:Times New Roman,Times,serif;
+														  font-style:italic;
+														  color:#555555;">“{{CLIENT_REMARKS}}”</p></td>
+            </tr>
+           </tbody>
+          </table> <!-- Action Required -->
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin-bottom:20px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+													   padding-top:20px;"><p style="margin:0;
+														  font-size:20px;
+														  line-height:1.4;
+														  font-family:Times New Roman,Times,serif;
+														  color:#1f1f1f;"><strong>Action Required</strong></p></td>
+            </tr>
+           </tbody>
+          </table> <p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Please review the revised budget breakdown using the button below. We believe the updated proposal now reflects your requirements more closely.</p> <!-- Approval Button -->
+          <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;
+											  margin:22px 0 24px 0;">
+           <tbody>
+            <tr>
+             <td align="center" style="background-color:#1b1b1b;
+													   border:1px solid #c9a75d;
+													   padding:12px 24px;
+													   text-align:center;"><a href="{{APPROVAL_LINK}}" style="font-size:17px;
+														  font-family:Arial,Helvetica,sans-serif;
+														  color:#ffffff;
+														  text-decoration:none;
+														  font-weight:bold;
+														  display:inline-block;">Review Revised Proposal </a></td>
+            </tr>
+           </tbody>
+          </table> <p style="margin:0 0 22px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Once the revised proposal is approved, our team will proceed with the appropriate next steps for project finalization.</p> <p style="margin:0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Warm regards,<br /> <strong>{{SUPERVISOR_NAME}}</strong><br /> Project Supervisor<br /> <strong>Team Arelia</strong></p></td>
+        </tr> <!-- Short Professional Footer -->
+        <tr>
+         <td align="center" style="background-color:#171717;
+									   border-top:2px solid #C99A3D;
+									   padding:24px 32px 22px 32px;
+									   text-align:center;"><p style="margin:0 0 5px 0;
+										  font-size:24px;
+										  line-height:1.3;
+										  font-family:Times New Roman,Times,serif;
+										  color:#D6B36A;
+										  font-weight:bold;
+										  text-align:center;">Arelia</p> <p style="margin:0 0 18px 0;
+										  font-size:11px;
+										  line-height:1.5;
+										  font-family:Arial,Helvetica,sans-serif;
+										  color:#C99A3D;
+										  letter-spacing:2px;
+										  text-align:center;">PREMIUM &amp; LUXURY INTERIOR DESIGNS</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;" width="100%">
+           <tbody>
+            <tr>
+             <td align="center" style="border-top:1px solid #6E5427;
+													   padding-top:16px;
+													   text-align:center;"><p style="margin:0 0 5px 0;
+														  font-size:11px;
+														  line-height:1.6;
+														  font-family:Arial,Helvetica,sans-serif;
+														  color:#8F887F;
+														  text-align:center;">This email was sent because a revised project budget proposal is ready for your review.</p> <p style="margin:0;
+														  font-size:11px;
+														  line-height:1.6;
+														  font-family:Arial,Helvetica,sans-serif;
+														  color:#8F887F;
+														  text-align:center;">© 2026 Arelia. All rights reserved.</p></td>
+            </tr>
+           </tbody>
+          </table></td>
+        </tr>
+       </tbody>
+      </table></td>
+    </tr>
+   </tbody>
+  </table>
+ </body>
 </html>

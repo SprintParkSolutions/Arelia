@@ -1,21 +1,219 @@
 <html>
-<head>
-	<title></title>
-</head>
-<body style="height: auto; min-height: auto;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Dear <strong>{{{Project__r.Client__r.Name}}}</strong>,<br />
-<br />
-We are delighted to inform you that Arelia team has accepted your project and your username is </span><strong>{{{Project__r.Client__r.Email}}}</strong><span style="font-family:Times New Roman,Times New Roman,Times,serif;"> and password is&nbsp;</span><strong>{{{Project__r.Client__r.Password__c}}}</strong><span style="font-family:Times New Roman,Times New Roman,Times,serif;"> . Kindly do not share your project code with anyone. You can use this code to track progress of the work.<br />
-<br />
-<strong>Project Details:</strong></span></span>
-<ul>
-	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Project Name:</strong>&nbsp;{{{Project__c.Name}}}</span></span></li>
-	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Project Status:</strong>&nbsp;{{{Project__c.Status__c}}}</span></span></li>
-	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Project Request Type:</strong> {{{Project__c.Project_Request_Quotation_Type__c}}}</span></span></li>
-</ul>
-<br />
-<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Thank You for choosing Arelia Team.<br />
-<br />
-<br />
-Kind Regards<br />
-Arelia Team.</span></span></body>
+ <head>
+  <title></title>
+ </head>
+ <body style="height: auto; min-height: auto;">
+  <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+              border-collapse:collapse;
+              background-color:#ffffff;" width="100%">
+   <tbody>
+    <tr>
+     <td align="center" style="padding:0;">
+      <table border="0" cellpadding="0" cellspacing="0" style="max-width:760px;
+                              width:100%;
+                              background-color:#ffffff;
+                              border:2px solid #c9a75d;
+                              border-collapse:collapse;" width="100%">
+       <tbody>
+        <tr>
+         <td style="padding:0;"><img alt="Arelia Email Banner Image" src="{[devName:Arelia_Email_Banner_Image]}" style="display:block;
+                                           width:100%;
+                                           max-width:100%;
+                                           height:auto;
+                                           border:0;" title="Arelia Email Banner Image" /></td>
+        </tr>
+        <tr>
+         <td style="padding:30px 34px 32px 34px;"><p style="margin:0 0 18px 0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">Dear <strong>{{{Project__r.Client__r.Name}}}</strong>,</p> <p style="margin:0 0 22px 0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">We are delighted to inform you that Arelia team has accepted your project. You can use the login details below to track the progress of the work.</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;
+                                              margin-bottom:20px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+                                                       padding-top:20px;"><p style="margin:0;
+                                                          font-size:20px;
+                                                          line-height:1.4;
+                                                          font-family:Times New Roman,Times,serif;
+                                                          color:#1f1f1f;"><strong>Project Login Details:</strong></p></td>
+            </tr>
+           </tbody>
+          </table>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;
+                                              margin-bottom:18px;
+                                              background-color:#faf8f3;
+                                              border-left:3px solid #c9a75d;" width="100%">
+           <tbody>
+            <tr>
+             <td style="padding:16px 10px 10px 18px;
+                                                       width:170px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Username:</strong></td>
+             <td style="padding:16px 18px 10px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>{{{Project__r.Client__r.Email}}}</strong></td>
+            </tr>
+            <tr>
+             <td style="padding:0 10px 16px 18px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Password:</strong></td>
+             <td style="padding:0 18px 16px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>{{{Project__r.Client__r.Password__c}}}</strong></td>
+            </tr>
+           </tbody>
+          </table>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;
+                                              margin-bottom:26px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="background-color:#faf8f3;
+                                                       border-left:3px solid #c9a75d;
+                                                       padding:14px 18px;"><p style="margin:0;
+                                                          font-size:17px;
+                                                          line-height:1.5;
+                                                          font-family:Times New Roman,Times,serif;
+                                                          color:#222222;"><strong>Please do not share your project password with anyone.</strong> You can use this username and password to track progress of the work.</p></td>
+            </tr>
+           </tbody>
+          </table>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;
+                                              margin-bottom:20px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+                                                       padding-top:20px;"><p style="margin:0;
+                                                          font-size:20px;
+                                                          line-height:1.4;
+                                                          font-family:Times New Roman,Times,serif;
+                                                          color:#1f1f1f;"><strong>Project Details:</strong></p></td>
+            </tr>
+           </tbody>
+          </table>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;
+                                              margin-bottom:26px;
+                                              background-color:#faf8f3;
+                                              border-left:3px solid #c9a75d;" width="100%">
+           <tbody>
+            <tr>
+             <td style="padding:16px 10px 10px 18px;
+                                                       width:220px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Project Name:</strong></td>
+             <td style="padding:16px 18px 10px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;">{{{Project__c.Name}}}</td>
+            </tr>
+            <tr>
+             <td style="padding:0 10px 10px 18px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Project Status:</strong></td>
+             <td style="padding:0 18px 10px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>{{{Project__c.Status__c}}}</strong></td>
+            </tr>
+            <tr>
+             <td style="padding:0 10px 16px 18px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Project Request Type:</strong></td>
+             <td style="padding:0 18px 16px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;">{{{Project__c.Project_Request_Quotation_Type__c}}}</td>
+            </tr>
+           </tbody>
+          </table> <p style="margin:0 0 22px 0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">Thank You for choosing Arelia Team.</p> <p style="margin:0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">Kind Regards,<br /> <strong>Arelia Team.</strong></p></td>
+        </tr>
+        <tr>
+         <td align="center" style="background-color:#171717;
+                                       border-top:2px solid #C99A3D;
+                                       padding:24px 32px 22px 32px;
+                                       text-align:center;"><p style="margin:0 0 5px 0;
+                                          font-size:24px;
+                                          line-height:1.3;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#D6B36A;
+                                          font-weight:bold;
+                                          text-align:center;">Arelia</p> <p style="margin:0 0 18px 0;
+                                          font-size:11px;
+                                          line-height:1.5;
+                                          font-family:Arial,Helvetica,sans-serif;
+                                          color:#C99A3D;
+                                          letter-spacing:2px;
+                                          text-align:center;">PREMIUM &amp; LUXURY INTERIOR DESIGNS</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;" width="100%">
+           <tbody>
+            <tr>
+             <td align="center" style="border-top:1px solid #6E5427;
+                                                       padding-top:16px;
+                                                       text-align:center;"><p style="margin:0 0 5px 0;
+                                                          font-size:11px;
+                                                          line-height:1.6;
+                                                          font-family:Arial,Helvetica,sans-serif;
+                                                          color:#8F887F;
+                                                          text-align:center;">This email was sent because your Arelia project was accepted and project access details were provided.</p> <p style="margin:0;
+                                                          font-size:11px;
+                                                          line-height:1.6;
+                                                          font-family:Arial,Helvetica,sans-serif;
+                                                          color:#8F887F;
+                                                          text-align:center;">© 2026 Arelia. All rights reserved.</p></td>
+            </tr>
+           </tbody>
+          </table></td>
+        </tr>
+       </tbody>
+      </table></td>
+    </tr>
+   </tbody>
+  </table>
+ </body>
 </html>

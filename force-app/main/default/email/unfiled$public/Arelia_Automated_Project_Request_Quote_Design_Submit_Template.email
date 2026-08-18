@@ -1,21 +1,162 @@
 <html>
-<head>
-	<title></title>
-</head>
-<body style="height: auto; min-height: auto;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hello <strong>{{{Recipient.FirstName}}}</strong>,</span></span><br />
-<br />
-Thank you for providing the details of your automatic project request. Here is a summary of the information you have submitted for our review and consideration.
-<ul>
-	<li>Company:&nbsp;<strong>{{{Recipient.Company}}}</strong></li>
-	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Project Type:&nbsp;<strong>{{{Recipient.Interior_Project_Type__c}}}</strong></span></span></li>
-	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Category:&nbsp;<strong>{{{Recipient.Interior_Category__c}}}</strong></span></span></li>
-	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Plan:&nbsp;<strong>{{{Recipient.Plan_Level__c}}}</strong></span></span></li>
-	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Site Space:&nbsp;<strong>{{{Recipient.Site_Space__c}}}</strong>&nbsp;<strong>sq ft</strong></span></span></li>
-	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Estimated Budget: <strong>{{{Recipient.Estimated_Budget__c}}}</strong></span></span></li>
-</ul>
-Should you have any further questions or require additional information, please do not hesitate to contact our management team.<br />
-<br />
-<br />
-Best Regards,<br />
-Arelia Team.</body>
+ <head>
+  <title></title>
+ </head>
+ <body style="height:auto;
+			 min-height:auto;
+			 margin:0;
+			 padding:0;
+			 background-color:#ffffff;">
+  <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+			  border-collapse:collapse;
+			  background-color:#ffffff;" width="100%">
+   <tbody>
+    <tr>
+     <td align="center" style="padding:0;">
+      <table border="0" cellpadding="0" cellspacing="0" style="max-width:760px;
+							  width:100%;
+							  background-color:#ffffff;
+							  border:2px solid #c9a75d;
+							  border-collapse:collapse;" width="100%">
+       <tbody>
+        <tr>
+         <td style="padding:0;"><img alt="Arelia Email Banner Image" src="{[devName:Arelia_Email_Banner_Image1]}" style="display:block;
+											width:100%;
+											max-width:100%;
+											height:auto;
+											border:0;" title="Arelia Email Banner Image" /></td>
+        </tr>
+        <tr>
+         <td style="padding:30px 34px 32px 34px;"><p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Hello <strong>{{{Recipient.FirstName}}}</strong>,</p> <p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Thank you for providing the details of your automated project request. We have received your information successfully and will review it as part of the next stage of your interior design journey.</p> <p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Here is a summary of the information you submitted:</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin-bottom:18px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+													   padding-top:20px;"><p style="margin:0;
+														  font-size:20px;
+														  line-height:1.4;
+														  font-family:Times New Roman,Times,serif;
+														  color:#1f1f1f;"><strong>Project Request Details</strong></p></td>
+            </tr>
+           </tbody>
+          </table>
+          <ul style="margin-top:8px;
+										   margin-bottom:24px;
+										   padding-left:24px;">
+           <li style="margin-bottom:10px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Company:</strong>&nbsp;{{{Recipient.Company}}}</li>
+           <li style="margin-bottom:10px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Project Type:</strong>&nbsp;{{{Recipient.Interior_Project_Type__c}}}</li>
+           <li style="margin-bottom:10px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Category:</strong>&nbsp;{{{Recipient.Interior_Category__c}}}</li>
+           <li style="margin-bottom:10px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Plan:</strong>&nbsp;{{{Recipient.Plan_Level__c}}}</li>
+           <li style="margin-bottom:10px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Site Space:</strong>&nbsp;{{{Recipient.Site_Space__c}}} sq ft</li>
+           <li style="margin-bottom:10px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Estimated Budget:</strong>&nbsp;{{{Recipient.Estimated_Budget__c}}}</li>
+          </ul>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin-bottom:20px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+													   padding-top:20px;"><p style="margin:0;
+														  font-size:20px;
+														  line-height:1.4;
+														  font-family:Times New Roman,Times,serif;
+														  color:#1f1f1f;"><strong>What happens next?</strong></p></td>
+            </tr>
+           </tbody>
+          </table> <p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Our team will review your project requirements, estimated budget, and design preferences to determine the appropriate next steps.</p> <p style="margin:0 0 22px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">If you have any additional questions or would like to provide further information, please feel free to contact our management team.</p> <p style="margin:0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Warm regards,<br /> <strong>Team Arelia</strong></p></td>
+        </tr>
+        <tr>
+         <td align="center" style="background-color:#171717;
+									   border-top:2px solid #C99A3D;
+									   padding:24px 32px 22px 32px;
+									   text-align:center;"><p style="margin:0 0 5px 0;
+										  font-size:24px;
+										  line-height:1.3;
+										  font-family:Times New Roman,Times,serif;
+										  color:#D6B36A;
+										  font-weight:bold;
+										  text-align:center;">Arelia</p> <p style="margin:0 0 18px 0;
+										  font-size:11px;
+										  line-height:1.5;
+										  font-family:Arial,Helvetica,sans-serif;
+										  color:#C99A3D;
+										  letter-spacing:2px;
+										  text-align:center;">PREMIUM &amp; LUXURY INTERIOR DESIGNS</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;" width="100%">
+           <tbody>
+            <tr>
+             <td align="center" style="border-top:1px solid #6E5427;
+													   padding-top:16px;
+													   text-align:center;"><p style="margin:0 0 5px 0;
+														  font-size:11px;
+														  line-height:1.6;
+														  font-family:Arial,Helvetica,sans-serif;
+														  color:#8F887F;
+														  text-align:center;">This email was sent because project request details were submitted to Arelia.</p> <p style="margin:0;
+														  font-size:11px;
+														  line-height:1.6;
+														  font-family:Arial,Helvetica,sans-serif;
+														  color:#8F887F;
+														  text-align:center;">© 2026 Arelia. All rights reserved.</p></td>
+            </tr>
+           </tbody>
+          </table></td>
+        </tr>
+       </tbody>
+      </table></td>
+    </tr>
+   </tbody>
+  </table>
+ </body>
 </html>

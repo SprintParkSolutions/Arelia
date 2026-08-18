@@ -1,0 +1,312 @@
+<template>
+    <div class="vendor-page">
+
+        <template if:true={isLoading}>
+            <div class="loading-overlay">
+                <div class="loading-box">
+                    <lightning-spinner
+                        alternative-text="Loading agreement"
+                        size="medium"
+                        variant="brand">
+                    </lightning-spinner>
+
+                    <p class="loading-text">
+                        Preparing vendor agreement...
+                    </p>
+                </div>
+            </div>
+        </template>
+
+        <template if:true={showCompletedScreen}>
+            <div class="status-container">
+                <section
+                    class="status-card completed-card"
+                    aria-labelledby="completed-title">
+
+                    <div class="status-icon-wrap completed-icon">
+                        <span class="status-checkmark">
+                            ✓
+                        </span>
+                    </div>
+
+                    <p class="status-eyebrow">
+                        Agreement Status
+                    </p>
+
+                    <div class="status-badge completed-badge">
+                        Completed
+                    </div>
+
+                    <h1
+                        id="completed-title"
+                        class="status-title">
+                        Vendor Agreement Already Signed
+                    </h1>
+
+                    <p class="status-message">
+                        This Vendor Agreement has already been
+                        signed and submitted successfully.
+                    </p>
+
+                    <p class="status-sub-message">
+                        No further action is required. For security
+                        and document integrity, a completed agreement
+                        cannot be signed again using the same link.
+                    </p>
+
+                    <div class="status-information">
+                        <div class="status-information-icon">
+                            ✓
+                        </div>
+
+                        <div class="status-information-content">
+                            <span class="status-information-label">
+                                Signature Status
+                            </span>
+
+                            <span class="status-information-value">
+                                Digital signature received
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="status-action">
+                        <button
+                            class="primary-button status-button"
+                            onclick={handleRedirect}>
+                            Return to Home
+                        </button>
+                    </div>
+
+                    <p class="status-footer-note">
+                        The signed document has been submitted
+                        for further processing.
+                    </p>
+                </section>
+            </div>
+        </template>
+
+        <template if:true={showErrorScreen}>
+            <div class="status-container">
+                <section
+                    class="status-card error-status-card"
+                    aria-labelledby="error-title">
+
+                    <div class="status-icon-wrap error-status-icon">
+                        <span class="status-error-symbol">
+                            !
+                        </span>
+                    </div>
+
+                    <p class="status-eyebrow error-eyebrow">
+                        Agreement Access
+                    </p>
+
+                    <div class="status-badge error-status-badge">
+                        Action Required
+                    </div>
+
+                    <h1
+                        id="error-title"
+                        class="status-title">
+                        Unable to Open Agreement
+                    </h1>
+
+                    <p class="status-message">
+                        We could not open this Vendor Agreement.
+                    </p>
+
+                    <div class="error-detail-panel">
+                        <span class="error-detail-label">
+                            Details
+                        </span>
+
+                        <span class="error-detail-message">
+                            {errorMessage}
+                        </span>
+                    </div>
+
+                    <p class="status-sub-message">
+                        Confirm that the agreement link is not
+                        expired or invalid. You may also try loading the page
+                        again.
+                    </p>
+
+                    <div class="status-action status-action-group">
+                        <button
+                            class="secondary-button status-button"
+                            onclick={handleRetry}>
+                            Try Again
+                        </button>
+
+                        <button
+                            class="primary-button status-button"
+                            onclick={handleRedirect}>
+                            Return to Home
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </template>
+
+        <template if:true={showSuccessScreen}>
+            <div class="success-container">
+                <div class="success-card">
+                    <div class="success-icon">
+                        ✓
+                    </div>
+
+                    <p class="success-eyebrow">
+                        Agreement Status
+                    </p>
+
+                    <h1 class="success-title">
+                        Vendor Agreement Signed Successfully
+                    </h1>
+
+                    <p class="success-message">
+                        Thank you,
+                        <strong>{vendorName}</strong>.
+                        Your signed Vendor Agreement has been
+                        submitted successfully.
+                    </p>
+
+                    <p class="success-sub-message">
+                        A signed copy has been shared with the
+                        concerned supervisor for further processing.
+                    </p>
+
+                    <div class="success-action">
+                        <button
+                            class="primary-button"
+                            onclick={handleRedirect}>
+                            OK
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template if:true={agreementLoaded}>
+            <section class="agreement-card">
+
+                <div class="agreement-header">
+                    <div class="header-badge">
+                        Digital Agreement
+                    </div>
+
+                    <h1>
+                        Vendor Agreement Signing
+                    </h1>
+
+                    <p>
+                        Review the vendor agreement carefully,
+                        draw your digital signature, and click
+                        <strong>Done</strong>
+                        to submit the signed agreement.
+                    </p>
+                </div>
+
+                <div class="vendor-info-panel">
+                    <div class="info-block">
+                        <span class="info-label">
+                            Vendor Name
+                        </span>
+
+                        <span class="info-value">
+                            {vendorName}
+                        </span>
+                    </div>
+
+                    <div class="info-block">
+                        <span class="info-label">
+                            Agreement Type
+                        </span>
+
+                        <span class="info-value">
+                            Interior Design Vendor /
+                            Contractor Agreement
+                        </span>
+                    </div>
+                </div>
+
+                <div class="agreement-preview-shell">
+                    <div class="document-ribbon">
+                        <span>
+                            Agreement Preview
+                        </span>
+
+                        <span class="document-ribbon-line">
+                        </span>
+                    </div>
+
+                    <div class="agreement-preview">
+                        <lightning-formatted-rich-text
+                            value={agreementHtml}>
+                        </lightning-formatted-rich-text>
+                    </div>
+                </div>
+
+                <div class="signature-section">
+                    <div class="signature-header">
+                        <div>
+                            <p class="signature-eyebrow">
+                                Vendor Authorization
+                            </p>
+
+                            <h2>
+                                Digital Signature
+                            </h2>
+                        </div>
+
+                        <div class="signature-status">
+                            Signature Required
+                        </div>
+                    </div>
+
+                    <p class="signature-instruction">
+                        Please sign inside the box below.
+                        This signature will be captured
+                        electronically and attached to the
+                        signed Vendor Agreement.
+                    </p>
+
+                    <div class="signature-canvas-wrap">
+                        <canvas
+                            class="signature-canvas"
+                            width="700"
+                            height="190"
+                            onmousedown={startDrawing}
+                            onmousemove={draw}
+                            onmouseup={stopDrawing}
+                            onmouseleave={stopDrawing}
+                            ontouchstart={startDrawing}
+                            ontouchmove={draw}
+                            ontouchend={stopDrawing}>
+                        </canvas>
+
+                        <div class="signature-placeholder">
+                            Sign here
+                        </div>
+                    </div>
+
+                    <div class="button-row">
+                        <button
+                            class="secondary-button"
+                            onclick={clearSignature}>
+                            Clear Signature
+                        </button>
+
+                        <button
+                            class="primary-button"
+                            onclick={handleDone}>
+                            Done
+                        </button>
+                    </div>
+                </div>
+
+            </section>
+        </template>
+
+    </div>
+</template>

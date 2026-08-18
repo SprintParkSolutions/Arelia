@@ -1,19 +1,152 @@
 <html>
-<head>
-	<title></title>
-</head>
-<body style="height: auto; min-height: auto;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Hi <strong>{{{Recipient.Supervisor_User__c}}}</strong>,<br />
-<br />
-The appointment for <strong>{{{Recipient.FirstName}}}</strong>&nbsp;<strong>{{{Recipient.LastName}}}</strong>&nbsp;has been <strong>{{{Recipient.Appointment_Status__c}}}</strong>.<br />
-<br />
-<strong>New Rescheduled Appointment Details:</strong></span></span>
-<ul>
-	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Rescheduled Appointment date:&nbsp;<strong>{{{Recipient.Appointment_Rescheduled_Time__c}}}</strong></span></span></li>
-	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Time Slots:&nbsp;<strong>{{{Recipient.Time_Slots__c}}}</strong></span></span></li>
-</ul>
-<span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;"> Please make a note of the updated schedule and reach out if any clarification is needed.<br />
-<br />
-<br />
-Thanks,<br />
-Arelia Team.</span></span></body>
+ <head>
+  <title></title>
+ </head>
+ <body style="height:auto;
+			 min-height:auto;
+			 margin:0;
+			 padding:0;
+			 background-color:#ffffff;">
+  <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+			  border-collapse:collapse;
+			  background-color:#ffffff;" width="100%">
+   <tbody>
+    <tr>
+     <td align="center" style="padding:0;">
+      <table border="0" cellpadding="0" cellspacing="0" style="max-width:760px;
+							  width:100%;
+							  background-color:#ffffff;
+							  border:2px solid #c9a75d;
+							  border-collapse:collapse;" width="100%">
+       <tbody>
+        <tr>
+         <td style="padding:0;"><img alt="Arelia Email Banner Image" src="{[devName:Arelia_Email_Banner_Image]}" style="display:block;
+											width:100%;
+											max-width:100%;
+											height:auto;
+											border:0;" title="Arelia Email Banner Image" /></td>
+        </tr>
+        <tr>
+         <td style="padding:30px 34px 32px 34px;"><p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Hello <strong>{{{Recipient.Supervisor_User__c}}}</strong>,</p> <p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">The appointment for <strong>{{{Recipient.FirstName}}} {{{Recipient.LastName}}}</strong> has been <strong>{{{Recipient.Appointment_Status__c}}}</strong>.</p> <p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Please find the updated appointment schedule below.</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin-bottom:18px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+													   padding-top:20px;"><p style="margin:0;
+														  font-size:20px;
+														  line-height:1.4;
+														  font-family:Times New Roman,Times,serif;
+														  color:#1f1f1f;"><strong>New Rescheduled Appointment Details</strong></p></td>
+            </tr>
+           </tbody>
+          </table>
+          <ul style="margin-top:8px;
+										   margin-bottom:24px;
+										   padding-left:24px;">
+           <li style="margin-bottom:10px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Client Name:</strong>&nbsp;{{{Recipient.FirstName}}} {{{Recipient.LastName}}}</li>
+           <li style="margin-bottom:10px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Rescheduled Appointment Date:</strong>&nbsp;{{{Recipient.Appointment_Rescheduled_Time__c}}}</li>
+           <li style="margin-bottom:10px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Time Slot:</strong>&nbsp;{{{Recipient.Time_Slots__c}}}</li>
+           <li style="margin-bottom:10px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Status:</strong>&nbsp;{{{Recipient.Appointment_Status__c}}}</li>
+          </ul>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin-bottom:20px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+													   padding-top:20px;"><p style="margin:0;
+														  font-size:20px;
+														  line-height:1.4;
+														  font-family:Times New Roman,Times,serif;
+														  color:#1f1f1f;"><strong>What happens next?</strong></p></td>
+            </tr>
+           </tbody>
+          </table> <p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Please make a note of the updated schedule and ensure you are prepared for the rescheduled appointment.</p> <p style="margin:0 0 22px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">If you need any clarification regarding the revised appointment details, please coordinate with the client or contact the Arelia team.</p> <p style="margin:0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Warm regards,<br /> <strong>Team Arelia</strong></p></td>
+        </tr>
+        <tr>
+         <td align="center" style="background-color:#171717;
+									   border-top:2px solid #C99A3D;
+									   padding:24px 32px 22px 32px;
+									   text-align:center;"><p style="margin:0 0 5px 0;
+										  font-size:24px;
+										  line-height:1.3;
+										  font-family:Times New Roman,Times,serif;
+										  color:#D6B36A;
+										  font-weight:bold;
+										  text-align:center;">Arelia</p> <p style="margin:0 0 18px 0;
+										  font-size:11px;
+										  line-height:1.5;
+										  font-family:Arial,Helvetica,sans-serif;
+										  color:#C99A3D;
+										  letter-spacing:2px;
+										  text-align:center;">PREMIUM &amp; LUXURY INTERIOR DESIGNS</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;" width="100%">
+           <tbody>
+            <tr>
+             <td align="center" style="border-top:1px solid #6E5427;
+													   padding-top:16px;
+													   text-align:center;"><p style="margin:0 0 5px 0;
+														  font-size:11px;
+														  line-height:1.6;
+														  font-family:Arial,Helvetica,sans-serif;
+														  color:#8F887F;
+														  text-align:center;">This email was sent regarding a rescheduled client appointment.</p> <p style="margin:0;
+														  font-size:11px;
+														  line-height:1.6;
+														  font-family:Arial,Helvetica,sans-serif;
+														  color:#8F887F;
+														  text-align:center;">© 2026 Arelia. All rights reserved.</p></td>
+            </tr>
+           </tbody>
+          </table></td>
+        </tr>
+       </tbody>
+      </table></td>
+    </tr>
+   </tbody>
+  </table>
+ </body>
 </html>

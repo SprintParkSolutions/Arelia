@@ -23,26 +23,10 @@
             throw new AuraHandledException('You do not have permission to access Lead records.');
         }
 
-        List<Lead> leads = [
-            SELECT Id,
-                   FirstName,
-                   LastName,
-                   Email,
-                   Phone,
-                   Company,
-                   Customer_Budget__c,
-                   Type_Of_Project__c,
-                   Project_Scope__c,
-                   Plan_Level__c,                  // 🔹 NEW
-                   Project_Description__c,
-                   Site_Location__c,
-                   Project_Request_Quotation_Type__c,
-                   Project_Request_Submitted__c,
-                   Site_Space__c
-            FROM Lead
-            WHERE Id = :leadId
-            LIMIT 1
-        ];
+        List<Lead> leads = [SELECT Id,FirstName,LastName,Email,Phone,Company, Customer_Budget__c,
+                Type_Of_Project__c, Project_Scope__c, Plan_Level__c, Project_Description__c,
+                Site_Location__c, Project_Request_Quotation_Type__c, Project_Request_Submitted__c, Site_Space__c
+                FROM Lead WHERE Id = :leadId LIMIT 1 ];
 
         return leads.isEmpty() ? null : leads[0];
     }
@@ -93,26 +77,10 @@
         Id leadId = (Id) payload.get('leadId');
 
         // ---- Load Lead including Project_Request_Submitted__c ----
-        List<Lead> leads = [
-            SELECT Id,
-                   Project_Request_Submitted__c,
-                   FirstName,
-                   LastName,
-                   Email,
-                   Phone,
-                   Company,
-                   Customer_Budget__c,
-                   Type_Of_Project__c,
-                   Project_Scope__c,
-                   Plan_Level__c,                  // 🔹 NEW
-                   Site_Space__c,
-                   Project_Description__c,
-                   Site_Location__c,
-                   Project_Request_Quotation_Type__c
-            FROM Lead
-            WHERE Id = :leadId
-            LIMIT 1
-        ];
+        List<Lead> leads = [SELECT Id,Project_Request_Submitted__c,FirstName,LastName,Email,Phone,
+                Company,Customer_Budget__c,Type_Of_Project__c,Project_Scope__c,Plan_Level__c, Site_Space__c,
+                Project_Description__c,Site_Location__c,Project_Request_Quotation_Type__c
+                FROM Lead WHERE Id = :leadId LIMIT 1];
 
         if (leads.isEmpty()) {
             // Lead not found – nothing to update, avoid throwing a hard error

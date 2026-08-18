@@ -1,0 +1,129 @@
+<template>
+    <lightning-quick-action-panel header="Send Client Agreement">
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading"></lightning-spinner>
+        </template>
+
+        <template if:false={isLoading}>
+            <div class="slds-p-around_medium">
+
+                <!-- Error Display Block -->
+                <template if:true={hasError}>
+                    <div class="error-box slds-m-bottom_medium">
+                        <div class="error-title">Error</div>
+                        <div class="error-message">{errorMessage}</div>
+
+                        <template if:true={errorDetails}>
+                            <pre class="error-details">{errorDetails}</pre>
+                        </template>
+                    </div>
+                </template>
+
+                <lightning-input
+                    label="Client Email"
+                    value={clientEmail}
+                    disabled>
+                </lightning-input>
+
+                <lightning-input
+                    class="slds-m-top_small"
+                    label="Supervisor Email"
+                    value={supervisorEmail}
+                    disabled>
+                </lightning-input>
+
+                <div class="slds-m-top_medium">
+                    <lightning-button
+                        label="Edit"
+                        onclick={handleEdit}
+                        disabled={isEditing}>
+                    </lightning-button>
+
+                    <lightning-button
+                        class="slds-m-left_small"
+                        label="Save"
+                        variant="brand"
+                        onclick={handleSave}
+                        disabled={saveDisabled}>
+                    </lightning-button>
+
+                    <lightning-button
+                        class="slds-m-left_small"
+                        label="Send"
+                        variant="success"
+                        onclick={handleSend}
+                        disabled={isSending}>
+                    </lightning-button>
+                </div>
+
+                <div class="slds-m-top_medium">
+                    <template if:true={isEditing}>
+                        <lightning-input-rich-text
+                            label="Agreement Body"
+                            value={agreementHtml}
+                            share-with-entity-id={recordId}
+                            onchange={handleAgreementChange}>
+                        </lightning-input-rich-text>
+                    </template>
+
+                    <template if:false={isEditing}>
+                        <div
+                            class="preview-box"
+                            lwc:dom="manual">
+                        </div>
+                    </template>
+                </div>
+
+                <div class="slds-m-top_medium upload-section">
+
+                    <h3>Supporting Images / PDFs</h3>
+                    <p class="helper-text">
+                        Upload supporting PNG, JPG, JPEG, or PDF files. Images will appear inside the agreement PDF. PDF files will be sent as separate attachments.
+                    </p>
+
+                    <lightning-file-upload
+                        label="Upload Supporting Files"
+                        name="supportingFiles"
+                        record-id={recordId}
+                        accept={acceptedFormats}
+                        multiple
+                        onuploadfinished={handleUploadFinished}>
+                    </lightning-file-upload>
+
+                    <template if:true={hasSupportingFiles}>
+                        <div class="supporting-file-list slds-m-top_small">
+                            <strong>Selected supporting files:</strong>
+
+                            <template for:each={selectedSupportingFiles} for:item="file">
+                                <div
+                                    key={file.uiKey}
+                                    class="supporting-file-row slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-m-top_x-small"
+                                >
+                                    <div>
+                                        <span>{file.fileName}</span>
+                                        <span class="file-type-pill slds-m-left_x-small">
+                                            {file.displayType}
+                                        </span>
+                                    </div>
+
+                                    <!--<lightning-button-icon
+                                        icon-name="utility:close"
+                                        alternative-text="Remove file"
+                                        title="Remove file from this agreement"
+                                        data-document-id={file.contentDocumentId}
+                                        onclick={handleRemoveSupportingFile}
+                                        variant="bare"
+                                    >
+                                    </lightning-button-icon>-->
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Hidden PDF source -->
+            
+            </div>
+        </template>
+    </lightning-quick-action-panel>
+</template>

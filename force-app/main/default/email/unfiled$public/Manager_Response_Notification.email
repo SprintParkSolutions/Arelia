@@ -1,24 +1,170 @@
 <html>
-<head>
-	<title></title>
-</head>
-<body style="height: auto; min-height: auto;">
-<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hello [SUPERVISOR_NAME],</span></span></p>
-
-<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">The <strong>3D Design Proposal</strong> for the below project has been [DECISION]<strong> by management</strong>.</span></span></p>
-
-<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Approval Status:</strong></span></span></p>
-
-<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Client Name:</strong> [CLIENT_NAME]<br />
-<strong>Project Reference:</strong> [PROJECT_NAME]<br />
-<strong>Manager Decision:</strong> [DECISION]</span></span></p>
-
-<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Manager Remarks:&nbsp;</strong><br />
-[COMMENTS]</span></span></p>
-
-<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">You may now proceed with the next phase as per the defined process ,&nbsp;Please ensure all actions are updated <b>&nbsp;</b>for tracking and audit purposes.</span></span></p>
-
-<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Sincerely,<br />
-Arelia Team.</span></span></p>
-</body>
+ <head>
+  <title></title>
+ </head>
+ <body style="height: auto; min-height: auto;">
+  <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+              border-collapse:collapse;
+              background-color:#ffffff;" width="100%">
+   <tbody>
+    <tr>
+     <td align="center" style="padding:0;">
+      <table border="0" cellpadding="0" cellspacing="0" style="max-width:760px;
+                              width:100%;
+                              background-color:#ffffff;
+                              border:2px solid #c9a75d;
+                              border-collapse:collapse;" width="100%">
+       <tbody>
+        <tr>
+         <td style="padding:0;"><img alt="Arelia Email Banner Image" src="{[devName:Arelia_Email_Banner_Image]}" style="display:block;
+                                           width:100%;
+                                           max-width:100%;
+                                           height:auto;
+                                           border:0;" title="Arelia Email Banner Image" /></td>
+        </tr>
+        <tr>
+         <td style="padding:30px 34px 32px 34px;"><p style="margin:0 0 18px 0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">Hello <strong>[SUPERVISOR_NAME]</strong>,</p> <p style="margin:0 0 22px 0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">The <strong>3D Design Proposal</strong> for the below project has been <strong>[DECISION] by management</strong>.</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;
+                                              margin-bottom:20px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+                                                       padding-top:20px;"><p style="margin:0;
+                                                          font-size:20px;
+                                                          line-height:1.4;
+                                                          font-family:Times New Roman,Times,serif;
+                                                          color:#1f1f1f;"><strong>Approval Status:</strong></p></td>
+            </tr>
+           </tbody>
+          </table>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;
+                                              margin-bottom:24px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="padding:0 0 10px 0;
+                                                       width:190px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Client Name:</strong></td>
+             <td style="padding:0 0 10px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;">[CLIENT_NAME]</td>
+            </tr>
+            <tr>
+             <td style="padding:0 0 10px 0;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Project Reference:</strong></td>
+             <td style="padding:0 0 10px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;">[PROJECT_NAME]</td>
+            </tr>
+            <tr>
+             <td style="padding:0;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Manager Decision:</strong></td>
+             <td style="padding:0 0 0 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>[DECISION]</strong></td>
+            </tr>
+           </tbody>
+          </table>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;
+                                              margin-bottom:24px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="background-color:#faf8f3;
+                                                       border-left:3px solid #c9a75d;
+                                                       padding:16px 18px;"><p style="margin:0 0 8px 0;
+                                                          font-size:18px;
+                                                          line-height:1.5;
+                                                          font-family:Times New Roman,Times,serif;
+                                                          color:#222222;"><strong>Manager Remarks:</strong></p> <p style="margin:0;
+                                                          font-size:18px;
+                                                          line-height:1.5;
+                                                          font-family:Times New Roman,Times,serif;
+                                                          color:#222222;">[COMMENTS]</p></td>
+            </tr>
+           </tbody>
+          </table> <p style="margin:0 0 22px 0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">You may now proceed with the next phase as per the defined process, Please ensure all actions are updated for tracking and audit purposes.</p> <p style="margin:0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">Sincerely,<br /> <strong>Arelia Team.</strong></p></td>
+        </tr>
+        <tr>
+         <td align="center" style="background-color:#171717;
+                                       border-top:2px solid #C99A3D;
+                                       padding:24px 32px 22px 32px;
+                                       text-align:center;"><p style="margin:0 0 5px 0;
+                                          font-size:24px;
+                                          line-height:1.3;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#D6B36A;
+                                          font-weight:bold;
+                                          text-align:center;">Arelia</p> <p style="margin:0 0 18px 0;
+                                          font-size:11px;
+                                          line-height:1.5;
+                                          font-family:Arial,Helvetica,sans-serif;
+                                          color:#C99A3D;
+                                          letter-spacing:2px;
+                                          text-align:center;">PREMIUM &amp; LUXURY INTERIOR DESIGNS</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;" width="100%">
+           <tbody>
+            <tr>
+             <td align="center" style="border-top:1px solid #6E5427;
+                                                       padding-top:16px;
+                                                       text-align:center;"><p style="margin:0 0 5px 0;
+                                                          font-size:11px;
+                                                          line-height:1.6;
+                                                          font-family:Arial,Helvetica,sans-serif;
+                                                          color:#8F887F;
+                                                          text-align:center;">This email was sent as part of your Arelia Space project communication.</p> <p style="margin:0;
+                                                          font-size:11px;
+                                                          line-height:1.6;
+                                                          font-family:Arial,Helvetica,sans-serif;
+                                                          color:#8F887F;
+                                                          text-align:center;">© 2026 Arelia. All rights reserved.</p></td>
+            </tr>
+           </tbody>
+          </table></td>
+        </tr>
+       </tbody>
+      </table></td>
+    </tr>
+   </tbody>
+  </table>
+ </body>
 </html>
