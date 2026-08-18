@@ -49,16 +49,9 @@
 
                         <!-- Phone -->
                         <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-2">
-                            <div class="field-card phone-card">
-                                <label class="custom-label">Phone</label>
-                                <div class="phone-wrapper">
-                                    <lightning-combobox name="countryCode" value={countryCode} options={countryOptions}
-                                        onchange={handleCountryChange} class="country-box luxury-input" disabled>
-                                    </lightning-combobox>
-                                    <lightning-input type="tel" placeholder="Phone Number" value={phoneNumber}
-                                        onchange={handlePhoneInput} class="phone-box luxury-input" readonly>
-                                    </lightning-input>
-                                </div>
+                            <div class="field-card">
+                                <lightning-input label="Phone" type="tel" value={phone} readonly class="luxury-input">
+                                </lightning-input>
                             </div>
                         </div>
 

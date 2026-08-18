@@ -1,25 +1,163 @@
 <html>
-<head>
-	<title></title>
-</head>
-<body style="height: auto; min-height: auto;">
-<p>Dear&nbsp;<strong>{{{Case.Project_Client_Name__c}}},</strong></p>
-
-<p>We are pleased to inform you that the support case you raised regarding your project&nbsp;<strong>{{{Case.Project__c}}}</strong>, has been successfully resolved and closed. Our team has carefully reviewed the issue and taken necessary steps to ensure it has been addressed.<br />
-<br />
-Kindly find the details of the closed support case provided below :</p>
-
-<p>Case ID :&nbsp;<strong>{{{Case.Id}}},</strong><br />
-Case Subject<b> </b>:&nbsp;<strong>&nbsp;{{{Case.Subject}}},</strong><br />
-Case Description :&nbsp;<strong>{{{Case.Description}}}</strong><br />
-<br />
-If you have any additional questions, require further clarification, or would like to discuss any related concerns, we kindly request that you reach out to your assigned project supervisor.<br />
-<br />
-Supervisor Contact Mail : <strong>{{{Case.Supervisor_Email__c}}}</strong><br />
-<br />
-Thank you for your patience, cooperation, and continued trust in our services. We look forward to supporting you throughout the successful completion of your requirement.<br />
-<br />
-Best Regards,<br />
-Arelia Team.</p>
-</body>
+ <head>
+  <title></title>
+ </head>
+ <body aria-readonly="false" style="height:auto;
+			 min-height:auto;
+			 margin:0;
+			 padding:0;
+			 background-color:#ffffff;">
+  <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+			  border-collapse:collapse;
+			  background-color:#ffffff;" width="100%">
+   <tbody>
+    <tr>
+     <td align="center" style="padding:0;">
+      <table border="0" cellpadding="0" cellspacing="0" style="max-width:760px;
+							  width:100%;
+							  background-color:#ffffff;
+							  border:2px solid #c9a75d;
+							  border-collapse:collapse;" width="100%">
+       <!-- Banner -->
+       <tbody>
+        <tr>
+         <td style="padding:0;"><img alt="Arelia Email Banner Image" src="{[devName:Arelia_Email_Banner_Image]}" style="display:block;
+											width:100%;
+											max-width:100%;
+											height:auto;
+											border:0;" title="Arelia Email Banner Image" /></td>
+        </tr> <!-- Main Email Content -->
+        <tr>
+         <td style="padding:30px 34px 32px 34px;"><p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Dear <strong>{{{Case.Project_Client_Name__c}}}</strong>,</p> <p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">We are pleased to inform you that the support case raised regarding your project <strong>{{{Case.Project__c}}}</strong> has been successfully resolved and closed.</p> <p style="margin:0 0 22px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Our team has carefully reviewed the issue and completed the necessary actions to address your concern.</p> <!-- Case Details -->
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin-bottom:18px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+													   padding-top:20px;"><p style="margin:0;
+														  font-size:20px;
+														  line-height:1.4;
+														  font-family:Times New Roman,Times,serif;
+														  color:#1f1f1f;"><strong>Closed Case Details</strong></p></td>
+            </tr>
+           </tbody>
+          </table>
+          <ul style="margin-top:8px;
+										   margin-bottom:24px;
+										   padding-left:24px;">
+           <li style="margin-bottom:10px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Case ID:</strong>&nbsp;{{{Case.Id}}}</li>
+           <li style="margin-bottom:10px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Case Subject:</strong>&nbsp;{{{Case.Subject}}}</li>
+           <li style="margin-bottom:10px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Case Description:</strong>&nbsp;{{{Case.Description}}}</li>
+          </ul> <!-- Need Further Assistance -->
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin-bottom:18px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+													   padding-top:20px;"><p style="margin:0;
+														  font-size:20px;
+														  line-height:1.4;
+														  font-family:Times New Roman,Times,serif;
+														  color:#1f1f1f;"><strong>Need Further Assistance?</strong></p></td>
+            </tr>
+           </tbody>
+          </table> <p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">If you have any additional questions, require further clarification, or would like to discuss any related concerns, please contact your assigned project supervisor.</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin:0 0 24px 0;" width="100%">
+           <tbody>
+            <tr>
+             <td style="background-color:#fbf8f1;
+													   border:1px solid #e3d2a8;
+													   padding:14px 16px;"><p style="margin:0;
+														  font-size:18px;
+														  line-height:1.5;
+														  font-family:Times New Roman,Times,serif;
+														  color:#222222;"><strong>Supervisor Email:</strong>&nbsp;{{{Case.Supervisor_Email__c}}}</p></td>
+            </tr>
+           </tbody>
+          </table> <p style="margin:0 0 22px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Thank you for your patience, cooperation, and continued trust in Arelia. We look forward to supporting you throughout the successful completion of your project.</p> <p style="margin:0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Warm regards,<br /> <strong>Team Arelia</strong></p></td>
+        </tr> <!-- Short Professional Footer -->
+        <tr>
+         <td align="center" style="background-color:#171717;
+									   border-top:2px solid #C99A3D;
+									   padding:24px 32px 22px 32px;
+									   text-align:center;"><p style="margin:0 0 5px 0;
+										  font-size:24px;
+										  line-height:1.3;
+										  font-family:Times New Roman,Times,serif;
+										  color:#D6B36A;
+										  font-weight:bold;
+										  text-align:center;">Arelia</p> <p style="margin:0 0 18px 0;
+										  font-size:11px;
+										  line-height:1.5;
+										  font-family:Arial,Helvetica,sans-serif;
+										  color:#C99A3D;
+										  letter-spacing:2px;
+										  text-align:center;">PREMIUM &amp; LUXURY INTERIOR DESIGNS</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;" width="100%">
+           <tbody>
+            <tr>
+             <td align="center" style="border-top:1px solid #6E5427;
+													   padding-top:16px;
+													   text-align:center;"><p style="margin:0 0 5px 0;
+														  font-size:11px;
+														  line-height:1.6;
+														  font-family:Arial,Helvetica,sans-serif;
+														  color:#8F887F;
+														  text-align:center;">This email was sent to confirm that your support case has been resolved and closed.</p> <p style="margin:0;
+														  font-size:11px;
+														  line-height:1.6;
+														  font-family:Arial,Helvetica,sans-serif;
+														  color:#8F887F;
+														  text-align:center;">© 2026 Arelia. All rights reserved.</p></td>
+            </tr>
+           </tbody>
+          </table></td>
+        </tr>
+       </tbody>
+      </table></td>
+    </tr>
+   </tbody>
+  </table>
+ </body>
 </html>

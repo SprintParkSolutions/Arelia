@@ -1,22 +1,151 @@
 <html>
-<head>
-	<title></title>
-</head>
-<body style="height: auto; min-height: auto;">
-<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Dear {{{Opportunity.Lead_Name__c}}},</strong></span></span></p>
-
-<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Congratulations !</strong><br />
-<br />
-We would like to inform you about the next step. Based on the requirements discussed, our Architect will prepare the 3D design and share it with you for review shortly.<br />
-<br />
-Please feel free to reach out to the Supervisor, if you have any questions or any requirement changes.<br />
-<br />
-<strong>Supervisor Name:&nbsp;</strong>{{{Opportunity.Supervisor_User__c}}}<br />
-<strong>Supervisor Email:&nbsp;</strong>{{{Opportunity.Supervisor_User_Email__c}}}<br />
-<strong>Supervisor Mobile:&nbsp;</strong>{{{Opportunity.Supervisor_User_Phone__c}}}<br />
-<br />
-We appreciate your cooperation and look forward to your feedback.</span></span></p>
-
-<p><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Best regards,</span></span></p>
-<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Arelia Team.</span></span></body>
+ <head>
+  <title></title>
+ </head>
+ <body style="height:auto;
+			 min-height:auto;
+			 margin:0;
+			 padding:0;
+			 background-color:#ffffff;">
+  <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+			  border-collapse:collapse;
+			  background-color:#ffffff;" width="100%">
+   <tbody>
+    <tr>
+     <td align="center" style="padding:0;">
+      <table border="0" cellpadding="0" cellspacing="0" style="max-width:760px;
+							  width:100%;
+							  background-color:#ffffff;
+							  border:2px solid #c9a75d;
+							  border-collapse:collapse;" width="100%">
+       <tbody>
+        <tr>
+         <td style="padding:0;"><img alt="Arelia Email Banner Image" src="{[devName:Arelia_Email_Banner_Image]}" style="display:block;
+											width:100%;
+											max-width:100%;
+											height:auto;
+											border:0;" title="Arelia Email Banner Image" /></td>
+        </tr>
+        <tr>
+         <td style="padding:30px 34px 32px 34px;"><p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Dear <strong>{{{Opportunity.Lead_Name__c}}}</strong>,</p> <p style="margin:0 0 18px 0;
+										  font-size:20px;
+										  line-height:1.4;
+										  font-family:Times New Roman,Times,serif;
+										  color:#1f1f1f;"><strong>Congratulations!</strong></p> <p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">We would like to inform you about the next step in your design journey. Based on the requirements discussed, our architect will prepare the 3D design and share it with you shortly for your review.</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin-bottom:18px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+													   padding-top:20px;"><p style="margin:0;
+														  font-size:20px;
+														  line-height:1.4;
+														  font-family:Times New Roman,Times,serif;
+														  color:#1f1f1f;"><strong>What happens next?</strong></p></td>
+            </tr>
+           </tbody>
+          </table> <p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Our architect will now work on the 3D design based on your approved requirements. Once the design is ready, it will be shared with you for review and feedback.</p> <p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">If you have any questions or would like to discuss changes to your requirements, please feel free to contact your assigned supervisor.</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin-bottom:18px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+													   padding-top:20px;"><p style="margin:0;
+														  font-size:20px;
+														  line-height:1.4;
+														  font-family:Times New Roman,Times,serif;
+														  color:#1f1f1f;"><strong>Your Supervisor Details</strong></p></td>
+            </tr>
+           </tbody>
+          </table>
+          <ul style="margin-top:8px;
+										   margin-bottom:24px;
+										   padding-left:24px;">
+           <li style="margin-bottom:10px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Supervisor Name:</strong>&nbsp;{{{Opportunity.Supervisor_User__c}}}</li>
+           <li style="margin-bottom:10px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Supervisor Email:</strong>&nbsp;{{{Opportunity.Supervisor_User_Email__c}}}</li>
+           <li style="margin-bottom:10px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Supervisor Mobile:</strong>&nbsp;{{{Opportunity.Supervisor_User_Phone__c}}}</li>
+          </ul> <p style="margin:0 0 22px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">We appreciate your cooperation and look forward to sharing the 3D design with you.</p> <p style="margin:0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Warm regards,<br /> <strong>Team Arelia</strong></p></td>
+        </tr>
+        <tr>
+         <td align="center" style="background-color:#171717;
+									   border-top:2px solid #C99A3D;
+									   padding:24px 32px 22px 32px;
+									   text-align:center;"><p style="margin:0 0 5px 0;
+										  font-size:24px;
+										  line-height:1.3;
+										  font-family:Times New Roman,Times,serif;
+										  color:#D6B36A;
+										  font-weight:bold;
+										  text-align:center;">Arelia</p> <p style="margin:0 0 18px 0;
+										  font-size:11px;
+										  line-height:1.5;
+										  font-family:Arial,Helvetica,sans-serif;
+										  color:#C99A3D;
+										  letter-spacing:2px;
+										  text-align:center;">PREMIUM &amp; LUXURY INTERIOR DESIGNS</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;" width="100%">
+           <tbody>
+            <tr>
+             <td align="center" style="border-top:1px solid #6E5427;
+													   padding-top:16px;
+													   text-align:center;"><p style="margin:0 0 5px 0;
+														  font-size:11px;
+														  line-height:1.6;
+														  font-family:Arial,Helvetica,sans-serif;
+														  color:#8F887F;
+														  text-align:center;">This email was sent regarding the next stage of your Arelia interior design project.</p> <p style="margin:0;
+														  font-size:11px;
+														  line-height:1.6;
+														  font-family:Arial,Helvetica,sans-serif;
+														  color:#8F887F;
+														  text-align:center;">© 2026 Arelia. All rights reserved.</p></td>
+            </tr>
+           </tbody>
+          </table></td>
+        </tr>
+       </tbody>
+      </table></td>
+    </tr>
+   </tbody>
+  </table>
+ </body>
 </html>

@@ -1,21 +1,181 @@
 <html>
-<head>
-	<title></title>
-</head>
-<body style="height: auto; min-height: auto;"><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hi {{{Recipient.Name}}},<br />
-<br />
-<br />
-A New site visit request has been sent to the below Client.<br />
-<br />
-Client Name:&nbsp;<strong>{{{leadName}}}</strong></span></span><br />
-<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Client Email: <strong>{{{leadEmail}}}</strong><br />
-Appoitment Type:<strong>&nbsp;{{{appointmentType}}}</strong><br />
-Appointment Date: <strong>{{{appointmentDate}}}</strong><br />
-Appointment Time Slot:<strong>&nbsp;{{{timeSlot}}}</strong><br />
-<br />
-Please ensure your availability for the appointment.<br />
-<br />
-<br />
-Best regards,<br />
-Arelia Team</span></span></body>
+ <head>
+  <title></title>
+ </head>
+ <body style="height: auto; min-height: auto;">
+  <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+              border-collapse:collapse;
+              background-color:#ffffff;" width="100%">
+   <tbody>
+    <tr>
+     <td align="center" style="padding:0;">
+      <table border="0" cellpadding="0" cellspacing="0" style="max-width:760px;
+                              width:100%;
+                              background-color:#ffffff;
+                              border:2px solid #c9a75d;
+                              border-collapse:collapse;" width="100%">
+       <tbody>
+        <tr>
+         <td style="padding:0;"><img alt="Arelia Email Banner Image" src="{[devName:Arelia_Email_Banner_Image]}" style="display:block;
+                                           width:100%;
+                                           max-width:100%;
+                                           height:auto;
+                                           border:0;" title="Arelia Email Banner Image" /></td>
+        </tr>
+        <tr>
+         <td style="padding:30px 34px 32px 34px;"><p style="margin:0 0 18px 0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">Hi <strong>{{{Recipient.Name}}}</strong>,</p> <p style="margin:0 0 22px 0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">A New site visit request has been sent to the below Client.</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;
+                                              margin-bottom:20px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+                                                       padding-top:20px;"><p style="margin:0;
+                                                          font-size:20px;
+                                                          line-height:1.4;
+                                                          font-family:Times New Roman,Times,serif;
+                                                          color:#1f1f1f;"><strong>Site Visit Details:</strong></p></td>
+            </tr>
+           </tbody>
+          </table>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;
+                                              margin-bottom:26px;
+                                              background-color:#faf8f3;
+                                              border-left:3px solid #c9a75d;" width="100%">
+           <tbody>
+            <tr>
+             <td style="padding:16px 10px 10px 18px;
+                                                       width:220px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Client Name:</strong></td>
+             <td style="padding:16px 18px 10px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>{{{leadName}}}</strong></td>
+            </tr>
+            <tr>
+             <td style="padding:0 10px 10px 18px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Client Email:</strong></td>
+             <td style="padding:0 18px 10px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>{{{leadEmail}}}</strong></td>
+            </tr>
+            <tr>
+             <td style="padding:0 10px 10px 18px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Appoitment Type:</strong></td>
+             <td style="padding:0 18px 10px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>{{{appointmentType}}}</strong></td>
+            </tr>
+            <tr>
+             <td style="padding:0 10px 10px 18px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Appointment Date:</strong></td>
+             <td style="padding:0 18px 10px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>{{{appointmentDate}}}</strong></td>
+            </tr>
+            <tr>
+             <td style="padding:0 10px 16px 18px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Appointment Time Slot:</strong></td>
+             <td style="padding:0 18px 16px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>{{{timeSlot}}}</strong></td>
+            </tr>
+           </tbody>
+          </table> <p style="margin:0 0 22px 0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">Please ensure your availability for the appointment.</p> <p style="margin:0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">Best regards,<br /> <strong>Arelia Team</strong></p></td>
+        </tr>
+        <tr>
+         <td align="center" style="background-color:#171717;
+                                       border-top:2px solid #C99A3D;
+                                       padding:24px 32px 22px 32px;
+                                       text-align:center;"><p style="margin:0 0 5px 0;
+                                          font-size:24px;
+                                          line-height:1.3;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#D6B36A;
+                                          font-weight:bold;
+                                          text-align:center;">Arelia</p> <p style="margin:0 0 18px 0;
+                                          font-size:11px;
+                                          line-height:1.5;
+                                          font-family:Arial,Helvetica,sans-serif;
+                                          color:#C99A3D;
+                                          letter-spacing:2px;
+                                          text-align:center;">PREMIUM &amp; LUXURY INTERIOR DESIGNS</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;" width="100%">
+           <tbody>
+            <tr>
+             <td align="center" style="border-top:1px solid #6E5427;
+                                                       padding-top:16px;
+                                                       text-align:center;"><p style="margin:0 0 5px 0;
+                                                          font-size:11px;
+                                                          line-height:1.6;
+                                                          font-family:Arial,Helvetica,sans-serif;
+                                                          color:#8F887F;
+                                                          text-align:center;">This email was sent because a new Site Visit Request was scheduled for an Arelia client.</p> <p style="margin:0;
+                                                          font-size:11px;
+                                                          line-height:1.6;
+                                                          font-family:Arial,Helvetica,sans-serif;
+                                                          color:#8F887F;
+                                                          text-align:center;">© 2026 Arelia. All rights reserved.</p></td>
+            </tr>
+           </tbody>
+          </table></td>
+        </tr>
+       </tbody>
+      </table></td>
+    </tr>
+   </tbody>
+  </table>
+ </body>
 </html>
