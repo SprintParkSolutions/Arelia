@@ -871,4 +871,11 @@ Sat: By Appointment</value>
         <shortDescription>manager architecture approval</shortDescription>
         <value>/manager-architecture-approval</value>
     </labels>
+    <labels>
+        <fullName>Client_Agreement_Signed_Client_Email</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Client Agreement Signed Client Email</shortDescription>
+        <value>Client_Agreement_Signed_Client</value>
+    </labels>
 </CustomLabels>
