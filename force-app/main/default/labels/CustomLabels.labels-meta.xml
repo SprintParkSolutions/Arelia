@@ -36,6 +36,20 @@
         <value>Additional_Request_FieldSet</value>
     </labels>
     <labels>
+        <fullName>Agreement_Base_URL</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Agreement Base URL</shortDescription>
+        <value>https://sprintpark--dev1.sandbox.my.site.com/Arelia/s/client-agreement-sign</value>
+    </labels>
+    <labels>
+        <fullName>Agreement_Email_Template</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Agreement Email Template</shortDescription>
+        <value>Client_Agreement_Email</value>
+    </labels>
+    <labels>
         <fullName>Arelia_Automated_Project_Quote_Submite_Template_DevName</fullName>
         <language>en_US</language>
         <protected>false</protected>
@@ -117,7 +131,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Arelia Living Enrollment Members</shortDescription>
-        <value>mohit.e@sprintpark.com,nareshp@sprintpark.com</value>
+        <value>monikagollu@gmail.com,shyamk@sprintpark.com</value>
     </labels>
     <labels>
         <fullName>Arelia_Living_Lead_Conversion_Approval_Email_Template</fullName>
@@ -160,6 +174,13 @@
         <protected>false</protected>
         <shortDescription>Arelia Living Management Email Template</shortDescription>
         <value>Details_To_Management</value>
+    </labels>
+    <labels>
+        <fullName>Arelia_Living_Management_Members</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Arelia Living Management Members</shortDescription>
+        <value>mohit98409@gmail.com,bhavanae@sprintpark.com,shyamk@sprintpark.com</value>
     </labels>
     <labels>
         <fullName>Arelia_Living_Opportunity_Appointment_Approved_Email</fullName>
@@ -317,6 +338,13 @@
         <value>info@areliaspace.com</value>
     </labels>
     <labels>
+        <fullName>Arelia_OWD_ID</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Arelia OWD ID</shortDescription>
+        <value>0D2ca00000012ivCAA</value>
+    </labels>
+    <labels>
         <fullName>Arelia_Project_Request_Already_Submitted</fullName>
         <language>en_US</language>
         <protected>false</protected>
@@ -342,7 +370,14 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Arelia Site Label</shortDescription>
-        <value>https://sprintpark.my.site.com/Arelia/s/</value>
+        <value>https://sprintpark--dev1.sandbox.my.site.com/Arelia/s/</value>
+    </labels>
+    <labels>
+        <fullName>Arelia_Site_Redirect_URL_Label</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Arelia_Site_Redirect_URL_Label</shortDescription>
+        <value>https://www.areliaspace.com</value>
     </labels>
     <labels>
         <fullName>Budget_Review_Page_Name</fullName>
@@ -408,6 +443,13 @@
         <value>Budget_Review_Notify_Supervisor</value>
     </labels>
     <labels>
+        <fullName>Client_Agreement_Supervisor_Email</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Client Agreement Supervisor Email</shortDescription>
+        <value>Client_Agreement_Supervisor_Email</value>
+    </labels>
+    <labels>
         <fullName>Client_Final_Response_Template</fullName>
         <language>en_US</language>
         <protected>false</protected>
@@ -448,6 +490,20 @@
         <protected>false</protected>
         <shortDescription>Customer Appointment Rescheduled Email</shortDescription>
         <value>Customer_Appointment_Rescheduled</value>
+    </labels>
+    <labels>
+        <fullName>FORGOT_PASSWORD_PATH</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>FORGOT PASSWORD PATH</shortDescription>
+        <value>forgot-password</value>
+    </labels>
+    <labels>
+        <fullName>FORGOT_PASSWORD_TEMPLATE_ID</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>FORGOT PASSWORD TEMPLATE ID</shortDescription>
+        <value>00Xca000001uN4eEAE</value>
     </labels>
     <labels>
         <fullName>Facebook_URL</fullName>
@@ -493,6 +549,20 @@
 Sat: By Appointment</value>
     </labels>
     <labels>
+        <fullName>HR_Job_Email_Notification</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>HR Job Email Notification</shortDescription>
+        <value>HR_Job_Email_Notifications</value>
+    </labels>
+    <labels>
+        <fullName>HR_email</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>HR email</shortDescription>
+        <value>mohit.e@sprintpark.com</value>
+    </labels>
+    <labels>
         <fullName>Hospitality_URL</fullName>
         <language>en_US</language>
         <protected>false</protected>
@@ -521,6 +591,13 @@ Sat: By Appointment</value>
         <value>inventory-catalogue</value>
     </labels>
     <labels>
+        <fullName>Job_Application_Email_Template</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job Application Email Template</shortDescription>
+        <value>Job_Email_to_Candidate</value>
+    </labels>
+    <labels>
         <fullName>LinkedIn_URL</fullName>
         <language>en_US</language>
         <protected>false</protected>
@@ -541,6 +618,34 @@ Sat: By Appointment</value>
         <protected>false</protected>
         <shortDescription>Manager_Response_Notification_Template</shortDescription>
         <value>Manager_Response_Notification</value>
+    </labels>
+    <labels>
+        <fullName>Org_Wide_Email</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Wide Email</shortDescription>
+        <value>careers@sprintpark.com</value>
+    </labels>
+    <labels>
+        <fullName>PASSWORD_RESET_PATH</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>PASSWORD RESET PATH</shortDescription>
+        <value>set-password</value>
+    </labels>
+    <labels>
+        <fullName>PASSWORD_RESET_TEMPLATE_ID</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>PASSWORD RESET TEMPLATE ID</shortDescription>
+        <value>00Xca000001uN4fEAE</value>
+    </labels>
+    <labels>
+        <fullName>PASSWORD_RESET_URL</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>PASSWORD RESET URL</shortDescription>
+        <value>https://sprintpark--dev1.sandbox.my.site.com/Arelia/s/</value>
     </labels>
     <labels>
         <fullName>Payment_Term_Page_Name</fullName>
@@ -718,11 +823,32 @@ Sat: By Appointment</value>
         <value>arelia-opp-appointment-approval</value>
     </labels>
     <labels>
+        <fullName>Vendor_Agreement_Signing_Base_URL</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Vendor Agreement Signing Base URL</shortDescription>
+        <value>https://sprintpark--dev1.sandbox.my.site.com/Arelia/s/vendor-agreement-sign</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Agreement_Supervisor_Email_Template_API_Name</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Vendor Agreement Supervisor Email Template API Name</shortDescription>
+        <value>00Xca000001sSGVEA2</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Agreement_Vendor_Email_Template_API_Name</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Vendor Agreement Vendor Email Template API Name</shortDescription>
+        <value>00Xca000001sSGWEA2</value>
+    </labels>
+    <labels>
         <fullName>WA_Access_Token</fullName>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>WA_Access_Token</shortDescription>
-        <value>EAA1OS0hDKqEBRJ9MonlYZCqTrNAQkuGZACZCczeVzvKBqWDlzq2PlWrW8eEDMZAUXSisQeVI0L795yhd9DXrl75zw3d7IoLtEI2KnPDjZC2bYYlPz5GqtFZAcM4MNaDXRtOJhJIOVGFjoIjACaahhTnEIGEDv7BKYfs73EP0vQ6rI6eTaB4vGeQKxWsAOpb12M85CLZBcdZAYAbGgTOWosOvJQYZAgOwtTroRujcfP7zAbEQ0ZADufxVTuCg4L1fZAHOLNvCFk2ZAmIrqZBalRMZAfseAAFGgN</value>
+        <value>EAAURDkLToDYBQ2mptwMFVYQxuh2TDnvLTaJEVDGSytty3AVFTfiGKy5x16DyX7WpxZCFZAxZA9IZCMU9ZAl0PmTnODaR5bfr6QPSpuKpPOX5Sw9yHZCOzY5WNy48TZBLRYqsNFZC86Ui9s4BHJSEnNZBug1F2n8NUIHtvaRVtydH9WNZCl2RtekdcG9SwElTKwbBj8mhlbDW8A0Wq768GKvXhcUpAMA8nwTkpNZCmdtvk225Qp37QoqCgYg2UlgkSIw4xSd4eo7ZAaztOKq79KFbsxRr2yfl</value>
     </labels>
     <labels>
         <fullName>WA_Phone_Number_Id</fullName>
@@ -744,33 +870,5 @@ Sat: By Appointment</value>
         <protected>false</protected>
         <shortDescription>manager architecture approval</shortDescription>
         <value>/manager-architecture-approval</value>
-    </labels>
-    <labels>
-        <fullName>HR_Job_Email_Notification</fullName>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>HR Job Email Notification</shortDescription>
-        <value>HR_Job_Email_Notifications</value>
-    </labels>
-    <labels>
-        <fullName>HR_email</fullName>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>HR email</shortDescription>
-        <value>careers@sprintpark.com</value>
-    </labels>
-    <labels>
-        <fullName>Job_Application_Email_Template</fullName>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Job Application Email Template</shortDescription>
-        <value>Job_Email_to_Candidate</value>
-    </labels>
-    <labels>
-        <fullName>Org_Wide_Email</fullName>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Wide Email</shortDescription>
-        <value>careers@sprintpark.com</value>
     </labels>
 </CustomLabels>

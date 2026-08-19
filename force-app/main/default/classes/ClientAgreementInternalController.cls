@@ -558,8 +558,8 @@ public with sharing class ClientAgreementInternalController {
     private static String projectRow(String label, String value) {
         return ''
             + '<tr>'
-            + '<td style="width:32%; padding:4px 8px 4px 0;"><strong>' + label + ':</strong></td>'
-            + '<td style="padding:4px 0;">' + value + '</td>'
+            + '<td style="width:32%; padding:8px;"><strong>' + label + ':</strong></td>'
+            + '<td style="padding:8px;">' + value + '</td>'
             + '</tr>';
     }
 }
