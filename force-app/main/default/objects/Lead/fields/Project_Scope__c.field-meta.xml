@@ -4,6 +4,7 @@
     <label>Project Scope</label>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>true</trackHistory>
     <type>Picklist</type>
     <valueSet>
         <controllingField>Type_Of_Project__c</controllingField>
@@ -65,6 +66,36 @@
                 <default>false</default>
                 <label>Cabins</label>
             </value>
+            <value>
+                <fullName>1BHK</fullName>
+                <default>false</default>
+                <label>1BHK</label>
+            </value>
+            <value>
+                <fullName>2BHK</fullName>
+                <default>false</default>
+                <label>2BHK</label>
+            </value>
+            <value>
+                <fullName>3BHK</fullName>
+                <default>false</default>
+                <label>3BHK</label>
+            </value>
+            <value>
+                <fullName>4BHK</fullName>
+                <default>false</default>
+                <label>4BHK</label>
+            </value>
+            <value>
+                <fullName>5BHK</fullName>
+                <default>false</default>
+                <label>5BHK</label>
+            </value>
+            <value>
+                <fullName>1RK</fullName>
+                <default>false</default>
+                <label>1RK</label>
+            </value>
         </valueSetDefinition>
         <valueSettings>
             <controllingFieldValue>Home</controllingFieldValue>
@@ -85,6 +116,30 @@
         <valueSettings>
             <controllingFieldValue>Home</controllingFieldValue>
             <valueName>Hall Interior</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Home</controllingFieldValue>
+            <valueName>1BHK</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Home</controllingFieldValue>
+            <valueName>2BHK</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Home</controllingFieldValue>
+            <valueName>3BHK</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Home</controllingFieldValue>
+            <valueName>4BHK</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Home</controllingFieldValue>
+            <valueName>5BHK</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Home</controllingFieldValue>
+            <valueName>1RK</valueName>
         </valueSettings>
         <valueSettings>
             <controllingFieldValue>Office</controllingFieldValue>

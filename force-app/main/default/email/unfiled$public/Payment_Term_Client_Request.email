@@ -1,28 +1,175 @@
 <html>
-<head>
-	<title></title>
-</head>
-<body style="font-family: Arial, sans-serif; font-size: 14px; color: rgb(51, 51, 51); height: auto; min-height: auto;">
-<p>Dear {{CLIENT_NAME}},</p>
-
-<p>We are excited to move forward with your project, <strong>{{OPPORTUNITY_NAME}}</strong>. Transparency is a core value at Arelia, and we want to ensure you have a clear understanding of the financial milestones for your project.</p>
-
-<p>Our team has finalized the proposed payment schedule based on our recent discussions. We kindly ask that you review these terms to ensure they meet your expectations.</p>
-
-<div style="border-left: 4px solid #2e844a; padding-left: 15px; margin: 20px 0;">
-<p><strong>Project:</strong> {{OPPORTUNITY_NAME}}<br />
-<strong>Supervisor:</strong> {{SUPERVISOR_NAME}}</p>
-</div>
-
-<p>Please click the button below to access your secure project portal. You will be able to see the specific installment dates and provide your digital sign-off.</p>
-
-<p><a href="{{APPROVAL_LINK}}" style="background-color: #2e844a; color: #ffffff; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">View Payment Schedule </a></p>
-
-<p>If you have any questions or require adjustments to the dates, you can request changes directly through the link provided above. Your supervisor will be notified instantly.</p>
-
-<p>Thank you for choosing Arelia.</p>
-
-<p>Sincerely,<br />
-Arelia Team.</p>
-</body>
+ <head>
+  <title></title>
+ </head>
+ <body style="height: auto; min-height: auto;">
+  <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+              border-collapse:collapse;
+              background-color:#ffffff;" width="100%">
+   <tbody>
+    <tr>
+     <td align="center" style="padding:0;">
+      <table border="0" cellpadding="0" cellspacing="0" style="max-width:760px;
+                              width:100%;
+                              background-color:#ffffff;
+                              border:2px solid #c9a75d;
+                              border-collapse:collapse;" width="100%">
+       <tbody>
+        <tr>
+         <td style="padding:0;"><img alt="Arelia Email Banner Image" src="{[devName:Arelia_Email_Banner_Image]}" style="display:block;
+                                           width:100%;
+                                           max-width:100%;
+                                           height:auto;
+                                           border:0;" title="Arelia Email Banner Image" /></td>
+        </tr>
+        <tr>
+         <td style="padding:30px 34px 32px 34px;"><p style="margin:0 0 18px 0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">Dear <strong>{{CLIENT_NAME}}</strong>,</p> <p style="margin:0 0 18px 0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">We are excited to move forward with your project, <strong>{{OPPORTUNITY_NAME}}</strong>. Transparency is a core value at Arelia, and we want to ensure you have a clear understanding of the financial milestones for your project.</p> <p style="margin:0 0 22px 0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">Our team has finalized the proposed payment schedule based on our recent discussions. We kindly ask that you review these terms to ensure they meet your expectations.</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;
+                                              margin-bottom:20px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+                                                       padding-top:20px;"><p style="margin:0;
+                                                          font-size:20px;
+                                                          line-height:1.4;
+                                                          font-family:Times New Roman,Times,serif;
+                                                          color:#1f1f1f;"><strong>Payment Schedule Details:</strong></p></td>
+            </tr>
+           </tbody>
+          </table>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;
+                                              margin-bottom:24px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="background-color:#faf8f3;
+                                                       border-left:3px solid #c9a75d;
+                                                       padding:16px 18px;">
+              <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                                              border-collapse:collapse;" width="100%">
+               <tbody>
+                <tr>
+                 <td style="padding:0 0 10px 0;
+                                                                       width:160px;
+                                                                       vertical-align:top;
+                                                                       font-size:18px;
+                                                                       line-height:1.5;
+                                                                       font-family:Times New Roman,Times,serif;
+                                                                       color:#222222;"><strong>Project:</strong></td>
+                 <td style="padding:0 0 10px 15px;
+                                                                       vertical-align:top;
+                                                                       font-size:18px;
+                                                                       line-height:1.5;
+                                                                       font-family:Times New Roman,Times,serif;
+                                                                       color:#222222;"><strong>{{OPPORTUNITY_NAME}}</strong></td>
+                </tr>
+                <tr>
+                 <td style="padding:0;
+                                                                       vertical-align:top;
+                                                                       font-size:18px;
+                                                                       line-height:1.5;
+                                                                       font-family:Times New Roman,Times,serif;
+                                                                       color:#222222;"><strong>Supervisor:</strong></td>
+                 <td style="padding:0 0 0 15px;
+                                                                       vertical-align:top;
+                                                                       font-size:18px;
+                                                                       line-height:1.5;
+                                                                       font-family:Times New Roman,Times,serif;
+                                                                       color:#222222;"><strong>{{SUPERVISOR_NAME}}</strong></td>
+                </tr>
+               </tbody>
+              </table></td>
+            </tr>
+           </tbody>
+          </table> <p style="margin:0 0 18px 0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">Please click the button below to access your secure project portal. You will be able to see the specific installment dates and provide your digital sign-off.</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;
+                                              margin:22px 0 24px 0;">
+           <tbody>
+            <tr>
+             <td style="background-color:#1b1b1b;
+                                                       border:1px solid #c9a75d;
+                                                       padding:12px 24px;
+                                                       text-align:center;"><a href="{{APPROVAL_LINK}}" style="font-size:17px;
+                                                          font-family:Arial,Helvetica,sans-serif;
+                                                          color:#ffffff;
+                                                          text-decoration:none;
+                                                          font-weight:bold;
+                                                          display:inline-block;">View Payment Schedule </a></td>
+            </tr>
+           </tbody>
+          </table> <p style="margin:0 0 18px 0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">If you have any questions or require adjustments to the dates, you can request changes directly through the link provided above. Your supervisor will be notified instantly.</p> <p style="margin:0 0 22px 0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">Thank you for choosing <strong>Arelia</strong>.</p> <p style="margin:0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">Sincerely,<br /> <strong>Arelia Team.</strong></p></td>
+        </tr>
+        <tr>
+         <td align="center" style="background-color:#171717;
+                                       border-top:2px solid #C99A3D;
+                                       padding:24px 32px 22px 32px;
+                                       text-align:center;"><p style="margin:0 0 5px 0;
+                                          font-size:24px;
+                                          line-height:1.3;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#D6B36A;
+                                          font-weight:bold;
+                                          text-align:center;">Arelia</p> <p style="margin:0 0 18px 0;
+                                          font-size:11px;
+                                          line-height:1.5;
+                                          font-family:Arial,Helvetica,sans-serif;
+                                          color:#C99A3D;
+                                          letter-spacing:2px;
+                                          text-align:center;">PREMIUM &amp; LUXURY INTERIOR DESIGNS</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;" width="100%">
+           <tbody>
+            <tr>
+             <td align="center" style="border-top:1px solid #6E5427;
+                                                       padding-top:16px;
+                                                       text-align:center;"><p style="margin:0 0 5px 0;
+                                                          font-size:11px;
+                                                          line-height:1.6;
+                                                          font-family:Arial,Helvetica,sans-serif;
+                                                          color:#8F887F;
+                                                          text-align:center;">This email was sent because a payment schedule was submitted for your Arelia project.</p> <p style="margin:0;
+                                                          font-size:11px;
+                                                          line-height:1.6;
+                                                          font-family:Arial,Helvetica,sans-serif;
+                                                          color:#8F887F;
+                                                          text-align:center;">© 2026 Arelia. All rights reserved.</p></td>
+            </tr>
+           </tbody>
+          </table></td>
+        </tr>
+       </tbody>
+      </table></td>
+    </tr>
+   </tbody>
+  </table>
+ </body>
 </html>

@@ -1,0 +1,76 @@
+<apex:page controller="PaymentReceiptPdfController" renderAs="pdf" showHeader="false" sidebar="false" standardStylesheets="false" applyBodyTag="false" applyHtmlTag="false" cache="false">
+<html>
+<head>
+<style type="text/css">
+  body { font-family: Arial, Helvetica, sans-serif; color: #1d1408; padding: 36px; }
+  .brand { color: #c8a97e; font-size: 22px; font-weight: bold; margin-bottom: 2px; }
+  .title { color: #333; font-size: 14px; font-weight: bold; margin-bottom: 20px; }
+  table.details { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  table.details td { padding: 10px 8px; width: 50%; vertical-align: top; border-bottom: 1px solid #e5e5e5; }
+  .label { display: block; color: #888; font-size: 9px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .value { display: block; color: #1d1408; font-size: 13px; }
+  .footer { margin-top: 30px; color: #999; font-size: 10px; }
+</style>
+</head>
+
+<body>
+  <apex:outputPanel rendered="{!hasReceipt}">
+    <div class="brand">ARELIA</div>
+    <div class="title">Payment Receipt</div>
+    <table class="details">
+      <tr>
+        <td>
+          <span class="label">Receipt / Transaction ID</span>
+          <span class="value">{!receiptNumber}</span>
+        </td>
+        <td>
+          <span class="label">Customer</span>
+          <span class="value">{!customerName}</span>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <span class="label">Project</span>
+          <span class="value">{!projectName}</span>
+        </td>
+        <td>
+          <span class="label">Installment</span>
+          <span class="value">{!installmentLabel}</span>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <span class="label">Payment Date</span>
+          <span class="value">{!paymentDate}</span>
+        </td>
+        <td>
+          <span class="label">Status</span>
+          <span class="value">{!status}</span>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <span class="label">Amount Paid</span>
+          <span class="value">{!currencyCode} {!amount}</span>
+        </td>
+        <td>
+          <span class="label">Razorpay Order ID</span>
+          <span class="value">{!razorpayOrderId}</span>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <span class="label">Razorpay Payment ID</span>
+          <span class="value">{!razorpayPaymentId}</span>
+        </td>
+        <td></td>
+      </tr>
+    </table>
+    <div class="footer">This is a system-generated receipt from the ARELIA Client Portal.</div>
+  </apex:outputPanel>
+  <apex:outputPanel rendered="{!!hasReceipt}">
+    <p>Receipt not available for this installment.</p>
+  </apex:outputPanel>
+</body>
+</html>
+</apex:page>

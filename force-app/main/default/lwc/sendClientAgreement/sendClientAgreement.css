@@ -1,0 +1,82 @@
+.preview-box {
+    border: 1px solid #d8dde6;
+    padding: 1rem;
+    min-height: 300px;
+    background: #ffffff;
+    color: #000000;
+    max-height: 500px;
+    overflow: auto;
+}
+
+
+
+.error-box {
+    border: 1px solid #ba0517;
+    background: #fef1f1;
+    color: #181818;
+    padding: 12px;
+    border-radius: 6px;
+}
+
+.error-title {
+    font-weight: 700;
+    color: #ba0517;
+    margin-bottom: 4px;
+}
+
+.error-message {
+    color: #ba0517;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.error-details {
+    margin-top: 8px;
+    white-space: pre-wrap;
+    background: #ffffff;
+    border: 1px solid #ddd;
+    padding: 8px;
+    max-height: 240px;
+    overflow: auto;
+    font-size: 12px;
+    color: #333333;
+}
+
+.upload-section {
+    border: 1px solid #d8dde6;
+    border-radius: 6px;
+    padding: 1rem;
+    background: #f8f9fb;
+}
+
+.upload-section h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.helper-text {
+    font-size: 12px;
+    color: #666666;
+    margin-bottom: 8px;
+}
+
+.supporting-file-list {
+    font-size: 12px;
+    color: #333333;
+}
+
+.supporting-file-row {
+    border: 1px solid #d8dde6;
+    border-radius: 4px;
+    padding: 6px 8px;
+    background: #ffffff;
+}
+
+.file-type-pill {
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    background: #f3f3f3;
+    color: #444444;
+}

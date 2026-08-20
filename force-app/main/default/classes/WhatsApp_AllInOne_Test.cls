@@ -143,6 +143,7 @@ private class WhatsApp_AllInOne_Test {
     private static Lead makeEligibleLead(CreateLeadParams p) {
         Lead l = TestDataUtility.createLead('WA Lead ' + p.last10Digits);
 
+        l.RecordTypeId = AreliaUtility.getAreliaLeadRecordTypeId();
         l.Phone = '+91 ' + p.last10Digits;
         l.MobilePhone = '+91 ' + p.last10Digits;
 
@@ -162,6 +163,7 @@ private class WhatsApp_AllInOne_Test {
     // ✅ NEW: ineligible lead (Project_Request_Quotation_Type__c null) -> resolveEligibleLead returns null
     private static Lead makeIneligibleLead(String last10) {
         Lead l = TestDataUtility.createLead('WA Ineligible ' + last10);
+        l.RecordTypeId = AreliaUtility.getAreliaLeadRecordTypeId();
         l.Phone = '+91 ' + last10;
         l.MobilePhone = '+91 ' + last10;
         // Intentionally DO NOT set Project_Request_Quotation_Type__c
@@ -197,6 +199,7 @@ private class WhatsApp_AllInOne_Test {
         Project__c proj = TestDataUtility.createProject('WA Project ' + String.valueOf(DateTime.now().getTime()), 5000, con.Id);
         try {
             proj.Project_Name__c = oppId;
+            proj.RecordTypeId = AreliaUtility.getAreliaProjectRecordTypeId();
             update proj;
         } catch (Exception e) {
             System.debug(LoggingLevel.WARN, 'Could not set Project_Name__c on Project__c in test: ' + e.getMessage());
@@ -316,8 +319,7 @@ private class WhatsApp_AllInOne_Test {
         // Best-effort ContentDistribution (org-dependent)
         try {
             Id docId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cv.Id LIMIT 1].ContentDocumentId;
-            ContentVersion latest = [
-                SELECT Id
+            ContentVersion latest = [SELECT Id
                 FROM ContentVersion
                 WHERE ContentDocumentId = :docId
                 ORDER BY VersionNumber DESC
@@ -508,8 +510,9 @@ private class WhatsApp_AllInOne_Test {
         User sup = getSupervisorFromSetup();
         Opportunity opp = TestDataUtility.createOpportunity('WA Opp', sup.Id);
 
-        Lead oldL = new Lead(Id = l.Id, IsConverted = false);
-        Lead newL = new Lead(Id = l.Id, IsConverted = true, ConvertedOpportunityId = opp.Id);
+        Id areliaLeadRtId = AreliaUtility.getAreliaLeadRecordTypeId();
+        Lead oldL = new Lead(Id = l.Id, RecordTypeId = areliaLeadRtId, IsConverted = false);
+        Lead newL = new Lead(Id = l.Id, RecordTypeId = areliaLeadRtId, IsConverted = true, ConvertedOpportunityId = opp.Id);
 
         Test.startTest();
         WhatsAppChatRelinker.onAfterUpdate(new List<Lead>{ newL }, new Map<Id, Lead>{ l.Id => oldL });
@@ -561,9 +564,12 @@ private class WhatsApp_AllInOne_Test {
 
         Contact con = getContactFromSetup();
         Project__c p = TestDataUtility.createProject('Proj Relink Update', 5000, con.Id);
+        Id areliaProjectRtId = AreliaUtility.getAreliaProjectRecordTypeId();
+        p.RecordTypeId = areliaProjectRtId;
+        update p;
 
-        Project__c oldP = new Project__c(Id = p.Id, Project_Name__c = null);
-        Project__c newP = new Project__c(Id = p.Id, Project_Name__c = opp.Id);
+        Project__c oldP = new Project__c(Id = p.Id, RecordTypeId = areliaProjectRtId, Project_Name__c = null);
+        Project__c newP = new Project__c(Id = p.Id, RecordTypeId = areliaProjectRtId, Project_Name__c = opp.Id);
 
         Test.startTest();
         WhatsAppChatRelinkerOnProject.onAfterUpdate(new List<Project__c>{ newP }, new Map<Id, Project__c>{ p.Id => oldP });

@@ -4,6 +4,7 @@
     <label>Type of Project</label>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
     <type>Picklist</type>
     <valueSet>
         <restricted>true</restricted>
@@ -20,14 +21,14 @@
                 <label>Home</label>
             </value>
             <value>
+                <fullName>Interior Combo Package</fullName>
+                <default>false</default>
+                <label>Interior Combo Package</label>
+            </value>
+            <value>
                 <fullName>Only Project Plan</fullName>
                 <default>false</default>
                 <label>Only Project Plan</label>
-            </value>
-            <value>
-                <fullName>Other</fullName>
-                <default>false</default>
-                <label>Other</label>
             </value>
         </valueSetDefinition>
     </valueSet>

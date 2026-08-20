@@ -4,6 +4,7 @@
     <label>Type Of Project</label>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>true</trackHistory>
     <type>Picklist</type>
     <valueSet>
         <restricted>true</restricted>
@@ -18,6 +19,11 @@
                 <fullName>Office</fullName>
                 <default>false</default>
                 <label>Office</label>
+            </value>
+            <value>
+                <fullName>Interior Combo Package</fullName>
+                <default>false</default>
+                <label>Interior Combo Package</label>
             </value>
             <value>
                 <fullName>Only Project Plan</fullName>

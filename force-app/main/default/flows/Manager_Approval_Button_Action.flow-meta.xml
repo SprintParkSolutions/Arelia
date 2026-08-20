@@ -20,7 +20,13 @@
         <nameSegment>QuotationService</nameSegment>
         <offset>0</offset>
     </actionCalls>
-    <apiVersion>65.0</apiVersion>
+    <apiVersion>67.0</apiVersion>
+    <customProperties>
+        <name>ScreenProgressIndicator</name>
+        <value>
+            <stringValue>{&quot;location&quot;:&quot;top&quot;,&quot;type&quot;:&quot;simple&quot;}</stringValue>
+        </value>
+    </customProperties>
     <decisions>
         <name>Check_Catalogue_Link_Status</name>
         <label>Check Catalogue Link Status</label>
@@ -69,6 +75,34 @@
     </processMetadataValues>
     <processType>Flow</processType>
     <recordLookups>
+        <name>Get_Arelia_Record_Type</name>
+        <label>Get Arelia Record Type</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Get_Opportunity</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>DeveloperName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Arelia</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>SobjectType</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Opportunity</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>RecordType</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
         <name>Get_Opportunity</name>
         <label>Get Opportunity</label>
         <locationX>0</locationX>
@@ -83,6 +117,13 @@
             <operator>EqualTo</operator>
             <value>
                 <elementReference>recordId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>RecordTypeId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Get_Arelia_Record_Type.Id</elementReference>
             </value>
         </filters>
         <getFirstRecordOnly>true</getFirstRecordOnly>
@@ -101,6 +142,14 @@
             <name>Error_Message</name>
             <fieldText>&lt;p&gt;&lt;strong&gt;🛑 Action Required&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;strong&gt;The catalogue link has not been sent to the client yet.&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Please ensure the link is sent to confirm the Catalouge Document before proceeding.&lt;/strong&gt;&lt;/p&gt;</fieldText>
             <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
         </fields>
         <showFooter>true</showFooter>
         <showHeader>true</showHeader>
@@ -120,6 +169,14 @@
             <name>Confirmation_Text</name>
             <fieldText>&lt;p&gt;&lt;strong style=&quot;font-size: 16px;&quot;&gt;Are you sure you want to submit the Catalouge Document for manager approval?&lt;/strong&gt;&lt;/p&gt;</fieldText>
             <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
         </fields>
         <nextOrFinishButtonLabel>Submit</nextOrFinishButtonLabel>
         <showFooter>true</showFooter>
@@ -137,6 +194,14 @@
             <name>Text</name>
             <fieldText>&lt;p&gt;✅ &lt;strong&gt;Success!&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;&lt;strong style=&quot;font-size: 16px; color: rgb(29, 31, 29);&quot;&gt;The Approval Request email has been sent successfully.&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;&lt;strong style=&quot;font-size: 16px; color: rgb(29, 31, 29);&quot;&gt;The manager will receive the attached Catalouge Document PDF.&lt;/strong&gt;&lt;/p&gt;</fieldText>
             <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
         </fields>
         <showFooter>false</showFooter>
         <showHeader>true</showHeader>
@@ -145,10 +210,10 @@
         <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>Get_Opportunity</targetReference>
+            <targetReference>Get_Arelia_Record_Type</targetReference>
         </connector>
     </start>
-    <status>Active</status>
+    <status>Draft</status>
     <variables>
         <name>recordId</name>
         <dataType>String</dataType>

@@ -76,6 +76,15 @@
         <field>Project__c.Remaining_Budget_Pending__c</field>
     </columns>
     <description>Project Budget Analysis</description>
+    <filter>
+        <criteriaItems>
+            <column>CUST_RECORDTYPE</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>Project__c.Arelia</value>
+        </criteriaItems>
+    </filter>
     <format>Summary</format>
     <groupingsDown>
         <dateGranularity>Day</dateGranularity>

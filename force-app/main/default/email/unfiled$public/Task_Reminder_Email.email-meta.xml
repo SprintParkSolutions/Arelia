@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Reminder email for upcoming task due date</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Task Reminder Email</name>
+    <relatedEntityType>Vendor_Assignment__c</relatedEntityType>
+    <style>none</style>
+    <subject>[REMINDER-ALERT] Task &quot;{{TaskSubject}}&quot; Due on {{DueDate}}</subject>
+    <type>custom</type>
+    <uiType>SFX</uiType>
+</EmailTemplate>

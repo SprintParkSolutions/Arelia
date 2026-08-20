@@ -8,12 +8,14 @@ global without sharing class MobileProjectStatusService {
         public Date    startDate;
         public Date    endDate;
         public Decimal remainingTasks;
+        public String status;
     }
 
     global class ProjectDTO {
         public String  projectId;
         public String  projectName;
         public String  projectStatus;
+        public String  projectType;
         public Decimal budget;
         public Date    startDate;
         public Date    endDate;
@@ -49,19 +51,9 @@ global without sharing class MobileProjectStatusService {
             }
 
             // ✅ Correct: Project__c has Client__c lookup(Contact)
-            List<Project__c> projects = [
-                SELECT Id,
-                    Name,
-                    Status__c,
-                    Supervisor_Estimated_Budget__c,
-                    Start_Date__c,
-                    End_Date__c,
-                    Project_Completion_Status__c,
-                    Client__c
-                FROM Project__c
-                WHERE Client__c = :contactId
-                ORDER BY CreatedDate DESC
-            ];
+            List<Project__c> projects = [SELECT Id, Name, Status__c, Supervisor_Estimated_Budget__c, Start_Date__c,
+                    Estimated_End_Date__c, Project_Completion_Status__c, Client__c, Type_Of_Project__c, Interior_Project_Type__r.Name 
+                    FROM Project__c WHERE Client__c = :contactId ORDER BY CreatedDate DESC];
 
             for (Project__c p : projects) {
                 ProjectDTO dto = new ProjectDTO();
@@ -70,21 +62,15 @@ global without sharing class MobileProjectStatusService {
                 dto.projectStatus = p.Status__c;
                 dto.budget = p.Supervisor_Estimated_Budget__c;
                 dto.startDate = p.Start_Date__c;
-                dto.endDate = p.End_Date__c;
+                dto.endDate = p.Estimated_End_Date__c;
                 dto.completionPercentage = p.Project_Completion_Status__c;
+                dto.projectType = p.Type_Of_Project__c != null ? p.Type_Of_Project__c : (p.Interior_Project_Type__r != null ? p.Interior_Project_Type__r.Name : null);
+                
                 dto.vendors = new List<VendorDTO>();
 
-                List<Vendor_Assignment__c> vas = [
-                    SELECT Vendor__r.Name,
-                           Vendor_Category__c,
-                           Completion__c,
-                           Vendor_Work_Start_Date__c,
-                           Vendor_Work_End_Date__c,
-                           Vendor_Tasks_Remaining_Percentage__c,
-                           Project__c
-                    FROM Vendor_Assignment__c
-                    WHERE Project__c = :p.Id
-                ];
+                List<Vendor_Assignment__c> vas = [SELECT Vendor__r.Name,Vendor_Category__c, Completion__c, Vendor_Work_Start_Date__c,
+                        Vendor_Work_End_Date__c, Vendor_Tasks_Remaining_Percentage__c, Status__c, Project__c
+                        FROM Vendor_Assignment__c WHERE Project__c = :p.Id];
 
                 for (Vendor_Assignment__c va : vas) {
                     VendorDTO v = new VendorDTO();
@@ -94,6 +80,7 @@ global without sharing class MobileProjectStatusService {
                     v.startDate = va.Vendor_Work_Start_Date__c;
                     v.endDate = va.Vendor_Work_End_Date__c;
                     v.remainingTasks = va.Vendor_Tasks_Remaining_Percentage__c;
+                    v.status = va.Status__c;
                     dto.vendors.add(v);
                 }
 

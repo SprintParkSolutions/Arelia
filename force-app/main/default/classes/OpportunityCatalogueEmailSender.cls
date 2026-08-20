@@ -1,16 +1,22 @@
+/**
+ * @description Sends the inventory catalogue link email for Arelia Opportunity records.
+ */
+@SuppressWarnings('PMD.ApexCRUDViolation')
 public with sharing class OpportunityCatalogueEmailSender {
+    private static final String ERROR_UNSUPPORTED_RECORD_TYPE =
+        'Catalogue link can be sent only for Arelia opportunities.';
+    private static final String TEMPLATE_DEVELOPER_NAME = 'Opportunity_Catalogue_Link';
 
+    /**
+     * @description Sends the catalogue link email for an Arelia Opportunity.
+     * @param oppId Opportunity Id selected from the quick action.
+     * @param forceSend When true, resends even when the catalogue link was already sent.
+     */
     @AuraEnabled
     public static void sendCatalogueEmail(Id oppId, Boolean forceSend) {
+        Opportunity opp = queryAreliaOpportunity(oppId);
 
-        Opportunity opp = [
-            SELECT Id, Lead_Name__c, Email__c, Catalogue_Link_Sent__c,Architecture_Manager_Approval__c
-            FROM Opportunity
-            WHERE Id = :oppId
-            LIMIT 1
-        ];
-
-// Architecture Manager approval check
+        // Architecture Manager approval check.
         if (!opp.Architecture_Manager_Approval__c) {
             throw new AuraHandledException(
                 'Catalogue link can be sent only after Architecture Manager approval.'
@@ -29,7 +35,7 @@ public with sharing class OpportunityCatalogueEmailSender {
         EmailTemplate tpl = [
             SELECT Id, HtmlValue, Subject
             FROM EmailTemplate
-            WHERE DeveloperName = 'Opportunity_Catalogue_Link'
+            WHERE DeveloperName = :TEMPLATE_DEVELOPER_NAME
             LIMIT 1
         ];
 
@@ -48,7 +54,7 @@ public with sharing class OpportunityCatalogueEmailSender {
         msg.setHtmlBody(htmlBody);
         msg.setWhatId(opp.Id);
         msg.setSaveAsActivity(true);
-        msg.setOrgWideEmailAddressId(getOWD());
+        AreliaUtility.setOrgWideEmailAddress(msg, System.Label.Arelia_OWD);
 
         Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ msg });
 
@@ -59,65 +65,26 @@ public with sharing class OpportunityCatalogueEmailSender {
         }
     }
 
-    private static Id getOWD() {
-        OrgWideEmailAddress owea = [
-            SELECT Id
-            FROM OrgWideEmailAddress
-            WHERE IsAllowAllProfiles = true
-            LIMIT 1
-        ];
-        return owea.Id;
-    }
-}
-
-
-/*public with sharing class OpportunityCatalogueEmailSender {
-
-    public static void sendCatalogueEmail(List<Id> oppIds) {
-
-        List<Opportunity> oppList = [
-            SELECT Id, Lead_Name__c, Email__c
-            FROM Opportunity
-            WHERE Id IN :oppIds
-        ];
-
-        EmailTemplate tpl = [
-            SELECT Id, HtmlValue, Subject
-            FROM EmailTemplate
-            WHERE DeveloperName = 'Opportunity_Catalogue_Link'
-            LIMIT 1
-        ];
-
-        List<Messaging.SingleEmailMessage> emails = new List<Messaging.SingleEmailMessage>();
-
-        for (Opportunity opp : oppList) { 
-
-            
-            String inventoryCatalogueLink = Label.Arelia_Site_Label+ Label.Inventory_Catalogue_Site_Base + '?id=' + opp.Id;
-
-           String html = tpl.HtmlValue
-                 .replace('{{{CustomerName}}}', opp.Lead_Name__c)
-               
-                   .replace('{{{catalogueLink}}}', inventoryCatalogueLink);
-
-            Messaging.SingleEmailMessage msg = new Messaging.SingleEmailMessage();
-            msg.setToAddresses(new List<String>{ opp.Email__c });
-            msg.setSubject(tpl.Subject);
-            msg.setHtmlBody(html);
-            msg.setWhatId(opp.Id);
-            msg.setSaveAsActivity(true);
-            msg.setOrgWideEmailAddressId(getOWD());
-            emails.add(msg);
+    private static Opportunity queryAreliaOpportunity(Id oppId) {
+        Id areliaOpportunityRecordTypeId = AreliaUtility.getAreliaOpportunityRecordTypeId();
+        if (areliaOpportunityRecordTypeId == null) {
+            throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
         }
 
-        Messaging.sendEmail(emails);
-    }
-
-    private static Id getOWD() {
-        List<OrgWideEmailAddress> listOWEA = [
-            SELECT Id FROM OrgWideEmailAddress
-            WHERE IsAllowAllProfiles = true LIMIT 1
+        // Keep the Arelia Record Type requirement in SOQL so unsupported Opportunities do not proceed.
+        List<Opportunity> opportunities = [
+            SELECT Id, Lead_Name__c, Email__c, Catalogue_Link_Sent__c,
+                Architecture_Manager_Approval__c
+            FROM Opportunity
+            WHERE Id = :oppId
+            AND RecordTypeId = :areliaOpportunityRecordTypeId
+            LIMIT 1
         ];
-        return !listOWEA.isEmpty() ? listOWEA[0].Id : null;
+
+        if (opportunities.isEmpty()) {
+            throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+        }
+
+        return opportunities[0];
     }
-}*/
+}

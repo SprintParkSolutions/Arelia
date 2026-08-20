@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Layout xmlns="http://soap.sforce.com/2006/04/metadata">
-    <excludeButtons>OpenSlackRecordChannel</excludeButtons>
+    <excludeButtons>DataDotComClean</excludeButtons>
     <excludeButtons>Submit</excludeButtons>
     <layoutSections>
         <customLabel>false</customLabel>
@@ -22,7 +22,7 @@
                 <field>Name</field>
             </layoutItems>
             <layoutItems>
-                <behavior>Edit</behavior>
+                <behavior>Required</behavior>
                 <field>Company</field>
             </layoutItems>
             <layoutItems>
@@ -42,6 +42,10 @@
             <layoutItems>
                 <behavior>Edit</behavior>
                 <field>OwnerId</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>RecordTypeId</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
@@ -348,6 +352,9 @@
         <relatedList>Site_Visit_Report__c.Lead__c</relatedList>
     </relatedLists>
     <relatedLists>
+        <relatedList>RelatedEntityHistoryList</relatedList>
+    </relatedLists>
+    <relatedLists>
         <fields>NAME</fields>
         <relatedList>WhatsApp_Chat__c.Lead__c</relatedList>
     </relatedLists>
@@ -398,7 +405,7 @@
     <showRunAssignmentRulesCheckbox>true</showRunAssignmentRulesCheckbox>
     <showSubmitAndAttachButton>false</showSubmitAndAttachButton>
     <summaryLayout>
-        <masterLabel>00hca000001MM7m</masterLabel>
+        <masterLabel>00hU9000006Unz7</masterLabel>
         <sizeX>4</sizeX>
         <sizeY>0</sizeY>
         <summaryLayoutStyle>Default</summaryLayoutStyle>

@@ -9,6 +9,8 @@
  */
 @SuppressWarnings('PMD.CognitiveComplexity,PMD.ApexCRUDViolation,PMD.ExcessiveParameterList')
 public with sharing class ScheduleAppointmentonOppController {
+    private static final String ERROR_UNSUPPORTED_RECORD_TYPE =
+        'Appointment scheduling is supported only for Arelia opportunities.';
 
 
     @AuraEnabled
@@ -25,15 +27,18 @@ public with sharing class ScheduleAppointmentonOppController {
             String slot = timeSlot == null ? null : timeSlot.trim();
             Id supervisorId = opp.Supervisor_User__c;
             ensureSupervisor(supervisorId);
+            Id areliaOpportunityRecordTypeId = getAreliaOpportunityRecordTypeId();
 
             Integer approvedConflicts = [SELECT COUNT() FROM Opportunity
                 WHERE Supervisor_User__c = :supervisorId
+                  AND RecordTypeId = :areliaOpportunityRecordTypeId
                   AND Re_Visit_Site_Appointment_Status__c = 'Approved'
                   AND Re_Visit_Appointment_Date__c   = :selectedDate
                   AND Re_Visit_Appointment_Time_Slots__c = :slot];
 
             Integer rescheduledConflicts = [SELECT COUNT() FROM Opportunity
                 WHERE Supervisor_User__c = :supervisorId
+                  AND RecordTypeId = :areliaOpportunityRecordTypeId
                   AND Re_Visit_Site_Appointment_Status__c IN ('Approved','Rescheduled')
                   AND Re_Visit_Appointment_Rescheduled_Date__c = :selectedDate
                   AND Re_Visit_Appointm_Rescheduled_Time_Slots__c = :slot];
@@ -80,7 +85,11 @@ public with sharing class ScheduleAppointmentonOppController {
     public static List<String> getAvailableTimeSlotsOpp(Date forDate, Id currentOppId) {
         if (forDate == null || currentOppId == null) {return new List<String>();}
 
-        Opportunity opp = [SELECT Id, Supervisor_User__c FROM Opportunity WHERE Id = :currentOppId LIMIT 1];
+        Id areliaOpportunityRecordTypeId = getAreliaOpportunityRecordTypeId();
+        Opportunity opp = [SELECT Id, Supervisor_User__c FROM Opportunity
+            WHERE Id = :currentOppId
+            AND RecordTypeId = :areliaOpportunityRecordTypeId
+            LIMIT 1];
         ensureSupervisor(opp.Supervisor_User__c);
 
         // Start with the picklist values defined on Opportunity.Appointment_Time_Slots__c
@@ -94,6 +103,7 @@ public with sharing class ScheduleAppointmentonOppController {
         for (Opportunity o : [SELECT Re_Visit_Appointment_Time_Slots__c, Rescheduled_Time_Slots__c, Appointment_Status__c,
                    Re_Visit_Appointment_Date__c, Appointment_Rescheduled_Date__c
               FROM Opportunity WHERE Supervisor_User__c = :opp.Supervisor_User__c
+               AND RecordTypeId = :areliaOpportunityRecordTypeId
                AND (
                         (Appointment_Status__c = 'Approved'
                          AND Re_Visit_Appointment_Date__c = :forDate)
@@ -135,8 +145,12 @@ public with sharing class ScheduleAppointmentonOppController {
     // ===== Helpers =====
 
     private static Opportunity fetchOpp(Id oppId) {
+        Id areliaOpportunityRecordTypeId = getAreliaOpportunityRecordTypeId();
         return [SELECT Id, Name, Email__c, Supervisor_User__c, Supervisor_User__r.Name, Supervisor_User__r.Email, 
-                Supervisor_User__r.Phone, Re_Visit_Appointmnet_Confirmation__c, Lead_Name__c, IsWon FROM Opportunity WHERE Id = :oppId LIMIT 1];
+                Supervisor_User__r.Phone, Re_Visit_Appointmnet_Confirmation__c, Lead_Name__c, IsWon FROM Opportunity
+                WHERE Id = :oppId
+                AND RecordTypeId = :areliaOpportunityRecordTypeId
+                LIMIT 1];
     }
 
     private static void validateOppFields(Opportunity opp) {
@@ -196,7 +210,7 @@ public with sharing class ScheduleAppointmentonOppController {
         m.setHtmlBody(html);
         m.setWhatId(opp.Id);
         m.setSaveAsActivity(true);
-        m.setOrgWideEmailAddressId(getDefaultOrgWideEmailAddressId());
+        AreliaUtility.setOrgWideEmailAddress(m, System.Label.Arelia_OWD);
         return m;
     }
 
@@ -225,7 +239,7 @@ public with sharing class ScheduleAppointmentonOppController {
         m.setHtmlBody(html);
         m.setWhatId(opp.Id);
         m.setSaveAsActivity(true);
-        m.setOrgWideEmailAddressId(getDefaultOrgWideEmailAddressId());
+        AreliaUtility.setOrgWideEmailAddress(m, System.Label.Arelia_OWD);
         return m;
     }
 
@@ -240,10 +254,13 @@ public with sharing class ScheduleAppointmentonOppController {
         }
     }
 
-    private static Id getDefaultOrgWideEmailAddressId() {
-        List<OrgWideEmailAddress> listOWEA = [SELECT Id FROM OrgWideEmailAddress WHERE Address = :Label.Arelia_OWD
-                                                AND IsAllowAllProfiles = true LIMIT 1];
-        return listOWEA.isEmpty() ? null : listOWEA[0].Id;
+    private static Id getAreliaOpportunityRecordTypeId() {
+        Id areliaOpportunityRecordTypeId = AreliaUtility.getAreliaOpportunityRecordTypeId();
+        if (areliaOpportunityRecordTypeId == null) {
+            throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+        }
+
+        return areliaOpportunityRecordTypeId;
     }
 
     // Input validation (date in future, today’s slot not in the past, etc.)

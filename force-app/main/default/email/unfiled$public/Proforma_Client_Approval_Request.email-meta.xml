@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Sent to the Client via the LWC when the internal user clicks &quot;Send&quot;.</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Proforma Client Approval Request</name>
+    <style>none</style>
+    <subject>Action Required: Proforma Invoice for [OPPORTUNITY_NAME]</subject>
+    <type>custom</type>
+    <uiType>SFX</uiType>
+</EmailTemplate>

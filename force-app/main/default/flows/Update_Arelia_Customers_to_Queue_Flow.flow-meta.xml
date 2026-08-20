@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
-    <apiVersion>63.0</apiVersion>
+    <apiVersion>67.0</apiVersion>
     <environments>Default</environments>
     <formulas>
         <description>Used to extract queue name from the custom label</description>
@@ -86,9 +86,16 @@
             <field>Phone</field>
             <operator>NotEqualTo</operator>
         </filters>
+        <filters>
+            <field>RecordTypeId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>012U9000002B1m1IAC</stringValue>
+            </value>
+        </filters>
         <object>Lead</object>
         <recordTriggerType>Create</recordTriggerType>
         <triggerType>RecordAfterSave</triggerType>
     </start>
-    <status>Active</status>
+    <status>Draft</status>
 </Flow>

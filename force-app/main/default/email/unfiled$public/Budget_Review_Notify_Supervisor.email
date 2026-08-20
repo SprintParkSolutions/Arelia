@@ -1,34 +1,182 @@
 <html>
-<head>
-	<title></title>
-</head>
-<body style="height: auto; min-height: auto;">
-<p>Hello {{SUPERVISOR_NAME}},</p>
-
-<p>Please be advised that the status of the Budget Review for project <strong>{{OPPORTUNITY_NAME}}</strong> has been updated.</p>
-
-<p><strong>New Status: <span style="color:#0070d2;">{{STATUS}}</span></strong></p>
-
-<hr />
-<p><strong>Feedback &amp; Remarks:</strong></p>
-
-<p>Depending on the status, please review the relevant feedback below to determine your next steps:</p>
-
-<ul>
-	<li><strong>Client Feedback:</strong> {{CLIENT_REMARKS}}</li>
-	<li><strong>Manager Feedback:</strong> {{MANAGER_REMARKS}}</li>
-</ul>
-
-<hr />
-<p><strong>Action Items:</strong></p>
-
-<ul>
-	<li>If <strong>Approved</strong>: No further action is needed on the budget. Prepare for the next phase.</li>
-	<li>If <strong>Changes Requested</strong>: Please log in to Salesforce, address the remarks, and re-submit the budget for approval.</li>
-</ul>
-&nbsp;
-
-<p>Regards,<br />
-Arelia Team.</p>
-</body>
+ <head>
+  <title></title>
+ </head>
+ <body style="height:auto;
+			 min-height:auto;
+			 margin:0;
+			 padding:0;
+			 background-color:#ffffff;">
+  <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+			  border-collapse:collapse;
+			  background-color:#ffffff;" width="100%">
+   <tbody>
+    <tr>
+     <td align="center" style="padding:0;">
+      <table border="0" cellpadding="0" cellspacing="0" style="max-width:760px;
+							  width:100%;
+							  background-color:#ffffff;
+							  border:2px solid #c9a75d;
+							  border-collapse:collapse;" width="100%">
+       <!-- Banner -->
+       <tbody>
+        <tr>
+         <td style="padding:0;"><img alt="Arelia Email Banner Image" src="{[devName:Arelia_Email_Banner_Image]}" style="display:block;
+											width:100%;
+											max-width:100%;
+											height:auto;
+											border:0;" title="Arelia Email Banner Image" /></td>
+        </tr> <!-- Main Email Content -->
+        <tr>
+         <td style="padding:30px 34px 32px 34px;"><p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Hello <strong>{{SUPERVISOR_NAME}}</strong>,</p> <p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Please be advised that the status of the Budget Review for project <strong>{{OPPORTUNITY_NAME}}</strong> has been updated.</p> <!-- Current Status -->
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin-bottom:18px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+													   padding-top:20px;"><p style="margin:0;
+														  font-size:20px;
+														  line-height:1.4;
+														  font-family:Times New Roman,Times,serif;
+														  color:#1f1f1f;"><strong>Budget Review Status</strong></p></td>
+            </tr>
+           </tbody>
+          </table>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin:0 0 24px 0;" width="100%">
+           <tbody>
+            <tr>
+             <td style="background-color:#fbf8f1;
+													   border:1px solid #e3d2a8;
+													   padding:15px 18px;"><p style="margin:0;
+														  font-size:18px;
+														  line-height:1.5;
+														  font-family:Times New Roman,Times,serif;
+														  color:#222222;"><strong>New Status:</strong>&nbsp; <strong style="color:#9A6D1F;">{{STATUS}}</strong></p></td>
+            </tr>
+           </tbody>
+          </table> <!-- Feedback and Remarks -->
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin-bottom:18px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+													   padding-top:20px;"><p style="margin:0;
+														  font-size:20px;
+														  line-height:1.4;
+														  font-family:Times New Roman,Times,serif;
+														  color:#1f1f1f;"><strong>Feedback &amp; Remarks</strong></p></td>
+            </tr>
+           </tbody>
+          </table> <p style="margin:0 0 14px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Depending on the current status, please review the relevant feedback below to determine the required next steps.</p>
+          <ul style="margin-top:8px;
+										   margin-bottom:24px;
+										   padding-left:24px;">
+           <li style="margin-bottom:12px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Client Feedback:</strong>&nbsp;{{CLIENT_REMARKS}}</li>
+           <li style="margin-bottom:12px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Manager Feedback:</strong>&nbsp;{{MANAGER_REMARKS}}</li>
+          </ul> <!-- Action Items -->
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin-bottom:18px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+													   padding-top:20px;"><p style="margin:0;
+														  font-size:20px;
+														  line-height:1.4;
+														  font-family:Times New Roman,Times,serif;
+														  color:#1f1f1f;"><strong>Action Items</strong></p></td>
+            </tr>
+           </tbody>
+          </table>
+          <ul style="margin-top:8px;
+										   margin-bottom:24px;
+										   padding-left:24px;">
+           <li style="margin-bottom:12px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>If Approved:</strong> No further action is required on the budget. Please prepare for the next phase of the project.</li>
+           <li style="margin-bottom:12px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>If Changes Are Requested:</strong> Please review the remarks, update the budget accordingly in Salesforce, and re-submit it for approval.</li>
+          </ul> <p style="margin:0 0 22px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Please complete any required follow-up promptly so the project can continue to the next stage.</p> <p style="margin:0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Warm regards,<br /> <strong>Team Arelia</strong></p></td>
+        </tr> <!-- Short Professional Footer -->
+        <tr>
+         <td align="center" style="background-color:#171717;
+									   border-top:2px solid #C99A3D;
+									   padding:24px 32px 22px 32px;
+									   text-align:center;"><p style="margin:0 0 5px 0;
+										  font-size:24px;
+										  line-height:1.3;
+										  font-family:Times New Roman,Times,serif;
+										  color:#D6B36A;
+										  font-weight:bold;
+										  text-align:center;">Arelia</p> <p style="margin:0 0 18px 0;
+										  font-size:11px;
+										  line-height:1.5;
+										  font-family:Arial,Helvetica,sans-serif;
+										  color:#C99A3D;
+										  letter-spacing:2px;
+										  text-align:center;">PREMIUM &amp; LUXURY INTERIOR DESIGNS</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;" width="100%">
+           <tbody>
+            <tr>
+             <td align="center" style="border-top:1px solid #6E5427;
+													   padding-top:16px;
+													   text-align:center;"><p style="margin:0 0 5px 0;
+														  font-size:11px;
+														  line-height:1.6;
+														  font-family:Arial,Helvetica,sans-serif;
+														  color:#8F887F;
+														  text-align:center;">This email was sent because the status of a project budget review has been updated.</p> <p style="margin:0;
+														  font-size:11px;
+														  line-height:1.6;
+														  font-family:Arial,Helvetica,sans-serif;
+														  color:#8F887F;
+														  text-align:center;">© 2026 Arelia. All rights reserved.</p></td>
+            </tr>
+           </tbody>
+          </table></td>
+        </tr>
+       </tbody>
+      </table></td>
+    </tr>
+   </tbody>
+  </table>
+ </body>
 </html>

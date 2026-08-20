@@ -26,10 +26,28 @@ jobs:
       # ------------------------------------------------------------
       # 2. Setup required runtimes
       # ------------------------------------------------------------
-      - name: Setup Node.js
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
+          check-latest: true
+
+      - name: Verify Node.js runtime
+        run: |
+          node --version
+          npm --version
+
+          node -e "
+          const { markAsUncloneable } = require('node:worker_threads');
+
+          if (typeof markAsUncloneable !== 'function') {
+            throw new Error(
+              'Node.js runtime does not provide worker_threads.markAsUncloneable'
+            );
+          }
+
+          console.log('Node.js runtime supports markAsUncloneable');
+          "
 
       - name: Setup Java 17
         uses: actions/setup-java@v4
@@ -46,13 +64,22 @@ jobs:
       # 3. Install Salesforce CLI and Code Analyzer v5
       # ------------------------------------------------------------
       - name: Install Salesforce CLI
-        run: npm install -g @salesforce/cli@latest
+        env:
+          SF_AUTOUPDATE_DISABLE: "true"
+          SF_DISABLE_TELEMETRY: "true"
+        run: |
+          npm install -g @salesforce/cli@latest
+          sf version
 
       - name: Install Salesforce Code Analyzer v5
+        env:
+          SF_AUTOUPDATE_DISABLE: "true"
+          SF_DISABLE_TELEMETRY: "true"
         run: |
-          echo "y" | sf plugins install code-analyzer@latest
+          sf plugins install code-analyzer@latest
           sf plugins
-
+          sf code-analyzer --help
+          
       # ------------------------------------------------------------
       # 4. Prepare report folder
       # ------------------------------------------------------------

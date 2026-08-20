@@ -1,38 +1,262 @@
 <html>
-<head>
-	<title></title>
-</head>
-<body style="height: auto; min-height: auto;">
-<div><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Dear Arelia Manager,<br />
-<br />
-We are pleased to inform you that a new project has been officially approved by <strong>{{{Site_Visit_Report__c.Supervisor_User__r.Name}}}&nbsp;</strong>for the following lead.<br />
-<br />
-<strong>Opportunity Information:</strong></span></span></div>
-
-<ul>
-	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Opportunity&nbsp;Name:&nbsp;</span></span><strong>{{{Site_Visit_Report__c.Opportunity__r.Name}}}</strong></li>
-</ul>
-
-<div><br />
-<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>Site Visit Report Information:</strong></span></span></div>
-
-<ul>
-	<li>Site Visit Report Number:&nbsp;<strong>{{{Site_Visit_Report__c.Name}}}&nbsp;</strong></li>
-	<li>Site Visit Supervisor:&nbsp;<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><strong>{{{Site_Visit_Report__c.Supervisor_User__r.Name}}}</strong></span></span></li>
-	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Site Visit Date:&nbsp;</span></span><strong>{{{Site_Visit_Report__c.Site_Visit_Date__c}}}</strong></li>
-	<li>Site Visit Time Slot:&nbsp;<strong>{{{Site_Visit_Report__c.Site_Visit_Time_Slot__c}}}</strong></li>
-	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Estimated Completion Months:&nbsp;</span></span><strong>{{{Site_Visit_Report__c.Estimated_Completion_Months__c}}}</strong></li>
-	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Supervisor Finall Estimated&nbsp;Cost: <strong>{{{Site_Visit_Report__c.Total_Estimated_Cost__c}}}</strong></span></span></li>
-	<li><span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Site Visit Report Status: <strong>{{{Site_Visit_Report__c.Site_Visit_Report_Status__c}}}</strong></span></span></li>
-</ul>
-
-<div><br />
-<font face="Times New Roman, Times New Roman, Times, serif">Please review and update the site visit report. </font><a href="{{{siteVisitRecordPageLink}}}">Click</a> <font face="Times New Roman, Times New Roman, Times, serif">on the link to view the report.</font></div>
-
-<div><br />
-<br />
-<span style="font-size:16px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Best Regards, &nbsp;<br />
-<strong>{{{Site_Visit_Report__c.Supervisor_User__r.Name}}}<br />
-{{{Site_Visit_Report__c.Supervisor_User__r.Phone}}}</strong></span></span></div>
-</body>
+ <head>
+  <title></title>
+ </head>
+ <body style="height: auto; min-height: auto;">
+  <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+              border-collapse:collapse;
+              background-color:#ffffff;" width="100%">
+   <tbody>
+    <tr>
+     <td align="center" style="padding:0;">
+      <table border="0" cellpadding="0" cellspacing="0" style="max-width:760px;
+                              width:100%;
+                              background-color:#ffffff;
+                              border:2px solid #c9a75d;
+                              border-collapse:collapse;" width="100%">
+       <tbody>
+        <tr>
+         <td style="padding:0;"><img alt="Arelia Email Banner Image" src="{[devName:Arelia_Email_Banner_Image]}" style="display:block;
+                                           width:100%;
+                                           max-width:100%;
+                                           height:auto;
+                                           border:0;" title="Arelia Email Banner Image" /></td>
+        </tr>
+        <tr>
+         <td style="padding:30px 34px 32px 34px;"><p style="margin:0 0 18px 0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">Dear Arelia Manager,</p> <p style="margin:0 0 22px 0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">We are pleased to inform you that a new project has been officially approved by <strong>{{{Site_Visit_Report__c.Supervisor_User__r.Name}}}</strong> for the following lead.</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;
+                                              margin-bottom:20px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+                                                       padding-top:20px;"><p style="margin:0;
+                                                          font-size:20px;
+                                                          line-height:1.4;
+                                                          font-family:Times New Roman,Times,serif;
+                                                          color:#1f1f1f;"><strong>Opportunity Information:</strong></p></td>
+            </tr>
+           </tbody>
+          </table>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;
+                                              margin-bottom:24px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="padding:0;
+                                                       width:240px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Opportunity Name:</strong></td>
+             <td style="padding:0 0 0 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>{{{Site_Visit_Report__c.Opportunity__r.Name}}}</strong></td>
+            </tr>
+           </tbody>
+          </table>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;
+                                              margin-bottom:20px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+                                                       padding-top:20px;"><p style="margin:0;
+                                                          font-size:20px;
+                                                          line-height:1.4;
+                                                          font-family:Times New Roman,Times,serif;
+                                                          color:#1f1f1f;"><strong>Site Visit Report Information:</strong></p></td>
+            </tr>
+           </tbody>
+          </table>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;
+                                              margin-bottom:24px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="padding:0 0 12px 0;
+                                                       width:285px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Site Visit Report Number:</strong></td>
+             <td style="padding:0 0 12px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>{{{Site_Visit_Report__c.Name}}}</strong></td>
+            </tr>
+            <tr>
+             <td style="padding:0 0 12px 0;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Site Visit Supervisor:</strong></td>
+             <td style="padding:0 0 12px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>{{{Site_Visit_Report__c.Supervisor_User__r.Name}}}</strong></td>
+            </tr>
+            <tr>
+             <td style="padding:0 0 12px 0;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Site Visit Date:</strong></td>
+             <td style="padding:0 0 12px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>{{{Site_Visit_Report__c.Site_Visit_Date__c}}}</strong></td>
+            </tr>
+            <tr>
+             <td style="padding:0 0 12px 0;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Site Visit Time Slot:</strong></td>
+             <td style="padding:0 0 12px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>{{{Site_Visit_Report__c.Site_Visit_Time_Slot__c}}}</strong></td>
+            </tr>
+            <tr>
+             <td style="padding:0 0 12px 0;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Estimated Completion Months:</strong></td>
+             <td style="padding:0 0 12px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>{{{Site_Visit_Report__c.Estimated_Completion_Months__c}}}</strong></td>
+            </tr>
+            <tr>
+             <td style="padding:0 0 12px 0;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Supervisor Finall Estimated Cost:</strong></td>
+             <td style="padding:0 0 12px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>{{{Site_Visit_Report__c.Total_Estimated_Cost__c}}}</strong></td>
+            </tr>
+            <tr>
+             <td style="padding:0;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Site Visit Report Status:</strong></td>
+             <td style="padding:0 0 0 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>{{{Site_Visit_Report__c.Site_Visit_Report_Status__c}}}</strong></td>
+            </tr>
+           </tbody>
+          </table> <p style="margin:0 0 18px 0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">Please review and update the site visit report.</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;
+                                              margin:22px 0 24px 0;">
+           <tbody>
+            <tr>
+             <td style="background-color:#1b1b1b;
+                                                       border:1px solid #c9a75d;
+                                                       padding:12px 24px;
+                                                       text-align:center;"><a href="{{{siteVisitRecordPageLink}}}" style="font-size:17px;
+                                                          font-family:Arial,Helvetica,sans-serif;
+                                                          color:#ffffff;
+                                                          text-decoration:none;
+                                                          font-weight:bold;
+                                                          display:inline-block;">Click </a></td>
+            </tr>
+           </tbody>
+          </table> <p style="margin:0 0 24px 0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">Click on the link to view the report.</p> <p style="margin:0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">Best Regards,<br /> <strong>{{{Site_Visit_Report__c.Supervisor_User__r.Name}}}</strong><br /> <strong>{{{Site_Visit_Report__c.Supervisor_User__r.Phone}}}</strong></p></td>
+        </tr>
+        <tr>
+         <td align="center" style="background-color:#171717;
+                                       border-top:2px solid #C99A3D;
+                                       padding:24px 32px 22px 32px;
+                                       text-align:center;"><p style="margin:0 0 5px 0;
+                                          font-size:24px;
+                                          line-height:1.3;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#D6B36A;
+                                          font-weight:bold;
+                                          text-align:center;">Arelia</p> <p style="margin:0 0 18px 0;
+                                          font-size:11px;
+                                          line-height:1.5;
+                                          font-family:Arial,Helvetica,sans-serif;
+                                          color:#C99A3D;
+                                          letter-spacing:2px;
+                                          text-align:center;">PREMIUM &amp; LUXURY INTERIOR DESIGNS</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;" width="100%">
+           <tbody>
+            <tr>
+             <td align="center" style="border-top:1px solid #6E5427;
+                                                       padding-top:16px;
+                                                       text-align:center;"><p style="margin:0 0 5px 0;
+                                                          font-size:11px;
+                                                          line-height:1.6;
+                                                          font-family:Arial,Helvetica,sans-serif;
+                                                          color:#8F887F;
+                                                          text-align:center;">This email was sent because a Site Visit Report was submitted for management review.</p> <p style="margin:0;
+                                                          font-size:11px;
+                                                          line-height:1.6;
+                                                          font-family:Arial,Helvetica,sans-serif;
+                                                          color:#8F887F;
+                                                          text-align:center;">© 2026 Arelia. All rights reserved.</p></td>
+            </tr>
+           </tbody>
+          </table></td>
+        </tr>
+       </tbody>
+      </table></td>
+    </tr>
+   </tbody>
+  </table>
+ </body>
 </html>

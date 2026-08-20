@@ -1,34 +1,205 @@
 <html>
-<head>
-	<title></title>
-</head>
-<body style="height: auto; min-height: auto;">
-<p>Dear [CLIENT_NAME],</p>
-
-<p>We are pleased to inform you that the 3D Design Proposal for your project has received final internal approval.</p>
-
-<p><strong>Project Details</strong></p>
-
-<ul>
-	<li><strong>Project Name:</strong> [PROJECT_NAME]</li>
-	<li><strong>Project Description:</strong> [PROJECT_DESCRIPTION]</li>
-</ul>
-
-<p>With this approval, we will now proceed to the next phase of execution as per the agreed project plan. Our team will connect with you shortly to discuss the upcoming steps, timelines, and any required coordination.</p>
-
-<p>Should you have any questions or require further clarification, please feel free to reach out to your supervisor.</p>
-
-<p><strong>Supervisor Details</strong></p>
-
-<ul>
-	<li><strong>Supervisor Email ID:</strong> [SUPERVISOR_EMAIL]</li>
-	<li><strong>Supervisor Contact Number:</strong> [SUPERVISOR_PHONE]</li>
-</ul>
-
-<p>Thank you for your continued trust and cooperation.</p>
-
-<p>Warm regards,</p>
-
-<p>Arelia Team.</p>
-</body>
+ <head>
+  <title></title>
+ </head>
+ <body aria-readonly="false" style="height:auto;
+			 min-height:auto;
+			 margin:0;
+			 padding:0;
+			 background-color:#ffffff;">
+  <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+			  border-collapse:collapse;
+			  background-color:#ffffff;" width="100%">
+   <tbody>
+    <tr>
+     <td align="center" style="padding:0;">
+      <table border="0" cellpadding="0" cellspacing="0" style="max-width:760px;
+							  width:100%;
+							  background-color:#ffffff;
+							  border:2px solid #c9a75d;
+							  border-collapse:collapse;" width="100%">
+       <!-- Banner -->
+       <tbody>
+        <tr>
+         <td style="padding:0;"><img alt="Arelia Email Banner Image" src="{[devName:Arelia_Email_Banner_Image]}" style="display:block;
+											width:100%;
+											max-width:100%;
+											height:auto;
+											border:0;" title="Arelia Email Banner Image" /></td>
+        </tr> <!-- Main Email Content -->
+        <tr>
+         <td style="padding:30px 34px 32px 34px;"><p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Dear <strong>[CLIENT_NAME]</strong>,</p> <p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">We are pleased to inform you that the <strong>3D Design Proposal</strong> for your project has received final internal approval.</p> <p style="margin:0 0 22px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">This approval confirms that the design has successfully completed the required internal review process and is ready to proceed to the next stage.</p> <!-- Project Details -->
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin-bottom:18px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+													   padding-top:20px;"><p style="margin:0;
+														  font-size:20px;
+														  line-height:1.4;
+														  font-family:Times New Roman,Times,serif;
+														  color:#1f1f1f;"><strong>Project Details</strong></p></td>
+            </tr>
+           </tbody>
+          </table>
+          <ul style="margin-top:8px;
+										   margin-bottom:24px;
+										   padding-left:24px;">
+           <li style="margin-bottom:12px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Project Name:</strong>&nbsp;[PROJECT_NAME]</li>
+           <li style="margin-bottom:12px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Project Description:</strong>&nbsp;[PROJECT_DESCRIPTION]</li>
+          </ul> <!-- What Happens Next -->
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin-bottom:18px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+													   padding-top:20px;"><p style="margin:0;
+														  font-size:20px;
+														  line-height:1.4;
+														  font-family:Times New Roman,Times,serif;
+														  color:#1f1f1f;"><strong>What happens next?</strong></p></td>
+            </tr>
+           </tbody>
+          </table> <p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">With the design now approved, we will proceed to the next phase of the project in accordance with the agreed project plan.</p> <p style="margin:0 0 22px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Our team will connect with you shortly to discuss the upcoming activities, timelines, and any coordination required from your side.</p> <!-- Supervisor Details -->
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin-bottom:18px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+													   padding-top:20px;"><p style="margin:0;
+														  font-size:20px;
+														  line-height:1.4;
+														  font-family:Times New Roman,Times,serif;
+														  color:#1f1f1f;"><strong>Supervisor Details</strong></p></td>
+            </tr>
+           </tbody>
+          </table> <p style="margin:0 0 16px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">If you have any questions or require further clarification, please contact your assigned supervisor.</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin:0 0 24px 0;" width="100%">
+           <tbody>
+            <tr>
+             <td style="width:42%;
+													   padding:12px 14px;
+													   border:1px solid #e3d2a8;
+													   background-color:#fbf8f1;
+													   font-size:17px;
+													   line-height:1.5;
+													   font-family:Times New Roman,Times,serif;
+													   color:#222222;"><strong>Supervisor Email</strong></td>
+             <td style="width:58%;
+													   padding:12px 14px;
+													   border:1px solid #e3d2a8;
+													   font-size:17px;
+													   line-height:1.5;
+													   font-family:Times New Roman,Times,serif;
+													   color:#222222;">[SUPERVISOR_EMAIL]</td>
+            </tr>
+            <tr>
+             <td style="width:42%;
+													   padding:12px 14px;
+													   border:1px solid #e3d2a8;
+													   background-color:#fbf8f1;
+													   font-size:17px;
+													   line-height:1.5;
+													   font-family:Times New Roman,Times,serif;
+													   color:#222222;"><strong>Supervisor Contact Number</strong></td>
+             <td style="width:58%;
+													   padding:12px 14px;
+													   border:1px solid #e3d2a8;
+													   font-size:17px;
+													   line-height:1.5;
+													   font-family:Times New Roman,Times,serif;
+													   color:#222222;">[SUPERVISOR_PHONE]</td>
+            </tr>
+           </tbody>
+          </table> <p style="margin:0 0 22px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Thank you for your continued trust and cooperation. We look forward to progressing with your project and bringing the approved design to life.</p> <p style="margin:0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Warm regards,<br /> <strong>Team Arelia</strong></p></td>
+        </tr> <!-- Short Professional Footer -->
+        <tr>
+         <td align="center" style="background-color:#171717;
+									   border-top:2px solid #C99A3D;
+									   padding:24px 32px 22px 32px;
+									   text-align:center;"><p style="margin:0 0 5px 0;
+										  font-size:24px;
+										  line-height:1.3;
+										  font-family:Times New Roman,Times,serif;
+										  color:#D6B36A;
+										  font-weight:bold;
+										  text-align:center;">Arelia</p> <p style="margin:0 0 18px 0;
+										  font-size:11px;
+										  line-height:1.5;
+										  font-family:Arial,Helvetica,sans-serif;
+										  color:#C99A3D;
+										  letter-spacing:2px;
+										  text-align:center;">PREMIUM &amp; LUXURY INTERIOR DESIGNS</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;" width="100%">
+           <tbody>
+            <tr>
+             <td align="center" style="border-top:1px solid #6E5427;
+													   padding-top:16px;
+													   text-align:center;"><p style="margin:0 0 5px 0;
+														  font-size:11px;
+														  line-height:1.6;
+														  font-family:Arial,Helvetica,sans-serif;
+														  color:#8F887F;
+														  text-align:center;">This email was sent to confirm the final internal approval of your 3D design proposal.</p> <p style="margin:0;
+														  font-size:11px;
+														  line-height:1.6;
+														  font-family:Arial,Helvetica,sans-serif;
+														  color:#8F887F;
+														  text-align:center;">© 2026 Arelia. All rights reserved.</p></td>
+            </tr>
+           </tbody>
+          </table></td>
+        </tr>
+       </tbody>
+      </table></td>
+    </tr>
+   </tbody>
+  </table>
+ </body>
 </html>

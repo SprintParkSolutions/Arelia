@@ -1,0 +1,594 @@
+:host {
+    display: block;
+}
+
+.page-container {
+    min-height: 100vh;
+    padding: 48px 18px 70px;
+    box-sizing: border-box;
+    font-family: "Aptos", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #111111;
+    background:
+        radial-gradient(circle at top center, rgba(212, 175, 55, 0.16), transparent 34%),
+        linear-gradient(145deg, #050505 0%, #111111 48%, #050505 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.page-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(rgba(212, 175, 55, 0.12) 0.6px, transparent 0.6px),
+        linear-gradient(90deg, rgba(212, 175, 55, 0.03), transparent, rgba(212, 175, 55, 0.025));
+    background-size: 34px 34px, 100% 100%;
+    opacity: 0.18;
+    pointer-events: none;
+}
+
+/* ================================
+   LOADING STATE
+================================ */
+
+.loading-panel {
+    position: relative;
+    z-index: 1;
+    min-height: 300px;
+    width: min(720px, 100%);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border-radius: 24px;
+    background: #ffffff;
+    border: 1px solid rgba(212, 175, 55, 0.32);
+    box-shadow: 0 28px 70px rgba(0, 0, 0, 0.42);
+}
+
+.loading-text {
+    margin-top: 54px;
+    color: #8a6514;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* ================================
+   AGREEMENT CARD
+================================ */
+
+.agreement-card {
+    position: relative;
+    z-index: 1;
+    width: min(920px, 100%);
+    margin: 0 auto;
+    padding: 34px;
+    box-sizing: border-box;
+    border-radius: 26px;
+    background: #ffffff;
+    border: 1px solid rgba(212, 175, 55, 0.42);
+    border-top: 5px solid #d4af37;
+    box-shadow:
+        0 34px 90px rgba(0, 0, 0, 0.46),
+        0 0 42px rgba(212, 175, 55, 0.14);
+}
+
+.agreement-header {
+    padding: 28px 30px;
+    margin-bottom: 26px;
+    border-radius: 20px;
+    color: #fdfcf0;
+    background:
+        radial-gradient(circle at top left, rgba(255, 223, 115, 0.18), transparent 40%),
+        linear-gradient(145deg, #050505, #151515);
+    border: 1px solid rgba(212, 175, 55, 0.34);
+    text-align: center;
+}
+
+.header-badge {
+    display: inline-flex;
+    padding: 8px 18px;
+    margin-bottom: 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 223, 115, 0.42);
+    background: rgba(212, 175, 55, 0.1);
+    color: #ffdf73;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.agreement-header h1 {
+    margin: 0 0 12px;
+    font-size: 2.35rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #ffdf73, #d4af37, #8a6514);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.agreement-header p {
+    max-width: 720px;
+    margin: 0 auto;
+    color: rgba(253, 252, 240, 0.78);
+    font-size: 0.98rem;
+    line-height: 1.7;
+}
+
+.agreement-header strong {
+    color: #ffdf73;
+}
+
+/* ================================
+   AGREEMENT PREVIEW
+================================ */
+
+.agreement-preview-shell {
+    padding: 22px;
+    border-radius: 20px;
+    background: #f7f4ec;
+    border: 1px solid rgba(212, 175, 55, 0.32);
+}
+
+.document-ribbon {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+    color: #8a6514;
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.document-ribbon-line {
+    height: 1px;
+    flex: 1;
+    background: linear-gradient(90deg, rgba(212, 175, 55, 0.75), transparent);
+}
+
+.agreement-preview {
+    background: #ffffff;
+    color: #111111;
+    padding: 38px 42px;
+    border-radius: 12px;
+    border: 1px solid #d9c994;
+    box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.08),
+        inset 0 0 0 1px rgba(212, 175, 55, 0.12);
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+}
+
+/* ================================
+   SIGNATURE SECTION
+================================ */
+
+.signature-section {
+    margin-top: 30px;
+    padding: 28px;
+    border-radius: 20px;
+    border: 1px solid rgba(212, 175, 55, 0.34);
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(250, 246, 232, 0.98));
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.08);
+}
+
+.signature-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+    margin-bottom: 10px;
+}
+
+.signature-eyebrow {
+    margin: 0 0 6px;
+    color: #8a6514;
+    font-size: 0.76rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.signature-section h2 {
+    margin: 0;
+    color: #111111;
+    font-size: 1.55rem;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+}
+
+.signature-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(212, 175, 55, 0.42);
+    background: #fff8e1;
+    color: #8a6514;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.signature-instruction {
+    margin: 0 0 18px;
+    color: #4b4b4b;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.signature-canvas-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 680px;
+    margin: 0;
+    border-radius: 14px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 252, 242, 0.98));
+    border: 2px solid #1f1f1f;
+    box-shadow: inset 0 0 0 1px rgba(212, 175, 55, 0.24);
+}
+
+.signature-canvas {
+    width: 100%;
+    height: 210px;
+    touch-action: none;
+    display: block;
+    border-radius: 12px;
+    background: transparent;
+    position: relative;
+    z-index: 2;
+}
+
+.signature-placeholder {
+    position: absolute;
+    left: 24px;
+    bottom: 18px;
+    z-index: 1;
+    color: rgba(138, 101, 20, 0.28);
+    font-size: 1.8rem;
+    font-weight: 700;
+    font-family: "Segoe Script", "Brush Script MT", cursive;
+    pointer-events: none;
+}
+
+/* ================================
+   BUTTONS
+================================ */
+
+.button-row {
+    margin-top: 20px;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.agreement-btn {
+    min-width: 165px;
+    border-radius: 10px;
+    padding: 13px 22px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-size: 0.86rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition:
+        transform 0.22s ease,
+        box-shadow 0.22s ease,
+        background-color 0.22s ease,
+        border-color 0.22s ease;
+}
+
+.agreement-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+.agreement-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.62;
+}
+
+.btn-primary {
+    color: #060606;
+    border-color: rgba(255, 223, 115, 0.75);
+    background: linear-gradient(135deg, #ffdf73, #d4af37, #8a6514);
+    box-shadow:
+        0 14px 30px rgba(212, 175, 55, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+
+.btn-secondary {
+    color: #8a6514;
+    background: #ffffff;
+    border-color: rgba(138, 101, 20, 0.38);
+}
+
+.btn-secondary:hover:not(:disabled) {
+    border-color: #d4af37;
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.08);
+}
+
+.submitting-message {
+    margin-top: 14px;
+    font-size: 0.88rem;
+    color: #8a6514;
+    font-weight: 700;
+}
+
+/* ================================
+   THANK YOU / SUBMITTED SCREEN
+================================ */
+
+.message-state {
+    position: relative;
+    z-index: 1;
+    min-height: calc(100vh - 120px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+.message-box {
+    width: min(620px, 100%);
+    margin: 0 auto;
+    padding: 48px 38px;
+    border-radius: 24px;
+    text-align: center;
+    background: #ffffff;
+    border: 1px solid rgba(212, 175, 55, 0.42);
+    border-top: 5px solid #d4af37;
+    box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.42),
+        0 0 44px rgba(212, 175, 55, 0.14);
+}
+
+.message-icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #050505;
+    font-size: 2.1rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #ffdf73, #d4af37, #8a6514);
+    box-shadow: 0 16px 36px rgba(212, 175, 55, 0.34);
+}
+
+.message-eyebrow {
+    margin: 0 0 10px;
+    color: #8a6514;
+    font-size: 0.74rem;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.message-box h1 {
+    margin: 0 0 14px;
+    font-size: 2rem;
+    font-weight: 900;
+    color: #111111;
+    letter-spacing: 0.02em;
+}
+
+.message-text {
+    max-width: 460px;
+    margin: 0 auto 28px;
+    color: #4b4b4b;
+    font-size: 0.98rem;
+    line-height: 1.7;
+}
+
+.ok-button {
+    min-width: 170px;
+}
+
+/* ================================
+   ERROR BLOCK
+================================ */
+
+.error-box {
+    border: 1px solid rgba(186, 5, 23, 0.42);
+    border-left: 4px solid #ba0517;
+    background: #fff5f5;
+    color: #181818;
+    padding: 14px 16px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.error-title {
+    font-weight: 900;
+    color: #ba0517;
+    margin-bottom: 4px;
+}
+
+.error-message {
+    color: #ba0517;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.error-details {
+    margin-top: 10px;
+    white-space: pre-wrap;
+    background: #ffffff;
+    border: 1px solid #e5bcbc;
+    padding: 10px;
+    max-height: 240px;
+    overflow: auto;
+    font-size: 0.78rem;
+    color: #333333;
+    border-radius: 8px;
+}
+
+/* ================================
+   SUBMISSION OVERLAY
+================================ */
+
+.submission-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(5, 5, 5, 0.78);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.submission-box {
+    width: 390px;
+    max-width: 100%;
+    background: #ffffff;
+    border: 1px solid rgba(212, 175, 55, 0.42);
+    border-top: 5px solid #d4af37;
+    border-radius: 20px;
+    padding: 30px 26px;
+    text-align: center;
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.42);
+}
+
+.submission-title {
+    margin-top: 54px;
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #8a6514;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.submission-text {
+    margin-top: 12px;
+    font-size: 0.92rem;
+    color: #4b4b4b;
+    line-height: 1.55;
+}
+
+/* ================================
+   MANUAL AGREEMENT CONTENT SAFETY
+================================ */
+
+.agreement-preview :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.agreement-preview :global(img) {
+    max-width: 100%;
+    height: auto;
+}
+
+/* ================================
+   MOBILE RESPONSIVENESS
+================================ */
+
+@media screen and (max-width: 768px) {
+    .page-container {
+        padding: 28px 10px 46px;
+    }
+
+    .agreement-card {
+        padding: 16px;
+        border-radius: 20px;
+    }
+
+    .agreement-header {
+        padding: 24px 18px;
+        border-radius: 18px;
+    }
+
+    .agreement-header h1 {
+        font-size: 1.65rem;
+        letter-spacing: 0.055em;
+    }
+
+    .agreement-header p {
+        font-size: 0.9rem;
+    }
+
+    .agreement-preview-shell {
+        padding: 12px;
+        border-radius: 16px;
+    }
+
+    .agreement-preview {
+        padding: 24px 16px;
+        border-radius: 10px;
+        overflow-x: auto;
+    }
+
+    .signature-section {
+        padding: 22px 16px;
+        border-radius: 18px;
+    }
+
+    .signature-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .signature-status {
+        white-space: normal;
+    }
+
+    .signature-canvas {
+        height: 190px;
+    }
+
+    .button-row {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .agreement-btn {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .message-state {
+        min-height: calc(100vh - 80px);
+        padding: 18px;
+    }
+
+    .message-box {
+        padding: 38px 22px;
+        border-radius: 20px;
+    }
+
+    .message-box h1 {
+        font-size: 1.55rem;
+    }
+
+    .message-text {
+        font-size: 0.92rem;
+    }
+
+    .ok-button {
+        width: 100%;
+    }
+
+    .submission-box {
+        padding: 28px 20px;
+    }
+}

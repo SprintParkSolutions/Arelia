@@ -88,6 +88,26 @@ private class OpportunityBudgetReviewControllerTest {
     }
 
     @IsTest
+    static void testGetBudgetReviewWithNoBudgetData() {
+        Opportunity testOpp = [SELECT Id FROM Opportunity WHERE Name = 'Test Budget Opp' LIMIT 1];
+        testOpp.Budget__c = null;
+        testOpp.Estimated_Budget__c = null;
+        testOpp.Supervisor_Estimated_Budget__c = null;
+        testOpp.Re_Visit_Site_Supervisor_Estimate_Budget__c = null;
+        testOpp.Project_Estimated_Completion_Months__c = null;
+        testOpp.ReVisit_Site_Estimated_Completion_Months__c = null;
+        update testOpp;
+
+        Test.startTest();
+        OpportunityBudgetReviewController.BudgetReviewResponseDTO dto = OpportunityBudgetReviewController.getBudgetReview(testOpp.Id);
+        Test.stopTest();
+
+        Assert.isNull(dto.customerBudget, 'Customer budget should be null when no budget fields are populated.');
+        Assert.isNull(dto.supervisorBudget, 'Supervisor budget should be null when no budget fields are populated.');
+        Assert.isNull(dto.estimatedDuration, 'Duration should be null when no duration fields are populated.');
+    }
+
+    @IsTest
     static void testGetBudgetReviewNullCheck() {
         Test.startTest();
         OpportunityBudgetReviewController.BudgetReviewResponseDTO dto = OpportunityBudgetReviewController.getBudgetReview(null);
@@ -187,6 +207,36 @@ private class OpportunityBudgetReviewControllerTest {
         
         Opportunity updatedOpp = [SELECT Budget_Review_Status__c FROM Opportunity WHERE Id = :testOpp.Id];
         Assert.areEqual('Sent for Client Approval', updatedOpp.Budget_Review_Status__c, 'Status should update properly when remarks are present');
+    }
+
+    @IsTest
+    static void testSubmitToClientWithClientRemarks() {
+        Opportunity testOpp = [SELECT Id FROM Opportunity LIMIT 1];
+        testOpp.Budget_Review_Client_Remarks__c = 'Client requested a previous revision';
+        update testOpp;
+
+        Test.startTest();
+        OpportunityBudgetReviewController.submitToClient(testOpp.Id);
+        Test.stopTest();
+
+        Opportunity updatedOpp = [SELECT Budget_Review_Status__c FROM Opportunity WHERE Id = :testOpp.Id];
+        Assert.areEqual('Sent for Client Approval', updatedOpp.Budget_Review_Status__c, 'Client remarks branch should still submit.');
+    }
+
+    @IsTest
+    static void testUnsupportedOpportunityValidation() {
+        Account accountRecord = TestDataUtility.createAccount('Unsupported Budget Account');
+        OpportunityBudgetReviewController.BudgetReviewSaveRequestDTO req = new OpportunityBudgetReviewController.BudgetReviewSaveRequestDTO();
+        req.inputCustomerBudget = 100;
+
+        Test.startTest();
+        try {
+            OpportunityBudgetReviewController.saveChildRows(accountRecord.Id, req);
+            Assert.fail('Unsupported parent should throw.');
+        } catch (Exception e) {
+            Assert.isInstanceOfType(e, AuraHandledException.class, 'Should throw AuraHandledException.');
+        }
+        Test.stopTest();
     }
 
     @IsTest
