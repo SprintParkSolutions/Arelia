@@ -36,7 +36,6 @@
         <offset>0</offset>
     </actionCalls>
     <apiVersion>67.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <environments>Default</environments>
     <interviewLabel>Opportunity Architect Info {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Architect Info</label>
