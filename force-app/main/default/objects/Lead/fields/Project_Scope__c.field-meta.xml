@@ -4,7 +4,6 @@
     <label>Project Scope</label>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>
-    <trackHistory>true</trackHistory>
     <type>Picklist</type>
     <valueSet>
         <controllingField>Type_Of_Project__c</controllingField>
@@ -67,6 +66,11 @@
                 <label>Cabins</label>
             </value>
             <value>
+                <fullName>1RK</fullName>
+                <default>false</default>
+                <label>1RK</label>
+            </value>
+            <value>
                 <fullName>1BHK</fullName>
                 <default>false</default>
                 <label>1BHK</label>
@@ -91,11 +95,6 @@
                 <default>false</default>
                 <label>5BHK</label>
             </value>
-            <value>
-                <fullName>1RK</fullName>
-                <default>false</default>
-                <label>1RK</label>
-            </value>
         </valueSetDefinition>
         <valueSettings>
             <controllingFieldValue>Home</controllingFieldValue>
@@ -119,6 +118,10 @@
         </valueSettings>
         <valueSettings>
             <controllingFieldValue>Home</controllingFieldValue>
+            <valueName>1RK</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Home</controllingFieldValue>
             <valueName>1BHK</valueName>
         </valueSettings>
         <valueSettings>
@@ -136,10 +139,6 @@
         <valueSettings>
             <controllingFieldValue>Home</controllingFieldValue>
             <valueName>5BHK</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>Home</controllingFieldValue>
-            <valueName>1RK</valueName>
         </valueSettings>
         <valueSettings>
             <controllingFieldValue>Office</controllingFieldValue>

@@ -1,5 +1,5 @@
 trigger VendorAssignmentTrigger on Vendor_Assignment__c (
-    before insert, before update,
+   before insert, before update,
     after insert, after update, after delete) 
 {
     // BEFORE: Calculate and set Vendor_Efficiency__c when eligible

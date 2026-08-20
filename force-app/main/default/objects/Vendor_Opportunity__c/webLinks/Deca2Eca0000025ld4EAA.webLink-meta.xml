@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebLink xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Deca2Eca0000025ld4EAA</fullName>
+    <availability>online</availability>
+    <displayType>button</displayType>
+    <encodingKey>UTF-8</encodingKey>
+    <linkType>url</linkType>
+    <masterLabel>Arelia Vendor Agreement</masterLabel>
+    <openType>replace</openType>
+    <protected>false</protected>
+    <url>{!URLFOR($Site.BaseUrl + &apos;/apex/dfsle__sending&apos;, null, [sId = Vendor_Opportunity__c.Id, sendingExperience = &apos;null&apos;, isEmbedded = false, templateId = &apos;a2Eca0000025ld4EAA&apos;, recordId = Vendor_Opportunity__c.Id, title = &apos;Arelia Vendor Agreement&apos;])}</url>
+</WebLink>

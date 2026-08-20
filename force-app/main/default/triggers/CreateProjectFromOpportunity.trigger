@@ -1,5 +1,5 @@
 trigger CreateProjectFromOpportunity on Opportunity (after insert, after update) {
-    if (Trigger.isAfter) {
+   if (Trigger.isAfter) {
         if (Trigger.isInsert) {
             CreateProjectFromOpportunityHandler.handleAfterInsert(Trigger.new);
         } else if (Trigger.isUpdate) {

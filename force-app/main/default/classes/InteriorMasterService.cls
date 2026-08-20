@@ -1,7 +1,6 @@
 /**
  * @File Name         : InteriorMasterService.cls
  * @Description       : Returns all master data (types, categories, rooms, designs WITH room + file)
- *
  * PMD Notes:
  * - Read-only service for LWC.
  * - "without sharing" intentional for Experience/guest access.

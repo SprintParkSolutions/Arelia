@@ -3,13 +3,16 @@
     <fullName>AllOpportunities</fullName>
     <columns>OPPORTUNITY.NAME</columns>
     <columns>ACCOUNT.NAME</columns>
-    <columns>OPPORTUNITY.AMOUNT</columns>
-    <columns>OPPORTUNITY.CLOSE_DATE</columns>
+    <columns>Primary_Contact__c</columns>
+    <columns>Supervisor_User__c</columns>
+    <columns>Project_Request_Quotation_Type__c</columns>
+    <columns>Lead_Phone__c</columns>
+    <columns>Architect_Email__c</columns>
     <columns>OPPORTUNITY.STAGE_NAME</columns>
-    <columns>OPPORTUNITY.PROBABILITY</columns>
-    <columns>OPPORTUNITY.TYPE</columns>
-    <columns>OPPORTUNITY.LEAD_SOURCE</columns>
-    <columns>CORE.USERS.FULL_NAME</columns>
     <filterScope>Everything</filterScope>
+    <filters>
+        <field>Project_Request_Quotation_Type__c</field>
+        <operation>notEqual</operation>
+    </filters>
     <label>All Opportunities</label>
 </ListView>

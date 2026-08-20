@@ -1,5 +1,4 @@
 public with sharing class VendorAbscondEmailController {
-
     // DTO for Email Template
     public class EmailTemplateDTO {
         @AuraEnabled public Id id { get; set; }

@@ -3,17 +3,18 @@
     <fullName>AllOpenLeads</fullName>
     <columns>FULL_NAME</columns>
     <columns>LEAD.COMPANY</columns>
+    <columns>LEAD.TITLE</columns>
+    <columns>LEAD.STATE</columns>
     <columns>LEAD.PHONE</columns>
     <columns>LEAD.EMAIL</columns>
-    <columns>Approval_Status__c</columns>
-    <columns>Project_Request_Quotation_Type__c</columns>
-    <columns>Supervisor_User__c</columns>
-    <columns>Supervisor_Estimated_Budget__c</columns>
-    <columns>Project_Estimated_Completion_Months__c</columns>
+    <columns>LEAD.STATUS</columns>
+    <columns>Project_Request_Submitted__c</columns>
+    <columns>LEAD.CREATED_DATE</columns>
     <filterScope>Everything</filterScope>
     <filters>
-        <field>Approval_Status__c</field>
+        <field>LEAD.STATUS</field>
         <operation>notEqual</operation>
+        <value>Qualified</value>
     </filters>
     <label>All Open Leads</label>
 </ListView>

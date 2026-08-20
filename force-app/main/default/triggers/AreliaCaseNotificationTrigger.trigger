@@ -1,5 +1,5 @@
 trigger AreliaCaseNotificationTrigger on Case (after update) {
-    AreliaCaseNotificationHandler.handleAfterUpdate(
+   AreliaCaseNotificationHandler.handleAfterUpdate(
         Trigger.new,
         Trigger.oldMap
     );

@@ -1,6 +1,6 @@
 trigger TaskTrigger on Task (after insert, after update, after delete) {
     
-    Set<Id> vendorAssignmentIds = new Set<Id>();
+   Set<Id> vendorAssignmentIds = new Set<Id>();
     
     // Determine which list to iterate: new records (insert/update) or old records (delete)
     List<Task> tasksToProcess = Trigger.isDelete ? Trigger.old : Trigger.new;

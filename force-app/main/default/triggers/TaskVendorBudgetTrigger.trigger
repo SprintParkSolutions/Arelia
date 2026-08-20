@@ -1,7 +1,7 @@
 trigger TaskVendorBudgetTrigger on Task (before insert, before update,
                                         after insert,  after update, after delete, after undelete) 
 {
-    // 1) Hard-stop if a save would exceed the vendor cap
+   // 1) Hard-stop if a save would exceed the vendor cap
     if (Trigger.isBefore && (Trigger.isInsert || Trigger.isUpdate)) {
         TaskVendorBudgetHandler.validatePercentTotals(Trigger.new, Trigger.oldMap);
     }

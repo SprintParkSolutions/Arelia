@@ -1,7 +1,7 @@
 trigger VendorAgreementSignatureEventTrigger on Vendor_Agreement_Signature_Event__e(after insert) {
 	Set<Id> signatureRequestIds = new Set<Id>();
 
-    for (
+   for (
         Vendor_Agreement_Signature_Event__e eventRecord
         : Trigger.new
     ) {

@@ -1,5 +1,5 @@
 trigger ClientAgreementSubmissionEventTrigger on Client_Agreement_Submission_Event__e (after insert) {
-    Set<Id> submissionIds = new Set<Id>();
+   Set<Id> submissionIds = new Set<Id>();
 
     for (Client_Agreement_Submission_Event__e eventRecord : Trigger.New) {
         if (String.isBlank(eventRecord.Submission_Id__c)) {

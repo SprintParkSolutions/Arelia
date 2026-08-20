@@ -45,7 +45,6 @@ public with sharing class VendorPathController {
         if (status == 'Initiated') {
             return 'Vendor Work Started';
         }
-
         // Default: Start at Step 1
         return 'Vendor Assigned';
     }

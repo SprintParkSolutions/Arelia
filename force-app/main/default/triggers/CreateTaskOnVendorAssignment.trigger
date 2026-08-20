@@ -1,5 +1,5 @@
 trigger CreateTaskOnVendorAssignment on Vendor_Assignment__c (after insert) {
-    List<Task> tasksToCreate = new List<Task>();
+   List<Task> tasksToCreate = new List<Task>();
     Map<Id, Vendor__c> vendorMap = new Map<Id, Vendor__c>();
 
     // Collect Vendor Ids

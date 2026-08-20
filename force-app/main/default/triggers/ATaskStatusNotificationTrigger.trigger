@@ -1,5 +1,5 @@
 trigger ATaskStatusNotificationTrigger on Task (after update) {
-    ATaskStatusNotificationHandler.handleAfterUpdate(
+   ATaskStatusNotificationHandler.handleAfterUpdate(
         Trigger.new,
         Trigger.oldMap
     );

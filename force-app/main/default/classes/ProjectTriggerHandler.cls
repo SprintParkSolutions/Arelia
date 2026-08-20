@@ -3,7 +3,6 @@
  * Handler class for operations related to Project__c object,
  * including assigning project codes and sending email notifications
  * to clients, supervisors, and internal teams (management/enrollment).
- *
  * @author
  * Arelia team
  */

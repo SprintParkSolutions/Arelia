@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Arelia_Opportunities_List_View</fullName>
+    <columns>OPPORTUNITY.NAME</columns>
+    <columns>ACCOUNT.NAME</columns>
+    <columns>Primary_Contact__c</columns>
+    <columns>Supervisor_User__c</columns>
+    <columns>Project_Request_Quotation_Type__c</columns>
+    <columns>OPPORTUNITY.STAGE_NAME</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Project_Request_Quotation_Type__c</field>
+        <operation>notEqual</operation>
+    </filters>
+    <label>Arelia Opportunities List View</label>
+</ListView>

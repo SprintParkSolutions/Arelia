@@ -1,5 +1,5 @@
 trigger AreliaPaymentNotificationTrigger on Payment_Term__c (
-    after update
+   after update
 ) {
     if (Trigger.isAfter && Trigger.isUpdate) {
         AreliaPaymentNotificationHandler.handleAfterUpdate(

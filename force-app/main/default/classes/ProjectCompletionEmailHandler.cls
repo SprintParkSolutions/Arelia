@@ -1,9 +1,9 @@
 /**
  * @description       : Handler for sending emails upon Project Completion.
- * @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+ * @author            : 
  * @group             :
  * @last modified on  : 01-16-2026
- * @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+ * @last modified by  : 
 **/
 @SuppressWarnings('PMD.ExcessiveParameterList')
 public without sharing class ProjectCompletionEmailHandler {

@@ -10,5 +10,5 @@
     <columns>Status__c</columns>
     <columns>Completion__c</columns>
     <filterScope>Everything</filterScope>
-    <label>All Vendor Assignments</label>
+    <label>All Vendor Assignments List View</label>
 </ListView>

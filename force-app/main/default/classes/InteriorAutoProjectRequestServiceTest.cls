@@ -4,7 +4,6 @@
  *                      - lead update failure branch (collectDbErrors path)
  *                      - copyDesignFilesToLead() "already linked" skip path (newLinks.isEmpty() return)
  *                      - payload skip/continue branches + quantity normalization
- *
  * @group             : Arelia Living
  */
 @IsTest

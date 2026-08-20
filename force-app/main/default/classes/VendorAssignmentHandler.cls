@@ -3,7 +3,7 @@
  * @description Handler class for VendorAssignmentTrigger.
  *              Calculates and updates Project__c.Project_Completion_Status__c
  *              based on related Vendor_Assignment__c records.
- * @author      YourName
+ * @author      A
  * @version     1.0
  */
 public with sharing class VendorAssignmentHandler {

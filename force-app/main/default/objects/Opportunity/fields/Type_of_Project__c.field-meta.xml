@@ -4,7 +4,6 @@
     <label>Type of Project</label>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>
-    <trackHistory>false</trackHistory>
     <type>Picklist</type>
     <valueSet>
         <restricted>true</restricted>
@@ -29,6 +28,12 @@
                 <fullName>Only Project Plan</fullName>
                 <default>false</default>
                 <label>Only Project Plan</label>
+            </value>
+            <value>
+                <fullName>Other</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Other</label>
             </value>
         </valueSetDefinition>
     </valueSet>

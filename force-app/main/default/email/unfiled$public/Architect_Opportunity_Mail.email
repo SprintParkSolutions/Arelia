@@ -1,117 +1,141 @@
 <html>
- <head>
-  <title></title>
- </head>
- <body aria-readonly="false" style="height:auto;
+<head>
+	<title></title>
+</head>
+<body aria-readonly="false" style="height:auto;
 			 min-height:auto;
 			 margin:0;
 			 padding:0;
 			 background-color:#ffffff;">
-  <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+<table border="0" cellpadding="0" cellspacing="0" style="width:100%;
 			  border-collapse:collapse;
 			  background-color:#ffffff;" width="100%">
-   <tbody>
-    <tr>
-     <td align="center" style="padding:0;">
-      <table border="0" cellpadding="0" cellspacing="0" style="max-width:760px;
+	
+		<tr>
+			<td align="center" style="padding:0;">
+			<table border="0" cellpadding="0" cellspacing="0" style="max-width:760px;
 							  width:100%;
 							  background-color:#ffffff;
 							  border:2px solid #c9a75d;
 							  border-collapse:collapse;" width="100%">
-       <!-- Banner -->
-       <tbody>
-        <tr>
-         <td style="padding:0;"><img alt="Arelia Email Banner Image" src="{[devName:Arelia_Email_Banner_Image]}" style="display:block;
+				<!-- Banner -->
+					<tr>
+						<td style="padding:0;"><img alt="Arelia Email Banner Image" src="https://sprintpark--dev4.sandbox.file.force.com/file-asset-public/Arelia_Email_Banner_Image?oid=00DU9000005YtIX" style="display:block;
 											width:100%;
 											max-width:100%;
 											height:auto;
 											border:0;" title="Arelia Email Banner Image" /></td>
-        </tr> <!-- Main Content -->
-        <tr>
-         <td style="padding:30px 34px 32px 34px;"><p style="margin:0 0 18px 0;
+					</tr>
+					<!-- Main Content -->
+					<tr>
+						<td style="padding:30px 34px 32px 34px;">
+						<p style="margin:0 0 18px 0;
 										  font-size:18px;
 										  line-height:1.5;
 										  font-family:Times New Roman,Times,serif;
-										  color:#222222;">Hi <strong>{{{Recipient.Name}}}</strong>,</p> <p style="margin:0 0 18px 0;
+										  color:#222222;">Dear <strong>{{{Opportunity.Architect_Name__c}}}</strong>,</p>
+
+						<p style="margin:0 0 18px 0;
 										  font-size:18px;
 										  line-height:1.5;
 										  font-family:Times New Roman,Times,serif;
-										  color:#222222;">Thank you for expressing your interest in Arelia.</p> <p style="margin:0 0 22px 0;
+										  color:#222222;">We hope you are doing well.</p>
+
+						<p style="margin:0 0 22px 0;
 										  font-size:18px;
 										  line-height:1.5;
 										  font-family:Times New Roman,Times,serif;
-										  color:#222222;">We would be delighted to take the next step by arranging a <strong>{{{appointmentType}}}</strong> site visit with your assigned supervisor, <strong>{{{Supervisor_User__c.Name}}}</strong>.</p> <!-- Appointment Details -->
-          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+										  color:#222222;">We would like to inform you about a potential opportunity, <strong>{{{Opportunity.Name}}}</strong>, related to an upcoming project. Based on your expertise and experience, we believe this project may align well with your profile.</p>
+						<!-- Opportunity Details -->
+
+						<table border="0" cellpadding="0" cellspacing="0" style="width:100%;
 											  border-collapse:collapse;
 											  margin-bottom:18px;" width="100%">
-           <tbody>
-            <tr>
-             <td style="border-top:1px solid #e3d2a8;
-													   padding-top:20px;"><p style="margin:0;
+							
+								<tr>
+									<td style="border-top:1px solid #e3d2a8;
+													   padding-top:20px;">
+									<p style="margin:0;
 														  font-size:20px;
 														  line-height:1.4;
 														  font-family:Times New Roman,Times,serif;
-														  color:#1f1f1f;"><strong>Site Visit Appointment Details</strong></p></td>
-            </tr>
-           </tbody>
-          </table>
-          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+														  color:#1f1f1f;"><strong>Opportunity Details</strong></p>
+									</td>
+								</tr>
+							
+						</table>
+
+						<table border="0" cellpadding="0" cellspacing="0" style="width:100%;
 											  border-collapse:collapse;
 											  margin:0 0 24px 0;" width="100%">
-           <tbody>
-            <tr>
-             <td style="width:40%;
+							
+								<tr>
+									<td style="width:40%;
 													   padding:12px 14px;
 													   border:1px solid #e3d2a8;
 													   background-color:#fbf8f1;
 													   font-size:17px;
 													   line-height:1.5;
 													   font-family:Times New Roman,Times,serif;
-													   color:#222222;"><strong>Appointment Type</strong></td>
-             <td style="width:60%;
+													   color:#222222;"><strong>Opportunity Name</strong></td>
+									<td style="width:60%;
 													   padding:12px 14px;
 													   border:1px solid #e3d2a8;
 													   font-size:17px;
 													   line-height:1.5;
 													   font-family:Times New Roman,Times,serif;
-													   color:#222222;">{{{appointmentType}}}</td>
-            </tr>
-            <tr>
-             <td style="width:40%;
-													   padding:12px 14px;
-													   border:1px solid #e3d2a8;
-													   background-color:#fbf8f1;
-													   font-size:17px;
-													   line-height:1.5;
-													   font-family:Times New Roman,Times,serif;
-													   color:#222222;"><strong>Appointment Date</strong></td>
-             <td style="width:60%;
-													   padding:12px 14px;
-													   border:1px solid #e3d2a8;
-													   font-size:17px;
-													   line-height:1.5;
-													   font-family:Times New Roman,Times,serif;
-													   color:#222222;"><strong>{{{appointmentDate}}}</strong></td>
-            </tr>
-            <tr>
-             <td style="width:40%;
+													   color:#222222;">{{{Opportunity.Name}}}</td>
+								</tr>
+								<tr>
+									<td style="width:40%;
 													   padding:12px 14px;
 													   border:1px solid #e3d2a8;
 													   background-color:#fbf8f1;
 													   font-size:17px;
 													   line-height:1.5;
 													   font-family:Times New Roman,Times,serif;
-													   color:#222222;"><strong>Time Slot</strong></td>
-             <td style="width:60%;
+													   color:#222222;"><strong>Architect</strong></td>
+									<td style="width:60%;
 													   padding:12px 14px;
 													   border:1px solid #e3d2a8;
 													   font-size:17px;
 													   line-height:1.5;
 													   font-family:Times New Roman,Times,serif;
-													   color:#222222;"><strong>{{{timeSlot}}}</strong></td>
-            </tr>
-            <tr>
-             <td style="width:40%;
+													   color:#222222;">{{{Opportunity.Architect_Name__c}}}</td>
+								</tr>
+							
+						</table>
+						<!-- Supervisor Details -->
+
+						<table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin-bottom:18px;" width="100%">
+							
+								<tr>
+									<td style="border-top:1px solid #e3d2a8;
+													   padding-top:20px;">
+									<p style="margin:0;
+														  font-size:20px;
+														  line-height:1.4;
+														  font-family:Times New Roman,Times,serif;
+														  color:#1f1f1f;"><strong>Supervisor Details</strong></p>
+									</td>
+								</tr>
+							
+						</table>
+
+						<p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Kindly connect with our supervisor to discuss the project requirements, scope, and next steps in greater detail.</p>
+
+						<table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin:0 0 24px 0;" width="100%">
+							
+								<tr>
+									<td style="width:40%;
 													   padding:12px 14px;
 													   border:1px solid #e3d2a8;
 													   background-color:#fbf8f1;
@@ -119,133 +143,142 @@
 													   line-height:1.5;
 													   font-family:Times New Roman,Times,serif;
 													   color:#222222;"><strong>Supervisor</strong></td>
-             <td style="width:60%;
+									<td style="width:60%;
 													   padding:12px 14px;
 													   border:1px solid #e3d2a8;
 													   font-size:17px;
 													   line-height:1.5;
 													   font-family:Times New Roman,Times,serif;
-													   color:#222222;">{{{Supervisor_User__c.Name}}}</td>
-            </tr>
-           </tbody>
-          </table> <!-- Supervisor Information -->
-          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+													   color:#222222;">{{{Opportunity.Supervisor_User__c}}}{{{Opportunity.Supervisor_Name__c}}}</td>
+								</tr>
+								<tr>
+									<td style="width:40%;
+													   padding:12px 14px;
+													   border:1px solid #e3d2a8;
+													   background-color:#fbf8f1;
+													   font-size:17px;
+													   line-height:1.5;
+													   font-family:Times New Roman,Times,serif;
+													   color:#222222;"><strong>Contact Number</strong></td>
+									<td style="width:60%;
+													   padding:12px 14px;
+													   border:1px solid #e3d2a8;
+													   font-size:17px;
+													   line-height:1.5;
+													   font-family:Times New Roman,Times,serif;
+													   color:#222222;">{{{Opportunity.Supervisor_User_Phone__c}}}</td>
+								</tr>
+								<tr>
+									<td style="width:40%;
+													   padding:12px 14px;
+													   border:1px solid #e3d2a8;
+													   background-color:#fbf8f1;
+													   font-size:17px;
+													   line-height:1.5;
+													   font-family:Times New Roman,Times,serif;
+													   color:#222222;"><strong>Email</strong></td>
+									<td style="width:60%;
+													   padding:12px 14px;
+													   border:1px solid #e3d2a8;
+													   font-size:17px;
+													   line-height:1.5;
+													   font-family:Times New Roman,Times,serif;
+													   color:#222222;">{{{Opportunity.Supervisor_User_Email__c}}}</td>
+								</tr>
+							
+						</table>
+						<!-- Next Steps -->
+
+						<table border="0" cellpadding="0" cellspacing="0" style="width:100%;
 											  border-collapse:collapse;
 											  margin-bottom:18px;" width="100%">
-           <tbody>
-            <tr>
-             <td style="border-top:1px solid #e3d2a8;
-													   padding-top:20px;"><p style="margin:0;
+							
+								<tr>
+									<td style="border-top:1px solid #e3d2a8;
+													   padding-top:20px;">
+									<p style="margin:0;
 														  font-size:20px;
 														  line-height:1.4;
 														  font-family:Times New Roman,Times,serif;
-														  color:#1f1f1f;"><strong>Supervisor Information</strong></p></td>
-            </tr>
-           </tbody>
-          </table> <p style="margin:0 0 16px 0;
+														  color:#1f1f1f;"><strong>Next Steps</strong></p>
+									</td>
+								</tr>
+							
+						</table>
+
+						<p style="margin:0 0 18px 0;
 										  font-size:18px;
 										  line-height:1.5;
 										  font-family:Times New Roman,Times,serif;
-										  color:#222222;">For any questions regarding the site visit, you may contact your assigned supervisor directly.</p>
-          <ul style="margin-top:8px;
-										   margin-bottom:24px;
-										   padding-left:24px;">
-           <li style="margin-bottom:10px;
-											   font-size:18px;
-											   line-height:1.5;
-											   font-family:Times New Roman,Times,serif;
-											   color:#222222;"><strong>Email:</strong>&nbsp;{{{Supervisor_User__c.Email}}}</li>
-           <li style="margin-bottom:10px;
-											   font-size:18px;
-											   line-height:1.5;
-											   font-family:Times New Roman,Times,serif;
-											   color:#222222;"><strong>Mobile Number:</strong>&nbsp;{{{Supervisor_User__c.Phone}}}</li>
-          </ul> <!-- Appointment Response -->
-          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
-											  border-collapse:collapse;
-											  margin-bottom:18px;" width="100%">
-           <tbody>
-            <tr>
-             <td style="border-top:1px solid #e3d2a8;
-													   padding-top:20px;"><p style="margin:0;
-														  font-size:20px;
-														  line-height:1.4;
-														  font-family:Times New Roman,Times,serif;
-														  color:#1f1f1f;"><strong>Appointment Response</strong></p></td>
-            </tr>
-           </tbody>
-          </table> <p style="margin:0 0 18px 0;
+										  color:#222222;">Please reach out to the supervisor at your convenience to discuss the project and understand the requirements in detail.</p>
+
+						<p style="margin:0 0 22px 0;
 										  font-size:18px;
 										  line-height:1.5;
 										  font-family:Times New Roman,Times,serif;
-										  color:#222222;">Please use the button below to review the scheduled appointment and submit your response.</p> <!-- Appointment Approval Button -->
-          <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;
-											  margin:22px 0 24px 0;">
-           <tbody>
-            <tr>
-             <td align="center" style="background-color:#1b1b1b;
-													   border:1px solid #c9a75d;
-													   padding:12px 24px;
-													   text-align:center;"><a href="{{{appointmentApprovalLink}}}" style="font-size:17px;
-														  font-family:Arial,Helvetica,sans-serif;
-														  color:#ffffff;
-														  text-decoration:none;
-														  font-weight:bold;
-														  display:inline-block;">Review &amp; Respond to Appointment </a></td>
-            </tr>
-           </tbody>
-          </table> <p style="margin:0 0 22px 0;
+										  color:#222222;">Thank you for your time and interest. We look forward to your response and the possibility of collaborating with you on this project.</p>
+
+						<p style="margin:0;
 										  font-size:18px;
 										  line-height:1.5;
 										  font-family:Times New Roman,Times,serif;
-										  color:#222222;">We look forward to meeting you and taking the next step toward bringing your design vision to life.</p> <p style="margin:0;
-										  font-size:18px;
-										  line-height:1.5;
-										  font-family:Times New Roman,Times,serif;
-										  color:#222222;">Warm regards,<br /> <strong>Team Arelia</strong></p></td>
-        </tr> <!-- Short Professional Footer -->
-        <tr>
-         <td align="center" style="background-color:#171717;
+										  color:#222222;">Warm regards,<br />
+						<strong>Team Arelia</strong></p>
+						</td>
+					</tr>
+					<!-- Short Professional Footer -->
+					<tr>
+						<td align="center" style="background-color:#171717;
 									   border-top:2px solid #C99A3D;
 									   padding:24px 32px 22px 32px;
-									   text-align:center;"><p style="margin:0 0 5px 0;
+									   text-align:center;">
+						<p style="margin:0 0 5px 0;
 										  font-size:24px;
 										  line-height:1.3;
 										  font-family:Times New Roman,Times,serif;
 										  color:#D6B36A;
 										  font-weight:bold;
-										  text-align:center;">Arelia</p> <p style="margin:0 0 18px 0;
+										  text-align:center;">Arelia</p>
+
+						<p style="margin:0 0 18px 0;
 										  font-size:11px;
 										  line-height:1.5;
 										  font-family:Arial,Helvetica,sans-serif;
 										  color:#C99A3D;
 										  letter-spacing:2px;
 										  text-align:center;">PREMIUM &amp; LUXURY INTERIOR DESIGNS</p>
-          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+
+						<table border="0" cellpadding="0" cellspacing="0" style="width:100%;
 											  border-collapse:collapse;" width="100%">
-           <tbody>
-            <tr>
-             <td align="center" style="border-top:1px solid #6E5427;
+							
+								<tr>
+									<td align="center" style="border-top:1px solid #6E5427;
 													   padding-top:16px;
-													   text-align:center;"><p style="margin:0 0 5px 0;
+													   text-align:center;">
+									<p style="margin:0 0 5px 0;
 														  font-size:11px;
 														  line-height:1.6;
 														  font-family:Arial,Helvetica,sans-serif;
 														  color:#8F887F;
-														  text-align:center;">This email was sent regarding your scheduled site visit appointment.</p> <p style="margin:0;
+														  text-align:center;">This email was sent regarding a potential architect opportunity for an upcoming Arelia project.</p>
+
+									<p style="margin:0;
 														  font-size:11px;
 														  line-height:1.6;
 														  font-family:Arial,Helvetica,sans-serif;
 														  color:#8F887F;
-														  text-align:center;">© 2026 Arelia. All rights reserved.</p></td>
-            </tr>
-           </tbody>
-          </table></td>
-        </tr>
-       </tbody>
-      </table></td>
-    </tr>
-   </tbody>
-  </table>
- </body>
+														  text-align:center;">© 2026 Arelia. All rights reserved.</p>
+									</td>
+								</tr>
+							
+						</table>
+						</td>
+					</tr>
+				
+			</table>
+			</td>
+		</tr>
+	
+</table>
+</body>
 </html>

@@ -15,6 +15,10 @@
                 <field>Sheet_Date__c</field>
             </layoutItems>
             <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Description__c</field>
+            </layoutItems>
+            <layoutItems>
                 <behavior>Readonly</behavior>
                 <field>Grand_Total__c</field>
             </layoutItems>

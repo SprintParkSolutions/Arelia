@@ -4,7 +4,6 @@
  *                (quotation type picklist).
  */
 
-
     public without sharing class ProjectRequestController {
  
     // DTO to return both Label and Value
