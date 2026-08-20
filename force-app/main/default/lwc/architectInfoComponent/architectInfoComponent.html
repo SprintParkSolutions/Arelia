@@ -1,0 +1,62 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 05-12-2026
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<template>
+    <div class="modal-wrapper">
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+        </template>
+        
+        <div class="full-bleed-header">
+            <h2>Architect Contact Details</h2>
+        </div>
+        
+        <div class="standard-body">
+            <div class="input-wrapper">
+                <lightning-input 
+                    label="Architect Name" 
+                    value={architectName} 
+                    onchange={handleChange} 
+                    data-field="name" 
+                    required>
+                </lightning-input>
+            </div>
+            
+            <div class="input-wrapper">
+                <lightning-input 
+                    type="email" 
+                    label="Architect Email" 
+                    value={architectEmail} 
+                    onchange={handleChange} 
+                    data-field="email" 
+                    pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$" 
+                    message-when-pattern-mismatch="Please Enter Valid Mail Address" 
+                    required>
+                </lightning-input>
+            </div>
+            
+            <div class="input-wrapper">
+                <lightning-input 
+                    type="tel" 
+                    label="Architect Contact Number" 
+                    value={architectPhone} 
+                    onchange={handleChange} 
+                    data-field="phone" 
+                    pattern="^[0-9]{10}$" 
+                    message-when-pattern-mismatch="Please Enter Valid Contact Number" 
+                    required>
+                </lightning-input>
+            </div>
+        </div>
+        
+        <div class="full-bleed-footer">
+            <button class="submit-btn" onclick={handleSubmit} disabled={isLoading}>
+                Submit
+            </button>
+        </div>
+    </div>
+</template>

@@ -1,174 +1,712 @@
-/* --- EXISTING STYLES (Keep these) --- */
-.arelia-container {
-    background-color: #f4f6f9;
-    padding: 40px 20px;
-    min-height: 100vh;
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    position: relative;
-    box-sizing: border-box;
+/* ========================================= */
+/* ARELIA PREMIUM PAYMENT TERMS APPROVAL UI  */
+/* FIXED PROFESSIONAL INSTALLMENT DISPLAY    */
+/* ========================================= */
+
+:host {
+    --obsidian: #050505;
+    --obsidian-card: #101010;
+    --gold-bright: #d4af37;
+    --gold-light: #ffdf73;
+    --gold-deep: #8a6514;
+    --gold-muted: #b8902e;
+    --gold-glow: rgba(212, 175, 55, 0.3);
+    --pearl: #fdfcf0;
+    --pearl-soft: rgba(253, 252, 240, 0.82);
+    --pearl-muted: rgba(253, 252, 240, 0.58);
+    --border-gold: rgba(212, 175, 55, 0.26);
+    --green: #22c55e;
+    --red: #ff5757;
 }
 
+/* Main Container */
+.arelia-container {
+    min-height: 100vh;
+    padding: 72px 20px;
+    position: relative;
+    box-sizing: border-box;
+    overflow: hidden;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: var(--pearl);
+    background:
+        radial-gradient(circle at top center, rgba(126, 92, 22, 0.5) 0%, rgba(8, 8, 8, 0.97) 38%, #000000 100%),
+        linear-gradient(145deg, #030303, #0b0b0b);
+}
+
+.arelia-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(rgba(212, 175, 55, 0.18) 0.6px, transparent 0.6px),
+        linear-gradient(90deg, rgba(212, 175, 55, 0.035), transparent, rgba(212, 175, 55, 0.025));
+    background-size: 34px 34px, 100% 100%;
+    opacity: 0.18;
+    pointer-events: none;
+}
+
+.arelia-container::after {
+    content: '';
+    position: absolute;
+    top: -160px;
+    left: 50%;
+    width: 680px;
+    height: 680px;
+    transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(255, 223, 115, 0.18), transparent 68%);
+    filter: blur(8px);
+    pointer-events: none;
+}
+
+.submit-spinner {
+    z-index: 9999;
+    position: absolute;
+}
+
+.main-title,
+.main-subtitle,
+.arelia-card,
+.error-alert {
+    position: relative;
+    z-index: 1;
+}
+
+/* Header */
 .main-title {
-    font-size: 2.2rem;
-    font-weight: 700;
-    color: #1a243d;
-    margin-bottom: 8px;
-    line-height: 1.2;
+    max-width: 1100px;
+    margin: 0 auto 14px auto;
+    font-size: 2.9rem;
+    font-weight: 800;
+    line-height: 1.16;
+    letter-spacing: 0.16em;
+    text-align: center;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    background: linear-gradient(
+        135deg,
+        var(--gold-light) 0%,
+        var(--gold-bright) 48%,
+        var(--gold-muted) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 18px 48px rgba(212, 175, 55, 0.4);
+    opacity: 1;
 }
 
 .main-subtitle {
-    font-size: 1.1rem;
-    color: #54698d;
-    max-width: 700px;
-    margin: 0 auto;
-    line-height: 1.5;
+    max-width: 850px;
+    margin: 0 auto 44px auto;
+    color: var(--gold-light);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    text-align: center;
+    opacity: 0.94;
 }
 
+/* Cards */
 .arelia-card {
-    background: white;
     width: 100%;
-    max-width: 900px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    margin: 0 auto 30px auto;
+    max-width: 1040px;
+    margin: 0 auto 34px auto;
+    padding: 36px;
     box-sizing: border-box;
-    overflow: hidden;
+    border-radius: 22px;
+    border: 1px solid var(--border-gold);
+    border-top: 4px solid var(--gold-bright);
+    background:
+        radial-gradient(circle at top left, rgba(255, 223, 115, 0.08), transparent 34%),
+        linear-gradient(145deg, rgba(20, 20, 20, 0.98), rgba(7, 7, 7, 0.98));
+    box-shadow:
+        0 32px 90px rgba(0, 0, 0, 0.78),
+        0 0 48px rgba(212, 175, 55, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.045);
 }
 
-.responsive-table-container { width: 100%; }
+.terms-card {
+    padding: 32px;
+}
 
-.table-header {
-    background-color: #f8f9fb;
-    color: #54698d;
-    font-weight: 700;
-    padding: 12px 10px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    letter-spacing: 0.05em;
+.action-card {
+    padding: 36px 42px;
+}
+
+/* ========================================= */
+/* INSTALLMENT DISPLAY - FIXED, CLEAN, STATIC */
+/* ========================================= */
+
+.installment-panel {
+    width: 100%;
+    overflow: hidden;
+    border-radius: 18px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    background:
+        radial-gradient(circle at top left, rgba(212, 175, 55, 0.08), transparent 36%),
+        linear-gradient(145deg, rgba(18, 18, 18, 0.98), rgba(6, 6, 6, 0.98));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.045),
+        0 22px 48px rgba(0, 0, 0, 0.42);
+}
+
+.installment-header,
+.installment-row {
+    display: grid;
+    grid-template-columns: 90px minmax(0, 1.7fr) 130px minmax(170px, 1fr);
+    width: 100%;
+    align-items: stretch;
+}
+
+.installment-header {
+    background:
+        linear-gradient(135deg, rgba(212, 175, 55, 0.22), rgba(212, 175, 55, 0.06)),
+        #0c0c0c;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.38);
+}
+
+.installment-header-cell {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    padding: 18px 20px;
+    box-sizing: border-box;
+    border-right: 1px solid rgba(212, 175, 55, 0.16);
+    color: var(--gold-light);
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.13em;
     text-transform: uppercase;
 }
 
-.slds-border_bottom { border-bottom: 1px solid #e5e5e5; }
-.slds-p-vertical_small { padding-top: 12px; padding-bottom: 12px; }
-
-.button-container { 
-    display: flex; 
-    justify-content: center; 
-    gap: 20px; 
-    width: 100%; 
-    flex-wrap: wrap; 
+.installment-header-cell:last-child {
+    border-right: none;
 }
 
-.arelia-btn {
-    border: none;
-    border-radius: 50px;
-    padding: 12px 30px;
+.installment-row {
+    min-height: 76px;
+    border-bottom: 1px solid rgba(253, 252, 240, 0.09);
+    background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.018), transparent, rgba(212, 175, 55, 0.018));
+    transition:
+        background 0.25s ease,
+        border-color 0.25s ease;
+}
+
+.installment-row:last-child {
+    border-bottom: none;
+}
+
+.installment-row:hover {
+    background:
+        linear-gradient(90deg, rgba(212, 175, 55, 0.045), rgba(212, 175, 55, 0.085), rgba(212, 175, 55, 0.045));
+    border-bottom-color: rgba(212, 175, 55, 0.2);
+}
+
+.installment-cell {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    padding: 18px 20px;
+    box-sizing: border-box;
+    border-right: 1px solid rgba(212, 175, 55, 0.11);
+    color: var(--pearl);
     font-size: 1rem;
+    line-height: 1.45;
     font-weight: 600;
-    color: white;
-    cursor: pointer;
+}
+
+.installment-cell:last-child {
+    border-right: none;
+}
+
+.installment-no-cell {
+    justify-content: center;
+    text-align: center;
+}
+
+.installment-center {
+    justify-content: center;
+    text-align: center;
+}
+
+.installment-date-cell {
+    justify-content: flex-start;
+    color: var(--pearl-soft);
+    font-weight: 650;
+    white-space: nowrap;
+}
+
+.installment-number {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 180px;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    color: #060606;
+    background: linear-gradient(135deg, var(--gold-light), var(--gold-bright), var(--gold-deep));
+    font-size: 0.82rem;
+    font-weight: 950;
+    box-shadow:
+        0 10px 22px rgba(212, 175, 55, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
-.arelia-btn:active { transform: translateY(1px); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-
-.btn-approve { background-color: #0070d2; }
-.btn-approve:hover { background-color: #005fb2; }
-
-.btn-request { background-color: #ba0517; }
-.btn-request:hover { background-color: #8e0000; }
-
-.btn-submit-changes {
-    background-color: #333;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    padding: 10px 20px;
-    min-width: auto;
-    color: white;
-    border: none;
-    cursor: pointer;
+.installment-term-cell {
+    justify-content: flex-start;
 }
-.btn-submit-changes:hover { background-color: #000; }
 
-.custom-textarea { width: 100%; border-radius: 8px; }
-
-.info-box {
-    background-color: #f0fcf4;
-    border: 1px solid #c9e7d0;
-    border-radius: 8px;
-    padding: 20px;
-    color: #2e844a;
-    text-align: center;
+.installment-term-name {
+    display: block;
+    width: 100%;
+    color: var(--pearl);
+    font-weight: 760;
+    overflow-wrap: anywhere;
+    word-break: normal;
 }
-.info-box h2 { font-size: 1.5rem; margin-bottom: 0.5rem; }
 
-.slds-theme_error {
-    background-color: #c23934;
-    color: white;
-    padding: 1rem;
-    border-radius: 6px;
-    text-align: center;
+.installment-percentage {
+    color: var(--gold-light);
+    font-size: 1.08rem;
+    font-weight: 900;
+}
+
+/* Safety fallback if old wrapper remains somewhere */
+.responsive-table-container {
+    overflow: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.responsive-table-container::-webkit-scrollbar {
+    display: none;
+}
+
+/* Buttons */
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    width: 100%;
+    flex-wrap: wrap;
     margin-top: 20px;
 }
 
-.submit-spinner { z-index: 9999; position: fixed; }
-
-.animate-fade-in { animation: fadeIn 0.4s ease-out; }
-@keyframes fadeIn { 
-    from { opacity: 0; transform: translateY(-10px); } 
-    to { opacity: 1; transform: translateY(0); } 
+.arelia-btn {
+    min-width: 230px;
+    border-radius: 8px;
+    padding: 15px 30px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    color: var(--pearl);
+    font-size: 0.96rem;
+    font-weight: 900;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        background-color 0.25s ease,
+        border-color 0.25s ease,
+        color 0.25s ease;
 }
 
-/* ========================================= */
-/* NEW CUSTOM MODAL STYLES (Use this!)      */
-/* ========================================= */
+.arelia-btn:hover {
+    transform: translateY(-2px);
+}
 
+.button-icon {
+    --slds-c-icon-color-foreground-default: currentColor;
+    flex-shrink: 0;
+}
+
+.approve-icon {
+    color: var(--green);
+    --slds-c-icon-color-foreground-default: var(--green);
+}
+
+.request-icon {
+    color: var(--red);
+    --slds-c-icon-color-foreground-default: var(--red);
+}
+
+.btn-approve {
+    color: #060606;
+    border-color: rgba(255, 223, 115, 0.48);
+    background: linear-gradient(135deg, var(--gold-light), var(--gold-bright), var(--gold-deep));
+    box-shadow:
+        0 16px 34px rgba(212, 175, 55, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.38);
+}
+
+.btn-approve:hover {
+    color: #000000;
+    filter: brightness(1.08);
+    box-shadow:
+        0 22px 48px rgba(212, 175, 55, 0.42),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.btn-request,
+.btn-back {
+    color: var(--gold-light);
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    background:
+        linear-gradient(145deg, rgba(212, 175, 55, 0.09), rgba(255, 255, 255, 0.025)),
+        #151515;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.36);
+}
+
+.btn-request:hover,
+.btn-back:hover {
+    color: #050505;
+    border-color: var(--gold-bright);
+    background: linear-gradient(135deg, var(--gold-light), var(--gold-bright));
+    box-shadow: 0 20px 42px rgba(212, 175, 55, 0.3);
+}
+
+.btn-submit-changes {
+    min-width: 220px;
+    color: #050505;
+    border-color: rgba(255, 223, 115, 0.48);
+    background: linear-gradient(135deg, var(--gold-light), var(--gold-bright), var(--gold-deep));
+    font-size: 0.9rem;
+    padding: 14px 26px;
+    box-shadow: 0 14px 32px rgba(212, 175, 55, 0.24);
+}
+
+.btn-submit-changes:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 18px 40px rgba(212, 175, 55, 0.36);
+}
+
+/* Amendment Section */
+.comment-box-container {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 26px;
+    border-radius: 16px;
+    border: 1px solid rgba(212, 175, 55, 0.24);
+    background:
+        radial-gradient(circle at top left, rgba(212, 175, 55, 0.08), transparent 34%),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.025), rgba(212, 175, 55, 0.055)),
+        #0f0f0f;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.amendment-label {
+    display: block;
+    margin-bottom: 12px;
+    color: var(--gold-light);
+    font-size: 0.95rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+.required-symbol {
+    color: var(--red);
+    text-decoration: none;
+    margin-right: 4px;
+}
+
+.native-amendment-textarea {
+    width: 100%;
+    min-height: 150px;
+    resize: vertical;
+    box-sizing: border-box;
+    border-radius: 12px;
+    border: 1px solid rgba(212, 175, 55, 0.42);
+    background-color: #101010;
+    color: var(--pearl);
+    -webkit-text-fill-color: var(--pearl);
+    caret-color: var(--gold-light);
+    padding: 15px 17px;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    outline: none;
+}
+
+.native-amendment-textarea::placeholder {
+    color: rgba(253, 252, 240, 0.42);
+    -webkit-text-fill-color: rgba(253, 252, 240, 0.42);
+}
+
+.native-amendment-textarea:focus {
+    border-color: var(--gold-bright);
+    box-shadow: 0 0 0 1px var(--gold-bright), 0 0 20px rgba(212, 175, 55, 0.24);
+}
+
+.amendment-button-container {
+    justify-content: flex-end;
+}
+
+/* Status */
+.info-box {
+    padding: 42px;
+    border-radius: 16px;
+    border: 1px solid rgba(212, 175, 55, 0.26);
+    border-left: 5px solid var(--gold-bright);
+    background:
+        radial-gradient(circle at top left, rgba(212, 175, 55, 0.09), transparent 32%),
+        linear-gradient(145deg, rgba(212, 175, 55, 0.095), rgba(255, 255, 255, 0.025)),
+        #101010;
+    color: var(--gold-bright);
+    text-align: center;
+}
+
+.info-box h2 {
+    color: var(--gold-light);
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+}
+
+.processed-message {
+    color: var(--pearl-soft);
+    font-size: 1rem;
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+}
+
+.error-alert {
+    max-width: 1040px;
+    margin: 0 auto 24px auto;
+    border-radius: 12px;
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    background: #160d0d !important;
+    color: var(--pearl);
+}
+
+/* Success Modal */
 .custom-modal-backdrop {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+    inset: 0;
     z-index: 9000;
     display: flex;
-    justify-content: center;
     align-items: center;
-    backdrop-filter: blur(2px); /* Nice blur effect */
+    justify-content: center;
+    padding: 20px;
+    background: radial-gradient(circle at center, rgba(13, 13, 13, 0.84), rgba(0, 0, 0, 0.96));
+    backdrop-filter: blur(8px);
 }
 
 .custom-modal-box {
-    background-color: white;
     width: 90%;
     max-width: 500px;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    padding: 56px 38px;
+    border-radius: 20px;
     text-align: center;
+    border: 1px solid var(--gold-muted);
+    border-top: 4px solid var(--gold-bright);
+    background:
+        radial-gradient(circle at top, rgba(212, 175, 55, 0.12), transparent 58%),
+        linear-gradient(145deg, rgba(18, 18, 18, 0.98), rgba(8, 8, 8, 0.98));
+    box-shadow:
+        0 30px 90px rgba(0, 0, 0, 0.78),
+        0 0 46px rgba(212, 175, 55, 0.14);
     z-index: 9001;
-    position: relative;
 }
 
-.animate-pop-in {
-    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+.success-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    margin: 0 auto 22px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--gold-light), var(--gold-bright), var(--gold-deep));
+    color: var(--obsidian);
+    font-size: 2rem;
+    font-weight: 900;
+    box-shadow: 0 16px 36px rgba(212, 175, 55, 0.34);
 }
 
-@keyframes popIn {
-    0% { transform: scale(0.8); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
+.success-title {
+    color: var(--gold-light);
+    font-size: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    margin-bottom: 14px;
 }
 
-/* --- MOBILE RESPONSIVENESS --- */
+.success-message {
+    color: var(--pearl-soft);
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    line-height: 1.6;
+    margin-bottom: 32px;
+}
+
+.return-btn {
+    margin-top: 10px;
+}
+
+/* Animations */
+.animate-fade-in {
+    animation: exoticFadeIn 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+    opacity: 0;
+}
+
+.fade-delay-one {
+    animation-delay: 0.1s;
+}
+
+.fade-delay-two {
+    animation-delay: 0.25s;
+}
+
+.fade-delay-three {
+    animation-delay: 0.4s;
+}
+
+@keyframes exoticFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.98);
+        filter: blur(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+/* Mobile */
 @media screen and (max-width: 768px) {
-    .arelia-container { padding: 20px 10px; }
-    .main-title { font-size: 1.8rem; }
-    .arelia-card { padding: 20px 15px !important; }
-    .button-container { flex-direction: column; }
-    .arelia-btn { width: 100%; }
-    .responsive-table-container { overflow-x: auto; }
+    .arelia-container {
+        padding: 38px 12px;
+    }
+
+    .main-title {
+        font-size: 1.95rem;
+        letter-spacing: 0.08em;
+        line-height: 1.35;
+        color: var(--gold-light) !important;
+        background: linear-gradient(
+            135deg,
+            var(--gold-light) 0%,
+            var(--gold-bright) 55%,
+            var(--gold-muted) 100%
+        ) !important;
+        -webkit-background-clip: text !important;
+        background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        text-shadow: 0 12px 32px rgba(212, 175, 55, 0.46) !important;
+        opacity: 1 !important;
+        filter: none !important;
+    }
+
+    .main-subtitle {
+        font-size: 0.82rem;
+        letter-spacing: 0.11em;
+        margin-bottom: 28px;
+        line-height: 1.7;
+    }
+
+    .arelia-card {
+        padding: 18px 10px;
+        border-radius: 16px;
+        margin-bottom: 28px;
+    }
+
+    .installment-header,
+    .installment-row {
+        grid-template-columns: 48px minmax(0, 1.28fr) 62px minmax(86px, 0.95fr);
+    }
+
+    .installment-header-cell {
+        padding: 12px 7px;
+        font-size: 0.56rem;
+        letter-spacing: 0.052em;
+    }
+
+    .installment-row {
+        min-height: 66px;
+    }
+
+    .installment-cell {
+        padding: 12px 7px;
+        font-size: 0.78rem;
+        line-height: 1.35;
+    }
+
+    .installment-number {
+        width: 29px;
+        height: 29px;
+        font-size: 0.68rem;
+    }
+
+    .installment-percentage {
+        font-size: 0.84rem;
+    }
+
+    .installment-date-cell {
+        font-size: 0.72rem;
+    }
+
+    .button-container {
+        flex-direction: column;
+        gap: 14px;
+        margin-top: 16px;
+    }
+
+    .arelia-btn {
+        width: 100%;
+        min-width: auto;
+        padding: 14px 18px;
+        font-size: 0.88rem;
+        letter-spacing: 0.09em;
+    }
+
+    .comment-box-container {
+        padding: 16px;
+    }
+
+    .amendment-label {
+        font-size: 0.82rem;
+        letter-spacing: 0.05em;
+    }
+
+    .native-amendment-textarea {
+        min-height: 135px;
+        font-size: 0.95rem;
+    }
+
+    .info-box {
+        padding: 28px 18px;
+    }
+
+    .info-box h2 {
+        font-size: 1.35rem;
+        letter-spacing: 0.08em;
+    }
+
+    .processed-message {
+        font-size: 0.92rem;
+    }
+
+    .custom-modal-box {
+        padding: 38px 24px;
+    }
+
+    .success-title {
+        font-size: 1.45rem;
+        letter-spacing: 0.1em;
+    }
+
+    .success-message {
+        font-size: 0.94rem;
+    }
 }

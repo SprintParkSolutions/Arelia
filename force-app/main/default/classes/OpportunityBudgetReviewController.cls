@@ -1,5 +1,7 @@
 @SuppressWarnings('PMD.ApexCRUDViolation, PMD.CognitiveComplexity, PMD.ExcessiveParameterList, PMD.ApexSOQLInjection')
 public without sharing class OpportunityBudgetReviewController {
+    private static final String ERROR_UNSUPPORTED_RECORD_TYPE =
+        'Budget review is supported only for Arelia opportunities.';
 
     // --- WRAPPERS ---
     public class BudgetReviewResponseDTO {
@@ -125,15 +127,26 @@ public without sharing class OpportunityBudgetReviewController {
             return null;
         }
         
-        Opportunity oppToUpdate = [SELECT Id, 
-                                   Budget__c,
-                                   Estimated_Budget__c,
-                                   Project_Request_Quotation_Type__c, 
-                                   Supervisor_Estimated_Budget__c,
-                                   Re_Visit_Site_Supervisor_Estimate_Budget__c, 
-                                   Project_Estimated_Completion_Months__c,
-                                   ReVisit_Site_Estimated_Completion_Months__c 
-                                   FROM Opportunity WHERE Id = :opportunityId LIMIT 1];
+        Id areliaOpportunityRecordTypeId = getAreliaOpportunityRecordTypeId();
+        List<Opportunity> opportunitiesToUpdate = [
+            SELECT Id,
+                Budget__c,
+                Estimated_Budget__c,
+                Project_Request_Quotation_Type__c,
+                Supervisor_Estimated_Budget__c,
+                Re_Visit_Site_Supervisor_Estimate_Budget__c,
+                Project_Estimated_Completion_Months__c,
+                ReVisit_Site_Estimated_Completion_Months__c
+            FROM Opportunity
+            WHERE Id = :opportunityId
+            AND RecordTypeId = :areliaOpportunityRecordTypeId
+            LIMIT 1
+        ];
+        if (opportunitiesToUpdate.isEmpty()) {
+            throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+        }
+
+        Opportunity oppToUpdate = opportunitiesToUpdate[0];
         
         Boolean oppChanged = false;
 
@@ -202,7 +215,7 @@ public without sharing class OpportunityBudgetReviewController {
                 toList.add(opp.Primary_Contact__r.Email);
             }
             
-            String ccList = Label.Arelia_Living_Enrollment_Members;
+            String ccList = Label.Arelia_Living_Management_Members;
             if (opp.Supervisor_User__r != null && opp.Supervisor_User__r.Email != null) {
                 ccList += ',' + opp.Supervisor_User__r.Email;
             }
@@ -248,7 +261,7 @@ public without sharing class OpportunityBudgetReviewController {
     
     private static void handleClientDecision(Opportunity opp, DecisionInput data) {
         String supervisorEmail = (opp.Supervisor_User__r != null) ? opp.Supervisor_User__r.Email : '';
-        String teamEmails = Label.Arelia_Living_Enrollment_Members;
+        String teamEmails = Label.Arelia_Living_Management_Members;
 
         if (data.action == 'Approve') {
             opp.Budget_Review_Status__c = 'Client Approved';
@@ -295,7 +308,7 @@ public without sharing class OpportunityBudgetReviewController {
 
     private static void handleManagerDecision(Opportunity opp, DecisionInput data) {
         String supervisorEmail = (opp.Supervisor_User__r != null) ? opp.Supervisor_User__r.Email : '';
-        String teamEmails = Label.Arelia_Living_Enrollment_Members;
+        String teamEmails = Label.Arelia_Living_Management_Members;
 
         if (data.action == 'Approve') {
             opp.Budget_Review_Status__c = 'Manager Approved';
@@ -349,14 +362,6 @@ public without sharing class OpportunityBudgetReviewController {
             return;
         }
         EmailTemplate et = templates[0];
-        OrgWideEmailAddress owea = null;
-        
-        if (String.isNotBlank(Label.Arelia_OWD)) {
-             List<OrgWideEmailAddress> oweas = [SELECT Id FROM OrgWideEmailAddress WHERE Address = :Label.Arelia_OWD LIMIT 1];
-             if (!oweas.isEmpty()) {
-                 owea = oweas[0];
-             }
-        }
         
         String url = '#';
         if (ctx.urlType != null) {
@@ -392,9 +397,7 @@ public without sharing class OpportunityBudgetReviewController {
         }
         
         Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-        if (owea != null) {
-            mail.setOrgWideEmailAddressId(owea.Id);
-        }
+        AreliaUtility.setOrgWideEmailAddress(mail, System.Label.Arelia_OWD);
         mail.setToAddresses(ctx.toList);
         
         if (String.isNotBlank(ctx.ccListStr)) {
@@ -412,13 +415,39 @@ public without sharing class OpportunityBudgetReviewController {
     }
 
     private static Opportunity getFullOpportunity(Id opId) {
-        return [SELECT Id, Name, Budget__c, Estimated_Budget__c, 
+        Id areliaOpportunityRecordTypeId = getAreliaOpportunityRecordTypeId();
+
+        // Keep the Arelia Record Type requirement in SOQL so unsupported Opportunities do not proceed.
+        List<Opportunity> opportunities = [
+            SELECT Id,
+                Name,
+                Budget__c,
+                Estimated_Budget__c,
                 Budget_Review_Status__c, Budget_Review_Client_Remarks__c, Budget_Review_Manager_Remarks__c,
                 Primary_Contact__r.Name, Primary_Contact__r.Email,
                 Supervisor_User__r.FirstName, Supervisor_User__r.LastName, Supervisor_User__r.Email,
                 ReVisit_Site_Estimated_Completion_Months__c, Project_Estimated_Completion_Months__c,
                 Supervisor_Estimated_Budget__c, Re_Visit_Site_Supervisor_Estimate_Budget__c
-                FROM Opportunity WHERE Id = :opId];
+            FROM Opportunity
+            WHERE Id = :opId
+            AND RecordTypeId = :areliaOpportunityRecordTypeId
+            LIMIT 1
+        ];
+
+        if (opportunities.isEmpty()) {
+            throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+        }
+
+        return opportunities[0];
+    }
+
+    private static Id getAreliaOpportunityRecordTypeId() {
+        Id areliaOpportunityRecordTypeId = AreliaUtility.getAreliaOpportunityRecordTypeId();
+        if (areliaOpportunityRecordTypeId == null) {
+            throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+        }
+
+        return areliaOpportunityRecordTypeId;
     }
 
     private static List<ArchitectureRowDTO> getArchRows(Id opportunityId) {

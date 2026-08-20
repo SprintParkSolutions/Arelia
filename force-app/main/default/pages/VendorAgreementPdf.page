@@ -1,0 +1,509 @@
+<apex:page controller="VendorAgreementPdfController"
+    renderAs="pdf"
+    showHeader="false"
+    sidebar="false"
+    applyHtmlTag="false"
+    applyBodyTag="false">
+ 
+    <html>
+<head>
+<style>
+                /*
+                 * Pages after the first page reserve sufficient
+                 * space for the repeating Arelia logo.
+                 */
+                @page {
+                    size: A4;
+                    margin: 38mm 14mm 18mm 14mm;
+ 
+                    @top-center {
+                        content: element(repeatingLogoHeader);
+                    }
+                }
+ 
+                /*
+                 * The first page retains the existing layout and
+                 * displays its logo as part of the page content.
+                 */
+                @page :first {
+                    margin: 18mm 14mm 18mm 14mm;
+ 
+                    @top-center {
+                        content: none;
+                    }
+                }
+ 
+                html,
+                body {
+                    margin: 0;
+                    padding: 0;
+                }
+ 
+                body {
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 10.5px;
+                    line-height: 1.45;
+                    color: #1f2937;
+                }
+ 
+                /*
+                 * Permanent Visualforce wrapper.
+                 *
+                 * This wrapper is not stored inside Agreement_HTML__c,
+                 * so lightning-input-rich-text cannot remove it.
+                 */
+                .pdf-agreement-content {
+                    width: 100%;
+                }
+ 
+                /*
+                 * Repeating logo on page 2 and subsequent pages.
+                 */
+                .repeating-logo-header {
+                    position: running(repeatingLogoHeader);
+                    width: 100%;
+                    text-align: center;
+                    padding-bottom: 7px;
+                }
+ 
+                .repeating-company-logo {
+                    width: 125px;
+                    height: auto;
+                }
+ 
+                /*
+                 * Existing first-page logo.
+                 */
+                .pdf-logo-container {
+                    width: 100%;
+                    text-align: center;
+                    margin-bottom: 7px;
+                }
+ 
+                .pdf-company-logo {
+                    width: 125px;
+                    height: auto;
+                }
+ 
+                /*
+                 * =====================================================
+                 * STANDARD AGREEMENT CLASSES
+                 * =====================================================
+                 *
+                 * These selectors continue supporting agreements whose
+                 * original custom class names remain available.
+                 */
+ 
+                .agreement-page {
+                    width: 100%;
+                }
+ 
+                .agreement-header {
+                    text-align: center;
+                    border-bottom: 3px solid #1f4e79;
+                    padding-bottom: 14px;
+                    margin-bottom: 18px;
+                }
+ 
+                .company-name {
+                    display: none !important;
+                }
+ 
+                .agreement-title {
+                    color: #111827;
+                    font-size: 19px;
+                    font-weight: bold;
+                    margin-top: 2px;
+                    text-align: center;
+                }
+ 
+                .agreement-subtitle {
+                    color: #6b7280;
+                    font-size: 10px;
+                    margin-top: 5px;
+                    text-align: center;
+                }
+ 
+                .reference-table,
+                .details-table {
+                    border-collapse: collapse;
+                    width: 100%;
+                    margin-bottom: 18px;
+                }
+ 
+                .reference-table td,
+                .details-table td {
+                    border: 1px solid #cbd5e1;
+                    padding: 7px;
+                    vertical-align: top;
+                }
+ 
+                .reference-table td:first-child,
+                .details-table td:first-child {
+                    width: 35%;
+                    background: #eaf2f8;
+                    color: #1f4e79;
+                    font-weight: bold;
+                }
+ 
+                .agreement-section {
+                    margin-top: 14px;
+                    page-break-inside: avoid;
+                }
+ 
+                .vendor-details {
+                    margin-top: 25px;
+                    page-break-inside: avoid;
+                }
+ 
+                .signature-block {
+                    width: 100%;
+                    margin-top: 35px;
+                    page-break-inside: avoid;
+                }
+ 
+                .signature-column {
+                    display: inline-block;
+                    width: 46%;
+                    vertical-align: top;
+                    margin-right: 3%;
+                }
+ 
+                .signature-space {
+                    height: 65px;
+                    border-bottom: 1px solid #6b7280;
+                    margin-bottom: 8px;
+                }
+ 
+                .agreement-footer {
+                    margin-top: 30px;
+                    text-align: center;
+                    font-size: 8px;
+                    color: #6b7280;
+                    border-top: 1px solid #cbd5e1;
+                    padding-top: 7px;
+                }
+ 
+                .digital-signature {
+                    margin-top: 30px;
+                    border: 1px solid #94a3b8;
+                    padding: 12px;
+                    background: #f8fafc;
+                    page-break-inside: avoid;
+                }
+ 
+                /*
+                 * =====================================================
+                 * RESILIENT STRUCTURAL STYLING
+                 * =====================================================
+                 *
+                 * lightning-input-rich-text may remove custom classes
+                 * from the stored HTML. These selectors use the HTML
+                 * structure instead of relying only on class names.
+                 */
+ 
+                /*
+                 * The generated agreement contains one main root div.
+                 */
+                .pdf-agreement-content > div {
+                    width: 100%;
+                }
+ 
+                /*
+                 * First child of the agreement root is the agreement
+                 * header, regardless of whether agreement-header class
+                 * remains after editing.
+                 */
+                .pdf-agreement-content > div > div:first-child {
+                    text-align: center;
+                    border-bottom: 3px solid #1f4e79;
+                    padding-bottom: 14px;
+                    margin-bottom: 18px;
+                }
+ 
+                /*
+                 * Hide the stored ARELIA SPACE text because the image
+                 * logo is rendered separately by Visualforce.
+                 */
+                .pdf-agreement-content
+> div
+> div:first-child
+> div:first-child {
+                    display: none !important;
+                }
+ 
+                /*
+                 * VENDOR AGREEMENT title.
+                 */
+                .pdf-agreement-content
+> div
+> div:first-child
+> div:nth-child(2) {
+                    color: #111827;
+                    font-size: 19px;
+                    font-weight: bold;
+                    line-height: 1.25;
+                    margin-top: 2px;
+                    text-align: center;
+                }
+ 
+                /*
+                 * Interior Design Vendor / Contractor Agreement subtitle.
+                 */
+                .pdf-agreement-content
+> div
+> div:first-child
+> div:nth-child(3) {
+                    color: #6b7280;
+                    font-size: 10px;
+                    line-height: 1.4;
+                    margin-top: 5px;
+                    text-align: center;
+                }
+ 
+                /*
+                 * Apply professional table styling to all agreement tables,
+                 * even when reference-table and details-table are removed.
+                 */
+                .pdf-agreement-content table {
+                    width: 100%;
+                    margin-bottom: 18px;
+                    border-collapse: collapse;
+                    border-spacing: 0;
+                    page-break-inside: avoid;
+                }
+ 
+                .pdf-agreement-content table tr {
+                    page-break-inside: avoid;
+                }
+ 
+                .pdf-agreement-content table td,
+                .pdf-agreement-content table th {
+                    border: 1px solid #cbd5e1;
+                    padding: 7px;
+                    vertical-align: top;
+                    color: #1f2937;
+                    background: #ffffff;
+                    font-size: 10.5px;
+                    line-height: 1.4;
+                }
+ 
+                .pdf-agreement-content table td:first-child,
+                .pdf-agreement-content table th:first-child {
+                    width: 35%;
+                    background: #eaf2f8;
+                    color: #1f4e79;
+                    font-weight: bold;
+                }
+ 
+                /*
+                 * Preserve bold labels inside table cells.
+                 */
+                .pdf-agreement-content table td:first-child strong,
+                .pdf-agreement-content table th:first-child strong {
+                    color: #1f4e79;
+                    font-weight: bold;
+                }
+ 
+                /*
+                 * General section headings.
+                 */
+                .pdf-agreement-content h1,
+                .pdf-agreement-content h2,
+                .pdf-agreement-content h3 {
+                    page-break-after: avoid;
+                }
+ 
+                .pdf-agreement-content h2 {
+                    color: #1f4e79;
+                    font-size: 12px;
+                    line-height: 1.3;
+                    margin-top: 14px;
+                    margin-bottom: 5px;
+                    border-left: 4px solid #1f4e79;
+                    padding-left: 7px;
+                }
+ 
+                .pdf-agreement-content h3 {
+                    color: #1f4e79;
+                    font-size: 11px;
+                    line-height: 1.3;
+                    margin-top: 12px;
+                    margin-bottom: 6px;
+                }
+ 
+                /*
+                 * Paragraph styling.
+                 */
+                .pdf-agreement-content p {
+                    margin: 0 0 8px 0;
+                    line-height: 1.45;
+                }
+ 
+                /*
+                 * Rich-text formatting.
+                 */
+                .pdf-agreement-content strong,
+                .pdf-agreement-content b {
+                    font-weight: bold;
+                }
+ 
+                .pdf-agreement-content em,
+                .pdf-agreement-content i {
+                    font-style: italic;
+                }
+ 
+                .pdf-agreement-content u {
+                    text-decoration: underline;
+                }
+ 
+                .pdf-agreement-content s,
+                .pdf-agreement-content strike,
+                .pdf-agreement-content del {
+                    text-decoration: line-through;
+                }
+ 
+                /*
+                 * Hyperlink styling.
+                 */
+                .pdf-agreement-content a {
+                    color: #1f4e79;
+                    text-decoration: underline;
+                    word-wrap: break-word;
+                }
+ 
+                /*
+                 * Bulleted and numbered lists.
+                 */
+                .pdf-agreement-content ul,
+                .pdf-agreement-content ol {
+                    margin-top: 4px;
+                    margin-bottom: 8px;
+                    padding-left: 22px;
+                }
+ 
+                .pdf-agreement-content ul {
+                    list-style-type: disc;
+                }
+ 
+                .pdf-agreement-content ol {
+                    list-style-type: decimal;
+                }
+ 
+                .pdf-agreement-content li {
+                    margin-bottom: 4px;
+                    line-height: 1.4;
+                }
+ 
+                /*
+                 * Quill / lightning-input-rich-text alignment classes.
+                 */
+                .pdf-agreement-content .ql-align-left {
+                    text-align: left;
+                }
+ 
+                .pdf-agreement-content .ql-align-center {
+                    text-align: center;
+                }
+ 
+                .pdf-agreement-content .ql-align-right {
+                    text-align: right;
+                }
+ 
+                .pdf-agreement-content .ql-align-justify {
+                    text-align: justify;
+                }
+ 
+                /*
+                 * Rich-text indentation classes.
+                 */
+                .pdf-agreement-content .ql-indent-1 {
+                    margin-left: 18px;
+                }
+ 
+                .pdf-agreement-content .ql-indent-2 {
+                    margin-left: 36px;
+                }
+ 
+                .pdf-agreement-content .ql-indent-3 {
+                    margin-left: 54px;
+                }
+ 
+                .pdf-agreement-content .ql-indent-4 {
+                    margin-left: 72px;
+                }
+ 
+                .pdf-agreement-content .ql-indent-5 {
+                    margin-left: 90px;
+                }
+ 
+                .pdf-agreement-content .ql-indent-6 {
+                    margin-left: 108px;
+                }
+ 
+                .pdf-agreement-content .ql-indent-7 {
+                    margin-left: 126px;
+                }
+ 
+                .pdf-agreement-content .ql-indent-8 {
+                    margin-left: 144px;
+                }
+ 
+                /*
+                 * Keep normal agreement content blocks together where
+                 * possible without affecting existing page flow.
+                 */
+                .pdf-agreement-content > div > div {
+                    page-break-inside: avoid;
+                }
+ 
+                /*
+                 * Do not force the main agreement root or header wrapper
+                 * to remain on one page.
+                 */
+                .pdf-agreement-content > div,
+                .pdf-agreement-content > div > div:first-child {
+                    page-break-inside: auto;
+                }
+ 
+                /*
+                 * Footer fallback when its class remains.
+                 */
+                .pdf-agreement-content .agreement-footer {
+                    margin-top: 30px;
+                    padding-top: 7px;
+                    color: #6b7280;
+                    font-size: 8px;
+                    text-align: center;
+                    border-top: 1px solid #cbd5e1;
+                }
+</style>
+</head>
+ 
+        <body>
+<!-- Repeating logo for page 2 and later pages -->
+<div class="repeating-logo-header">
+<apex:image url="{!URLFOR($Resource.AreliaLogo)}"
+                    styleClass="repeating-company-logo"
+                    alt="Arelia Space Logo"/>
+</div>
+ 
+            <!-- Existing logo displayed on page 1 -->
+<div class="pdf-logo-container">
+<apex:image url="{!URLFOR($Resource.AreliaLogo)}"
+                    styleClass="pdf-company-logo"
+                    alt="Arelia Space Logo"/>
+</div>
+ 
+            <!--
+                Permanent wrapper ensures that professional PDF styles
+                remain available even when rich-text editing removes
+                custom classes from Agreement_HTML__c.
+            -->
+<div class="pdf-agreement-content">
+<apex:outputText value="{!agreementHtml}"
+                    escape="false"/>
+</div>
+</body>
+</html>
+</apex:page>

@@ -1,34 +1,36 @@
 import { LightningElement, wire, track } from 'lwc';
 import { CurrentPageReference } from 'lightning/navigation';
-import ARELIA_SITE_URL from '@salesforce/label/c.Arelia_Site_Label';
+import AreliaSiteRedirectUrlLabel from '@salesforce/label/c.Arelia_Site_Redirect_URL_Label';
 import getInvoice from '@salesforce/apex/ProformaManagerController.getInvoiceById';
 import submitDecision from '@salesforce/apex/ProformaManagerController.submitManagerDecision';
+
+const ACTION_APPROVE = 'Approve';
+const ACTION_REJECT = 'Reject';
+const STATUS_APPROVED = 'Approved';
+const STATUS_REJECTED = 'Rejected';
 
 export default class ProformaManagerAction extends LightningElement {
     @track invoiceData;
     @track comments = '';
     @track isLoading = true;
     @track error;
-    
     @track showCommentBox = false;
-    
-    // Modal States
     @track showConfirmationModal = false;
     @track showSuccessModal = false;
     @track confirmationMessage = '';
     @track successMessage = '';
-    
-    // Internal variable to store which action is being confirmed
-    pendingAction;
 
-    recordId; 
+    pendingAction;
+    recordId;
 
     @wire(CurrentPageReference)
     getStateParameters(currentPageReference) {
-        if (currentPageReference) {
-            this.recordId = currentPageReference.state.id;
-            this.loadData();
+        if (!currentPageReference) {
+            return;
         }
+
+        this.recordId = currentPageReference.state.id;
+        this.loadData();
     }
 
     loadData() {
@@ -39,70 +41,88 @@ export default class ProformaManagerAction extends LightningElement {
         }
 
         getInvoice({ recordId: this.recordId })
-            .then(result => {
+            .then((result) => {
                 this.invoiceData = result;
                 this.comments = result.comments || '';
                 this.isLoading = false;
             })
-            .catch(error => {
-                console.error(error);
+            .catch(() => {
                 this.error = 'Record Not Found or Access Denied.';
                 this.isLoading = false;
             });
     }
 
     get isLocked() {
-        return this.invoiceData && 
-              (this.invoiceData.managerStatus === 'Approved' || 
-               this.invoiceData.managerStatus === 'Rejected');
+        return this.invoiceData &&
+            (
+                this.invoiceData.managerStatus === STATUS_APPROVED ||
+                this.invoiceData.managerStatus === STATUS_REJECTED
+            );
     }
 
     get managerStatusDisplay() {
         if (this.invoiceData) {
             return this.invoiceData.managerStatus;
         }
+
         return 'Loading...';
     }
-    
+
     get statusBadgeClass() {
-        if (!this.invoiceData) return '';
-        return this.invoiceData.managerStatus === 'Approved' 
-            ? 'slds-badge slds-theme_success' 
-            : 'slds-badge slds-theme_error';
+        if (!this.invoiceData) {
+            return 'slds-badge';
+        }
+
+        if (this.invoiceData.managerStatus === STATUS_APPROVED) {
+            return 'slds-badge slds-theme_success';
+        }
+
+        return 'slds-badge slds-theme_error';
     }
 
-    handleCommentChange(event) { this.comments = event.target.value; }
-    
-    toggleComments() { this.showCommentBox = !this.showCommentBox; }
+    handleCommentChange(event) {
+        this.comments = event.target.value;
+        event.target.setCustomValidity('');
+        event.target.reportValidity();
 
-    // --- STEP 1: INITIAL CLICK HANDLERS ---
+        if (this.error) {
+            this.error = null;
+        }
+    }
 
-    // User clicks "Final Sign-Off"
+    handleRequestChangesClick() {
+        this.showCommentBox = true;
+        this.clearTextareaValidation();
+    }
+
+    handleBackClick() {
+        this.showCommentBox = false;
+        this.clearTextareaValidation();
+    }
+
     handleApproveClick() {
-        if(this.showCommentBox) {
+        if (this.showCommentBox) {
             this.showCommentBox = false;
         }
-        
-        this.pendingAction = 'Approve';
+
+        this.pendingAction = ACTION_APPROVE;
         this.confirmationMessage = 'Are you sure you want to approve this invoice for final sign-off?';
         this.showConfirmationModal = true;
     }
-    
-    // User clicks "Submit Decision" (Reject)
+
     handleSubmitRejectionClick() {
-        if(!this.comments) {
-            const inputField = this.template.querySelector('lightning-textarea');
-            inputField.setCustomValidity('Please provide a reason for rejection.');
-            inputField.reportValidity();
+        const trimmedComments = this.comments ? this.comments.trim() : '';
+
+        if (!trimmedComments) {
+            this.showTextareaValidation('Please provide a reason for rejection.');
             return;
         }
-        
-        this.pendingAction = 'Reject';
+
+        this.clearTextareaValidation();
+        this.pendingAction = ACTION_REJECT;
         this.confirmationMessage = 'Are you sure you want to reject this invoice and request changes?';
         this.showConfirmationModal = true;
     }
-
-    // --- STEP 2: CONFIRMATION MODAL HANDLERS ---
 
     closeConfirmationModal() {
         this.showConfirmationModal = false;
@@ -111,48 +131,79 @@ export default class ProformaManagerAction extends LightningElement {
 
     handleConfirmYes() {
         this.showConfirmationModal = false;
-        if(this.pendingAction) {
+
+        if (this.pendingAction) {
             this.submit(this.pendingAction);
         }
     }
-
-    // --- STEP 3: API SUBMISSION ---
 
     submit(action) {
         this.isLoading = true;
         this.error = null;
 
-        submitDecision({ recordId: this.recordId, action: action, comments: this.comments })
+        submitDecision({
+            recordId: this.recordId,
+            action,
+            comments: this.comments
+        })
             .then(() => {
-                this.isLoading = false;
-                
-                // Update Local State to 'lock' the UI visually behind the modal
-                let newData = { ...this.invoiceData };
-                newData.managerStatus = (action === 'Approve') ? 'Approved' : 'Rejected';
-                this.invoiceData = newData;
-                
-                this.showCommentBox = false;
-                
-                // Prepare Success Message
-                if(action === 'Approve') {
-                    this.successMessage = 'The invoice has been successfully approved and signed off.';
-                } else {
-                    this.successMessage = 'The invoice has been rejected. Revision requests have been sent.';
-                }
-
-                // Show Success Modal
-                this.showSuccessModal = true;
+                this.handleSubmitSuccess(action);
             })
-            .catch(error => {
-                console.error(error);
-                this.error = error.body ? error.body.message : 'Unknown Error';
+            .catch((error) => {
+                this.error = error && error.body && error.body.message
+                    ? error.body.message
+                    : 'Unknown Error';
                 this.isLoading = false;
             });
     }
 
-    // --- STEP 4: SUCCESS MODAL CLOSE (REDIRECT) ---
+    handleSubmitSuccess(action) {
+        const managerStatus = action === ACTION_APPROVE ? STATUS_APPROVED : STATUS_REJECTED;
+
+        this.isLoading = false;
+        this.showCommentBox = false;
+        this.pendingAction = null;
+
+        this.invoiceData = {
+            ...this.invoiceData,
+            managerStatus
+        };
+
+        this.successMessage = this.getSuccessMessage(action);
+        this.showSuccessModal = true;
+    }
+
+    getSuccessMessage(action) {
+        if (action === ACTION_APPROVE) {
+            return 'The invoice has been successfully approved and signed off.';
+        }
+
+        return 'The invoice has been rejected. Revision requests have been sent.';
+    }
+
+    showTextareaValidation(message) {
+        const inputField = this.template.querySelector('.manager-remarks-textarea');
+
+        if (inputField) {
+            inputField.setCustomValidity(message);
+            inputField.reportValidity();
+        }
+    }
+
+    clearTextareaValidation() {
+        const inputField = this.template.querySelector('.manager-remarks-textarea');
+
+        if (inputField) {
+            inputField.setCustomValidity('');
+            inputField.reportValidity();
+        }
+    }
 
     handleSuccessClose() {
-        window.location.href = ARELIA_SITE_URL;
+        const redirectUrl = (AreliaSiteRedirectUrlLabel || '').trim();
+
+        if (redirectUrl) {
+            window.location.assign(redirectUrl);
+        }
     }
 }

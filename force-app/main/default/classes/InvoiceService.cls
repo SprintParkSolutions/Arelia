@@ -18,7 +18,7 @@
  *  - Child rows are replaced on every save/submit for consistency
  */
 @SuppressWarnings('PMD.CognitiveComplexity,PMD.ExcessiveParameterList,PMD.ApexCRUDViolation')
-public with sharing class InvoiceService {
+public without sharing class InvoiceService {
 
     // =========================
     // Constants

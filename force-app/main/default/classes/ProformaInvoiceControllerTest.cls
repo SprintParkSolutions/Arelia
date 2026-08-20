@@ -85,6 +85,23 @@ private class ProformaInvoiceControllerTest {
     }
 
     @isTest
+    static void testSendInvoiceForApprovalNoClientEmail() {
+        Opportunity opp = [SELECT Id, Primary_Contact__c FROM Opportunity LIMIT 1];
+        opp.Primary_Contact__c = null;
+        update opp;
+
+        ContentVersion cv = TestDataUtility.createContentVersion('No_Client_Email_File', 'No email content');
+        Id docId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cv.Id].ContentDocumentId;
+
+        Test.startTest();
+        ProformaInvoiceController.sendInvoiceForApproval(opp.Id, new List<String>{docId});
+        Test.stopTest();
+
+        Integer invoiceCount = [SELECT COUNT() FROM Proforma_Invoice__c WHERE Opportunity__c = :opp.Id];
+        System.assertEquals(1, invoiceCount, 'Invoice should be created even when no client email is available.');
+    }
+
+    @isTest
     static void testSubmitClientDecisionApproved() {
         Opportunity opp = [SELECT Id FROM Opportunity LIMIT 1];
         Proforma_Invoice__c invoice = TestDataUtility.createProformaInvoice(opp.Id);
@@ -104,6 +121,20 @@ private class ProformaInvoiceControllerTest {
     }
 
     @isTest
+    static void testSubmitClientDecisionNoFilesAndDefaultComments() {
+        Opportunity opp = [SELECT Id FROM Opportunity LIMIT 1];
+        Proforma_Invoice__c invoice = TestDataUtility.createProformaInvoice(opp.Id);
+
+        Test.startTest();
+        ProformaInvoiceController.submitClientDecision(invoice.Id, 'Approved', null);
+        Test.stopTest();
+
+        Proforma_Invoice__c updatedInvoice = [SELECT Status__c, Client_Comments__c FROM Proforma_Invoice__c WHERE Id = :invoice.Id];
+        System.assertEquals('Approved', updatedInvoice.Status__c, 'Invoice status should still update without linked files.');
+        System.assertEquals('Approved by Client', updatedInvoice.Client_Comments__c, 'Blank comments should use the default text.');
+    }
+
+    @isTest
     static void testSubmitClientDecisionException() {
         Test.startTest();
         try {
@@ -119,6 +150,9 @@ private class ProformaInvoiceControllerTest {
     @isTest
     static void testGetInvoiceByIdSuccess() {
         Opportunity opp = [SELECT Id, Name, Lead_Name__c FROM Opportunity LIMIT 1];
+        opp.Lead_Name__c = 'Named Client';
+        update opp;
+
         Proforma_Invoice__c invoice = TestDataUtility.createProformaInvoice(opp.Id);
         
         ContentVersion cv = [SELECT ContentDocumentId FROM ContentVersion LIMIT 1];
@@ -134,6 +168,7 @@ private class ProformaInvoiceControllerTest {
         System.assertEquals('Sent', result.get('status'), 'Status should match.');
         System.assertEquals('Proforma_Invoice_Draft', result.get('title'), 'File title should match the ContentDocument.');
         System.assertEquals(opp.Name, result.get('projectName'), 'Project name should default to Opportunity Name.');
+        System.assertEquals('Named Client', result.get('clientName'), 'Client name should use Opportunity lead name when present.');
     }
 
     @isTest
@@ -184,5 +219,41 @@ private class ProformaInvoiceControllerTest {
         Test.stopTest();
 
         System.assertEquals(0, history.size(), 'Should return an empty list if no invoices are linked.');
+    }
+
+    @isTest
+    static void testGetRelatedInvoicesMissingFileFallback() {
+        Opportunity opp = [SELECT Id FROM Opportunity LIMIT 1];
+        Proforma_Invoice__c invoice = new Proforma_Invoice__c(
+            Opportunity__c = opp.Id,
+            Status__c = 'Sent',
+            Client_Comments__c = 'Project invoice'
+        );
+        insert invoice;
+
+        Test.startTest();
+        List<ProformaInvoiceController.InvoiceHistoryWrapper> history =
+            ProformaInvoiceController.getRelatedInvoices(opp.Id);
+        Test.stopTest();
+
+        System.assertEquals(1, history.size(), 'Invoice history should be returned.');
+        System.assertEquals('File Not Found', history[0].fileName, 'Missing related file should use fallback label.');
+    }
+
+    @isTest
+    static void testMergeAndSupervisorFallbackHelpers() {
+        Map<String, String> replacements = new Map<String, String>{
+            'TOKEN' => null
+        };
+
+        Test.startTest();
+        String nullText = ProformaInvoiceController.applyMergeFields(null, replacements);
+        String replacedText = ProformaInvoiceController.applyMergeFields('Value=[TOKEN]', replacements);
+        String supervisorName = ProformaInvoiceController.getSupervisorNameForTest(new Proforma_Invoice__c());
+        Test.stopTest();
+
+        System.assertEquals('', nullText, 'Null merge text should become blank.');
+        System.assertEquals('Value=', replacedText, 'Null merge values should become blank.');
+        System.assertEquals('Team', supervisorName, 'Missing supervisor relationship should use Team fallback.');
     }
 }

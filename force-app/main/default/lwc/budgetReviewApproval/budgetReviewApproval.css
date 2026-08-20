@@ -1,127 +1,239 @@
-.arelia-container {
-    max-width: 950px;
-    margin: 0 auto;
-    padding: 20px;
-    font-family: 'Segoe UI', sans-serif;
+/* ========================================= */
+/* ARELIA BLACK & GOLD BUDGET APPROVAL UI    */
+/* ========================================= */
+
+:host {
+    --arelia-black: #050505;
+    --arelia-card: #0d0d0d;
+    --arelia-gold: #d4af37;
+    --arelia-gold-light: #ffdf73;
+    --arelia-gold-muted: #a8872d;
+    --arelia-white: #fdfcf0;
+    --arelia-muted: rgba(253, 252, 240, 0.68);
+    --arelia-border: rgba(212, 175, 55, 0.22);
+    --arelia-glow: rgba(212, 175, 55, 0.24);
 }
 
-/* --- Header & Title --- */
+.arelia-container {
+    min-height: 100vh;
+    max-width: none;
+    margin: 0;
+    padding: 70px 20px;
+    position: relative;
+    box-sizing: border-box;
+    overflow: hidden;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: var(--arelia-white);
+    background:
+        radial-gradient(circle at top center, rgba(86, 65, 20, 0.55) 0%, rgba(5, 5, 5, 0.95) 42%, #000000 100%),
+        linear-gradient(145deg, #000000, #090909);
+}
+
+.arelia-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(rgba(212, 175, 55, 0.18) 0.6px, transparent 0.6px),
+        linear-gradient(90deg, rgba(212, 175, 55, 0.035), transparent, rgba(212, 175, 55, 0.025));
+    background-size: 34px 34px, 100% 100%;
+    opacity: 0.22;
+    pointer-events: none;
+}
+
+.arelia-container::after {
+    content: '';
+    position: absolute;
+    top: -120px;
+    left: 50%;
+    width: 520px;
+    height: 520px;
+    transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.18), transparent 70%);
+    filter: blur(8px);
+    pointer-events: none;
+}
+
+.submit-spinner {
+    z-index: 9999;
+    position: absolute;
+}
+
+.header-section,
+.arelia-card,
+.error-alert {
+    position: relative;
+    z-index: 1;
+}
+
+.header-section {
+    max-width: 950px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .main-title {
-    font-size: 1.8rem;
+    font-size: 2.55rem;
     font-weight: 700;
-    color: #1a237e;
-    margin-bottom: 10px;
+    line-height: 1.2;
+    margin-bottom: 18px;
+    text-align: center;
+    letter-spacing: 0.04em;
+    background: linear-gradient(135deg, var(--arelia-gold-light), var(--arelia-gold), var(--arelia-gold-muted));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 16px 42px var(--arelia-glow);
 }
 
 .message-box {
-    background-color: #e8eaf6;
-    border-left: 4px solid #1a237e;
-    padding: 16px;
-    border-radius: 4px;
+    max-width: 950px;
+    margin: 0 auto 20px auto;
+    padding: 18px 22px;
+    border-radius: 13px;
     text-align: left;
-    color: #333;
-    margin-bottom: 20px;
+    border: 1px solid rgba(212, 175, 55, 0.24);
+    border-left: 4px solid var(--arelia-gold);
+    color: var(--arelia-muted);
+    background:
+        linear-gradient(145deg, rgba(212, 175, 55, 0.095), rgba(255, 255, 255, 0.025)),
+        #101010;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.04),
+        0 14px 32px rgba(0, 0, 0, 0.28);
 }
+
+.message-box p {
+    margin: 0 0 4px 0;
+    line-height: 1.5;
+}
+
+.message-box strong {
+    color: var(--arelia-gold-light);
+}
+
 .message-box.manager-msg {
-    background-color: #e0f2f1;
-    border-left-color: #00897b;
+    border-left-color: var(--arelia-gold-light);
 }
 
-/* --- Main Card --- */
-.arelia-card {
-    background: #ffffff;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-    border-radius: 16px;
-    overflow: hidden; /* Important for rounding corners */
-    border: 1px solid #e0e0e0;
-}
-
-/* --- Left Column: Project Details --- */
-.project-details-col {
-    background-color: #ffffff;
-    padding: 30px;
-    border-right: 1px solid #f0f0f0;
-}
-
-.details-wrapper .section-label {
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    color: #888;
-    letter-spacing: 1px;
+.revised-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 999px;
+    color: #050505;
+    background: linear-gradient(135deg, var(--arelia-gold-light), var(--arelia-gold));
     font-weight: 700;
-    margin-bottom: 25px;
+    box-shadow: 0 12px 26px rgba(212, 175, 55, 0.2);
+}
+
+.arelia-card {
+    width: 100%;
+    max-width: 950px;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+    border-radius: 18px;
+    border: 1px solid var(--arelia-border);
+    border-top: 3px solid var(--arelia-gold);
+    overflow: hidden;
+    background:
+        linear-gradient(145deg, rgba(18, 18, 18, 0.96), rgba(8, 8, 8, 0.98)),
+        radial-gradient(circle at top, rgba(212, 175, 55, 0.09), transparent 58%);
+    box-shadow:
+        0 28px 80px rgba(0, 0, 0, 0.78),
+        0 0 42px rgba(212, 175, 55, 0.07),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.project-details-col {
+    padding: 34px;
+    border-right: 1px solid rgba(212, 175, 55, 0.14);
+    background: rgba(255, 255, 255, 0.015);
+}
+
+.budget-summary-col {
+    padding: 34px;
+    background:
+        linear-gradient(145deg, rgba(212, 175, 55, 0.055), rgba(255, 255, 255, 0.015)),
+        #101010;
+}
+
+.section-label {
     display: block;
+    margin-bottom: 26px;
+    color: var(--arelia-gold-light);
+    font-size: 0.86rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-weight: 800;
 }
 
 .detail-item {
     display: flex;
     align-items: flex-start;
-    margin-bottom: 25px;
+    margin-bottom: 26px;
 }
 
-.detail-item:last-child { margin-bottom: 0; }
+.detail-item:last-child {
+    margin-bottom: 0;
+}
 
 .icon-box {
-    background-color: #f5f7fa;
-    border-radius: 8px;
+    min-width: 42px;
+    min-height: 42px;
+    border-radius: 10px;
     padding: 8px;
-    margin-right: 15px;
+    margin-right: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
+    background:
+        linear-gradient(145deg, rgba(212, 175, 55, 0.12), rgba(255, 255, 255, 0.025)),
+        #151515;
+    border: 1px solid rgba(212, 175, 55, 0.16);
 }
 
 .info-content label {
     display: block;
-    font-size: 0.8rem;
-    color: #666;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
+    color: var(--arelia-muted);
+    font-size: 0.82rem;
 }
 
 .info-content .value {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #1a237e;
+    color: var(--arelia-gold-light);
+    font-size: 1.12rem;
+    font-weight: 700;
 }
 
 .info-content .sub-value {
-    font-size: 0.9rem;
-    color: #777;
-    margin-top: 2px;
-}
-
-/* --- Right Column: Budget Summary --- */
-.budget-summary-col {
-    background-color: #fafbfc; /* Subtle grey background for numbers */
-    padding: 30px;
-}
-
-.budget-wrapper .section-label {
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    color: #888;
-    letter-spacing: 1px;
-    font-weight: 700;
-    margin-bottom: 25px;
-    display: block;
+    color: var(--arelia-muted);
+    font-size: 0.92rem;
+    margin-top: 3px;
 }
 
 .budget-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 17px;
+    gap: 18px;
+    color: var(--arelia-muted);
     font-size: 1rem;
-    color: #444;
 }
 
-.budget-row .lbl { color: #555; }
-.budget-row .val { font-weight: 600; color: #333; }
+.budget-row .lbl {
+    color: var(--arelia-muted);
+}
+
+.budget-row .val {
+    color: var(--arelia-white);
+    font-weight: 700;
+}
 
 .divider {
     height: 1px;
-    background-color: #e0e0e0;
-    margin: 20px 0;
+    margin: 24px 0;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.32), transparent);
 }
 
 .final-row {
@@ -130,60 +242,380 @@
 
 .final-row label {
     display: block;
+    margin-bottom: 8px;
+    color: var(--arelia-muted);
     font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 5px;
 }
 
 .big-number {
-    font-size: 2.2rem;
-    font-weight: 800;
-    color: #2e7d32; /* Green */
+    color: var(--arelia-gold-light);
+    font-size: 2.25rem;
+    font-weight: 850;
     line-height: 1.1;
+    text-shadow: 0 12px 30px rgba(212, 175, 55, 0.25);
 }
 
-/* --- Responsive Adjustments --- */
-@media (max-width: 768px) {
+.action-card {
+    padding: 30px !important;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 22px;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.arelia-btn {
+    min-width: 210px;
+    border-radius: 4px;
+    padding: 13px 26px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    color: var(--arelia-white);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.035em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        background-color 0.25s ease,
+        border-color 0.25s ease,
+        color 0.25s ease;
+}
+
+.arelia-btn:hover {
+    transform: translateY(-2px);
+}
+
+.button-icon {
+    --slds-c-icon-color-foreground-default: currentColor;
+    flex-shrink: 0;
+}
+
+.approve-icon {
+    color: #1fbf62;
+    --slds-c-icon-color-foreground-default: #1fbf62;
+}
+
+.request-icon {
+    color: #ff4d4d;
+    --slds-c-icon-color-foreground-default: #ff4d4d;
+}
+
+.btn-approve {
+    color: #070707;
+    border-color: rgba(255, 223, 115, 0.45);
+    background: linear-gradient(135deg, var(--arelia-gold-light), var(--arelia-gold), var(--arelia-gold-muted));
+    box-shadow: 0 14px 30px rgba(212, 175, 55, 0.22);
+}
+
+.btn-approve:hover {
+    color: #000000;
+    filter: brightness(1.08);
+    box-shadow: 0 18px 42px rgba(212, 175, 55, 0.36);
+}
+
+.btn-request {
+    color: var(--arelia-gold-light);
+    border-color: rgba(212, 175, 55, 0.46);
+    background:
+        linear-gradient(145deg, rgba(212, 175, 55, 0.08), rgba(255, 255, 255, 0.02)),
+        #111111;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32);
+}
+
+.btn-request:hover {
+    color: #050505;
+    border-color: var(--arelia-gold);
+    background: linear-gradient(135deg, var(--arelia-gold-light), var(--arelia-gold));
+    box-shadow: 0 18px 38px rgba(212, 175, 55, 0.26);
+}
+
+.comment-box-container {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 24px;
+    border-radius: 13px;
+    border: 1px solid rgba(212, 175, 55, 0.22);
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.025), rgba(212, 175, 55, 0.055)),
+        #0f0f0f;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.change-label {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--arelia-gold-light);
+    font-size: 0.98rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+.required-symbol {
+    color: #ff4d4d;
+    text-decoration: none;
+    margin-right: 4px;
+}
+
+.budget-remarks-textarea {
+    width: 100%;
+    min-height: 145px;
+    resize: vertical;
+    box-sizing: border-box;
+    border-radius: 10px;
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    background-color: #101010;
+    color: #fdfcf0;
+    -webkit-text-fill-color: #fdfcf0;
+    caret-color: var(--arelia-gold-light);
+    padding: 14px 16px;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    outline: none;
+}
+
+.budget-remarks-textarea::placeholder {
+    color: rgba(253, 252, 240, 0.42);
+    -webkit-text-fill-color: rgba(253, 252, 240, 0.42);
+}
+
+.budget-remarks-textarea:focus {
+    border-color: var(--arelia-gold);
+    box-shadow: 0 0 0 1px var(--arelia-gold), 0 0 18px rgba(212, 175, 55, 0.2);
+}
+
+.amendment-button-container {
+    justify-content: flex-end;
+}
+
+.btn-back {
+    min-width: 150px;
+    color: var(--arelia-gold-light);
+    border: 1px solid rgba(212, 175, 55, 0.42);
+    background:
+        linear-gradient(145deg, rgba(212, 175, 55, 0.06), rgba(255, 255, 255, 0.02)),
+        #111111;
+}
+
+.btn-back:hover {
+    color: #050505;
+    border-color: var(--arelia-gold);
+    background: linear-gradient(135deg, var(--arelia-gold-light), var(--arelia-gold));
+}
+
+.btn-submit-changes {
+    min-width: 190px;
+    color: #050505;
+    border-color: rgba(255, 223, 115, 0.45);
+    background: linear-gradient(135deg, var(--arelia-gold-light), var(--arelia-gold), var(--arelia-gold-muted));
+    font-size: 0.98rem;
+    padding: 11px 22px;
+    box-shadow: 0 12px 28px rgba(212, 175, 55, 0.2);
+}
+
+.btn-submit-changes:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 16px 34px rgba(212, 175, 55, 0.34);
+}
+
+.info-box {
+    padding: 34px;
+    border-radius: 13px;
+    border: 1px solid rgba(212, 175, 55, 0.24);
+    background:
+        linear-gradient(145deg, rgba(212, 175, 55, 0.095), rgba(255, 255, 255, 0.025)),
+        #101010;
+    color: var(--arelia-muted);
+}
+
+.info-box h2 {
+    color: var(--arelia-gold-light);
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+}
+
+.info-box p {
+    color: var(--arelia-muted);
+}
+
+.no-record-card {
+    color: var(--arelia-muted);
+}
+
+.no-record-title {
+    color: var(--arelia-gold-light);
+    -webkit-text-fill-color: unset;
+    background: none;
+}
+
+.error-help-text {
+    color: #ff9b9b;
+    font-size: 0.9rem;
+}
+
+.error-alert {
+    max-width: 950px;
+    margin: 24px auto 0 auto;
+    border-radius: 10px;
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    background: #160d0d !important;
+    color: var(--arelia-white);
+}
+
+/* Success Modal */
+.custom-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.78);
+    backdrop-filter: blur(7px);
+}
+
+.custom-modal-box {
+    width: 90%;
+    max-width: 480px;
+    padding: 46px 36px;
+    border-radius: 18px;
+    text-align: center;
+    border: 1px solid rgba(212, 175, 55, 0.28);
+    border-top: 3px solid var(--arelia-gold);
+    background:
+        linear-gradient(145deg, rgba(18, 18, 18, 0.98), rgba(8, 8, 8, 0.98)),
+        radial-gradient(circle at top, rgba(212, 175, 55, 0.12), transparent 58%);
+    box-shadow:
+        0 28px 80px rgba(0, 0, 0, 0.78),
+        0 0 42px rgba(212, 175, 55, 0.12);
+}
+
+.success-icon {
+    width: 68px;
+    height: 68px;
+    margin: 0 auto 22px auto;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #050505;
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--arelia-gold-light), var(--arelia-gold), var(--arelia-gold-muted));
+    box-shadow: 0 16px 34px rgba(212, 175, 55, 0.32);
+}
+
+.success-title {
+    color: var(--arelia-gold-light);
+    font-size: 1.9rem;
+    font-weight: 750;
+    margin-bottom: 14px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.success-message {
+    color: var(--arelia-muted);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.return-btn {
+    margin: 0;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.35s ease-in;
+}
+
+.animate-pop-in {
+    animation: popIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0.92);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Mobile */
+@media screen and (max-width: 768px) {
+    .arelia-container {
+        padding: 38px 12px;
+    }
+
+    .main-title {
+        font-size: 2rem;
+        letter-spacing: 0.03em;
+    }
+
+    .message-box {
+        padding: 16px;
+    }
+
     .project-details-col {
         border-right: none;
-        border-bottom: 1px solid #f0f0f0;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.14);
+        padding: 24px;
     }
+
     .budget-summary-col {
-        background-color: #fff; /* White on mobile to blend */
+        padding: 24px;
     }
+
     .final-row {
         text-align: center;
     }
-}
 
-/* --- Buttons & Modals (Existing) --- */
-.arelia-btn {
-    padding: 12px 28px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    margin: 0 10px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.arelia-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-.btn-approve { background-color: #2e7d32; color: white; }
-.btn-approve:hover { background-color: #1b5e20; }
-.btn-request { background-color: #f1f3f5; color: #333; border: 1px solid #ddd; }
-.btn-request:hover { background-color: #e9ecef; }
+    .big-number {
+        font-size: 1.9rem;
+    }
 
-.custom-modal-backdrop {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex; align-items: center; justify-content: center; z-index: 9999;
-}
-.custom-modal-box {
-    background: white; padding: 40px; border-radius: 16px;
-    text-align: center; max-width: 420px; width: 90%;
-    animation: popIn 0.3s ease-out;
-}
-@keyframes popIn {
-    0% { transform: scale(0.9); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
+    .button-container {
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .arelia-btn {
+        width: 100%;
+        min-width: auto;
+        font-size: 0.98rem;
+        padding: 14px 20px;
+        margin: 0;
+    }
+
+    .comment-box-container {
+        padding: 16px;
+    }
+
+    .custom-modal-box {
+        padding: 36px 24px;
+    }
 }

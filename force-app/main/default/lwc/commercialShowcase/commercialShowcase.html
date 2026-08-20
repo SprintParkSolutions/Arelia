@@ -1,11 +1,15 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 04-02-2026
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
 <template>
   <section class="rs-root" aria-labelledby="rs-title">
     <div class="wrap">
-      <h2 id="rs-title" class="rs-hero">Commercial <span>Portfolio</span></h2>
-      <p class="rs-lead">
-        Explore commercial spaces — click any card to open a focused gallery and see our commercial
-        deliveries.
-      </p>
+      <h2 id="rs-title" class="rs-hero">Commercial Design Showcase & <span>Portfolio</span></h2>
+      <p class="rs-lead">Every workspace has a purpose. Browse through our commercial spaces and find the design that drives yours forward.</p>
 
       <div class="rs-grid">
         <template for:each={rooms} for:item="room">
@@ -25,6 +29,7 @@
 
               <div class="rs-actions">
                 <button class="rs-btn" data-key={room.key} onclick={openRoom}>Open Gallery</button>
+                <!-- Explore Moodboard removed -->
               </div>
             </div>
           </article>
@@ -43,26 +48,24 @@
             <p class="rs-modal-sub">{activeRoom.tagline}</p>
           </header>
 
+          <!-- modal body: carousel + thumbnails + side panel -->
           <div class="rs-modal-body">
             <!-- Carousel + thumbnail strip -->
             <div class="carousel">
-              <button class="car-nav car-prev" onclick={prevImage} aria-label="Previous image">
-                &#10094;
-              </button>
+              <button class="car-nav car-prev" onclick={prevImage} aria-label="Previous image">&#10094;</button>
 
               <div class="car-stage" part="car-stage">
                 <img src={currentImage} alt={currentCaption} class="car-img" />
                 <p class="car-caption">{currentCaption}</p>
               </div>
 
-              <button class="car-nav car-next" onclick={nextImage} aria-label="Next image">
-                &#10095;
-              </button>
+              <button class="car-nav car-next" onclick={nextImage} aria-label="Next image">&#10095;</button>
 
-              <!-- Thumbnail strip -->
+              <!-- Thumbnail strip: shows all images for the active room -->
               <div class="thumb-strip" role="list" aria-label="Image thumbnails">
                 <template if:true={activeRoom}>
                   <template for:each={activeRoom.images} for:item="imgSrc" for:index="idx">
+                    <!-- key must be stable — use image src (imgSrc) instead of idx -->
                     <button key={imgSrc} class="thumb-btn" data-idx={idx} onclick={handleThumbClick} role="listitem"
                       aria-label="View image">
                       <img src={imgSrc} alt="Thumbnail" />
@@ -82,9 +85,8 @@
               </ul>
 
               <div class="modal-actions">
-                <button class="rs-primary" data-key={activeRoom.key} onclick={handleModalAction}>
-                  Book Consultation
-                </button>
+                <button class="rs-primary" data-key={activeRoom.key} onclick={handleModalAction}>Book
+                  Consultation</button>
               </div>
             </aside>
           </div>
@@ -92,9 +94,4 @@
       </div>
     </template>
   </section>
-
-  <!-- Registration Popup -->
-  <template if:true={showRegistrationPopup}>
-    <c-registration-popup-form onclosepopup={handleClosePopup}></c-registration-popup-form>
-  </template>
 </template>
