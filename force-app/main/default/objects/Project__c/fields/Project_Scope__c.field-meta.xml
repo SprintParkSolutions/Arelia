@@ -65,6 +65,36 @@
                 <default>false</default>
                 <label>Cabins</label>
             </value>
+            <value>
+                <fullName>1RK</fullName>
+                <default>false</default>
+                <label>1RK</label>
+            </value>
+            <value>
+                <fullName>1BHK</fullName>
+                <default>false</default>
+                <label>1BHK</label>
+            </value>
+            <value>
+                <fullName>2BHK</fullName>
+                <default>false</default>
+                <label>2BHK</label>
+            </value>
+            <value>
+                <fullName>3BHK</fullName>
+                <default>false</default>
+                <label>3BHK</label>
+            </value>
+            <value>
+                <fullName>4BHK</fullName>
+                <default>false</default>
+                <label>4BHK</label>
+            </value>
+            <value>
+                <fullName>5BHK</fullName>
+                <default>false</default>
+                <label>5BHK</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

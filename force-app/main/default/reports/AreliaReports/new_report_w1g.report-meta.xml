@@ -61,6 +61,15 @@
         <label>Verification Status</label>
         <scale>2</scale>
     </customDetailFormulas>
+    <filter>
+        <criteriaItems>
+            <column>FK_CUST_RECORDTYPE</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>Project__c.Arelia</value>
+        </criteriaItems>
+    </filter>
     <format>Summary</format>
     <groupingsDown>
         <dateGranularity>Day</dateGranularity>

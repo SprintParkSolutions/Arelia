@@ -1,0 +1,705 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Arelia</fullName>
+    <active>true</active>
+    <businessProcess>Arelia</businessProcess>
+    <description>It is related to all arelia opportunities.</description>
+    <label>Arelia</label>
+    <picklistValues>
+        <picklist>Appointment_Confirmation_Type__c</picklist>
+        <values>
+            <fullName>Follow-up</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>New</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Appointment_Status__c</picklist>
+        <values>
+            <fullName>Approved</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pending</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Re-Visit</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Rescheduled</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Appointment_Time_Slots__c</picklist>
+        <values>
+            <fullName>10AM-11AM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>11AM-12PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>12PM-1PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1PM-2PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>2PM-3PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>3PM-4PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>4PM-5PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>5PM-6PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>9AM-10AM</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Budget_Review_Status__c</picklist>
+        <values>
+            <fullName>Client Approved</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Client Requested Changes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Manager Approved</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Manager Requested Changes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Not Sent</fullName>
+            <default>true</default>
+        </values>
+        <values>
+            <fullName>Sent for Client Approval</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>DeliveryInstallationStatus__c</picklist>
+        <values>
+            <fullName>Completed</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>In progress</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yet to begin</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>ForecastCategoryName</picklist>
+        <values>
+            <fullName>Best Case</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Closed</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Commit</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Omitted</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pipeline</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>LeadSource</picklist>
+        <values>
+            <fullName>Advertisement</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Customer Event</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Employee Referral</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>External Referral</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Google AdWords</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Partner</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Purchased List</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Trade Show</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Webinar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Website</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Loss_Reason__c</picklist>
+        <values>
+            <fullName>Lost to Competitor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No Budget %2F Lost Funding</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No Decision %2F Non-Responsive</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Price</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Payment_Terms_Status__c</picklist>
+        <values>
+            <fullName>Client Approved</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Client Requested Changes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Manager Approved</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Manager Requested Changes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Not Sent</fullName>
+            <default>true</default>
+        </values>
+        <values>
+            <fullName>Sent for Client Approval</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sent for Manager Approval</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Plan_Level__c</picklist>
+        <values>
+            <fullName>Luxury</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Premium</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Standard</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Project_Estimated_Completion_Months__c</picklist>
+        <values>
+            <fullName>1 Month</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 1 Month</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 2 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 3 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 4 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 5 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 6 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>10 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>11 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>12 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>2 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>3 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>4 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>5 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>6 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>7 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>8 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>9 Months</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Project_Request_Quotation_Type__c</picklist>
+        <values>
+            <fullName>Automation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Manual</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Project_Scope__c</picklist>
+        <values>
+            <fullName>1BHK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1RK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>2BHK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>3BHK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>4BHK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>5BHK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bed Room</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cabins</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Conference Hall</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Dining Hall</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Full Home Interiors</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fully Office Interiors</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hall Interior</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Home Decor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Kitchen</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Office Decor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Office Space</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>ReVisit_Site_Estimated_Completion_Months__c</picklist>
+        <values>
+            <fullName>1 Month</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 1 Month</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 2 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 3 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 4 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 5 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 6 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>10 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>11 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>12 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>2 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>3 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>4 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>5 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>6 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>7 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>8 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>9 Months</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Re_Visit_Appointm_Rescheduled_Time_Slots__c</picklist>
+        <values>
+            <fullName>10AM-11AM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>11AM-12PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>12PM-1PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1PM-2PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>2PM-3PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>3PM-4PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>4PM-5PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>5PM-6PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>9AM-10AM</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Re_Visit_Appointment_Time_Slots__c</picklist>
+        <values>
+            <fullName>10AM-11AM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>11AM-12PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>12PM-1PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1PM-2PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>2PM-3PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>3PM-4PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>4PM-5PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>5PM-6PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>9AM-10AM</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Re_Visit_Site_Appointment_Status__c</picklist>
+        <values>
+            <fullName>Approved</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pending</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Rescheduled</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Re_Visit_Site_Appointment_Type__c</picklist>
+        <values>
+            <fullName>Re Visit Follow up</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Re-Budget</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Re-Design</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Re_Visit_Site_Status__c</picklist>
+        <values>
+            <fullName>Approved</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Negotiable</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pending</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Rejected</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Rescheduled_Time_Slots__c</picklist>
+        <values>
+            <fullName>10AM-11AM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>11AM-12PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>12PM-1PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1PM-2PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>2PM-3PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>3PM-4PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>4PM-5PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>5PM-6PM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>9AM-10AM</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Site_Visit_Status__c</picklist>
+        <values>
+            <fullName>Approved</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Negotiable</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pending</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Rejected</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Type</picklist>
+        <values>
+            <fullName>Existing Business</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>New Business</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Type_of_Project__c</picklist>
+        <values>
+            <fullName>Home</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Interior Combo Package</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Office</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Only Project Plan</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>
