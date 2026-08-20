@@ -12,7 +12,6 @@
   .footer { margin-top: 30px; color: #999; font-size: 10px; }
 </style>
 </head>
-
 <body>
   <apex:outputPanel rendered="{!hasReceipt}">
     <div class="brand">ARELIA</div>

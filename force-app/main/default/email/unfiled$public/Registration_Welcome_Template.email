@@ -2,7 +2,7 @@
  <head>
   <title></title>
  </head>
- <body aria-readonly="false" style="height:auto;
+ <body style="height:auto;
 			 min-height:auto;
 			 margin:0;
 			 padding:0;
@@ -148,7 +148,7 @@
 										  font-family:Times New Roman,Times,serif;
 										  color:#D6B36A;
 										  font-weight:bold;
-										  text-align:center;">Arelia</p> <p style="margin:0 0 18px 0;
+										  text-align:center;">AreliaSpace</p> <p style="margin:0 0 20px 0;
 										  font-size:11px;
 										  line-height:1.5;
 										  font-family:Arial,Helvetica,sans-serif;
@@ -160,7 +160,29 @@
            <tbody>
             <tr>
              <td align="center" style="border-top:1px solid #6E5427;
-													   padding-top:16px;
+													   padding:18px 10px 0 10px;
+													   text-align:center;"><p style="margin:0 0 8px 0;
+														  font-size:13px;
+														  line-height:1.7;
+														  font-family:Arial,Helvetica,sans-serif;
+														  color:#D3C6B5;
+														  text-align:center;">At AreliaSpace, we craft timeless interiors that reflect your personality and elevate the way you live.</p> <p style="margin:0 0 18px 0;
+														  font-size:15px;
+														  line-height:1.5;
+														  font-family:Times New Roman,Times,serif;
+														  font-style:italic;
+														  color:#D6B36A;
+														  text-align:center;">Designing Spaces. Creating Experiences.</p></td>
+            </tr>
+           </tbody>
+          </table>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;" width="100%">
+           <tbody>
+            <tr>
+             <td align="center" style="border-top:1px solid #3f3527;
+													   border-bottom:1px solid #3f3527;
+													   padding:15px 10px;
 													   text-align:center;"><p style="margin:0 0 5px 0;
 														  font-size:11px;
 														  line-height:1.6;
@@ -174,7 +196,17 @@
 														  text-align:center;">© 2026 Arelia. All rights reserved.</p></td>
             </tr>
            </tbody>
-          </table></td>
+          </table> <p style="margin:16px 0 5px 0;
+										  font-size:11px;
+										  line-height:1.6;
+										  font-family:Arial,Helvetica,sans-serif;
+										  color:#8F887F;
+										  text-align:center;">This email was sent because you recently registered with AreliaSpace.</p> <p style="margin:0;
+										  font-size:11px;
+										  line-height:1.6;
+										  font-family:Arial,Helvetica,sans-serif;
+										  color:#8F887F;
+										  text-align:center;">© 2026 AreliaSpace. All rights reserved.</p></td>
         </tr>
        </tbody>
       </table></td>
