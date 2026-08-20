@@ -14,6 +14,8 @@ public without sharing class AppointmentControllerToOpp {
     // ---- Lead reschedule pair (matches your org)
     private static final String LEAD_RESCHED_DATE_FIELD = 'Appointment_Rescheduled_Time__c';
     private static final String LEAD_RESCHED_SLOT_FIELD = 'Time_Slots__c';
+    private static final String ERROR_UNSUPPORTED_RECORD_TYPE =
+        'Appointment response is supported only for Arelia opportunities.';
 
     // Customer templates (Label contains DeveloperName)
     private static final String CUST_TPL_APPROVED   = Label.Arelia_Living_Customer_Opportunity_Appointment_Approved_Email;
@@ -89,13 +91,16 @@ public without sharing class AppointmentControllerToOpp {
             throw new AuraHandledException('Status is required.');
         }
 
+        Id areliaOpportunityRecordTypeId = getAreliaOpportunityRecordTypeId();
         Opportunity opp = [SELECT Id, Name, Re_Visit_Site_Appointment_Status__c, Primary_Contact__c,
                    Primary_Contact__r.Name, Primary_Contact__r.Phone, Primary_Contact__r.Email,
                    Re_Visit_Appointment_Date__c, Re_Visit_Appointment_Time_Slots__c,
                    Re_Visit_Appointment_Rescheduled_Date__c, Re_Visit_Appointm_Rescheduled_Time_Slots__c,
                    Supervisor_User__c, Supervisor_User__r.Name, Supervisor_User__r.FirstName, Supervisor_User__r.LastName,
                    Supervisor_User__r.Phone, Supervisor_User__r.Email FROM Opportunity
-            WHERE Id = :opportunityId LIMIT 1];
+            WHERE Id = :opportunityId
+            AND RecordTypeId = :areliaOpportunityRecordTypeId
+            LIMIT 1];
 
         // Allow responses only while still Pending or Rescheduled
         String existing = opp.Re_Visit_Site_Appointment_Status__c;
@@ -143,8 +148,11 @@ public without sharing class AppointmentControllerToOpp {
             throw new AuraHandledException('Opportunity ID is missing.');
         }
 
+        Id areliaOpportunityRecordTypeId = getAreliaOpportunityRecordTypeId();
         Opportunity currentOpp = [SELECT Id, Supervisor_User__c FROM Opportunity
-                                WHERE Id = :currentOpportunityId LIMIT 1];
+                                WHERE Id = :currentOpportunityId
+                                AND RecordTypeId = :areliaOpportunityRecordTypeId
+                                LIMIT 1];
 
         List<String> allSlots = getPicklistValues(Opportunity.Re_Visit_Appointm_Rescheduled_Time_Slots__c);
         if (allSlots.isEmpty()) {return allSlots;}
@@ -176,9 +184,11 @@ public without sharing class AppointmentControllerToOpp {
 
     private static Set<String> collectTakenSlots(Id supervisorId, Date forDate, Id excludeOpportunityId) {
         Set<String> taken = new Set<String>();
+        Id areliaOpportunityRecordTypeId = getAreliaOpportunityRecordTypeId();
 
         for (AggregateResult ar : [SELECT Re_Visit_Appointm_Rescheduled_Time_Slots__c slot FROM Opportunity
             WHERE Supervisor_User__c = :supervisorId
+              AND RecordTypeId = :areliaOpportunityRecordTypeId
               AND Re_Visit_Site_Appointment_Status__c IN ('Pending','Approved','Rescheduled')
               AND Re_Visit_Appointment_Rescheduled_Date__c = :forDate
               AND Re_Visit_Appointm_Rescheduled_Time_Slots__c != null
@@ -189,6 +199,7 @@ public without sharing class AppointmentControllerToOpp {
 
         for (AggregateResult ar2 : [SELECT Re_Visit_Appointment_Time_Slots__c slot FROM Opportunity
             WHERE Supervisor_User__c = :supervisorId
+              AND RecordTypeId = :areliaOpportunityRecordTypeId
               AND Re_Visit_Site_Appointment_Status__c IN ('Pending','Approved','Rescheduled')
               AND Re_Visit_Appointment_Date__c = :forDate AND Re_Visit_Appointment_Time_Slots__c != null
               AND Id != :excludeOpportunityId GROUP BY Re_Visit_Appointment_Time_Slots__c])
@@ -253,7 +264,6 @@ public without sharing class AppointmentControllerToOpp {
         }
 
         Map<String, String> tokens = buildTokens(opp);
-        Id owd = getDefaultOrgWideEmailAddressId();
 
         // 1) Supervisor email
         if (opp.Supervisor_User__c != null && opp.Supervisor_User__r != null && !String.isBlank(opp.Supervisor_User__r.Email)) {
@@ -264,7 +274,7 @@ public without sharing class AppointmentControllerToOpp {
                 supMsg.setHtmlBody(applyTokens(supTpl.HtmlValue, tokens));
                 supMsg.setTargetObjectId(opp.Supervisor_User__c);
                 supMsg.setTreatTargetObjectAsRecipient(true);
-                if (owd != null) {supMsg.setOrgWideEmailAddressId(owd);}
+                AreliaUtility.setOrgWideEmailAddress(supMsg, System.Label.Arelia_OWD);
                 supMsg.setSaveAsActivity(false);
                 Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ supMsg });
             }
@@ -278,17 +288,19 @@ public without sharing class AppointmentControllerToOpp {
                 custMsg.setSubject(applyTokens(custTpl.Subject, tokens));
                 custMsg.setHtmlBody(applyTokens(custTpl.HtmlValue, tokens));
                 custMsg.setToAddresses(new List<String>{ opp.Primary_Contact__r.Email });
-                if (owd != null) {custMsg.setOrgWideEmailAddressId(owd);}
+                AreliaUtility.setOrgWideEmailAddress(custMsg, System.Label.Arelia_OWD);
                 custMsg.setSaveAsActivity(false);
                 Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ custMsg });
             }
         }
     }
 
-    /** Fetch Org-Wide Email Address by label from Custom Label Arelia_OWD. */
-    private static Id getDefaultOrgWideEmailAddressId() {
-        List<OrgWideEmailAddress> oweaList = [SELECT Id FROM OrgWideEmailAddress
-            WHERE Address = :Label.Arelia_OWD AND IsAllowAllProfiles = true LIMIT 1];
-        return oweaList.isEmpty() ? null : oweaList[0].Id;
+    private static Id getAreliaOpportunityRecordTypeId() {
+        Id areliaOpportunityRecordTypeId = AreliaUtility.getAreliaOpportunityRecordTypeId();
+        if (areliaOpportunityRecordTypeId == null) {
+            throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+        }
+
+        return areliaOpportunityRecordTypeId;
     }
 }

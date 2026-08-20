@@ -6,7 +6,13 @@ import getAppointmentTypesPicklistValues from '@salesforce/apex/ScheduleAppointm
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { CloseActionScreenEvent } from 'lightning/actions';
 
-const FIELDS = ['Lead.Id', 'Lead.Supervisor_User__c'];
+// ✅ Added appointment fields to verify if data already exists
+const FIELDS = [
+    'Lead.Id', 
+    'Lead.Supervisor_User__c', 
+    'Lead.Appointment_Date__c', 
+    'Lead.Appointment_Status__c'
+];
 
 export default class ScheduleAppointment extends LightningElement {
     @api recordId; // Lead Id from page
@@ -14,10 +20,14 @@ export default class ScheduleAppointment extends LightningElement {
     supervisorId;
     appointmentDate;
     appointmentTime;
+    
+    // Track if Lead has prior appointment data saved
+    hasPreviousAppointment = false;
+    allAppointmentTypes = [];
+
     @track timeSlotOptions = [];
     @track selectedTimeSlot = '';
 
-    // ✅ NEW: Appointment Type
     @track appointmentTypeOptions = [];
     @track selectedAppointmentType = '';
 
@@ -26,6 +36,19 @@ export default class ScheduleAppointment extends LightningElement {
         if (data) {
             this.leadId = data.fields.Id.value;
             this.supervisorId = data.fields.Supervisor_User__c?.value;
+            
+            // ✅ Check if there is already appointment data populated on the record
+            const hasDate = !!data.fields.Appointment_Date__c?.value;
+            const statusValue = data.fields.Appointment_Status__c?.value;
+            
+            // Treat as a previous appointment ONLY if a date exists OR the status is something other than 'Pending'
+            const hasValidStatus = statusValue && statusValue.toLowerCase() !== 'pending';
+            
+            this.hasPreviousAppointment = hasDate || hasValidStatus;
+
+            // Attempt to filter types now that we have lead data
+            this.filterAppointmentTypes();
+
             // If user picked a date before record wire resolved, load slots now
             if (this.appointmentDate) {
                 this.loadAvailableSlots();
@@ -39,12 +62,38 @@ export default class ScheduleAppointment extends LightningElement {
         // Load appointment types once
         getAppointmentTypesPicklistValues()
             .then(list => {
-                this.appointmentTypeOptions = (list || []).map(v => ({ label: v, value: v }));
+                this.allAppointmentTypes = (list || []).map(v => ({ label: v, value: v }));
+                this.filterAppointmentTypes();
             })
             .catch(err => {
                 const msg = err?.body?.message || 'Failed to load appointment types.';
                 this.showToast('Error', msg, 'error');
             });
+    }
+
+    // Filters the dropdown based on first-time or follow-up status
+    filterAppointmentTypes() {
+        // Ensure both picklist values and lead data are loaded
+        if (!this.allAppointmentTypes.length || !this.leadId) {
+            return;
+        }
+
+        if (this.hasPreviousAppointment) {
+            // Data exists -> Second time onwards -> Only show Follow Up
+            this.appointmentTypeOptions = this.allAppointmentTypes.filter(opt => 
+                opt.value.toLowerCase().includes('follow')
+            );
+        } else {
+            // Data is null/empty (or just 'Pending') -> First time -> Only show New
+            this.appointmentTypeOptions = this.allAppointmentTypes.filter(opt => 
+                opt.value.toLowerCase() === 'new'
+            );
+        }
+
+        // Auto-select the only available option to save the user a click
+        if (this.appointmentTypeOptions.length === 1) {
+            this.selectedAppointmentType = this.appointmentTypeOptions[0].value;
+        }
     }
 
     handleDateChange(event) {
@@ -53,7 +102,6 @@ export default class ScheduleAppointment extends LightningElement {
         this.loadAvailableSlots();
     }
 
-    // Optional: time input if you keep it
     handleTimeChange(event) {
         this.appointmentTime = event.target.value;
     }
@@ -62,11 +110,9 @@ export default class ScheduleAppointment extends LightningElement {
         this.selectedTimeSlot = event.detail.value;
     }
 
-    // ✅ NEW
     handleAppointmentTypeChange(event) {
         this.selectedAppointmentType = event.detail.value;
     }
-
 
     get todayDate() {
         const today = new Date();
@@ -94,8 +140,8 @@ export default class ScheduleAppointment extends LightningElement {
     }
 
     handleSchedule() {
-        if (!this.appointmentDate || !this.selectedTimeSlot) {
-            this.showToast('Missing Input', 'Please select both date and time slot.', 'warning');
+        if (!this.appointmentDate || !this.selectedTimeSlot || !this.selectedAppointmentType) {
+            this.showToast('Missing Input', 'Please select appointment type, date, and time slot.', 'warning');
             return;
         }
 
@@ -104,7 +150,7 @@ export default class ScheduleAppointment extends LightningElement {
             return;
         }
 
-        // ✅ Validate the selected slot is not in the past for today
+        // Validate the selected slot is not in the past for today
         if (this.appointmentDate === this.todayDate) {
             const now = new Date();
             const startTimeRaw = this.selectedTimeSlot.split('-')[0].trim(); // e.g., "9 AM" or "9:30 AM"
@@ -136,7 +182,7 @@ export default class ScheduleAppointment extends LightningElement {
             supervisorId: this.supervisorId,
             appointmentDate: this.appointmentDate,
             timeSlot: this.selectedTimeSlot,
-            appointmentType: this.selectedAppointmentType // ✅ pass to Apex
+            appointmentType: this.selectedAppointmentType 
         })
             .then(() => {
                 this.showToast('Success', 'Appointment scheduled successfully.', 'success');
@@ -151,6 +197,7 @@ export default class ScheduleAppointment extends LightningElement {
     showToast(title, message, variant) {
         this.dispatchEvent(new ShowToastEvent({ title, message, variant }));
     }
+    
     closeQuickAction() {
         this.dispatchEvent(new CloseActionScreenEvent());
     }

@@ -3,12 +3,18 @@ public with sharing class SiteVisitReportFileService {
     public static void attachFilesToLead(Id siteVisitReportId) {
 
         // Step 1: Fetch Site Visit Report with RecordType
-        Site_Visit_Report__c siteVisitReportObj = [
-            SELECT Id, Lead__c, Opportunity__c, RecordType.DeveloperName
-            FROM Site_Visit_Report__c
-            WHERE Id = :siteVisitReportId
-            LIMIT 1
-        ];
+       List<Site_Visit_Report__c> reports = [
+    SELECT Id, Lead__c, Opportunity__c, RecordType.DeveloperName
+    FROM Site_Visit_Report__c
+    WHERE Id = :siteVisitReportId
+    LIMIT 1
+];
+
+if (reports.isEmpty()) {
+    return; // 🔥 DO NOT THROW ERROR
+}
+
+Site_Visit_Report__c siteVisitReportObj = reports[0];
 
         if (siteVisitReportObj == null) {
             throw new AuraHandledException('No Site Visit Report found for the given Id.');

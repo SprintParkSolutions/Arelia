@@ -155,6 +155,7 @@ if (managerApprovedNow || negotiatedNow || negotiationReasonChanged) {
 
         // Build email messages in memory (bulk).
         List<Messaging.SingleEmailMessage> emailsToSend = new List<Messaging.SingleEmailMessage>();
+        Id orgWideEmailAddressId = getOrgWideEmailAddressId();
 
         for (Site_Visit_Report__c report : fullReports) {
             if (report == null) {
@@ -225,6 +226,9 @@ if (managerApprovedNow || negotiatedNow || negotiationReasonChanged) {
             email.setSubject(subject);
             email.setHtmlBody(htmlBody);
             email.setSaveAsActivity(false);
+            if (orgWideEmailAddressId != null) {
+                email.setOrgWideEmailAddressId(orgWideEmailAddressId);
+            }
 
             emailsToSend.add(email);
         }
@@ -247,6 +251,27 @@ if (managerApprovedNow || negotiatedNow || negotiationReasonChanged) {
      */
     private static String safeString(Object val) {
         return (val == null) ? '' : String.valueOf(val);
+    }
+
+    /**
+     * @description
+     * Queries the Arelia org-wide email address configured in the Arelia_OWD label.
+     *
+     * @return Matching OrgWideEmailAddress Id, or null when the label/address is not configured.
+     */
+    private static Id getOrgWideEmailAddressId() {
+        if (String.isBlank(System.Label.Arelia_OWD)) {
+            return null;
+        }
+
+        List<OrgWideEmailAddress> orgWideEmailAddresses = [
+            SELECT Id
+            FROM OrgWideEmailAddress
+            WHERE Address = :System.Label.Arelia_OWD
+            LIMIT 1
+        ];
+
+        return orgWideEmailAddresses.isEmpty() ? null : orgWideEmailAddresses[0].Id;
     }
 
     /**

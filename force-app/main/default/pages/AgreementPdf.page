@@ -1,0 +1,72 @@
+<apex:page controller="AgreementPdfController"
+    renderAs="pdf"
+    showHeader="false"
+    sidebar="false"
+    standardStylesheets="false"
+    cache="false">
+
+    <apex:stylesheet value=""/>
+
+    <div style="font-family: 'Arial Unicode MS' Arial, Helvetica, sans-serif; font-size: 12px; color: #222222;">
+
+        <h1>Signed Client Agreement</h1>
+
+        <p>
+            <b>Agreement Id:</b>
+            <apex:outputText value="{!agreement.Id}"/>
+        </p>
+
+        <p>
+            <b>Agreement Name:</b>
+            <apex:outputText value="{!agreement.Name}"/>
+        </p>
+
+        <p>
+            <b>Status:</b>
+            <apex:outputText value="{!agreement.Status__c}"/>
+        </p>
+
+        <p>
+            <b>Opportunity:</b>
+            <apex:outputText value="{!opp.Name}"/>
+        </p>
+
+        <p>
+            <b>Client Email:</b>
+            <apex:outputText value="{!opp.Email__c}"/>
+        </p>
+
+        <p>
+            <b>Supervisor Email:</b>
+            <apex:outputText value="{!opp.Supervisor_User_Email__c}"/>
+        </p>
+
+        <p>
+            <b>Signed Date:</b>
+            <apex:outputText value="{!signedDateText}"/>
+        </p>
+
+        <hr/>
+
+        <h2>Agreement Body</h2>
+
+        <div style="border:1px solid #cccccc; padding:10px; white-space: pre-line;">
+            <apex:outputText value="{!agreementPlainText}" escape="true"/>
+        </div>
+
+        <hr/>
+
+        <h2>Signature</h2>
+
+        <p>
+            Signature captured electronically for client:
+            <apex:outputText value="{!opp.Email__c}"/>
+        </p>
+
+        <p>
+            Signed Date:
+            <apex:outputText value="{!signedDateText}"/>
+        </p>
+
+    </div>
+</apex:page>

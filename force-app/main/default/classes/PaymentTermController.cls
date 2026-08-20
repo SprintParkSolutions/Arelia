@@ -1,5 +1,7 @@
 @SuppressWarnings('PMD.ApexCRUDViolation')
 public without sharing class PaymentTermController {
+    private static final String ERROR_UNSUPPORTED_RECORD_TYPE =
+        'Payment terms are supported only for Arelia opportunities.';
 
     // --- WRAPPERS ---
     public class DecisionInput {
@@ -82,12 +84,14 @@ public without sharing class PaymentTermController {
     // =========================================================================
 
     private static void executeSaveLogic(List<Payment_Term__c> terms, Id recordId, List<Id> termsToDelete) {
+        String sObjName = recordId.getSObjectType().getDescribe().getName();
+        validateAreliaOpportunity(recordId, sObjName);
+
         if (termsToDelete != null && !termsToDelete.isEmpty()) {
             delete [SELECT Id FROM Payment_Term__c WHERE Id IN :termsToDelete];
         }
         if (terms == null || terms.isEmpty()) { return; }
         
-        String sObjName = recordId.getSObjectType().getDescribe().getName();
         for (Payment_Term__c term : terms) {
             if (sObjName == 'Opportunity') { term.Opportunity__c = recordId; } 
             else if (sObjName == 'Project__c') { term.Project__c = recordId; }
@@ -145,9 +149,22 @@ public without sharing class PaymentTermController {
     
     private static SObject fetchParentRecord(Id recordId, String sObjName) {
         if (sObjName == 'Opportunity') {
-            return [SELECT Id, Name, Payment_Terms_Status__c, 
-                    Payment_Term_Manager_Remarks__c, Payment_Term_Client_Remarks__c 
-                    FROM Opportunity WHERE Id = :recordId LIMIT 1];
+            Id areliaOpportunityRecordTypeId = getAreliaOpportunityRecordTypeId();
+
+            // Keep the Arelia Record Type requirement in SOQL so unsupported Opportunities do not proceed.
+            List<Opportunity> opportunities = [
+                SELECT Id, Name, Payment_Terms_Status__c,
+                    Payment_Term_Manager_Remarks__c, Payment_Term_Client_Remarks__c
+                FROM Opportunity
+                WHERE Id = :recordId
+                AND RecordTypeId = :areliaOpportunityRecordTypeId
+                LIMIT 1
+            ];
+            if (opportunities.isEmpty()) {
+                throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+            }
+
+            return opportunities[0];
         } 
         if (sObjName == 'Project__c') {
             return Database.query('SELECT Id, Name FROM Project__c WHERE Id = :recordId LIMIT 1');
@@ -177,12 +194,29 @@ public without sharing class PaymentTermController {
         return new ParentInfo();
     }
 
+    @TestVisible
+    private static ParentInfo getParentInfoForTest(Id recordId) {
+        return getParentInfo(recordId);
+    }
+
     private static ParentInfo getOpportunityInfo(Id recordId) {
         ParentInfo info = new ParentInfo();
-        Opportunity opp = [SELECT Name, Primary_Contact__r.Name, Primary_Contact__r.Phone, Primary_Contact__r.Email, 
-                           Supervisor_User__r.FirstName, Supervisor_User__r.LastName, Supervisor_User__r.Email,
-                           Payment_Terms_Status__c, Payment_Term_Manager_Remarks__c, Payment_Term_Client_Remarks__c, Supervisor_Name__c
-                           FROM Opportunity WHERE Id = :recordId LIMIT 1];
+        Id areliaOpportunityRecordTypeId = getAreliaOpportunityRecordTypeId();
+        List<Opportunity> opportunities = [
+            SELECT Name, Primary_Contact__r.Name, Primary_Contact__r.Phone, Primary_Contact__r.Email,
+                Supervisor_User__r.FirstName, Supervisor_User__r.LastName, Supervisor_User__r.Email,
+                Payment_Terms_Status__c, Payment_Term_Manager_Remarks__c,
+                Payment_Term_Client_Remarks__c, Supervisor_Name__c
+            FROM Opportunity
+            WHERE Id = :recordId
+            AND RecordTypeId = :areliaOpportunityRecordTypeId
+            LIMIT 1
+        ];
+        if (opportunities.isEmpty()) {
+            throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+        }
+
+        Opportunity opp = opportunities[0];
         info.name = opp.Name;
         info.status = opp.Payment_Terms_Status__c;
         info.managerRemarks = opp.Payment_Term_Manager_Remarks__c;
@@ -245,7 +279,7 @@ public without sharing class PaymentTermController {
         }
 
         EmailRequest req = new EmailRequest();
-        req.toList = safeSplit(Label.Arelia_Living_Enrollment_Members);
+        req.toList = safeSplit(Label.Arelia_Living_Management_Members);
         req.templateName = tpl;
         req.recordId = recordId;
         req.info = getParentInfo(recordId);
@@ -309,7 +343,7 @@ public without sharing class PaymentTermController {
         
         EmailRequest req = new EmailRequest();
         req.toList = new List<String>{info.supervisorEmail};
-        req.ccList = safeSplit(Label.Arelia_Living_Enrollment_Members);
+        req.ccList = safeSplit(Label.Arelia_Living_Management_Members);
         req.templateName = Label.Payment_Term_Template_Notify;
         req.recordId = recordId;
         req.info = info;
@@ -325,7 +359,6 @@ public without sharing class PaymentTermController {
 
         try {
             EmailTemplate et = [SELECT Id, Subject, HtmlValue FROM EmailTemplate WHERE DeveloperName = :req.templateName LIMIT 1];
-            OrgWideEmailAddress owea = fetchOWD();
 
             // FIX: Use explicit urlUserType instead of guessing from template name
             String urlType = String.isNotBlank(req.urlUserType) ? req.urlUserType : 'Manager';
@@ -334,7 +367,7 @@ public without sharing class PaymentTermController {
             Map<String, String> replacements = buildReplacements(req.info, url);
 
             Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-            if (owea != null) { mail.setOrgWideEmailAddressId(owea.Id); }
+            AreliaUtility.setOrgWideEmailAddress(mail, System.Label.Arelia_OWD);
             mail.setToAddresses(req.toList);
             if (req.ccList != null && !req.ccList.isEmpty()) { mail.setCcAddresses(req.ccList); }
             mail.setSubject(doReplace(et.Subject, replacements));
@@ -345,14 +378,6 @@ public without sharing class PaymentTermController {
         } catch (Exception e) {
             System.debug(LoggingLevel.ERROR, 'Email Failed: ' + e.getMessage());
         }
-    }
-
-    private static OrgWideEmailAddress fetchOWD() {
-        if (String.isNotBlank(Label.Arelia_OWD)) {
-            try { return [SELECT Id, Address FROM OrgWideEmailAddress WHERE Address = :Label.Arelia_OWD LIMIT 1]; } 
-            catch (Exception e) { return null; }
-        }
-        return null;
     }
 
     private static Map<String, String> buildReplacements(ParentInfo info, String url) {
@@ -385,5 +410,31 @@ public without sharing class PaymentTermController {
     
     public static String getBaseUrl() {
         return (Label.Arelia_Site_Label != null ? Label.Arelia_Site_Label : '') + (Label.Payment_Term_Page_Name != null ? Label.Payment_Term_Page_Name : '');
+    }
+
+    private static void validateAreliaOpportunity(Id recordId, String sObjName) {
+        if (sObjName != 'Opportunity') {
+            return;
+        }
+
+        Id areliaOpportunityRecordTypeId = getAreliaOpportunityRecordTypeId();
+
+        // Validate the parent Opportunity before saving child Payment Term records.
+        if (
+            [SELECT Id FROM Opportunity WHERE Id = :recordId
+                AND RecordTypeId = :areliaOpportunityRecordTypeId LIMIT 1]
+                .isEmpty()
+        ) {
+            throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+        }
+    }
+
+    private static Id getAreliaOpportunityRecordTypeId() {
+        Id areliaOpportunityRecordTypeId = AreliaUtility.getAreliaOpportunityRecordTypeId();
+        if (areliaOpportunityRecordTypeId == null) {
+            throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+        }
+
+        return areliaOpportunityRecordTypeId;
     }
 }

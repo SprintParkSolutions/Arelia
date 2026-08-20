@@ -1,4 +1,8 @@
 public without sharing class OpportunityQuotePDFController {
+    @TestVisible
+    private static Boolean forcePdfGenerationFailureForTest = false;
+    @TestVisible
+    private static Boolean forceAutomaticProjectTypeForTest = false;
 
     /* ===============================
        PROPERTIES USED BY VF
@@ -80,7 +84,7 @@ public String projectType {
                 : Opp.Type_of_Project__c;
         }
 
-        if (Opp.Project_Request_Quotation_Type__c == 'Automatic Quotation'
+        if ((Opp.Project_Request_Quotation_Type__c == 'Automatic Quotation' || forceAutomaticProjectTypeForTest)
             && Opp.Interior_Project_Type__r != null) {
             return Opp.Interior_Project_Type__r.Name;
         }
@@ -232,6 +236,9 @@ ci.Type_of_Project__c = opp.Type_of_Project__c;
 
         Blob pdfBlob;
 try {
+    if (forcePdfGenerationFailureForTest) {
+        throw new AuraHandledException('Forced PDF failure');
+    }
     pdfBlob = Test.isRunningTest()
         ? Blob.valueOf('TEST PDF')
         : pageRef.getContentAsPDF();
@@ -275,11 +282,15 @@ System.enqueueJob(
     /* ===============================
        ORG-WIDE EMAIL
     =============================== */
+    /**
+     * @description Returns the configured Arelia org-wide email address Id.
+     * @return OrgWideEmailAddress Id for System.Label.Arelia_OWD, or null when it is not configured.
+     */
     public static Id getOWD() {
         List<OrgWideEmailAddress> ow = [
             SELECT Id
             FROM OrgWideEmailAddress
-            WHERE IsAllowAllProfiles = true
+            WHERE Address = :System.Label.Arelia_OWD
             LIMIT 1
         ];
         return ow.isEmpty() ? null : ow[0].Id;

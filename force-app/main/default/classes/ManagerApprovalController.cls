@@ -6,6 +6,9 @@
 @SuppressWarnings('PMD.ApexCRUDViolation')
 public without sharing class ManagerApprovalController {
 
+    private static final String ARELIA_OPPORTUNITY_RECORD_TYPE_NAME = 'Arelia';
+    private static Id cachedAreliaOpportunityRecordTypeId;
+
     // --- Inner Classes ---
 
     private class ManagerNotificationData {
@@ -30,6 +33,7 @@ public without sharing class ManagerApprovalController {
             // REMOVED: Name (title) and Architecture_Budget__c
             Architecture_Design__c design = [
                 SELECT Id, Status__c, Manager_Approval__c, Manager_Comments__c, Related_File_Id__c,
+                       Opportunity__r.RecordTypeId,
                        Opportunity__r.Name, Opportunity__r.Lead_Name__c,
                        Project__r.Name, LastModifiedDate
                 FROM Architecture_Design__c
@@ -103,6 +107,7 @@ public without sharing class ManagerApprovalController {
     private static Architecture_Design__c fetchDesignForDecision(String recordId) {
         return [
             SELECT Id, Opportunity__c, Related_File_Id__c,
+                   Opportunity__r.RecordTypeId,
                    Opportunity__r.Name,
                    Opportunity__r.Project_Description__c,
                    Opportunity__r.Lead_Name__c, 
@@ -121,7 +126,7 @@ public without sharing class ManagerApprovalController {
 
     // Helper to separate Opportunity update logic
     private static void handleOpportunityUpdate(Architecture_Design__c design) {
-        if (design.Opportunity__c != null) {
+        if (design.Opportunity__c != null && isAreliaOpportunityRecordType(design)) {
             Opportunity oppToUpdate = new Opportunity(
                 Id = design.Opportunity__c, 
                 Architecture_Manager_Approval__c = true
@@ -133,6 +138,10 @@ public without sharing class ManagerApprovalController {
     // --- 3. Notification Logic ---
 
     private static void sendManagerResponseNotification(ManagerNotificationData data) {
+        if (!shouldProcessManagerDecision(data.design)) {
+            return;
+        }
+
         List<ContentVersion> cvList = fetchAttachments(data.design.Id);
 
         // 1. Send SUPERVISOR Email
@@ -268,6 +277,45 @@ public without sharing class ManagerApprovalController {
             OrgWideEmailAddress[] owd = [SELECT Id FROM OrgWideEmailAddress WHERE Address = :System.Label.Arelia_OWD LIMIT 1];
             if (!owd.isEmpty()) { mail.setOrgWideEmailAddressId(owd[0].Id); }
         } catch (Exception ex) { System.debug('OWD Error'); }
+    }
+
+    private static Boolean shouldProcessManagerDecision(Architecture_Design__c design) {
+        if (design == null) {
+            return false;
+        }
+
+        if (design.Opportunity__c == null) {
+            return true;
+        }
+
+        return isAreliaOpportunityRecordType(design);
+    }
+
+    private static Boolean isAreliaOpportunityRecordType(Architecture_Design__c design) {
+        if (design == null || design.Opportunity__r == null || design.Opportunity__r.RecordTypeId == null) {
+            return false;
+        }
+
+        Id areliaOpportunityRecordTypeId = getAreliaOpportunityRecordTypeId();
+        return areliaOpportunityRecordTypeId != null
+            && design.Opportunity__r.RecordTypeId == areliaOpportunityRecordTypeId;
+    }
+
+    private static Id getAreliaOpportunityRecordTypeId() {
+        if (cachedAreliaOpportunityRecordTypeId != null) {
+            return cachedAreliaOpportunityRecordTypeId;
+        }
+
+        Schema.RecordTypeInfo recordTypeInfo = Schema.SObjectType.Opportunity
+            .getRecordTypeInfosByName()
+            .get(ARELIA_OPPORTUNITY_RECORD_TYPE_NAME);
+
+        if (recordTypeInfo == null) {
+            return null;
+        }
+
+        cachedAreliaOpportunityRecordTypeId = recordTypeInfo.getRecordTypeId();
+        return cachedAreliaOpportunityRecordTypeId;
     }
 
     private static String resolveSupervisorName(Architecture_Design__c design) {

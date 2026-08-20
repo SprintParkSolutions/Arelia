@@ -12,17 +12,19 @@ import getTaskFiles from '@salesforce/apex/TaskBulkController.getTaskFiles';
 
 import OWNER_ID_FIELD from '@salesforce/schema/Vendor_Assignment__c.OwnerId';
 
-import { getObjectInfo, getPicklistValues } from 'lightning/uiObjectInfoApi';
-import TASK_OBJECT from '@salesforce/schema/Task';
-import STATUS_FIELD from '@salesforce/schema/Task.Status';
+// import { getObjectInfo, getPicklistValues } from 'lightning/uiObjectInfoApi';
+// import TASK_OBJECT from '@salesforce/schema/Task';
+// import STATUS_FIELD from '@salesforce/schema/Task.Status';
+
+import getTaskStatusOptions from '@salesforce/apex/TaskBulkController.getTaskStatusOptions';
 
 export default class VendorTaskCreator extends LightningElement {
     @track statusOptions = [];
 
-    get recordTypeId() {
-        return this.taskMetadata?.data?.defaultRecordTypeId || '012000000000000AAA';
-    }
-
+    // get recordTypeId() {
+    //     return this.taskMetadata?.data?.defaultRecordTypeId || '012000000000000AAA';
+    // }
+    
     // FIX 1: Reactive recordId to prevent "Blank Screen"
     _recordId;
     @api 
@@ -65,22 +67,37 @@ export default class VendorTaskCreator extends LightningElement {
 
     // ---------------- Dynamic Picklist ---------------- //
 
-    @wire(getObjectInfo, { objectApiName: TASK_OBJECT })
-    taskMetadata;
+    // @wire(getObjectInfo, { objectApiName: TASK_OBJECT })
+    // taskMetadata;
 
-    @wire(getPicklistValues, {
-        recordTypeId: '$recordTypeId',
-        fieldApiName: STATUS_FIELD
-    })
-    wiredStatusValues({ error, data }) {
-        if (data) {
-            this.statusOptions = data.values.map(item => ({
-                label: item.label,
-                value: item.value
-            }));
-        } else if (error) {
-            console.error('Error fetching Status picklist', error);
-        }
+    // @wire(getPicklistValues, {
+    //     recordTypeId: '$recordTypeId',
+    //     fieldApiName: STATUS_FIELD
+    // })
+    // wiredStatusValues({ error, data }) {
+    //     if (data) {
+    //         this.statusOptions = data.values.map(item => ({
+    //             label: item.label,
+    //             value: item.value
+    //         }));
+    //     } else if (error) {
+    //         console.error('Error fetching Status picklist', error);
+    //     }
+    // }
+
+    connectedCallback() {
+        this.loadStatusOptions();
+    }
+
+    loadStatusOptions() {
+        getTaskStatusOptions()
+            .then(result => {
+                this.statusOptions = result;
+            })
+            .catch(error => {
+                console.error('Error fetching Status picklist from Apex', error);
+                this.statusOptions = []; // fallback safe
+            });
     }
 
     // Initialize only when we have an ID
@@ -152,7 +169,7 @@ export default class VendorTaskCreator extends LightningElement {
         const tasksToInsert = this.taskList.map(row => ({
             sobjectType: 'Task',
             WhatId: this._recordId,
-            OwnerId: this.vendorOwnerId,
+            OwnerId: this.vendorOwnerId, // OwnerId: UserInfo.getUserId(),
             Subject: row.Subject,
             Status: row.Status,
             Start_Date__c: row.Start_Date__c,

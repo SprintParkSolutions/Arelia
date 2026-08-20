@@ -3,7 +3,6 @@
         <div class="header">
             <div class="hTitle">
                 <h1 class="title">Budget Review</h1>
-               
             </div>
         </div>
 
@@ -26,14 +25,6 @@
                     <div class="money">
                         <lightning-formatted-number value={customerBudget} format-style="currency" currency-code="INR"></lightning-formatted-number>
                     </div>
-                    <lightning-input 
-                        data-id="customerBudget" 
-                        type="text" 
-                        label="Edit Customer Budget"
-                        value={customerBudgetText} 
-                        onchange={onCustomerInput} 
-                        disabled={isReadOnly}>
-                    </lightning-input>
                 </div>
 
                 <div class="card">
@@ -79,8 +70,13 @@
                 <div class="secTop">
                     <div class="secTitle">Architecture Design</div>
                 </div>
-                <lightning-datatable key-field="id" data={architectureRows} columns={architectureColumns}
-                    draft-values={architectureDraftValues} hide-checkbox-column oncellchange={onArchChange}>
+                <lightning-datatable 
+                    key-field="id" 
+                    data={architectureRows} 
+                    columns={architectureColumns}
+                    draft-values={architectureDraftValues} 
+                    hide-checkbox-column="true"
+                    oncellchange={onArchChange}>
                 </lightning-datatable>
             </div>
 
@@ -88,8 +84,13 @@
                 <div class="secTop">
                     <div class="secTitle">Payment Terms</div>
                 </div>
-                <lightning-datatable key-field="id" data={paymentTermRows} columns={paymentTermColumns}
-                    draft-values={paymentTermDraftValues} hide-checkbox-column oncellchange={onTermChange}>
+                <lightning-datatable 
+                    key-field="id" 
+                    data={paymentTermRows} 
+                    columns={paymentTermColumns}
+                    draft-values={paymentTermDraftValues} 
+                    hide-checkbox-column="true"
+                    oncellchange={onTermChange}>
                 </lightning-datatable>
             </div>
 
