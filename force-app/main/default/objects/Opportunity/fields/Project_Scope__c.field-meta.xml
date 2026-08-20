@@ -4,6 +4,7 @@
     <label>Project Scope</label>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
     <type>Picklist</type>
     <valueSet>
         <restricted>true</restricted>
@@ -63,6 +64,36 @@
                 <fullName>Full Home Interiors</fullName>
                 <default>false</default>
                 <label>Full Home Interiors</label>
+            </value>
+            <value>
+                <fullName>1BHK</fullName>
+                <default>false</default>
+                <label>1BHK</label>
+            </value>
+            <value>
+                <fullName>2BHK</fullName>
+                <default>false</default>
+                <label>2BHK</label>
+            </value>
+            <value>
+                <fullName>3BHK</fullName>
+                <default>false</default>
+                <label>3BHK</label>
+            </value>
+            <value>
+                <fullName>4BHK</fullName>
+                <default>false</default>
+                <label>4BHK</label>
+            </value>
+            <value>
+                <fullName>5BHK</fullName>
+                <default>false</default>
+                <label>5BHK</label>
+            </value>
+            <value>
+                <fullName>1RK</fullName>
+                <default>false</default>
+                <label>1RK</label>
             </value>
         </valueSetDefinition>
     </valueSet>

@@ -71,6 +71,13 @@
             <operator>equals</operator>
             <value>0</value>
         </criteriaItems>
+        <criteriaItems>
+            <column>RECORDTYPE</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>Lead.Arelia</value>
+        </criteriaItems>
     </filter>
     <format>Summary</format>
     <groupingsDown>
