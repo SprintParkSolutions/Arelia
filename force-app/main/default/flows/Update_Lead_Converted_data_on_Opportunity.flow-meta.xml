@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <environments>Default</environments>
     <interviewLabel>Update Lead Converted data on Opportunity {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Update Lead Converted data on Opportunity</label>
@@ -26,8 +27,8 @@
     <recordLookups>
         <name>Get_Opportunities</name>
         <label>Get Opportunities</label>
-        <locationX>176</locationX>
-        <locationY>323</locationY>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>Update_Opportunity</targetReference>
@@ -47,8 +48,8 @@
     <recordUpdates>
         <name>Update_Opportunity</name>
         <label>Update Opportunity</label>
-        <locationX>176</locationX>
-        <locationY>431</locationY>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
         <filterLogic>and</filterLogic>
         <filters>
             <field>Primary_Contact__c</field>
@@ -63,7 +64,7 @@
         <object>Opportunity</object>
     </recordUpdates>
     <start>
-        <locationX>50</locationX>
+        <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
             <targetReference>Get_Opportunities</targetReference>
