@@ -21,6 +21,7 @@
         <offset>0</offset>
     </actionCalls>
     <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <customProperties>
         <name>ScreenProgressIndicator</name>
         <value>

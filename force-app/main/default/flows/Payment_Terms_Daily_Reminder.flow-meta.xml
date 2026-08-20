@@ -3,8 +3,8 @@
     <actionCalls>
         <name>Send_Reminder_Email</name>
         <label>Send Reminder Email</label>
-        <locationX>50</locationX>
-        <locationY>660</locationY>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
         <connector>
@@ -51,11 +51,12 @@
         <offset>0</offset>
     </actionCalls>
     <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <decisions>
         <name>Check_Client_Email_Exists</name>
         <label>Check Client Email Exists</label>
-        <locationX>314</locationX>
-        <locationY>252</locationY>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
         <defaultConnectorLabel>No Email</defaultConnectorLabel>
         <rules>
             <name>Has_Email</name>
@@ -76,8 +77,8 @@
     <decisions>
         <name>Check_Due_Date_Proximity</name>
         <label>Check Due Date Proximity</label>
-        <locationX>50</locationX>
-        <locationY>360</locationY>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
         <defaultConnectorLabel>No Action Needed</defaultConnectorLabel>
         <rules>
             <name>Due_In_3_Days</name>
@@ -176,8 +177,8 @@
     <recordCreates>
         <name>Log_Email_Task</name>
         <label>Log Email Task</label>
-        <locationX>50</locationX>
-        <locationY>768</locationY>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
         <inputAssignments>
             <field>ActivityDate</field>
             <value>
@@ -212,7 +213,7 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordCreates>
     <start>
-        <locationX>188</locationX>
+        <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
             <targetReference>Check_Client_Email_Exists</targetReference>
