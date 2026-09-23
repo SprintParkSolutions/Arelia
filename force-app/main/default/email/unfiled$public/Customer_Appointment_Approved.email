@@ -1,28 +1,188 @@
 <html>
-<head>
-	<title></title>
-</head>
-<body style="height: auto; min-height: auto;">
-<p><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Hello <strong>{{{Recipient.FirstName}}}&nbsp;{{{Recipient.LastName}}}</strong>,<br />
-<br />
-Great News! Your site visit appointment has been <strong>{{{Recipient.Appointment_Status__c}}}</strong>.<br />
-<br />
-<strong>Appointment Details:</strong></span></span></p>
-
-<ul>
-	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Scheduled Date:&nbsp;<strong>{{{Recipient.Appointment_Date__c}}}</strong></span></span></li>
-	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Time Slot:&nbsp;<strong>{{{Recipient.Appointment_Time_Slots__c}}}</strong></span></span></li>
-</ul>
-<span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">If you have any queries, please contact supervisor.&nbsp;<br />
-<br />
-<strong>Supervisor Details:</strong></span></span>
-
-<ul>
-	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Supervisor Name:&nbsp;<strong>{{{Recipient.Supervisor_User__c}}}</strong></span></span></li>
-	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Email<strong>:</strong>&nbsp;<strong>{{{Recipient.Supervisor_User_Email__c}}}</strong></span></span></li>
-	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Phone:&nbsp;<strong>{{{Recipient.Supervisor_User_Phone__c}}}</strong></span></span></li>
-</ul>
-<br />
-<span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Thank you,<br />
-Arelia Team.</span></span></body>
+ <head>
+  <title></title>
+ </head>
+ <body style="height:auto;
+			 min-height:auto;
+			 margin:0;
+			 padding:0;
+			 background-color:#ffffff;">
+  <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+			  border-collapse:collapse;
+			  background-color:#ffffff;" width="100%">
+   <tbody>
+    <tr>
+     <td align="center" style="padding:0;">
+      <table border="0" cellpadding="0" cellspacing="0" style="max-width:760px;
+							  width:100%;
+							  background-color:#ffffff;
+							  border:2px solid #c9a75d;
+							  border-collapse:collapse;" width="100%">
+       <!-- Banner -->
+       <tbody>
+        <tr>
+         <td style="padding:0;"><img alt="Arelia Email Banner Image" src="{[devName:Arelia_Email_Banner_Image]}" style="display:block;
+											width:100%;
+											max-width:100%;
+											height:auto;
+											border:0;" title="Arelia Email Banner Image" /></td>
+        </tr> <!-- Main Email Content -->
+        <tr>
+         <td style="padding:30px 34px 32px 34px;"><p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Hello <strong>{{{Recipient.FirstName}}}&nbsp;{{{Recipient.LastName}}}</strong>,</p> <p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Great news! Your site visit appointment has been <strong>{{{Recipient.Appointment_Status__c}}}</strong>.</p> <p style="margin:0 0 22px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Please find the confirmed appointment details below.</p> <!-- Appointment Details -->
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin-bottom:18px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+													   padding-top:20px;"><p style="margin:0;
+														  font-size:20px;
+														  line-height:1.4;
+														  font-family:Times New Roman,Times,serif;
+														  color:#1f1f1f;"><strong>Appointment Details</strong></p></td>
+            </tr>
+           </tbody>
+          </table>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin:0 0 24px 0;" width="100%">
+           <tbody>
+            <tr>
+             <td style="width:40%;
+													   padding:12px 14px;
+													   border:1px solid #e3d2a8;
+													   background-color:#fbf8f1;
+													   font-size:17px;
+													   line-height:1.5;
+													   font-family:Times New Roman,Times,serif;
+													   color:#222222;"><strong>Scheduled Date</strong></td>
+             <td style="width:60%;
+													   padding:12px 14px;
+													   border:1px solid #e3d2a8;
+													   font-size:17px;
+													   line-height:1.5;
+													   font-family:Times New Roman,Times,serif;
+													   color:#222222;"><strong>{{{Recipient.Appointment_Date__c}}}</strong></td>
+            </tr>
+            <tr>
+             <td style="width:40%;
+													   padding:12px 14px;
+													   border:1px solid #e3d2a8;
+													   background-color:#fbf8f1;
+													   font-size:17px;
+													   line-height:1.5;
+													   font-family:Times New Roman,Times,serif;
+													   color:#222222;"><strong>Time Slot</strong></td>
+             <td style="width:60%;
+													   padding:12px 14px;
+													   border:1px solid #e3d2a8;
+													   font-size:17px;
+													   line-height:1.5;
+													   font-family:Times New Roman,Times,serif;
+													   color:#222222;"><strong>{{{Recipient.Appointment_Time_Slots__c}}}</strong></td>
+            </tr>
+           </tbody>
+          </table> <!-- Supervisor Details -->
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin-bottom:18px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+													   padding-top:20px;"><p style="margin:0;
+														  font-size:20px;
+														  line-height:1.4;
+														  font-family:Times New Roman,Times,serif;
+														  color:#1f1f1f;"><strong>Supervisor Details</strong></p></td>
+            </tr>
+           </tbody>
+          </table> <p style="margin:0 0 16px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">If you have any questions regarding your site visit, please contact your assigned supervisor.</p>
+          <ul style="margin-top:8px;
+										   margin-bottom:24px;
+										   padding-left:24px;">
+           <li style="margin-bottom:10px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Supervisor Name:</strong>&nbsp;{{{Recipient.Supervisor_User__c}}}</li>
+           <li style="margin-bottom:10px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Email:</strong>&nbsp;{{{Recipient.Supervisor_User_Email__c}}}</li>
+           <li style="margin-bottom:10px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Phone:</strong>&nbsp;{{{Recipient.Supervisor_User_Phone__c}}}</li>
+          </ul> <p style="margin:0 0 22px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">We look forward to meeting you and taking the next step in your design journey.</p> <p style="margin:0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Warm regards,<br /> <strong>Team Arelia</strong></p></td>
+        </tr> <!-- Short Professional Footer -->
+        <tr>
+         <td align="center" style="background-color:#171717;
+									   border-top:2px solid #C99A3D;
+									   padding:24px 32px 22px 32px;
+									   text-align:center;"><p style="margin:0 0 5px 0;
+										  font-size:24px;
+										  line-height:1.3;
+										  font-family:Times New Roman,Times,serif;
+										  color:#D6B36A;
+										  font-weight:bold;
+										  text-align:center;">Arelia</p> <p style="margin:0 0 18px 0;
+										  font-size:11px;
+										  line-height:1.5;
+										  font-family:Arial,Helvetica,sans-serif;
+										  color:#C99A3D;
+										  letter-spacing:2px;
+										  text-align:center;">PREMIUM &amp; LUXURY INTERIOR DESIGNS</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;" width="100%">
+           <tbody>
+            <tr>
+             <td align="center" style="border-top:1px solid #6E5427;
+													   padding-top:16px;
+													   text-align:center;"><p style="margin:0 0 5px 0;
+														  font-size:11px;
+														  line-height:1.6;
+														  font-family:Arial,Helvetica,sans-serif;
+														  color:#8F887F;
+														  text-align:center;">This email was sent to confirm the approval of your site visit appointment.</p> <p style="margin:0;
+														  font-size:11px;
+														  line-height:1.6;
+														  font-family:Arial,Helvetica,sans-serif;
+														  color:#8F887F;
+														  text-align:center;">© 2026 Arelia. All rights reserved.</p></td>
+            </tr>
+           </tbody>
+          </table></td>
+        </tr>
+       </tbody>
+      </table></td>
+    </tr>
+   </tbody>
+  </table>
+ </body>
 </html>

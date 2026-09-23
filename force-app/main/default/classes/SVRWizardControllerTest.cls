@@ -259,4 +259,64 @@ private class SVRWizardControllerTest {
         
         System.assert(fields.isEmpty(), 'Should return empty list for completely invalid object API name');
     }
+
+    @isTest
+    static void testOpportunityRecordTypeValidationBranches() {
+        Account accountRecord = TestDataUtility.createAccount('Unsupported SVR Account');
+
+        Test.startTest();
+        Boolean caughtLatest = false;
+        try {
+            SVRWizardController.getLatestSVR(accountRecord.Id, 'Opportunity');
+        } catch (AuraHandledException e) {
+            caughtLatest = true;
+            System.assertNotEquals(null, e.getMessage(), 'Unsupported parent should include an error message.');
+        }
+
+        Boolean caughtCreate = false;
+        try {
+            SVRWizardController.createSVR(accountRecord.Id, 'Opportunity', new Site_Visit_Report__c());
+        } catch (AuraHandledException e) {
+            caughtCreate = true;
+            System.assertNotEquals(null, e.getMessage(), 'Unsupported parent should include an error message.');
+        }
+        Test.stopTest();
+
+        System.assert(caughtLatest, 'Unsupported Opportunity lookup should throw.');
+        System.assert(caughtCreate, 'Unsupported Opportunity create should throw.');
+    }
+
+    @isTest
+    static void testGetFieldSetFieldsExistingFieldSetWhenAvailable() {
+        Map<String, Schema.FieldSet> fieldSets = Site_Visit_Report__c.SObjectType.getDescribe().fieldSets.getMap();
+        if (fieldSets.isEmpty()) {
+            System.assertEquals(0, SVRWizardController.getFieldSetFields('Site_Visit_Report__c', 'Missing_Field_Set').size());
+            return;
+        }
+
+        String fieldSetName = new List<String>(fieldSets.keySet())[0];
+        Test.startTest();
+        List<String> fields = SVRWizardController.getFieldSetFields('Site_Visit_Report__c', fieldSetName);
+        Test.stopTest();
+
+        System.assertNotEquals(null, fields, 'Existing fieldset should return a non-null list.');
+    }
+
+    @isTest
+    static void testCreateSVRMissingRecordTypeBranch() {
+        Lead leadRecord = [SELECT Id FROM Lead LIMIT 1];
+        SVRWizardController.forceMissingRecordTypeForTest = true;
+
+        Test.startTest();
+        Boolean caught = false;
+        try {
+            SVRWizardController.createSVR(leadRecord.Id, 'Lead', new Site_Visit_Report__c());
+        } catch (AuraHandledException e) {
+            caught = true;
+            System.assertNotEquals(null, e.getMessage(), 'Missing record type branch should include an error.');
+        }
+        Test.stopTest();
+
+        System.assert(caught, 'Forced missing record type should throw.');
+    }
 }

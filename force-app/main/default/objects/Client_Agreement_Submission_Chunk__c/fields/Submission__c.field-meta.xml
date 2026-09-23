@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Submission__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Submission</label>
+    <referenceTo>Client_Agreement_Submission__c</referenceTo>
+    <relationshipLabel>Client Agreement Submission Chunks</relationshipLabel>
+    <relationshipName>Client_Agreement_Submission_Chunks</relationshipName>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

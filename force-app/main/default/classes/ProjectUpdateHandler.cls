@@ -75,7 +75,7 @@ public without sharing class ProjectUpdateHandler {
             return;
         }
 
-        Id oweaId = getDefaultOrgWideEmailAddressId(); // may be null
+        Id oweaId = AreliaUtility.getOrgWideEmailAddressId(label.Arelia_OWD); // may be null
         List<Messaging.SingleEmailMessage> batch = new List<Messaging.SingleEmailMessage>();
 
         for (Project__c proj : updatedProjects) {
@@ -209,12 +209,5 @@ public without sharing class ProjectUpdateHandler {
      *  - picks any OWEA that is allowed for all profiles (common "default"),
      *  - returns null if none found (safe to skip OWEA).
      */
-    private static Id getDefaultOrgWideEmailAddressId() {
-        List<OrgWideEmailAddress> oweaList = [SELECT Id FROM OrgWideEmailAddress
-            WHERE IsAllowAllProfiles = true ORDER BY CreatedDate ASC LIMIT 1];
-        if (!oweaList.isEmpty()) {
-            return oweaList[0].Id;
-        }
-        return null;
-    }
+    // Org-Wide Email retrieval is handled by AreliaUtility.getOrgWideEmailAddressId(String).
 }

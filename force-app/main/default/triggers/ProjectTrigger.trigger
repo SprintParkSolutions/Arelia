@@ -1,9 +1,9 @@
 /**
  * @description       : 
- * @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+ * @author            : Arelia Living
  * @group             : 
  * @last modified on  : 12-11-2025
- * @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+ * @last modified by  : Arelia Living
 **/
 trigger ProjectTrigger on Project__c (before insert, before update, after insert, after update) {
 

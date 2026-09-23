@@ -101,6 +101,10 @@ public class VendorOpportunityControllerTest {
     static void testCreateAndReadCoverage() {
         User u = [SELECT Id FROM User WHERE Alias = 'vendtest' LIMIT 1];
         Opportunity opp = TestDataUtility.createOpportunity('Test Opp Logic', u.Id);
+        opp.Client_Agreement_Sent__c = true;
+        opp.Client_Agreement_Signed__c = true;
+        update opp;
+
         Vendor__c vendor = TestDataUtility.createVendor('Test Vendor', 'Server Room Setup', 'test@test.com');
 
         Vendor_Opportunity__c vo = new Vendor_Opportunity__c(
@@ -110,31 +114,33 @@ public class VendorOpportunityControllerTest {
 
         Test.startTest();
 
-        // 1. Create (Catch Validation)
-        try {
+        // 1. Create and verify the return path.
+        List<Vendor_Opportunity__c> createdRecords =
             VendorOpportunityController.createVendorOpportunities(new List<Vendor_Opportunity__c>{ vo }, opp.Id);
-        } catch (Exception e) {
-            // FIX: Populated empty catch block
-            System.debug(LoggingLevel.INFO, 'Expected Validation Exception: ' + e.getMessage());
-        }
+        Assert.areEqual(1, createdRecords.size(), 'One Vendor Opportunity should be returned after insert');
+        Assert.areEqual(opp.Id, createdRecords[0].Opportunity__c, 'Controller should stamp the parent Opportunity');
 
-        // 2. Has Records (False)
+        // 2. Has Records (True)
         Boolean hasRecs = VendorOpportunityController.hasExistingRecords(opp.Id);
-        Assert.isFalse(hasRecs, 'Should not have records yet');
+        Assert.isTrue(hasRecs, 'Should find the created Vendor Opportunity');
 
         // 3. Get Records (Query Building)
         // Path A: With ID (Logic Skip)
-        try {
+        List<Vendor_Opportunity__c> recordsWithId =
             VendorOpportunityController.getExistingRecords(opp.Id, new List<String>{'Id', 'Name'});
-        } catch(Exception e) {
-            System.debug(LoggingLevel.INFO, 'Expected Exception: ' + e.getMessage());
-        }
+        Assert.areEqual(1, recordsWithId.size(), 'Query with Id should return the created record');
 
         // Path B: Without ID (Logic Add)
-        try {
+        List<Vendor_Opportunity__c> recordsWithoutId =
             VendorOpportunityController.getExistingRecords(opp.Id, new List<String>{'Name'});
-        } catch(Exception e) {
-            System.debug(LoggingLevel.INFO, 'Expected Exception: ' + e.getMessage());
+        Assert.areEqual(1, recordsWithoutId.size(), 'Query without Id should add Id and return the created record');
+
+        Account unsupportedParent = TestDataUtility.createAccount('Unsupported Vendor Opp Parent');
+        try {
+            VendorOpportunityController.hasExistingRecords(unsupportedParent.Id);
+            Assert.fail('Expected unsupported parent exception');
+        } catch (AuraHandledException e) {
+            Assert.isTrue(e.getMessage() != null, 'Unsupported parent should be rejected');
         }
 
         Test.stopTest();

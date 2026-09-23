@@ -1,9 +1,9 @@
 /**
  * @description       : 
- * @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+ * @author            : 
  * @group             : 
- * @last modified on  : 02-06-2026
- * @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+ * @last modified on  : 
+ * @last modified by  : 
 **/
 trigger ArchitectureDesignTrigger on Architecture_Design__c (after update) {
     if (Trigger.isAfter && Trigger.isUpdate) {

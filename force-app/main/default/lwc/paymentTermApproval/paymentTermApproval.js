@@ -2,11 +2,16 @@ import { LightningElement, wire, track } from 'lwc';
 import { CurrentPageReference } from 'lightning/navigation';
 import getApprovalData from '@salesforce/apex/PaymentTermController.getApprovalData';
 import submitDecision from '@salesforce/apex/PaymentTermController.submitDecision';
-import ARELIA_SITE_LABEL from '@salesforce/label/c.Arelia_Site_Label';
-
-// Import Standard Modules for Popups
+import AreliaSiteRedirectUrlLabel from '@salesforce/label/c.Arelia_Site_Redirect_URL_Label';
 import LightningAlert from 'lightning/alert';
 import LightningConfirm from 'lightning/confirm';
+
+const USER_TYPE_MANAGER = 'Manager';
+const USER_TYPE_CLIENT = 'Client';
+const ACTION_APPROVE = 'Approve';
+const ACTION_REJECT = 'Reject';
+const STATUS_SENT_FOR_MANAGER_APPROVAL = 'Sent for Manager Approval';
+const STATUS_SENT_FOR_CLIENT_APPROVAL = 'Sent for Client Approval';
 
 export default class PaymentTermApproval extends LightningElement {
     @track approvalData;
@@ -14,24 +19,23 @@ export default class PaymentTermApproval extends LightningElement {
     @track comments = '';
     @track isLoading = true;
     @track error;
-    
-    // UI State
     @track showCommentBox = false;
     @track isProcessed = false;
-    
-    // Success Modal State only (Confirmation is now handled by JS)
     @track showSuccessModal = false;
-    
+    @track successMessage = '';
+
     recordId;
-    userType; 
+    userType;
 
     @wire(CurrentPageReference)
     getStateParameters(currentPageReference) {
-        if (currentPageReference) {
-            this.recordId = currentPageReference.state.id;
-            this.userType = currentPageReference.state.type || 'Manager';
-            this.loadData();
+        if (!currentPageReference) {
+            return;
         }
+
+        this.recordId = currentPageReference.state.id;
+        this.userType = currentPageReference.state.type || USER_TYPE_MANAGER;
+        this.loadData();
     }
 
     loadData() {
@@ -42,117 +46,174 @@ export default class PaymentTermApproval extends LightningElement {
         }
 
         getApprovalData({ recordId: this.recordId })
-            .then(result => {
+            .then((result) => {
                 this.approvalData = result;
-                this.terms = result.terms.map((t, i) => ({
-                    ...t,
-                    serialNumber: i + 1,
-                    Term_Label__c: t.Term_Label__c || t.Name
-                }));
-                
+                this.terms = this.getPreparedTerms(result.terms);
+                this.isProcessed = this.getProcessedState(result);
                 this.isLoading = false;
-                
-                const status = result.opportunity.Payment_Terms_Status__c;
-                if ((this.userType === 'Manager' && status !== 'Sent for Manager Approval') ||
-                    (this.userType === 'Client' && status !== 'Sent for Client Approval')) {
-                     this.isProcessed = true;
-                }
             })
-            .catch(err => {
-                console.error(err);
-                this.error = 'Error loading data. The record may be invalid.';
+            .catch((error) => {
+                this.error = this.getErrorMessage(
+                    error,
+                    'Error loading data. The record may be invalid.'
+                );
                 this.isLoading = false;
             });
     }
 
-    handleCommentChange(e) { 
-        this.comments = e.target.value; 
+    getPreparedTerms(paymentTerms) {
+        if (!paymentTerms) {
+            return [];
+        }
+
+        return paymentTerms.map((term, index) => ({
+            ...term,
+            serialNumber: index + 1,
+            Term_Label__c: term.Term_Label__c || term.Name
+        }));
     }
 
-    // --- BUTTON CLICKS ---
+    getProcessedState(result) {
+        const status = result && result.opportunity
+            ? result.opportunity.Payment_Terms_Status__c
+            : '';
+
+        return (
+            (this.userType === USER_TYPE_MANAGER && status !== STATUS_SENT_FOR_MANAGER_APPROVAL) ||
+            (this.userType === USER_TYPE_CLIENT && status !== STATUS_SENT_FOR_CLIENT_APPROVAL)
+        );
+    }
+
+    handleCommentChange(event) {
+        this.comments = event.target.value;
+        event.target.setCustomValidity('');
+        event.target.reportValidity();
+    }
 
     async handleApproveClick() {
-        // 1. Clear any rejection data if they switch back to Approve
         this.comments = '';
         this.showCommentBox = false;
 
-        // 2. Open Standard Confirmation Dialog
         const result = await LightningConfirm.open({
             message: 'Are you sure you want to APPROVE these payment terms? This action cannot be undone.',
             variant: 'header',
             label: 'Confirm Approval',
-            theme: 'success', // Green header
+            theme: 'success'
         });
 
-        // 3. If User clicked "OK", proceed
         if (result) {
-            this.submit('Approve');
+            this.submit(ACTION_APPROVE);
         }
     }
 
     handleRequestChangesClick() {
-        // Toggle the comment box view
-        this.showCommentBox = !this.showCommentBox;
+        this.showCommentBox = true;
+        this.clearTextareaValidation();
+    }
+
+    handleBackClick() {
+        this.showCommentBox = false;
+        this.comments = '';
+        this.clearTextareaValidation();
     }
 
     async handleRejectClick() {
-        // 1. Validate Comments
-        if (!this.comments || this.comments.trim() === '') {
+        const trimmedComments = this.comments ? this.comments.trim() : '';
+
+        if (!trimmedComments) {
+            this.showTextareaValidation('Please enter remarks before submitting an amendment.');
+
             await LightningAlert.open({
                 message: 'Please enter remarks before submitting a rejection.',
                 theme: 'error',
-                label: 'Validation Error',
+                label: 'Validation Error'
             });
+
             return;
         }
 
-        // 2. Open Standard Confirmation Dialog
+        this.clearTextareaValidation();
+
         const result = await LightningConfirm.open({
             message: 'Are you sure you want to REQUEST CHANGES? The remarks will be sent to the team.',
             variant: 'header',
             label: 'Confirm Rejection',
-            theme: 'warning', // Orange header
+            theme: 'warning'
         });
 
-        // 3. If User clicked "OK", proceed
         if (result) {
-            this.submit('Reject');
+            this.submit(ACTION_REJECT);
         }
     }
 
-    // --- SUBMISSION ---
+    submit(action) {
+        this.isLoading = true;
+        this.error = null;
 
-    // --- Update only the submit method in paymentTermApproval.js ---
-submit(action) {
-    this.isLoading = true;
+        const decisionData = {
+            userType: this.userType,
+            action,
+            comments: this.comments
+        };
 
-    // FIX: Wrap parameters into an object named 'data' 
-    // to match the DecisionInput wrapper in Apex
-    const decisionData = {
-        userType: this.userType,
-        action: action,
-        comments: this.comments
-    };
+        submitDecision({
+            recordId: this.recordId,
+            data: decisionData
+        })
+            .then(() => {
+                this.handleSubmitSuccess(action);
+            })
+            .catch((error) => {
+                this.isLoading = false;
+                this.error = this.getErrorMessage(error, 'Error submitting decision.');
+            });
+    }
 
-    submitDecision({ 
-        recordId: this.recordId, 
-        data: decisionData // This matches the @AuraEnabled parameter name
-    })
-    .then(() => {
+    handleSubmitSuccess(action) {
         this.isLoading = false;
+        this.isProcessed = true;
+        this.showCommentBox = false;
+        this.successMessage = this.getSuccessMessage(action);
         this.showSuccessModal = true;
-    })
-    .catch(err => {
-        console.error('Error:', err);
-        this.isLoading = false;
-        this.error = err.body ? err.body.message : err.message;
-    });
-}
+    }
 
-    // --- NAVIGATION ---
+    getSuccessMessage(action) {
+        if (action === ACTION_APPROVE) {
+            return 'Payment terms have been successfully authorized.';
+        }
+
+        return 'Your amendment request has been submitted successfully.';
+    }
+
+    showTextareaValidation(message) {
+        const inputField = this.template.querySelector('.native-amendment-textarea');
+
+        if (inputField) {
+            inputField.setCustomValidity(message);
+            inputField.reportValidity();
+        }
+    }
+
+    clearTextareaValidation() {
+        const inputField = this.template.querySelector('.native-amendment-textarea');
+
+        if (inputField) {
+            inputField.setCustomValidity('');
+            inputField.reportValidity();
+        }
+    }
+
+    getErrorMessage(error, defaultMessage) {
+        return error && error.body && error.body.message
+            ? error.body.message
+            : defaultMessage;
+    }
 
     handleNavigateHome() {
-        this.isLoading = true; 
-        window.location.href = ARELIA_SITE_LABEL;
+        const redirectUrl = (AreliaSiteRedirectUrlLabel || '').trim();
+
+        if (redirectUrl) {
+            window.location.assign(redirectUrl);
+        }
     }
 }

@@ -1,0 +1,105 @@
+<template>
+    <lightning-quick-action-panel
+        header="Send Vendor Agreement">
+
+        <template if:true={isLoading}>
+            <lightning-spinner
+                alternative-text="Loading Vendor Agreement">
+            </lightning-spinner>
+        </template>
+
+        <div class="slds-p-around_medium">
+
+            <lightning-input
+                label="Vendor"
+                value={vendorName}
+                disabled>
+            </lightning-input>
+
+            <lightning-input
+                class="slds-m-top_small"
+                label="Vendor Email"
+                value={vendorEmail}
+                disabled>
+            </lightning-input>
+
+            <div class="slds-m-top_medium">
+                <template if:true={isEditing}>
+                    <lightning-input-rich-text
+                        value={agreementHtml}
+                        formats={formats}
+                        onchange={handleAgreementChange}>
+                    </lightning-input-rich-text>
+                </template>
+
+                <template if:false={isEditing}>
+                    <div class="agreement-preview">
+
+                        <!--
+                            Fixed preview header.
+
+                            This header is separate from the editable
+                            Agreement_HTML__c content so its alignment
+                            remains identical before and after editing.
+                        -->
+                        <div class="preview-agreement-header">
+                            <div class="preview-company-name">
+                                ARELIA SPACE
+                            </div>
+
+                            <div class="preview-agreement-title">
+                                VENDOR AGREEMENT
+                            </div>
+
+                            <div class="preview-agreement-subtitle">
+                                Interior Design Vendor /
+                                Contractor Agreement
+                            </div>
+                        </div>
+
+                        <!--
+                            Render only the agreement body because the
+                            fixed header above already displays the
+                            agreement heading.
+                        -->
+                        <lightning-formatted-rich-text
+                            value={previewAgreementBodyHtml}>
+                        </lightning-formatted-rich-text>
+                    </div>
+                </template>
+            </div>
+
+        </div>
+
+        <div slot="footer">
+            <lightning-button
+                label="Cancel"
+                onclick={handleCancel}>
+            </lightning-button>
+
+            <template if:false={isEditing}>
+                <lightning-button
+                    class="slds-m-left_small"
+                    label="Edit"
+                    onclick={handleEdit}>
+                </lightning-button>
+            </template>
+
+            <template if:true={isEditing}>
+                <lightning-button
+                    class="slds-m-left_small"
+                    label="Save"
+                    onclick={handleSave}>
+                </lightning-button>
+            </template>
+
+            <lightning-button
+                class="slds-m-left_small"
+                variant="brand"
+                label="Send"
+                onclick={handleSend}>
+            </lightning-button>
+        </div>
+
+    </lightning-quick-action-panel>
+</template>

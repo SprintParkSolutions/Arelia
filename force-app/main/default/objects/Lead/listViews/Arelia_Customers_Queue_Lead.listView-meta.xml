@@ -3,10 +3,11 @@
     <fullName>Arelia_Customers_Queue_Lead</fullName>
     <columns>FULL_NAME</columns>
     <columns>LEAD.COMPANY</columns>
-    <columns>LEAD.STATE</columns>
     <columns>LEAD.EMAIL</columns>
+    <columns>LEAD.PHONE</columns>
+    <columns>Approval_Status__c</columns>
     <columns>Project_Request_Quotation_Type__c</columns>
-    <columns>LEAD.STATUS</columns>
+    <columns>Project_Request_Submitted__c</columns>
     <columns>LEAD.CREATED_DATE</columns>
     <columns>CORE.USERS.ALIAS</columns>
     <filterScope>Queue</filterScope>

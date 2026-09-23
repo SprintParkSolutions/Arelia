@@ -87,13 +87,17 @@ private class VendorEmailControllerTest {
     @IsTest
     static void testGetFilesByOpportunityId() {
         Opportunity opp = [SELECT Id FROM Opportunity LIMIT 1];
+        User sup = [SELECT Id FROM User WHERE Alias = 'VemUsr' LIMIT 1];
+        Opportunity emptyOpp = TestDataUtility.createOpportunity('No File Opportunity', sup.Id);
 
         Test.startTest();
         List<ContentVersion> files = VendorEmailController.getFilesByOpportunityId(opp.Id);
+        List<ContentVersion> emptyFiles = VendorEmailController.getFilesByOpportunityId(emptyOpp.Id);
         List<ContentVersion> nullFiles = VendorEmailController.getFilesByOpportunityId(null);
         Test.stopTest();
 
         Assert.areEqual(1, files.size(), 'Should retrieve one file linked to the Opportunity.');
+        Assert.isTrue(emptyFiles.isEmpty(), 'Opportunity with no linked files should return empty list.');
         Assert.isTrue(nullFiles.isEmpty(), 'Null ID should return an empty list.');
     }
 
@@ -139,9 +143,11 @@ private class VendorEmailControllerTest {
 
         Test.startTest();
         List<SObject> specs = VendorEmailController.getSpecificationsByOpportunityAndCategory(opp.Id, 'Server Room Setup');
+        List<SObject> invalidSpecs = VendorEmailController.getSpecificationsByOpportunityAndCategory('not-an-id', 'Server Room Setup');
         Test.stopTest();
 
         Assert.isNotNull(specs, 'Method should return a list, even if empty due to missing fieldsets.');
+        Assert.isTrue(invalidSpecs.isEmpty(), 'Invalid input should be handled as an empty result.');
     }
 
     // ============================================================================
@@ -159,6 +165,7 @@ private class VendorEmailControllerTest {
 
         Test.startTest();
         VendorEmailController.AbscondedVendorDetails details = VendorEmailController.getAbscondedVendorTasks(opp.Id, testCategory);
+        VendorEmailController.AbscondedVendorDetails emptyDetails = VendorEmailController.getAbscondedVendorTasks(opp.Id, 'Missing Category');
         VendorEmailController.AbscondedVendorDetails nullDetails = VendorEmailController.getAbscondedVendorTasks(null, null);
         Test.stopTest();
 
@@ -169,6 +176,7 @@ private class VendorEmailControllerTest {
         Assert.areEqual(expectedComp, details.overallCompletion, 'Completion calculation should dynamically match the database value.');
         Assert.areEqual(1, details.tasks.size(), 'Should find the Task attached to the Assignment.');
         
+        Assert.areEqual(0, emptyDetails.overallCompletion, 'Unknown category should return empty details.');
         Assert.areEqual(0, nullDetails.overallCompletion, 'Null input should return empty details.');
     }
 
@@ -246,6 +254,60 @@ private class VendorEmailControllerTest {
             Assert.isTrue(e.getTypeName().contains('AuraHandledException'), 'Should catch email send error');
         }
 
+        Account unsupportedParent = TestDataUtility.createAccount('Unsupported Vendor Email Parent');
+        Vendor__c vendor = [SELECT Id FROM Vendor__c LIMIT 1];
+        try {
+            VendorEmailController.sendEmailToVendors(
+                unsupportedParent.Id, new List<String>(), new List<String>{vendor.Id}, 'Server Room Setup', 'New'
+            );
+            Assert.fail('Should reject unsupported parent records.');
+        } catch (Exception e) {
+            Assert.isTrue(e.getTypeName().contains('AuraHandledException'), 'Unsupported parent should throw AuraHandledException');
+        }
+
         Test.stopTest();
+    }
+
+    @IsTest
+    static void testTableBuilderBranches() {
+        Opportunity opp = [SELECT Id FROM Opportunity LIMIT 1];
+        Set<String> specFields = new Set<String>{'Id', 'Interior_Product__c', 'Interior_Product__r.Name'};
+        Schema.FieldSet specFieldSet = SObjectType.Project_Specification__c.FieldSets.getMap().get('Vendor_Email_Fields');
+        if (specFieldSet != null) {
+            for (Schema.FieldSetMember member : specFieldSet.getFields()) {
+                specFields.add(member.getFieldPath());
+            }
+        }
+        String specQuery = 'SELECT ' + String.join(new List<String>(specFields), ', ')
+            + ' FROM Project_Specification__c LIMIT 1';
+        Project_Specification__c spec = Database.query(specQuery);
+
+        VendorEmailController.AbscondedVendorDetails noTaskDetails = new VendorEmailController.AbscondedVendorDetails();
+        noTaskDetails.overallCompletion = 0.25;
+        noTaskDetails.overallAssignmentStartDate = Date.today();
+        noTaskDetails.overallAssignmentEndDate = Date.today().addDays(1);
+
+        Test.startTest();
+        String nullTable = VendorEmailController.buildDynamicSpecificationTableForTest(null);
+        String specTable = VendorEmailController.buildDynamicSpecificationTableForTest(new List<SObject>{spec});
+        String emptyAbscondedTable = VendorEmailController.buildAbscondedTaskTableForTest(null);
+        String summaryOnlyTable = VendorEmailController.buildAbscondedTaskTableForTest(noTaskDetails);
+        String nullDeepValue = VendorEmailController.getDeepValueForTest(null, 'Name');
+        String relatedDeepValue = VendorEmailController.getDeepValueForTest(spec, 'Interior_Product__r.Name');
+        Integer emptyAttachmentCount = VendorEmailController.getAttachmentCountForParentIdsTest(new Set<Id>());
+        Interior_Product__c productWithoutFile = new Interior_Product__c(Name = 'No File Product');
+        insert productWithoutFile;
+        Integer noDocumentAttachmentCount = VendorEmailController.getAttachmentCountForParentIdsTest(new Set<Id>{productWithoutFile.Id});
+        Test.stopTest();
+
+        Assert.areEqual('', nullTable, 'Null specification rows should return an empty table.');
+        Assert.isNotNull(specTable, 'Specification table helper should return a string.');
+        Assert.areEqual('', emptyAbscondedTable, 'Null absconded details should return an empty table.');
+        Assert.isTrue(summaryOnlyTable.contains('Overall Assignment Completion'), 'Summary-only details should render the summary.');
+        Assert.areEqual('', nullDeepValue, 'Null record should return an empty value.');
+        Assert.isTrue(String.isNotBlank(relatedDeepValue), 'Relationship field value should be resolved.');
+        Assert.areEqual(0, emptyAttachmentCount, 'Empty parent id set should return no attachments.');
+        Assert.areEqual(0, noDocumentAttachmentCount, 'Parent records without files should return no attachments.');
+        Assert.isNotNull(opp.Id, 'Setup Opportunity should exist.');
     }
 }

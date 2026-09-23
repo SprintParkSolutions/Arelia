@@ -14,6 +14,7 @@ public class SiteVisitReportHandlerTest {
         User supervisor = TestDataUtility.createSupervisorUser('SupSVR');
 
         // 2. Create Roles (for Manager email logic)
+        User mgrUser;
         System.runAs(new User(Id = UserInfo.getUserId())) {
             UserRole r;
             List<UserRole> roles = [SELECT Id FROM UserRole WHERE Name = 'Regional Manager' LIMIT 1];
@@ -23,9 +24,15 @@ public class SiteVisitReportHandlerTest {
                 r = TestDataUtility.createUserRole('Regional Manager');
             }
 
-            TestDataUtility.createUserWithRole('MgrUser', r.Id);
+            mgrUser = TestDataUtility.createUserWithRole('MgrUser', r.Id);
+        }
 
-            // 3. Create Email Templates using Labels
+        // 3. Create Email Templates using Labels
+        // Run as the freshly-created manager user (not the shared running user) so these
+        // templates land in a dedicated personal folder instead of the org's default
+        // test-execution user's folder, which many parallel-running test classes
+        // insert into concurrently and can cause UNABLE_TO_LOCK_ROW.
+        System.runAs(mgrUser) {
             String leadTplName = Label.Arelia_Living_Lead_Conversion_Approval_Email_Template;
             if (String.isNotBlank(leadTplName)) {
                 TestDataUtility.createSpecificEmailTemplate(

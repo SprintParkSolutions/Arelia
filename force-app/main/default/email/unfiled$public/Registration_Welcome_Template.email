@@ -1,24 +1,185 @@
 <html>
-<head>
-	<title></title>
-</head>
-<body style="height: auto; min-height: auto;"><span style="font-size:18px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Hi <strong>{{{Recipient.Name}}}</strong>,<br />
-<br />
-Welcome to <strong>Arelia !&nbsp;</strong>Your registration is complete and we are excited to help you design your space.<br />
-<br />
-Here is a quick summary of the details we have received:</span></span>
-<ul>
-	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:18px;">Name:&nbsp;<strong>{{{Recipient.Name}}}</strong></span></span></li>
-	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:18px;">Email:&nbsp;<strong>{{{Recipient.Email}}}</strong></span></span></li>
-	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:18px;">Phone:&nbsp;<strong>{{{Recipient.Phone}}}</strong></span></span></li>
-</ul>
-
-<p><span style="font-size:18px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">To continue with the next step of your interior project,&nbsp;please click the below: </span></span><a href="{{{ProjectRequestLink}}}"><span style="font-size:18px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Link</span></span></a><br />
-<br />
-<span style="font-size:18px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Our team will review your information after you complete the next step and get in touch with you to discuss suggestions,&nbsp;timelines, and design options.</span></span></p>
-
-<p><br />
-<span style="font-size:18px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Best Regards,</span></span><br />
-<span style="font-size:18px;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;">Arelia Team.</span></span></p>
-</body>
+ <head>
+  <title></title>
+ </head>
+ <body aria-readonly="false" style="height:auto;
+			 min-height:auto;
+			 margin:0;
+			 padding:0;
+			 background-color:#ffffff;">
+  <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+			  border-collapse:collapse;
+			  background-color:#ffffff;" width="100%">
+   <tbody>
+    <tr>
+     <td align="center" style="padding:0;">
+      <table border="0" cellpadding="0" cellspacing="0" style="max-width:760px;
+							  width:100%;
+							  background-color:#ffffff;
+							  border:2px solid #c9a75d;
+							  border-collapse:collapse;" width="100%">
+       <tbody>
+        <tr>
+         <td style="padding:0;"><img alt="Arelia Email Banner Image" src="{[devName:Arelia_Email_Banner_Image]}" style="display:block;
+											width:100%;
+											max-width:100%;
+											height:auto;
+											border:0;" title="Arelia Email Banner Image" /></td>
+        </tr>
+        <tr>
+         <td style="padding:30px 34px 32px 34px;"><p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Welcome to <strong>Arelia</strong>,&nbsp;<strong>{{{Recipient.Name}}}</strong>!</p> <p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">We’re delighted to have you with us. Your registration has been completed successfully, and your design journey begins here.</p> <p style="margin:0 0 14px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Here is a quick summary of the details we have received:</p> <p style="margin:0 0 10px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;"><strong>Your Registration Details:</strong></p>
+          <ul style="margin-top:8px;
+										   margin-bottom:24px;
+										   padding-left:24px;">
+           <li style="margin-bottom:8px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;">Name:&nbsp;<strong>{{{Recipient.Name}}}</strong></li>
+           <li style="margin-bottom:8px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;">Email:&nbsp;<strong>{{{Recipient.Email}}}</strong></li>
+           <li style="margin-bottom:8px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;">Phone:&nbsp;<strong>{{{Recipient.Phone}}}</strong></li>
+          </ul>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;
+											  margin-bottom:20px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+													   padding-top:20px;"><p style="margin:0;
+														  font-size:20px;
+														  line-height:1.4;
+														  font-family:Times New Roman,Times,serif;
+														  color:#1f1f1f;"><strong>What happens next?</strong></p></td>
+            </tr>
+           </tbody>
+          </table> <p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">To continue with your interior project, please click on the link below and share your project details:</p>
+          <ul style="margin-top:8px;
+										   margin-bottom:22px;
+										   padding-left:24px;">
+           <li style="margin-bottom:8px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Project Type</strong> – Residential or Commercial</li>
+           <li style="margin-bottom:8px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Property Details</strong> – Rooms, size, and layout</li>
+           <li style="margin-bottom:8px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Budget &amp; Design Preferences</strong> – Your expectations and design preferences</li>
+           <li style="margin-bottom:8px;
+											   font-size:18px;
+											   line-height:1.5;
+											   font-family:Times New Roman,Times,serif;
+											   color:#222222;"><strong>Additional Requirements</strong> – Any special requirements you would like us to consider</li>
+          </ul> <p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">These details will help our team understand your vision and plan the next steps.</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;
+											  margin:22px 0 24px 0;">
+           <tbody>
+            <tr>
+             <td style="background-color:#1b1b1b;
+													   border:1px solid #c9a75d;
+													   padding:12px 24px;
+													   text-align:center;"><a href="{{{ProjectRequestLink}}}" style="font-size:17px;
+														  font-family:Arial,Helvetica,sans-serif;
+														  color:#ffffff;
+														  text-decoration:none;
+														  font-weight:bold;
+														  display:inline-block;">Share Project Details </a></td>
+            </tr>
+           </tbody>
+          </table> <p style="margin:0 0 18px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Our team will review your information after you complete the next step and get in touch with you to discuss suggestions, timelines, and design options.</p> <p style="margin:0 0 22px 0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Thank you for choosing <strong>Arelia</strong>. We look forward to bringing your vision to life.</p> <p style="margin:0;
+										  font-size:18px;
+										  line-height:1.5;
+										  font-family:Times New Roman,Times,serif;
+										  color:#222222;">Warm regards,<br /> <strong>Team Arelia</strong></p></td>
+        </tr>
+        <tr>
+         <td align="center" style="background-color:#171717;
+									   border-top:2px solid #C99A3D;
+									   padding:24px 32px 22px 32px;
+									   text-align:center;"><p style="margin:0 0 5px 0;
+										  font-size:24px;
+										  line-height:1.3;
+										  font-family:Times New Roman,Times,serif;
+										  color:#D6B36A;
+										  font-weight:bold;
+										  text-align:center;">Arelia</p> <p style="margin:0 0 18px 0;
+										  font-size:11px;
+										  line-height:1.5;
+										  font-family:Arial,Helvetica,sans-serif;
+										  color:#C99A3D;
+										  letter-spacing:2px;
+										  text-align:center;">PREMIUM &amp; LUXURY INTERIOR DESIGNS</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+											  border-collapse:collapse;" width="100%">
+           <tbody>
+            <tr>
+             <td align="center" style="border-top:1px solid #6E5427;
+													   padding-top:16px;
+													   text-align:center;"><p style="margin:0 0 5px 0;
+														  font-size:11px;
+														  line-height:1.6;
+														  font-family:Arial,Helvetica,sans-serif;
+														  color:#8F887F;
+														  text-align:center;">This email was sent because you recently registered with Arelia.</p> <p style="margin:0;
+														  font-size:11px;
+														  line-height:1.6;
+														  font-family:Arial,Helvetica,sans-serif;
+														  color:#8F887F;
+														  text-align:center;">© 2026 Arelia. All rights reserved.</p></td>
+            </tr>
+           </tbody>
+          </table></td>
+        </tr>
+       </tbody>
+      </table></td>
+    </tr>
+   </tbody>
+  </table>
+ </body>
 </html>

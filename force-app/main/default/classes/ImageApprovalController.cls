@@ -6,6 +6,9 @@
 @SuppressWarnings('PMD.ApexCRUDViolation')
 public without sharing class ImageApprovalController {
 
+    private static final String ERROR_UNSUPPORTED_RECORD_TYPE =
+        'Image approval is supported only for Arelia opportunities.';
+
     // ============================================================================
     // INNER CLASSES & WRAPPERS
     // ============================================================================
@@ -48,6 +51,8 @@ public without sharing class ImageApprovalController {
         }
 
         try {
+            assertAreliaOpportunityRecordType(recordId);
+
             // 1. Create Record with Budget
             Architecture_Design__c designRec = createDesignRecord(recordId, fileIds[0], budget);
             
@@ -93,12 +98,8 @@ public without sharing class ImageApprovalController {
     }
 
     private static void cleanupOpportunityFiles(Id recordId, List<String> fileIds) {
-        List<ContentDocumentLink> linksToDelete = [
-            SELECT Id 
-            FROM ContentDocumentLink 
-            WHERE LinkedEntityId = :recordId 
-            AND ContentDocumentId IN :fileIds
-        ];
+        List<ContentDocumentLink> linksToDelete = [SELECT Id FROM ContentDocumentLink WHERE LinkedEntityId = :recordId 
+            AND ContentDocumentId IN :fileIds];
         if (!linksToDelete.isEmpty()) {
             delete linksToDelete;
         }
@@ -138,6 +139,7 @@ public without sharing class ImageApprovalController {
      * @description FIX: Retrieves ContentVersion Ids directly. 
      * Bypasses Guest User 'VersionData' restrictions and heap limits.
      */
+    @TestVisible
     private static List<Id> getVersionIds(List<String> fileIds) {
         List<Id> cvIds = new List<Id>();
         if (fileIds == null || fileIds.isEmpty()) {
@@ -150,6 +152,17 @@ public without sharing class ImageApprovalController {
         return cvIds;
     }
 
+    @TestVisible
+    private static String getExternalProjectName(Architecture_Design__c design) {
+        String projectName = 'Architectural Design';
+        if (design.Project__r != null) {
+            projectName = design.Project__r.Name;
+        } else if (design.Opportunity__r != null) {
+            projectName = design.Opportunity__r.Name;
+        }
+        return projectName;
+    }
+
     // ============================================================================
     // 2. INTERNAL: GET HISTORY
     // ============================================================================
@@ -158,13 +171,7 @@ public without sharing class ImageApprovalController {
     public static List<DesignWrapper> getRelatedImages(Id recordId) {
         List<DesignWrapper> designList = new List<DesignWrapper>();
         
-        List<Architecture_Design__c> designs = [
-            SELECT Id, Name, Status__c, Comments__c, CreatedDate, 
-                   Manager_Approval__c, Manager_Comments__c
-            FROM Architecture_Design__c 
-            WHERE Opportunity__c = :recordId OR Project__c = :recordId 
-            ORDER BY CreatedDate DESC
-        ];
+        List<Architecture_Design__c> designs = [SELECT Id, Name, Status__c, Comments__c, CreatedDate, Manager_Approval__c, Manager_Comments__c FROM Architecture_Design__c WHERE Opportunity__c = :recordId OR Project__c = :recordId ORDER BY CreatedDate DESC];
         
         for (Architecture_Design__c ad : designs) {
             DesignWrapper wrapper = new DesignWrapper();
@@ -199,26 +206,14 @@ public without sharing class ImageApprovalController {
     @AuraEnabled(cacheable=true)
     public static Map<String, String> getFileByToken(String token) {
         try {
-            Architecture_Design__c design = [
-                SELECT Id, Status__c, Comments__c, 
-                       Project__r.Name, 
-                       Opportunity__r.Name, Opportunity__r.Lead_Name__c 
-                FROM Architecture_Design__c 
-                WHERE Secure_Token__c = :token 
-                LIMIT 1
-            ];
+            Architecture_Design__c design = [SELECT Id, Status__c, Comments__c, Project__r.Name, Opportunity__r.Name, Opportunity__r.Lead_Name__c FROM Architecture_Design__c WHERE Secure_Token__c = :token 
+                LIMIT 1];
 
             Map<String, String> result = new Map<String, String>();
             result.put('status', design.Status__c);
             result.put('comments', design.Comments__c);
 
-            String projectName = 'Architectural Design'; 
-            if (design.Project__r != null) {
-                projectName = design.Project__r.Name;
-            } else if (design.Opportunity__r != null) {
-                projectName = design.Opportunity__r.Name;
-            }
-            result.put('projectName', projectName);
+            result.put('projectName', getExternalProjectName(design));
 
             String clientName = 'Valued Client';
             if (design.Opportunity__r != null && design.Opportunity__r.Lead_Name__c != null) {
@@ -235,19 +230,13 @@ public without sharing class ImageApprovalController {
     @AuraEnabled
     public static void submitDecision(String token, String status, String comments) {
         try {
-            Architecture_Design__c design = [
-                SELECT Id, Status__c, Comments__c, Related_File_Id__c,
-                       Opportunity__r.Name, Opportunity__r.Lead_Name__c, 
-                       Opportunity__r.Project_Description__c, Opportunity__r.Site_Space__c,
-                       Opportunity__r.Primary_Contact__r.Email, 
-                       Opportunity__r.Lead_Phone__c,
-                       Opportunity__r.Supervisor_User_Email__c, 
-                       Opportunity__r.Supervisor_User__r.FirstName,
-                       Opportunity__r.Supervisor_User__r.LastName, 
-                       Project__r.Name
-                FROM Architecture_Design__c 
-                WHERE Secure_Token__c = :token LIMIT 1
-            ];
+            Architecture_Design__c design = [SELECT Id, Status__c, Comments__c, Related_File_Id__c, Opportunity__r.RecordTypeId, Opportunity__r.Name, Opportunity__r.Lead_Name__c, Opportunity__r.Project_Description__c, Opportunity__r.Site_Space__c, Opportunity__r.Primary_Contact__r.Email, 
+                       Opportunity__r.Lead_Phone__c, Opportunity__r.Supervisor_User_Email__c, Opportunity__r.Supervisor_User__r.FirstName, Opportunity__r.Supervisor_User__r.LastName, Project__r.Name FROM Architecture_Design__c WHERE Secure_Token__c = :token LIMIT 1];
+
+            if (design.Opportunity__r != null &&
+                !isAreliaOpportunityRecordType(design.Opportunity__r.RecordTypeId)) {
+                throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+            }
 
             design.Status__c = status;
             design.Comments__c = String.isNotBlank(comments) ? comments : 'Approved By Client';
@@ -355,6 +344,39 @@ public without sharing class ImageApprovalController {
     // 5. GENERIC HELPERS
     // ============================================================================
 
+    private static void assertAreliaOpportunityRecordType(Id recordId) {
+        if (recordId == null) {
+            return;
+        }
+
+        String sObjName = recordId.getSObjectType().getDescribe().getName();
+        if (sObjName != 'Opportunity') {
+            return;
+        }
+
+        Id areliaOpportunityRecordTypeId = AreliaUtility.getAreliaOpportunityRecordTypeId();
+
+        // Keep the record type check in the query so only supported Opportunity records pass.
+        if (
+            areliaOpportunityRecordTypeId == null ||
+            [SELECT Id FROM Opportunity WHERE Id = :recordId
+                AND RecordTypeId = :areliaOpportunityRecordTypeId LIMIT 1]
+                .isEmpty()
+        ) {
+            throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+        }
+    }
+
+    private static Boolean isAreliaOpportunityRecordType(Id recordTypeId) {
+        if (recordTypeId == null) {
+            return false;
+        }
+
+        Id areliaOpportunityRecordTypeId = AreliaUtility.getAreliaOpportunityRecordTypeId();
+        return areliaOpportunityRecordTypeId != null
+            && recordTypeId == areliaOpportunityRecordTypeId;
+    }
+
     private static void linkDesignToParent(Architecture_Design__c designRec, Id recordId) {
         String sObjName = recordId.getSObjectType().getDescribe().getName();
         if (sObjName == 'Opportunity') {
@@ -375,7 +397,14 @@ public without sharing class ImageApprovalController {
         String sObjName = recordId.getSObjectType().getDescribe().getName();
         RecipientInfo info = new RecipientInfo();
         if (sObjName == 'Opportunity') { 
-            Opportunity opp = [SELECT Email__c, Lead_Name__c FROM Opportunity WHERE Id = :recordId];
+            Id areliaOpportunityRecordTypeId = AreliaUtility.getAreliaOpportunityRecordTypeId();
+            List<Opportunity> opportunities = [SELECT Email__c, Lead_Name__c FROM Opportunity WHERE Id = :recordId
+                AND RecordTypeId = :areliaOpportunityRecordTypeId LIMIT 1];
+            if (opportunities.isEmpty()) {
+                throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+            }
+
+            Opportunity opp = opportunities[0];
             if (String.isBlank(opp.Email__c)) {
                 throw new AuraHandledException('No email address found on Opportunity.');
             }
@@ -391,6 +420,11 @@ public without sharing class ImageApprovalController {
             info.name = 'Valued Client';
         }
         return info;
+    }
+
+    @TestVisible
+    private static String getRecipientEmailForTest(Id recordId) {
+        return fetchRecipientDetails(recordId).email;
     }
 
     private static void setOrgWideAddress(Messaging.SingleEmailMessage mail) {

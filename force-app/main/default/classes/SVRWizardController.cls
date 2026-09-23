@@ -1,5 +1,9 @@
 @SuppressWarnings('PMD.CognitiveComplexity,PMD.ApexCRUDViolation,PMD.ExcessiveParameterList')
 public with sharing class SVRWizardController {
+    private static final String ERROR_UNSUPPORTED_RECORD_TYPE =
+        'Site Visit Report is supported only for Arelia opportunities.';
+    @TestVisible
+    private static Boolean forceMissingRecordTypeForTest = false;
 
     /* ========== GET LATEST SVR (Strict Record Type Check) ========== */
     @AuraEnabled
@@ -22,6 +26,7 @@ public with sharing class SVRWizardController {
                 LIMIT 1
             ];
         } else if (objectApiName == 'Opportunity') {
+            validateAreliaOpportunity(parentId);
             svrs = [
                 SELECT Id, Wizard_Step__c, Is_Final_Submitted__c, Layout_Blueprint_Uploaded__c, Management_Approval__c
                 FROM Site_Visit_Report__c
@@ -50,12 +55,16 @@ public with sharing class SVRWizardController {
             draftData.Lead__c = parentId;
             rtName = 'Lead Site Visit Report';
         } else if (objectApiName == 'Opportunity') {
+            validateAreliaOpportunity(parentId);
             draftData.Opportunity__c = parentId;
             rtName = 'Opportunity Site Visit Report';
         }
 
         if (String.isNotBlank(rtName)) {
             try {
+                if (forceMissingRecordTypeForTest) {
+                    rtName = 'Missing Record Type';
+                }
                 draftData.RecordTypeId = Schema.SObjectType.Site_Visit_Report__c
                     .getRecordTypeInfosByName()
                     .get(rtName)
@@ -145,5 +154,27 @@ public with sharing class SVRWizardController {
             WHERE LinkedEntityId = :recordId
             
         ];
+    }
+
+    private static void validateAreliaOpportunity(Id opportunityId) {
+        Id areliaOpportunityRecordTypeId = getAreliaOpportunityRecordTypeId();
+
+        // Keep the Arelia Record Type requirement in SOQL so unsupported Opportunities do not proceed.
+        if (
+            [SELECT Id FROM Opportunity WHERE Id = :opportunityId
+                AND RecordTypeId = :areliaOpportunityRecordTypeId LIMIT 1]
+                .isEmpty()
+        ) {
+            throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+        }
+    }
+
+    private static Id getAreliaOpportunityRecordTypeId() {
+        Id areliaOpportunityRecordTypeId = AreliaUtility.getAreliaOpportunityRecordTypeId();
+        if (areliaOpportunityRecordTypeId == null) {
+            throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+        }
+
+        return areliaOpportunityRecordTypeId;
     }
 }

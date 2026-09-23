@@ -7,6 +7,8 @@ public without sharing class ArchitectureDesignTriggerHandler {
 
     private static final String STATUS_APPROVED         = 'Approved';
     private static final String TEMPLATE_DEVELOPER_NAME = 'Architecture_Manager_Approval';
+    private static final String ARELIA_OPPORTUNITY_RECORD_TYPE_NAME = 'Arelia';
+    private static Id cachedAreliaOpportunityRecordTypeId;
 
     // --- Inner Classes ---
 
@@ -65,7 +67,7 @@ public without sharing class ArchitectureDesignTriggerHandler {
     private static EmailContext loadEmailContext() {
         EmailContext ctx = new EmailContext();
         
-        ctx.toAddresses = parseEmailsFromLabel(Label.Arelia_Living_Enrollment_Members);
+        ctx.toAddresses = parseEmailsFromLabel(Label.Arelia_Living_Management_Members);
         if (ctx.toAddresses.isEmpty()) {
             return null;
         }
@@ -93,6 +95,7 @@ public without sharing class ArchitectureDesignTriggerHandler {
                    Status__c,        
                    Comments__c,      
                    Opportunity__c,
+                   Opportunity__r.RecordTypeId,
                    Opportunity__r.Name, 
                    Opportunity__r.Project_Description__c,
                    Opportunity__r.Site_Space__c,
@@ -160,7 +163,7 @@ public without sharing class ArchitectureDesignTriggerHandler {
 
         for (Id designId : designIds) {
             Architecture_Design__c design = ctx.designMap.get(designId);
-            if (design == null) {
+            if (design == null || !shouldHandleDesign(design)) {
                 continue;
             }
 
@@ -174,6 +177,47 @@ public without sharing class ArchitectureDesignTriggerHandler {
             emails.add(mail);
         }
         return emails;
+    }
+
+    private static Boolean shouldHandleDesign(Architecture_Design__c design) {
+        if (design == null) {
+            return false;
+        }
+
+        if (design.Opportunity__c == null) {
+            return true;
+        }
+
+        return isAreliaOpportunityRecordType(design.Opportunity__r == null
+            ? null
+            : design.Opportunity__r.RecordTypeId);
+    }
+
+    private static Boolean isAreliaOpportunityRecordType(Id recordTypeId) {
+        if (recordTypeId == null) {
+            return false;
+        }
+
+        Id areliaOpportunityRecordTypeId = getAreliaOpportunityRecordTypeId();
+        return areliaOpportunityRecordTypeId != null
+            && recordTypeId == areliaOpportunityRecordTypeId;
+    }
+
+    private static Id getAreliaOpportunityRecordTypeId() {
+        if (cachedAreliaOpportunityRecordTypeId != null) {
+            return cachedAreliaOpportunityRecordTypeId;
+        }
+
+        Schema.RecordTypeInfo recordTypeInfo = Schema.SObjectType.Opportunity
+            .getRecordTypeInfosByName()
+            .get(ARELIA_OPPORTUNITY_RECORD_TYPE_NAME);
+
+        if (recordTypeInfo == null) {
+            return null;
+        }
+
+        cachedAreliaOpportunityRecordTypeId = recordTypeInfo.getRecordTypeId();
+        return cachedAreliaOpportunityRecordTypeId;
     }
 
     private static Messaging.SingleEmailMessage buildSingleEmail(Architecture_Design__c design, EmailContext ctx) {

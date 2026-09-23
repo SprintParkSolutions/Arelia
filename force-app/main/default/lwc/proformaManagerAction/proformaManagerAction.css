@@ -1,188 +1,567 @@
-/* --- SHARED ARELIA STYLES --- */
-.arelia-container {
-    background-color: #f9f9f9;
-    padding: 40px 20px;
-    min-height: 100vh;
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    position: relative;
-    box-sizing: border-box;
+:host {
+    --arelia-black: #050505;
+    --arelia-card: #0d0d0d;
+    --arelia-gold: #d4af37;
+    --arelia-gold-light: #ffdf73;
+    --arelia-gold-muted: #a8872d;
+    --arelia-white: #fdfcf0;
+    --arelia-muted: rgba(253, 252, 240, 0.68);
+    --arelia-border: rgba(212, 175, 55, 0.22);
+    --arelia-glow: rgba(212, 175, 55, 0.24);
 }
 
-.submit-spinner { z-index: 9999; position: absolute; }
+.arelia-container {
+    min-height: 100vh;
+    padding: 70px 20px;
+    position: relative;
+    box-sizing: border-box;
+    overflow: hidden;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: var(--arelia-white);
+    background:
+        radial-gradient(circle at top center, rgba(86, 65, 20, 0.55) 0%, rgba(5, 5, 5, 0.95) 42%, #000000 100%),
+        linear-gradient(145deg, #000000, #090909);
+}
 
-/* Typography */
+.arelia-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(rgba(212, 175, 55, 0.18) 0.6px, transparent 0.6px),
+        linear-gradient(90deg, rgba(212, 175, 55, 0.035), transparent, rgba(212, 175, 55, 0.025));
+    background-size: 34px 34px, 100% 100%;
+    opacity: 0.22;
+    pointer-events: none;
+}
+
+.arelia-container::after {
+    content: '';
+    position: absolute;
+    top: -120px;
+    left: 50%;
+    width: 520px;
+    height: 520px;
+    transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.18), transparent 70%);
+    filter: blur(8px);
+    pointer-events: none;
+}
+
+.submit-spinner {
+    z-index: 9999;
+    position: absolute;
+}
+
+.page-header-content {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 36px;
+}
+
 .main-title {
-    font-size: 2.5rem;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 10px;
+    font-size: 2.8rem;
+    font-weight: 650;
     line-height: 1.2;
+    margin-bottom: 14px;
+    text-align: center;
+    letter-spacing: 0.04em;
+    background: linear-gradient(135deg, var(--arelia-gold-light), var(--arelia-gold), var(--arelia-gold-muted));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 16px 42px var(--arelia-glow);
 }
 
 .main-subtitle {
-    font-size: 1.1rem;
-    color: #555;
-    max-width: 700px;
+    max-width: 760px;
     margin: 0 auto;
-    line-height: 1.5;
+    color: var(--arelia-muted);
+    font-size: 1.04rem;
+    line-height: 1.65;
+    text-align: center;
 }
 
-/* Card Styling */
-.arelia-card {
-    background: white;
-    width: 100%;
-    max-width: 800px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    margin: 0 auto;
-    box-sizing: border-box;
-}
-
-.card-inner-content { width: 100%; max-width: 650px; }
-
-.card-title {
-    font-size: 1.75rem;
-    font-weight: 600;
-    color: #333;
-}
-
-/* --- MANAGER SPECIFIC ELEMENTS --- */
-
-/* Client Status Box */
-.info-box {
-    background-color: #f0fcf4; /* Light green tint */
-    border-radius: 8px;
-    border: 1px solid #c9e7d0;
-    width: 100%;
-    box-sizing: border-box;
-}
-.client-status-label {
-    font-size: 0.85rem;
-    color: #2e844a; /* Dark green */
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+.main-subtitle strong {
+    color: var(--arelia-gold-light);
     font-weight: 700;
 }
-.value-text { font-size: 1.1rem; font-weight: 600; color: #333; }
-.success-text { color: #2e844a; }
-.sub-label { font-size: 0.9rem; color: #666; }
 
-/* Note Box (Warning Style) */
-.note-box {
-    background-color: #fff8e1; /* Warning Yellow tint */
-    border: 1px solid #ffe0b2;
-    border-radius: 8px;
+.arelia-card {
+    position: relative;
+    z-index: 1;
     width: 100%;
-    color: #5d4037;
+    max-width: 820px;
+    margin: 0 auto;
     box-sizing: border-box;
+    border-radius: 18px;
+    border: 1px solid var(--arelia-border);
+    border-top: 3px solid var(--arelia-gold);
+    background:
+        linear-gradient(145deg, rgba(18, 18, 18, 0.96), rgba(8, 8, 8, 0.98)),
+        radial-gradient(circle at top, rgba(212, 175, 55, 0.09), transparent 58%);
+    box-shadow:
+        0 28px 80px rgba(0, 0, 0, 0.78),
+        0 0 42px rgba(212, 175, 55, 0.07),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
-.note-icon { --slds-c-icon-color-foreground: #f57f17; flex-shrink: 0; }
 
-/* --- BUTTONS --- */
-.button-container { 
-    display: flex; 
-    justify-content: center; 
-    gap: 20px; 
-    width: 100%; 
-    flex-wrap: wrap; 
+.arelia-card::before {
+    content: '';
+    position: absolute;
+    inset: 14px;
+    border: 1px solid rgba(212, 175, 55, 0.08);
+    border-radius: 13px;
+    pointer-events: none;
+}
+
+.card-inner-content {
+    width: 100%;
+    max-width: 650px;
+    position: relative;
+    z-index: 1;
+}
+
+.card-title {
+    color: var(--arelia-white);
+    font-size: 1.95rem;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    text-shadow: 0 8px 26px rgba(0, 0, 0, 0.75);
+}
+
+/* Client status */
+.info-box {
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 13px;
+    border: 1px solid rgba(31, 191, 98, 0.28);
+    background:
+        linear-gradient(145deg, rgba(31, 191, 98, 0.11), rgba(212, 175, 55, 0.045)),
+        #101010;
+    color: var(--arelia-muted);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.04),
+        0 14px 32px rgba(0, 0, 0, 0.28);
+}
+
+.status-success-icon {
+    --slds-c-icon-color-foreground-default: #1fbf62;
+    color: #1fbf62;
+    flex-shrink: 0;
+}
+
+.client-status-label {
+    color: var(--arelia-gold-light);
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 800;
+}
+
+.value-text {
+    color: var(--arelia-white);
+    font-size: 1.08rem;
+    font-weight: 700;
+}
+
+.success-text {
+    color: #7be89f;
+}
+
+.sub-label {
+    color: var(--arelia-muted);
+    font-size: 0.9rem;
+}
+
+/* Compliance note */
+.note-box {
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 12px;
+    border: 1px solid rgba(212, 175, 55, 0.24);
+    background:
+        linear-gradient(145deg, rgba(212, 175, 55, 0.095), rgba(255, 255, 255, 0.025)),
+        #101010;
+    color: var(--arelia-muted);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.04),
+        0 14px 32px rgba(0, 0, 0, 0.28);
+}
+
+.note-icon {
+    --slds-c-icon-color-foreground: var(--arelia-gold);
+    flex-shrink: 0;
+}
+
+.note-box p {
+    margin: 0;
+    color: var(--arelia-muted);
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+.note-box strong {
+    color: var(--arelia-gold-light);
+}
+
+/* Buttons */
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 22px;
+    width: 100%;
+    flex-wrap: wrap;
 }
 
 .arelia-btn {
-    border: none;
-    border-radius: 6px;
-    padding: 12px 24px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: white;
+    min-width: 210px;
+    border-radius: 4px;
+    padding: 13px 26px;
+    border: 1px solid transparent;
     cursor: pointer;
+    color: var(--arelia-white);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.035em;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 200px;
-    transition: background-color 0.2s;
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        background-color 0.25s ease,
+        border-color 0.25s ease,
+        color 0.25s ease;
 }
 
-.btn-approve { background-color: #0070d2; }
-.btn-approve:hover { background-color: #005fb2; }
-
-.btn-request { background-color: #ba0517; }
-.btn-request:hover { background-color: #8e0000; }
-
-.btn-submit-changes {
-    background-color: #333;
-    font-size: 1rem;
-    padding: 10px 20px;
-    min-width: auto;
+.arelia-btn:hover {
+    transform: translateY(-2px);
 }
-.btn-submit-changes:hover { background-color: #000; }
 
-/* Misc */
+.button-icon {
+    --slds-c-icon-color-foreground-default: currentColor;
+    flex-shrink: 0;
+}
+
+.approve-icon {
+    color: #1fbf62;
+    --slds-c-icon-color-foreground-default: #1fbf62;
+}
+
+.request-icon {
+    color: #ff4d4d;
+    --slds-c-icon-color-foreground-default: #ff4d4d;
+}
+
+.btn-approve {
+    color: #070707;
+    border-color: rgba(255, 223, 115, 0.45);
+    background: linear-gradient(135deg, var(--arelia-gold-light), var(--arelia-gold), var(--arelia-gold-muted));
+    box-shadow: 0 14px 30px rgba(212, 175, 55, 0.22);
+}
+
+.btn-approve:hover {
+    color: #000000;
+    filter: brightness(1.08);
+    box-shadow: 0 18px 42px rgba(212, 175, 55, 0.36);
+}
+
+.btn-request {
+    color: var(--arelia-gold-light);
+    border-color: rgba(212, 175, 55, 0.46);
+    background:
+        linear-gradient(145deg, rgba(212, 175, 55, 0.08), rgba(255, 255, 255, 0.02)),
+        #111111;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32);
+}
+
+.btn-request:hover {
+    color: #050505;
+    border-color: var(--arelia-gold);
+    background: linear-gradient(135deg, var(--arelia-gold-light), var(--arelia-gold));
+    box-shadow: 0 18px 38px rgba(212, 175, 55, 0.26);
+}
+
+/* Remarks section */
 .comment-box-container {
     width: 100%;
-    background-color: #f9f9f9;
-    padding: 20px;
-    border-radius: 8px;
     box-sizing: border-box;
+    padding: 24px;
+    border-radius: 13px;
+    border: 1px solid rgba(212, 175, 55, 0.22);
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.025), rgba(212, 175, 55, 0.055)),
+        #0f0f0f;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
 }
 
-.animate-fade-in { animation: fadeIn 0.3s ease-in; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+.change-label {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--arelia-gold-light);
+    font-size: 0.98rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
 
-.slds-badge { font-size: 1rem; padding: 8px 16px; }
-.final-message { font-size: 1.1rem; color: #555; }
+.required-symbol {
+    color: #ff4d4d;
+    text-decoration: none;
+    margin-right: 4px;
+}
 
-/* --- MODAL STYLES --- */
+.manager-remarks-textarea {
+    width: 100%;
+    min-height: 145px;
+    resize: vertical;
+    box-sizing: border-box;
+    border-radius: 10px;
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    background-color: #101010;
+    color: #fdfcf0;
+    -webkit-text-fill-color: #fdfcf0;
+    caret-color: var(--arelia-gold-light);
+    padding: 14px 16px;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    outline: none;
+}
+
+.manager-remarks-textarea::placeholder {
+    color: rgba(253, 252, 240, 0.42);
+    -webkit-text-fill-color: rgba(253, 252, 240, 0.42);
+}
+
+.manager-remarks-textarea:focus {
+    border-color: var(--arelia-gold);
+    box-shadow: 0 0 0 1px var(--arelia-gold), 0 0 18px rgba(212, 175, 55, 0.2);
+}
+
+.amendment-button-container {
+    justify-content: flex-end;
+}
+
+.btn-back {
+    min-width: 150px;
+    color: var(--arelia-gold-light);
+    border: 1px solid rgba(212, 175, 55, 0.42);
+    background:
+        linear-gradient(145deg, rgba(212, 175, 55, 0.06), rgba(255, 255, 255, 0.02)),
+        #111111;
+}
+
+.btn-back:hover {
+    color: #050505;
+    border-color: var(--arelia-gold);
+    background: linear-gradient(135deg, var(--arelia-gold-light), var(--arelia-gold));
+}
+
+.btn-submit-changes {
+    min-width: 190px;
+    color: #050505;
+    border-color: rgba(255, 223, 115, 0.45);
+    background: linear-gradient(135deg, var(--arelia-gold-light), var(--arelia-gold), var(--arelia-gold-muted));
+    font-size: 0.98rem;
+    padding: 11px 22px;
+    box-shadow: 0 12px 28px rgba(212, 175, 55, 0.2);
+}
+
+.btn-submit-changes:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 16px 34px rgba(212, 175, 55, 0.34);
+}
+
+/* Status */
+.slds-badge {
+    font-size: 1rem;
+    padding: 9px 18px;
+    border-radius: 999px;
+    color: #050505;
+    background: linear-gradient(135deg, var(--arelia-gold-light), var(--arelia-gold));
+    border: 1px solid rgba(255, 223, 115, 0.35);
+    box-shadow: 0 12px 26px rgba(212, 175, 55, 0.2);
+}
+
+.slds-theme_success,
+.slds-theme_error {
+    color: #050505;
+    background: linear-gradient(135deg, var(--arelia-gold-light), var(--arelia-gold)) !important;
+}
+
+.final-message {
+    color: var(--arelia-muted);
+    font-size: 1.05rem;
+}
+
+.slds-text-color_weak {
+    color: var(--arelia-muted) !important;
+}
+
+/* Error */
+.slds-notify_alert.slds-theme_error {
+    position: relative;
+    z-index: 2;
+    max-width: 820px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 10px;
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    background: #160d0d !important;
+    color: var(--arelia-white);
+}
+
+/* Modals */
 .slds-modal {
-    z-index: 9001; /* Above backdrops */
+    z-index: 9001;
 }
+
 .slds-backdrop {
     z-index: 9000;
-}
-.slds-modal__header.slds-theme_success {
-    background-color: #04844b;
-    color: white;
+    background: rgba(0, 0, 0, 0.78);
+    backdrop-filter: blur(7px);
 }
 
-/* ========================================= */
-/* MOBILE RESPONSIVENESS (Max Width: 768px)  */
-/* ========================================= */
+.slds-modal__container {
+    max-width: 560px;
+}
+
+.slds-modal__header {
+    border-bottom: 1px solid rgba(212, 175, 55, 0.22);
+    border-radius: 14px 14px 0 0;
+    background:
+        linear-gradient(145deg, rgba(212, 175, 55, 0.14), rgba(255, 255, 255, 0.025)),
+        #0d0d0d;
+}
+
+.slds-modal__header h2 {
+    color: var(--arelia-gold-light);
+}
+
+.slds-modal__header.slds-theme_success {
+    background:
+        linear-gradient(135deg, var(--arelia-gold-light), var(--arelia-gold), var(--arelia-gold-muted)) !important;
+    color: #050505 !important;
+}
+
+.success-header-title {
+    color: #050505 !important;
+}
+
+.slds-modal__content {
+    background: #101010;
+    color: var(--arelia-muted);
+    border-left: 1px solid rgba(212, 175, 55, 0.16);
+    border-right: 1px solid rgba(212, 175, 55, 0.16);
+}
+
+.slds-modal__content h2 {
+    color: var(--arelia-gold-light);
+}
+
+.slds-modal__content p {
+    color: var(--arelia-muted);
+    line-height: 1.6;
+}
+
+.slds-modal__footer {
+    border-top: 1px solid rgba(212, 175, 55, 0.18);
+    border-radius: 0 0 14px 14px;
+    background: #0d0d0d;
+}
+
+.slds-button_brand {
+    border-color: var(--arelia-gold);
+    color: #050505;
+    background: linear-gradient(135deg, var(--arelia-gold-light), var(--arelia-gold));
+}
+
+.slds-button_brand:hover {
+    color: #050505;
+    filter: brightness(1.06);
+}
+
+.slds-button_neutral {
+    border-color: rgba(212, 175, 55, 0.36);
+    color: var(--arelia-gold-light);
+    background: #111111;
+}
+
+.slds-button_neutral:hover {
+    border-color: var(--arelia-gold);
+    color: #050505;
+    background: var(--arelia-gold);
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.35s ease-in;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mobile */
 @media screen and (max-width: 768px) {
     .arelia-container {
-        padding: 20px 10px; 
+        padding: 38px 12px;
     }
 
     .main-title {
-        font-size: 1.8rem;
+        font-size: 2rem;
+        letter-spacing: 0.03em;
     }
 
     .main-subtitle {
-        font-size: 1rem;
+        font-size: 0.96rem;
+        padding: 0 10px;
     }
 
     .arelia-card {
-        padding: 1.5rem 1rem !important; 
+        padding: 1.5rem 1rem !important;
+        border-radius: 14px;
     }
 
-    /* Stack buttons vertically */
+    .arelia-card::before {
+        inset: 9px;
+    }
+
+    .card-title {
+        font-size: 1.55rem;
+    }
+
     .button-container {
         flex-direction: column;
-        gap: 15px;
+        gap: 14px;
     }
 
     .arelia-btn {
         width: 100%;
         min-width: auto;
-        font-size: 1rem; 
-        padding: 14px 20px; 
+        font-size: 0.98rem;
+        padding: 14px 20px;
     }
 
-    .info-box, .note-box {
+    .comment-box-container {
+        padding: 16px;
+    }
+
+    .info-box,
+    .note-box {
         padding: 1rem !important;
     }
-    
-    /* Mobile Modal Adjustment */
+
     .slds-modal__container {
-        width: 90%;
+        width: 92%;
         max-width: none;
         margin: 0 auto;
         padding: 20px 0;

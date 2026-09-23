@@ -1,170 +1,344 @@
-@isTest
-public class SiteVisitReportFileServiceTest {
+@IsTest
+@SuppressWarnings('PMD.ApexCRUDViolation')
+private class SiteVisitReportFileServiceTest {
+    private static final String LEAD_RECORD_TYPE_DEVELOPER_NAME = 'Lead_Site_Visit_Report';
+    private static final String OPPORTUNITY_RECORD_TYPE_DEVELOPER_NAME = 'Opportunity_Site_Visit_Report';
 
-    // Helper to get RecordType Id by Developer Name safely
-    private static Id getRecordTypeId(String devName) {
+    private static final String LEAD_LAST_NAME = 'Test Lead Parent';
+    private static final String EMPTY_LEAD_LAST_NAME = 'Empty Lead';
+    private static final String DUPLICATE_LEAD_LAST_NAME = 'Duplicate Check Lead';
+
+    private static final String SUPERVISOR_ALIAS = 'svrSup';
+    private static final String OPPORTUNITY_NAME = 'Test Opp Parent';
+
+    private static final String LEAD_FILE_TITLE = 'Test File Lead';
+    private static final String OPPORTUNITY_FILE_TITLE = 'Test File Opp';
+    private static final String EXISTING_FILE_TITLE = 'Existing File';
+    private static final String MISSING_LEAD_FILE_TITLE = 'Missing Lead File';
+    private static final String MISSING_OPPORTUNITY_FILE_TITLE = 'Missing Opportunity File';
+
+    private static final String FILE_BODY = 'Content Body';
+    private static final Decimal LEAD_TOTAL_COST = 500;
+    private static final Decimal OPPORTUNITY_TOTAL_COST = 1000;
+
+    @IsTest
+    static void testAttachFilesToLeadCreatesMissingLink() {
+        Lead leadRecord = TestDataUtility.createLead(LEAD_LAST_NAME);
+        markAppointmentCompleted(leadRecord);
+
+        Site_Visit_Report__c reportRecord = createLeadSiteVisitReport(leadRecord.Id);
+
+        ContentVersion contentVersion = TestDataUtility.createContentVersion(
+            LEAD_FILE_TITLE,
+            FILE_BODY
+        );
+        ContentDocumentLink reportFileLink = TestDataUtility.linkFileToRecord(
+            contentVersion.Id,
+            reportRecord.Id
+        );
+
+        Test.startTest();
+        SiteVisitReportFileService.attachFilesToLead(reportRecord.Id);
+        Test.stopTest();
+
+        Integer linkedFileCount = getLinkedFileCount(
+            leadRecord.Id,
+            reportFileLink.ContentDocumentId
+        );
+
+        System.assertEquals(
+            1,
+            linkedFileCount,
+            'File should be attached to the related Lead.'
+        );
+    }
+
+    @IsTest
+    static void testAttachFilesToOpportunityCreatesMissingLink() {
+        User supervisorUser = TestDataUtility.createSupervisorUser(SUPERVISOR_ALIAS);
+        Opportunity opportunityRecord = TestDataUtility.createOpportunity(
+            OPPORTUNITY_NAME,
+            supervisorUser.Id
+        );
+
+        Site_Visit_Report__c reportRecord = createOpportunitySiteVisitReport(
+            opportunityRecord.Id
+        );
+
+        ContentVersion contentVersion = TestDataUtility.createContentVersion(
+            OPPORTUNITY_FILE_TITLE,
+            FILE_BODY
+        );
+        ContentDocumentLink reportFileLink = TestDataUtility.linkFileToRecord(
+            contentVersion.Id,
+            reportRecord.Id
+        );
+
+        Test.startTest();
+        SiteVisitReportFileService.attachFilesToLead(reportRecord.Id);
+        Test.stopTest();
+
+        Integer linkedFileCount = getLinkedFileCount(
+            opportunityRecord.Id,
+            reportFileLink.ContentDocumentId
+        );
+
+        System.assertEquals(
+            1,
+            linkedFileCount,
+            'File should be attached to the related Opportunity.'
+        );
+    }
+
+    @IsTest
+    static void testNoFilesAttachedReturnsWithoutCreatingLinks() {
+        Lead leadRecord = TestDataUtility.createLead(EMPTY_LEAD_LAST_NAME);
+        markAppointmentCompleted(leadRecord);
+
+        Site_Visit_Report__c reportRecord = createLeadSiteVisitReport(leadRecord.Id);
+
+        Test.startTest();
+        SiteVisitReportFileService.attachFilesToLead(reportRecord.Id);
+        Test.stopTest();
+
+        Integer linkedFileCount = [
+            SELECT COUNT()
+            FROM ContentDocumentLink
+            WHERE LinkedEntityId = :leadRecord.Id
+        ];
+
+        System.assertEquals(
+            0,
+            linkedFileCount,
+            'No file links should be created when Site Visit Report has no files.'
+        );
+    }
+
+    @IsTest
+    static void testAlreadyLinkedLeadFileDoesNotCreateDuplicate() {
+        Lead leadRecord = TestDataUtility.createLead(DUPLICATE_LEAD_LAST_NAME);
+        markAppointmentCompleted(leadRecord);
+
+        Site_Visit_Report__c reportRecord = createLeadSiteVisitReport(leadRecord.Id);
+
+        ContentVersion contentVersion = TestDataUtility.createContentVersion(
+            EXISTING_FILE_TITLE,
+            FILE_BODY
+        );
+
+        ContentDocumentLink reportFileLink = TestDataUtility.linkFileToRecord(
+            contentVersion.Id,
+            reportRecord.Id
+        );
+        TestDataUtility.linkFileToRecord(
+            contentVersion.Id,
+            leadRecord.Id
+        );
+
+        Test.startTest();
+        SiteVisitReportFileService.attachFilesToLead(reportRecord.Id);
+        Test.stopTest();
+
+        Integer linkedFileCount = getLinkedFileCount(
+            leadRecord.Id,
+            reportFileLink.ContentDocumentId
+        );
+
+        System.assertEquals(
+            1,
+            linkedFileCount,
+            'Existing Lead file link should not be duplicated.'
+        );
+    }
+
+    @IsTest
+    static void testAlreadyLinkedOpportunityFileDoesNotCreateDuplicate() {
+        User supervisorUser = TestDataUtility.createSupervisorUser('svrDup');
+        Opportunity opportunityRecord = TestDataUtility.createOpportunity(
+            'Duplicate Opp Parent',
+            supervisorUser.Id
+        );
+
+        Site_Visit_Report__c reportRecord = createOpportunitySiteVisitReport(
+            opportunityRecord.Id
+        );
+
+        ContentVersion contentVersion = TestDataUtility.createContentVersion(
+            'Existing Opp File',
+            FILE_BODY
+        );
+
+        ContentDocumentLink reportFileLink = TestDataUtility.linkFileToRecord(
+            contentVersion.Id,
+            reportRecord.Id
+        );
+        TestDataUtility.linkFileToRecord(
+            contentVersion.Id,
+            opportunityRecord.Id
+        );
+
+        Test.startTest();
+        SiteVisitReportFileService.attachFilesToLead(reportRecord.Id);
+        Test.stopTest();
+
+        Integer linkedFileCount = getLinkedFileCount(
+            opportunityRecord.Id,
+            reportFileLink.ContentDocumentId
+        );
+
+        System.assertEquals(
+            1,
+            linkedFileCount,
+            'Existing Opportunity file link should not be duplicated.'
+        );
+    }
+
+    @IsTest
+    static void testMissingLeadParentThrowsAuraHandledException() {
+        Site_Visit_Report__c reportRecord = new Site_Visit_Report__c(
+            RecordTypeId = getSiteVisitReportRecordTypeId(LEAD_RECORD_TYPE_DEVELOPER_NAME),
+            Total_Estimated_Cost__c = LEAD_TOTAL_COST
+        );
+        insert reportRecord;
+
+        ContentVersion contentVersion = TestDataUtility.createContentVersion(
+            MISSING_LEAD_FILE_TITLE,
+            FILE_BODY
+        );
+        TestDataUtility.linkFileToRecord(contentVersion.Id, reportRecord.Id);
+
+        Test.startTest();
+
+        try {
+            SiteVisitReportFileService.attachFilesToLead(reportRecord.Id);
+            System.assert(false, 'Expected AuraHandledException for missing Lead parent.');
+        } catch (AuraHandledException exceptionRecord) {
+            System.assertNotEquals(
+                null,
+                exceptionRecord.getMessage(),
+                'Missing Lead parent should throw AuraHandledException.'
+            );
+        }
+
+        Test.stopTest();
+    }
+
+    @IsTest
+    static void testMissingOpportunityParentThrowsAuraHandledException() {
+        Site_Visit_Report__c reportRecord = new Site_Visit_Report__c(
+            RecordTypeId = getSiteVisitReportRecordTypeId(OPPORTUNITY_RECORD_TYPE_DEVELOPER_NAME),
+            Total_Estimated_Cost__c = OPPORTUNITY_TOTAL_COST
+        );
+        insert reportRecord;
+
+        ContentVersion contentVersion = TestDataUtility.createContentVersion(
+            MISSING_OPPORTUNITY_FILE_TITLE,
+            FILE_BODY
+        );
+        TestDataUtility.linkFileToRecord(contentVersion.Id, reportRecord.Id);
+
+        Test.startTest();
+
+        try {
+            SiteVisitReportFileService.attachFilesToLead(reportRecord.Id);
+            System.assert(false, 'Expected AuraHandledException for missing Opportunity parent.');
+        } catch (AuraHandledException exceptionRecord) {
+            System.assertNotEquals(
+                null,
+                exceptionRecord.getMessage(),
+                'Missing Opportunity parent should throw AuraHandledException.'
+            );
+        }
+
+        Test.stopTest();
+    }
+
+    @IsTest
+    static void testNullReportIdReturnsWithoutException() {
+        Boolean completedWithoutException = true;
+
+        Test.startTest();
+
+        try {
+            SiteVisitReportFileService.attachFilesToLead(null);
+        } catch (Exception exceptionRecord) {
+            completedWithoutException = false;
+        }
+
+        Test.stopTest();
+
+        System.assertEquals(
+            true,
+            completedWithoutException,
+            'Null Site Visit Report Id should return without throwing an exception.'
+        );
+    }
+
+    @IsTest
+    static void testInvalidReportIdReturnsWithoutException() {
+        Id fakeReportId = getFakeSiteVisitReportId();
+        Boolean completedWithoutException = true;
+
+        Test.startTest();
+
+        try {
+            SiteVisitReportFileService.attachFilesToLead(fakeReportId);
+        } catch (Exception exceptionRecord) {
+            completedWithoutException = false;
+        }
+
+        Test.stopTest();
+
+        System.assertEquals(
+            true,
+            completedWithoutException,
+            'Invalid Site Visit Report Id should return without throwing an exception.'
+        );
+    }
+
+    private static Site_Visit_Report__c createLeadSiteVisitReport(Id leadId) {
+        Site_Visit_Report__c reportRecord = new Site_Visit_Report__c(
+            Lead__c = leadId,
+            RecordTypeId = getSiteVisitReportRecordTypeId(LEAD_RECORD_TYPE_DEVELOPER_NAME),
+            Total_Estimated_Cost__c = LEAD_TOTAL_COST
+        );
+        insert reportRecord;
+        return reportRecord;
+    }
+
+    private static Site_Visit_Report__c createOpportunitySiteVisitReport(Id opportunityId) {
+        Site_Visit_Report__c reportRecord = new Site_Visit_Report__c(
+            Opportunity__c = opportunityId,
+            RecordTypeId = getSiteVisitReportRecordTypeId(OPPORTUNITY_RECORD_TYPE_DEVELOPER_NAME),
+            Total_Estimated_Cost__c = OPPORTUNITY_TOTAL_COST
+        );
+        insert reportRecord;
+        return reportRecord;
+    }
+
+    private static void markAppointmentCompleted(Lead leadRecord) {
+        leadRecord.put('Appointment_Completed__c', true);
+        update leadRecord;
+    }
+
+    private static Id getSiteVisitReportRecordTypeId(String developerName) {
         return Schema.SObjectType.Site_Visit_Report__c
             .getRecordTypeInfosByDeveloperName()
-            .get(devName)
+            .get(developerName)
             .getRecordTypeId();
     }
 
-    @isTest
-    static void testAttachToLead() {
-        Lead l = TestDataUtility.createLead('Test Lead Parent');
-
-        // FIX: Explicitly check the checkbox to satisfy Validation Rule.
-        // We use .put() to ensure it works even if FLS is tricky in the scratch org.
-        l.put('Appointment_Completed__c', true);
-        update l;
-
-        Site_Visit_Report__c svr = new Site_Visit_Report__c(
-            Lead__c = l.Id,
-            RecordTypeId = getRecordTypeId('Lead_Site_Visit_Report'),
-            Total_Estimated_Cost__c = 500
-        );
-        insert svr;
-
-        ContentVersion cv = TestDataUtility.createContentVersion('Test File Lead', 'Content Body');
-        TestDataUtility.linkFileToRecord(cv.Id, svr.Id);
-
-        Test.startTest();
-        SiteVisitReportFileService.attachFilesToLead(svr.Id);
-        Test.stopTest();
-
-        Id docId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cv.Id].ContentDocumentId;
-        List<ContentDocumentLink> links = [
-            SELECT Id FROM ContentDocumentLink 
-            WHERE LinkedEntityId = :l.Id 
-            AND ContentDocumentId = :docId
+    private static Integer getLinkedFileCount(Id parentId, Id contentDocumentId) {
+        return [
+            SELECT COUNT()
+            FROM ContentDocumentLink
+            WHERE LinkedEntityId = :parentId
+            AND ContentDocumentId = :contentDocumentId
         ];
-        
-        System.assertEquals(1, links.size(), 'File should be attached to the Lead');
     }
 
-    @isTest
-    static void testAttachToOpportunity() {
-        User sup = TestDataUtility.createSupervisorUser('sup1');
-        Opportunity opp = TestDataUtility.createOpportunity('Test Opp Parent', sup.Id);
-
-        Site_Visit_Report__c svr = new Site_Visit_Report__c(
-            Opportunity__c = opp.Id,
-            RecordTypeId = getRecordTypeId('Opportunity_Site_Visit_Report'),
-            Total_Estimated_Cost__c = 1000
-        );
-        insert svr;
-
-        ContentVersion cv = TestDataUtility.createContentVersion('Test File Opp', 'Content Body');
-        TestDataUtility.linkFileToRecord(cv.Id, svr.Id);
-
-        Test.startTest();
-        SiteVisitReportFileService.attachFilesToLead(svr.Id);
-        Test.stopTest();
-
-        Id docId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cv.Id].ContentDocumentId;
-        List<ContentDocumentLink> links = [
-            SELECT Id FROM ContentDocumentLink 
-            WHERE LinkedEntityId = :opp.Id 
-            AND ContentDocumentId = :docId
-        ];
-        
-        System.assertEquals(1, links.size(), 'File should be attached to the Opportunity');
-    }
-
-    @isTest
-    static void testNoFilesAttached() {
-        Lead l = TestDataUtility.createLead('Empty Lead');
-        
-        // FIX: Satisfy Validation Rule
-        l.put('Appointment_Completed__c', true);
-        update l;
-        
-        Site_Visit_Report__c svr = new Site_Visit_Report__c(
-            Lead__c = l.Id,
-            RecordTypeId = getRecordTypeId('Lead_Site_Visit_Report'),
-            Total_Estimated_Cost__c = 500
-        );
-        insert svr;
-
-        Test.startTest();
-        SiteVisitReportFileService.attachFilesToLead(svr.Id);
-        Test.stopTest();
-
-        Integer count = [SELECT COUNT() FROM ContentDocumentLink WHERE LinkedEntityId = :l.Id];
-        System.assertEquals(0, count, 'No files should be linked');
-    }
-
-    @isTest
-    static void testAlreadyLinked() {
-        Lead l = TestDataUtility.createLead('Duplicate Check Lead');
-        
-        // FIX: Satisfy Validation Rule
-        l.put('Appointment_Completed__c', true);
-        update l;
-        
-        Site_Visit_Report__c svr = new Site_Visit_Report__c(
-            Lead__c = l.Id,
-            RecordTypeId = getRecordTypeId('Lead_Site_Visit_Report'),
-            Total_Estimated_Cost__c = 500
-        );
-        insert svr;
-
-        ContentVersion cv = TestDataUtility.createContentVersion('Existing File', 'Data');
-        
-        TestDataUtility.linkFileToRecord(cv.Id, svr.Id);
-        TestDataUtility.linkFileToRecord(cv.Id, l.Id); 
-
-        Test.startTest();
-        SiteVisitReportFileService.attachFilesToLead(svr.Id);
-        Test.stopTest();
-
-        Id docId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cv.Id].ContentDocumentId;
-        Integer count = [
-            SELECT COUNT() FROM ContentDocumentLink 
-            WHERE LinkedEntityId = :l.Id 
-            AND ContentDocumentId = :docId
-        ];
-        System.assertEquals(1, count, 'Should remain 1 link, no duplicates');
-    }
-
-    @isTest
-    static void testMissingLeadParent() {
-        // Create Report with Lead RecordType but NULL Lead__c
-        Site_Visit_Report__c svr = new Site_Visit_Report__c(
-            Lead__c = null, 
-            RecordTypeId = getRecordTypeId('Lead_Site_Visit_Report'),
-            Total_Estimated_Cost__c = 500
-        );
-        insert svr;
-
-        // Attach file so the code proceeds to the parent check
-        ContentVersion cv = TestDataUtility.createContentVersion('File', 'Data');
-        TestDataUtility.linkFileToRecord(cv.Id, svr.Id);
-
-        Test.startTest();
-        try {
-            SiteVisitReportFileService.attachFilesToLead(svr.Id);
-            // This assertion ensures we catch the specific "Parent ID Missing" error from the service
-            System.assert(false, 'Should have thrown exception for missing Lead');
-        } catch (AuraHandledException e) {
-            System.assert(true, 'Expected AuraHandledException was thrown');
-        } catch (Exception e) {
-            System.assert(true, 'Exception caught: ' + e.getMessage());
-        }
-        Test.stopTest();
-    }
-
-    @isTest
-    static void testInvalidReportId() {
-        Test.startTest();
-        try {
-            // Generate a fake ID with the correct Key Prefix for SVR
-            String fakeId = String.valueOf(Site_Visit_Report__c.SObjectType.getDescribe().getKeyPrefix()) + '000000000000';
-            SiteVisitReportFileService.attachFilesToLead((Id)fakeId);
-            System.assert(false, 'Should have thrown exception for invalid ID');
-        } catch (Exception e) {
-            System.assert(true, 'Exception caught successfully');
-        }
-        Test.stopTest();
+    private static Id getFakeSiteVisitReportId() {
+        String keyPrefix = Site_Visit_Report__c.SObjectType.getDescribe().getKeyPrefix();
+        return (Id) (keyPrefix + '000000000000');
     }
 }

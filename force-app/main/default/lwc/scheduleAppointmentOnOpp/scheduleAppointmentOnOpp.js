@@ -137,17 +137,6 @@
 //     }
 // }
 
-
-
-
-
-
-
-
-
-
-
-
 import { LightningElement, api, wire, track } from 'lwc';
 import { getRecord } from 'lightning/uiRecordApi';
 import scheduleAppointmentAndSendEmails from '@salesforce/apex/ScheduleAppointmentonOppController.scheduleAppointmentAndSendEmails';
@@ -231,9 +220,45 @@ export default class ScheduleAppointmentOnOpp extends LightningElement {
             this.timeSlotOptions = [];
             return;
         }
+
+        // Requirement 1: Prevent past dates
+        const selectedDateObj = new Date(this.appointmentDate);
+        const currentDateObj = new Date();
+        selectedDateObj.setHours(0, 0, 0, 0);
+        currentDateObj.setHours(0, 0, 0, 0);
+
+        if (selectedDateObj < currentDateObj) {
+            this.timeSlotOptions = [];
+            this.toast('Invalid Date', 'Please select today or a future date.', 'warning');
+            return;
+        }
+
         getAvailableTimeSlotsOpp({ forDate: this.appointmentDate, currentOpportunityId: this.oppId })
             .then(slots => {
-                this.timeSlotOptions = (slots || []).map(s => ({ label: s, value: s }));
+                let availableSlots = slots || [];
+
+                // Requirement 2: Filter past time slots if current date is selected
+                if (this.appointmentDate === this.todayDate) {
+                    const now = new Date();
+                    availableSlots = availableSlots.filter(slot => {
+                        const startRaw = slot.split('-')[0].trim();
+                        const m = startRaw.match(/(\d+)(?::(\d+))?\s*(AM|PM)/i);
+                        if (m) {
+                            let hour = parseInt(m[1], 10);
+                            const minute = parseInt(m[2] || '0', 10);
+                            const ampm = m[3].toUpperCase();
+                            if (ampm === 'PM' && hour !== 12) hour += 12;
+                            if (ampm === 'AM' && hour === 12) hour = 0;
+
+                            const slotDt = new Date();
+                            slotDt.setHours(hour, minute, 0, 0);
+                            return slotDt > now;
+                        }
+                        return true;
+                    });
+                }
+
+                this.timeSlotOptions = availableSlots.map(s => ({ label: s, value: s }));
                 if (!this.timeSlotOptions.length) {
                     this.toast('No Slots', 'No time slots are available for the selected date.', 'warning');
                 }
@@ -297,10 +322,10 @@ export default class ScheduleAppointmentOnOpp extends LightningElement {
             });
     }
 
-    // In your template, bind disabled={isClosedWon} on inputs & button if you want to gray them out.
     toast(title, message, variant) {
         this.dispatchEvent(new ShowToastEvent({ title, message, variant }));
     }
+    
     close() {
         this.dispatchEvent(new CloseActionScreenEvent());
     }

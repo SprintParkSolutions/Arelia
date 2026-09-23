@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Arelia Payment Overdue</name>
+    <relatedEntityType>Payment_Term__c</relatedEntityType>
+    <style>none</style>
+    <subject>OVERDUE: Payment Required for {{{Payment_Term__c.Project__r.Name}}}</subject>
+    <type>custom</type>
+    <uiType>SFX</uiType>
+</EmailTemplate>

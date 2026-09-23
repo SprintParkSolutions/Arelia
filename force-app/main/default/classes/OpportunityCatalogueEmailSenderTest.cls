@@ -133,4 +133,18 @@ private class OpportunityCatalogueEmailSenderTest {
         }
         Test.stopTest();
     }
+
+    @IsTest
+    static void testUnsupportedRecordTypeValidation() {
+        Account accountRecord = TestDataUtility.createAccount('Catalogue Unsupported Account');
+
+        Test.startTest();
+        try {
+            OpportunityCatalogueEmailSender.sendCatalogueEmail(accountRecord.Id, false);
+            Assert.fail('Should reject non-Opportunity/non-Arelia record Id');
+        } catch (Exception e) {
+            Assert.isTrue(e.getTypeName().contains('AuraHandledException'), 'Should be AuraHandledException');
+        }
+        Test.stopTest();
+    }
 }

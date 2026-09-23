@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Arelia</fullName>
+    <active>true</active>
+    <description>It is related to all arelia projects.</description>
+    <label>Arelia</label>
+    <picklistValues>
+        <picklist>Additional_Request_Status__c</picklist>
+        <values>
+            <fullName>Approved</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pending</fullName>
+            <default>true</default>
+        </values>
+        <values>
+            <fullName>Rejected</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Estimated_Project_Duration__c</picklist>
+        <values>
+            <fullName>1 Month</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 1 Month</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 2 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 3 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 4 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 5 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1 Year 6 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>10 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>11 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>12 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>2 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>3 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>4 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>5 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>6 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>7 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>8 Months</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>9 Months</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Hold_Reason__c</picklist>
+        <values>
+            <fullName>Buddget Issue</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Design Issue</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hold Request from Client</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Vendor Abscond</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Plan_Level__c</picklist>
+        <values>
+            <fullName>Luxury</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Premium</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Standard</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Priority__c</picklist>
+        <values>
+            <fullName>High</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Low</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Medium</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Project_Request_Quotation_Type__c</picklist>
+        <values>
+            <fullName>Automation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Manual</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Project_Scope__c</picklist>
+        <values>
+            <fullName>1BHK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1RK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>2BHK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>3BHK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>4BHK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>5BHK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bed Room</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cabins</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Conference Hall</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Dining Hall</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Full Home Interiors</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fully Office Interiors</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hall Interior</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Home Decor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Kitchen</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Office Decor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Office Space</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Project_Status__c</picklist>
+        <values>
+            <fullName>Active</fullName>
+            <default>true</default>
+        </values>
+        <values>
+            <fullName>Inactive</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Request_Type__c</picklist>
+        <values>
+            <fullName>Civil %26 Carpentry Contractors</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Decor %26 Accessories</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Flooring %26 Wall Finishes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Furniture %26 Furnishings</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Lighting %26 Electrical</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Source_Channel__c</picklist>
+        <values>
+            <fullName>Experience Site</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Referral</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Website</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Status__c</picklist>
+        <values>
+            <fullName>Cancelled</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Completed</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hold</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>In Progress</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Initiated</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Type_Of_Project__c</picklist>
+        <values>
+            <fullName>Home</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Office</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Only Project Plan</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

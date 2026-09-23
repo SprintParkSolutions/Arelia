@@ -3,7 +3,9 @@
  * Handles retrieval of specifications, tasks, and email dispatching.
  */
 @SuppressWarnings('PMD.CognitiveComplexity,PMD.ApexCRUDViolation,PMD.ExcessiveParameterList')
-public with sharing class VendorEmailController {
+public without sharing class VendorEmailController {
+    private static final String ERROR_UNSUPPORTED_RECORD_TYPE =
+        'Vendor email is supported only for Arelia opportunities.';
 
     // --- 1. UTILITIES ---
 
@@ -174,6 +176,35 @@ public with sharing class VendorEmailController {
 
     // ================= HELPERS =================
 
+    private static Opportunity queryAreliaOpportunity(String opportunityId) {
+        Id areliaOpportunityRecordTypeId = getAreliaOpportunityRecordTypeId();
+
+        // Keep the Arelia Record Type requirement in SOQL so unsupported Opportunities do not proceed.
+        List<Opportunity> opportunities = [
+            SELECT Id, Name, Supervisor_User__r.Name, Supervisor_User__r.Email,
+                Supervisor_User__r.Phone, Project_Scope__c
+            FROM Opportunity
+            WHERE Id = :opportunityId
+            AND RecordTypeId = :areliaOpportunityRecordTypeId
+            LIMIT 1
+        ];
+
+        if (opportunities.isEmpty()) {
+            throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+        }
+
+        return opportunities[0];
+    }
+
+    private static Id getAreliaOpportunityRecordTypeId() {
+        Id areliaOpportunityRecordTypeId = AreliaUtility.getAreliaOpportunityRecordTypeId();
+        if (areliaOpportunityRecordTypeId == null) {
+            throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+        }
+
+        return areliaOpportunityRecordTypeId;
+    }
+
     private with sharing class SpecQueryHelper {
         public List<SObject> querySpecs(String opportunityId, String category) {
             Schema.FieldSet fs = SObjectType.Project_Specification__c.FieldSets.getMap().get('Vendor_Email_Fields');
@@ -205,7 +236,7 @@ public with sharing class VendorEmailController {
             
             EmailContentWrapper content = buildContent(ctx);
             
-            Opportunity opp = [SELECT Id, Name, Supervisor_User__r.Name, Supervisor_User__r.Email, Supervisor_User__r.Phone, Project_Scope__c FROM Opportunity WHERE Id = :ctx.opportunityId  LIMIT 1];
+            Opportunity opp = VendorEmailController.queryAreliaOpportunity(ctx.opportunityId);
 
             List<Messaging.EmailFileAttachment> attachments = buildAttachments(ctx.fileIds, content.specs);
             List<Vendor__c> vendors = [SELECT Id, Name, Email__c, Vendor_Category__c FROM Vendor__c WHERE Id IN :ctx.vendorIds AND Email__c != NULL ];
@@ -269,9 +300,7 @@ public with sharing class VendorEmailController {
             email.setSubject(subject);
             email.setHtmlBody(body);
             email.setFileAttachments(ctx.attachments);
-            if (ctx.opportunity.Supervisor_User__r?.Name != null) {
-                email.setSenderDisplayName(ctx.opportunity.Supervisor_User__r.Name + ' (Project Supervisor)');
-            }
+            AreliaUtility.setOrgWideEmailAddress(email, System.Label.Arelia_OWD);
             return email;
         }
 
@@ -320,6 +349,26 @@ public with sharing class VendorEmailController {
             }
             return result;
         }
+    }
+
+    @TestVisible
+    private static String buildDynamicSpecificationTableForTest(List<SObject> records) {
+        return new TableBuilderHelper().buildDynamicSpecificationTable(records);
+    }
+
+    @TestVisible
+    private static String buildAbscondedTaskTableForTest(AbscondedVendorDetails details) {
+        return new TableBuilderHelper().buildAbscondedTaskTable(details);
+    }
+
+    @TestVisible
+    private static String getDeepValueForTest(SObject record, String fieldPath) {
+        return new TableBuilderHelper().getDeepValue(record, fieldPath);
+    }
+
+    @TestVisible
+    private static Integer getAttachmentCountForParentIdsTest(Set<Id> parentIds) {
+        return new EmailServiceHelper().getAttachmentsFromParentIds(parentIds).size();
     }
 
     /** @description Helper class for HTML Table generation. */

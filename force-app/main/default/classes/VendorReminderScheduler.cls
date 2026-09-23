@@ -337,6 +337,7 @@ global without sharing class VendorReminderScheduler implements Schedulable {
             SELECT Subject, Status, Priority, ActivityDate, Start_Date__c
             FROM Task
             WHERE WhatId = :vendorAssignmentId
+                   AND RecordType.Name = 'Arelia'
         ];
 
         String html = '<table border="1"><tr>' +

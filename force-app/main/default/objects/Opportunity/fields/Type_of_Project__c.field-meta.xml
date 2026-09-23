@@ -20,6 +20,11 @@
                 <label>Home</label>
             </value>
             <value>
+                <fullName>Interior Combo Package</fullName>
+                <default>false</default>
+                <label>Interior Combo Package</label>
+            </value>
+            <value>
                 <fullName>Only Project Plan</fullName>
                 <default>false</default>
                 <label>Only Project Plan</label>
@@ -27,6 +32,7 @@
             <value>
                 <fullName>Other</fullName>
                 <default>false</default>
+                <isActive>false</isActive>
                 <label>Other</label>
             </value>
         </valueSetDefinition>

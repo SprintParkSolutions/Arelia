@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>65.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <choices>
         <name>No</name>
         <choiceText>&lt;p style=&quot;text-align: center;&quot;&gt;No&lt;/p&gt;</choiceText>
@@ -11,6 +12,12 @@
         <choiceText>&lt;p style=&quot;text-align: center;&quot;&gt;Yes&lt;/p&gt;</choiceText>
         <dataType>String</dataType>
     </choices>
+    <customProperties>
+        <name>ScreenProgressIndicator</name>
+        <value>
+            <stringValue>{&quot;location&quot;:&quot;top&quot;,&quot;type&quot;:&quot;simple&quot;}</stringValue>
+        </value>
+    </customProperties>
     <decisions>
         <name>Check_Completion_Criteria</name>
         <label>Check Completion Criteria</label>
@@ -150,6 +157,14 @@
             <name>Errormsg</name>
             <fieldText>&lt;p style=&quot;text-align: center;&quot;&gt;&lt;strong style=&quot;color: rgb(255, 0, 0);&quot;&gt;❌ Unable to Complete Project&lt;/strong&gt;&lt;/p&gt;&lt;p style=&quot;text-align: center;&quot;&gt;&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;text-align: center;&quot;&gt;Please check the following:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Project Completion Status must be &lt;strong&gt;100%&lt;/strong&gt;&lt;/li&gt;&lt;li&gt;All &lt;strong&gt;Payment Terms&lt;/strong&gt; must be marked as Received&lt;/li&gt;&lt;/ul&gt;</fieldText>
             <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
         </fields>
         <showFooter>true</showFooter>
         <showHeader>false</showHeader>
@@ -169,6 +184,14 @@
             <name>Confirm_Project_Completion</name>
             <fieldText>&lt;p style=&quot;text-align: center;&quot;&gt;⚠️ &lt;strong&gt;Are you sure you want to complete this project?&lt;/strong&gt;&lt;/p&gt;&lt;p style=&quot;text-align: center;&quot;&gt;&lt;strong&gt;This action will mark the project status as Completed&lt;/strong&gt;.&lt;/p&gt;</fieldText>
             <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
         </fields>
         <nextOrFinishButtonLabel>Proceed</nextOrFinishButtonLabel>
         <showFooter>true</showFooter>

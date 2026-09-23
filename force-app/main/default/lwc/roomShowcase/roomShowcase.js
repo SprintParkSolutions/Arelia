@@ -33,12 +33,12 @@ export default class RoomShowcase extends LightningElement {
     {
       key: 'living',
       title: 'Living Room',
-      tagline: 'Modern living designs & layouts',
+      tagline: 'Modern living designs & layoutsThe first room you walk into. The last one you leave.',
       features: [
-        'Sofa layout examples',
-        'TV units & media walls',
+        'Sofa arrangements for your lifestyle',
+        'TV units & media walls with purpose',
         'False ceiling styles',
-        'Lighting ideas',
+        'Lighting that shifts the mood',
         'Wall textures'
       ],
       images: [LIVING_1, LIVING_2, LIVING_3, LIVING_4],
@@ -54,10 +54,10 @@ export default class RoomShowcase extends LightningElement {
       title: 'Bedrooms',
       tagline: 'Master, guest & kids bedroom solutions',
       features: [
-        'Master bedroom design',
-        'Guest & kids layouts',
-        'Wardrobes & storage',
-        'Study & dressing area'
+        'Master bedrooms as quiet retreats',
+        'Guest & kids rooms playful yet polished',
+        'Wardrobes & storage that blend in',
+        'Study nooks & dressing areas that work'
       ],
       images: [BEDROOM_1, BEDROOM_2, BEDROOM_3, BEDROOM_4],
       deliverables: [
@@ -72,10 +72,10 @@ export default class RoomShowcase extends LightningElement {
       title: 'Kitchen',
       tagline: 'Modular kitchens & smart storage',
       features: [
-        'L-shape, Island, Parallel',
-        'Smart storage solutions',
-        'Countertop & backsplash options',
-        'Appliances integration'
+        'L-shape, Island & Parallel layouts',
+        'Storage that makes every inch count',
+        'Countertop & backsplash with intention',
+        'Appliances that fit, not stick out'
       ],
       images: [KITCHEN_1, KITCHEN_2, KITCHEN_3, KITCHEN_4],
       deliverables: [
@@ -90,10 +90,10 @@ export default class RoomShowcase extends LightningElement {
       title: 'Bathrooms',
       tagline: 'Functional & elegant bathroom designs',
       features: [
-        'Vanity styles',
-        'Glass partitions',
-        'Tiles & finish options',
-        'Storage & mood lighting'
+        'Vanity designs , stylish & practical',
+        'Glass partitions , clean & open',
+        'Tiles & finishes that set the tone',
+        'Lighting & storage in harmony'
       ],
       images: [BATH_1, BATH_2, BATH_3, BATH_4],
       deliverables: [
@@ -108,10 +108,10 @@ export default class RoomShowcase extends LightningElement {
       title: 'Dining',
       tagline: 'Dining setups & lighting',
       features: [
-        'Lighting & pendants',
-        'Table layouts',
-        'Wall décor ideas',
-        'Niche designs'
+        'Pendant lighting that sets the table',
+        'Layouts sized for your space',
+        'Wall decor that completes the room',
+        'Niche designs without the clutter'
       ],
       images: [DINING_1, DINING_2, DINING_3, DINING_4],
       deliverables: [
@@ -126,9 +126,9 @@ export default class RoomShowcase extends LightningElement {
       title: 'Balcony / Outdoor',
       tagline: 'Outdoor seating & greenery',
       features: [
-        'Seating ideas',
-        'Greenery & planters',
-        'Lighting for evenings'
+        'Seating that slows you down',
+        'Greenery that brings the outside in',
+        'Evening lighting as a destination'
       ],
       images: [BALCONY_1, BALCONY_2, BALCONY_3, BALCONY_4],
       deliverables: [

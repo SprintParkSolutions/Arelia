@@ -1,182 +1,686 @@
-/* --- SHARED ARELIA STYLES --- */
+/* ================================
+   ARELIA MANAGER APPROVAL THEME
+   Black + Gold Professional UI
+================================ */
+
+:host {
+    display: block;
+}
+
 .arelia-container {
-    background-color: #f9f9f9;
-    padding: 40px 20px;
     min-height: 100vh;
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    padding: 56px 20px 70px;
     position: relative;
+    overflow: hidden;
+    color: #fdfcf0;
+    font-family: "Aptos", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background:
+        radial-gradient(circle at 50% 0%, rgba(255, 223, 115, 0.14), transparent 34%),
+        radial-gradient(circle at 0% 100%, rgba(212, 175, 55, 0.08), transparent 36%),
+        linear-gradient(145deg, #050505, #0c0c0c 58%, #020202);
 }
 
-.submit-spinner { z-index: 9999; position: absolute; }
+.arelia-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(rgba(212, 175, 55, 0.13) 0.6px, transparent 0.6px),
+        linear-gradient(90deg, rgba(212, 175, 55, 0.025), transparent, rgba(212, 175, 55, 0.025));
+    background-size: 32px 32px, 100% 100%;
+    opacity: 0.14;
+    pointer-events: none;
+}
 
-/* Typography */
-.main-title {
-    font-size: 2.5rem;
+.submit-spinner {
+    z-index: 10000;
+    position: fixed;
+}
+
+.loading-box {
+    min-height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.error-alert {
+    position: relative;
+    z-index: 2;
+    width: min(760px, 100%);
+    margin: 0 auto 24px;
+    padding: 15px 18px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 87, 87, 0.32);
+    border-left: 4px solid #ff5757;
+    background: #160d0d;
+    color: #ffbaba;
     font-weight: 600;
-    color: #333;
-    margin-bottom: 10px;
-}
-
-.main-subtitle {
-    font-size: 1.1rem;
-    color: #555;
-    max-width: 700px;
-    margin: 0 auto;
     line-height: 1.5;
 }
 
-/* Card Styling */
-.arelia-card {
-    background: white;
-    width: 100%;
-    max-width: 800px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    margin: 0 auto;
+/* ================================
+   HEADER
+================================ */
+
+.page-header-content {
+    position: relative;
+    z-index: 1;
+    max-width: 780px;
+    margin: 0 auto 34px;
+    text-align: center;
 }
 
-.card-inner-content { width: 100%; max-width: 650px; }
-
-.card-title {
-    font-size: 1.75rem;
-    font-weight: 600;
-    color: #333;
-}
-
-/* --- MANAGER SPECIFIC ELEMENTS --- */
-
-/* Client Status Box */
-.info-box {
-    background-color: #f0fcf4; /* Light green tint */
-    border-radius: 8px;
-    border: 1px solid #c9e7d0;
-    width: 100%;
-}
-.client-status-label {
-    font-size: 0.85rem;
-    color: #2e844a; /* Dark green */
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-weight: 700;
-}
-.value-text { font-size: 1.1rem; font-weight: 600; color: #333; }
-.success-text { color: #2e844a; }
-.sub-label { font-size: 0.9rem; color: #666; }
-
-/* Note Box (Warning Style) */
-.note-box {
-    background-color: #fff8e1; /* Warning Yellow tint */
-    border: 1px solid #ffe0b2;
-    border-radius: 8px;
-    width: 100%;
-    color: #5d4037;
-}
-.note-icon { --slds-c-icon-color-foreground: #f57f17; }
-
-/* --- BUTTONS --- */
-.button-container { 
-    display: flex; 
-    justify-content: center; 
-    gap: 20px; 
-    width: 100%; 
-    flex-wrap: wrap; 
-}
-
-.arelia-btn {
-    border: none;
-    border-radius: 6px;
-    padding: 12px 24px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: white;
-    cursor: pointer;
+.eyebrow {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 200px;
-    transition: background-color 0.2s;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto 16px;
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(212, 175, 55, 0.42);
+    color: #ffdf73;
+    background: rgba(212, 175, 55, 0.08);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1.1;
 }
 
-.btn-approve { background-color: #0070d2; }
-.btn-approve:hover { background-color: #005fb2; }
+.main-title {
+    margin: 0 auto 14px;
+    font-size: 2.6rem;
+    font-weight: 800;
+    line-height: 1.18;
+    letter-spacing: 0.075em;
+    text-transform: uppercase;
+    text-align: center;
+    background: linear-gradient(135deg, #ffdf73, #d4af37, #8a6514);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 18px 46px rgba(212, 175, 55, 0.34);
+}
 
-.btn-request { background-color: #ba0517; }
-.btn-request:hover { background-color: #8e0000; }
+.main-subtitle {
+    max-width: 720px;
+    margin: 0 auto;
+    color: rgba(253, 252, 240, 0.72);
+    font-size: 1rem;
+    line-height: 1.7;
+}
+
+.main-subtitle strong {
+    color: #ffdf73;
+}
+
+/* ================================
+   MAIN CARD
+================================ */
+
+.arelia-card {
+    position: relative;
+    z-index: 1;
+    width: min(760px, 100%);
+    margin: 0 auto;
+    padding: 38px 34px 42px;
+    box-sizing: border-box;
+    border-radius: 24px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-top: 4px solid #d4af37;
+    background:
+        radial-gradient(circle at top left, rgba(255, 223, 115, 0.09), transparent 32%),
+        linear-gradient(145deg, rgba(22, 22, 22, 0.98), rgba(7, 7, 7, 0.98));
+    box-shadow:
+        0 28px 74px rgba(0, 0, 0, 0.72),
+        0 0 40px rgba(212, 175, 55, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.045);
+}
+
+.card-inner-content {
+    width: 100%;
+    max-width: 650px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.card-title {
+    margin: 0 auto 30px;
+    color: #ffdf73;
+    font-size: 1.45rem;
+    font-weight: 800;
+    letter-spacing: 0.085em;
+    text-transform: uppercase;
+    line-height: 1.3;
+}
+
+/* ================================
+   CLIENT STATUS PANEL
+================================ */
+
+.status-panel {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr);
+    align-items: center;
+    gap: 18px;
+    width: 100%;
+    margin: 0 auto 24px;
+    padding: 20px 22px;
+    box-sizing: border-box;
+    border-radius: 16px;
+    border: 1px solid rgba(34, 197, 94, 0.35);
+    background:
+        linear-gradient(145deg, rgba(34, 197, 94, 0.12), rgba(255, 255, 255, 0.025)),
+        #0f1712;
+    text-align: left;
+}
+
+.status-icon-wrap {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(34, 197, 94, 0.12);
+    border: 1px solid rgba(34, 197, 94, 0.35);
+}
+
+.client-success-icon {
+    --slds-c-icon-color-foreground-default: #22c55e;
+}
+
+.client-status-label {
+    margin: 0 0 6px;
+    color: #ffdf73;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 800;
+}
+
+.value-text {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+}
+
+.success-text {
+    color: #45d483;
+}
+
+.sub-label {
+    margin: 4px 0 0;
+    font-size: 0.92rem;
+    color: rgba(253, 252, 240, 0.62);
+}
+
+/* ================================
+   NOTE BOX
+================================ */
+
+.note-box {
+    width: 100%;
+    margin: 0 auto 30px;
+    padding: 18px 20px;
+    box-sizing: border-box;
+    border-radius: 16px;
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 14px;
+    align-items: center;
+    border: 1px solid rgba(255, 223, 115, 0.28);
+    background:
+        linear-gradient(145deg, rgba(255, 223, 115, 0.1), rgba(255, 255, 255, 0.025)),
+        #17130a;
+    color: rgba(253, 252, 240, 0.82);
+    text-align: left;
+}
+
+.note-box p {
+    margin: 0;
+    font-size: 0.94rem;
+    line-height: 1.55;
+}
+
+.note-box strong {
+    color: #ffdf73;
+}
+
+.note-icon {
+    --slds-c-icon-color-foreground-default: #ffdf73;
+}
+
+/* ================================
+   BUTTONS
+================================ */
+
+.button-container,
+.modal-button-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.arelia-btn {
+    min-width: 190px;
+    border-radius: 10px;
+    padding: 14px 24px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 800;
+    letter-spacing: 0.085em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    box-sizing: border-box;
+    line-height: 1.2;
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        background-color 0.25s ease,
+        border-color 0.25s ease,
+        color 0.25s ease;
+}
+
+.arelia-btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-approve {
+    color: #060606;
+    border-color: rgba(255, 223, 115, 0.5);
+    background: linear-gradient(135deg, #ffdf73, #d4af37, #8a6514);
+    box-shadow:
+        0 14px 32px rgba(212, 175, 55, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.38);
+}
+
+.btn-request,
+.btn-cancel {
+    color: #ffdf73;
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    background:
+        linear-gradient(145deg, rgba(212, 175, 55, 0.09), rgba(255, 255, 255, 0.025)),
+        #151515;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.36);
+}
+
+.btn-back {
+    color: #ffdf73;
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    background:
+        linear-gradient(145deg, rgba(212, 175, 55, 0.09), rgba(255, 255, 255, 0.025)),
+        #151515;
+}
 
 .btn-submit-changes {
-    background-color: #333;
-    font-size: 1rem;
-    padding: 10px 20px;
-    min-width: auto;
+    color: #060606;
+    border-color: rgba(255, 223, 115, 0.5);
+    background: linear-gradient(135deg, #ffdf73, #d4af37, #8a6514);
 }
-.btn-submit-changes:hover { background-color: #000; }
 
-/* Misc */
+.button-icon {
+    margin-right: 10px;
+}
+
+.approve-icon {
+    --slds-c-icon-color-foreground-default: #22c55e;
+}
+
+.request-icon {
+    --slds-c-icon-color-foreground-default: #ff5757;
+}
+
+/* ================================
+   COMMENT SECTION
+================================ */
+
 .comment-box-container {
     width: 100%;
-    background-color: #f9f9f9;
+    margin-top: 8px;
+    padding: 24px;
+    box-sizing: border-box;
+    border-radius: 18px;
+    border: 1px solid rgba(212, 175, 55, 0.24);
+    background:
+        radial-gradient(circle at top left, rgba(212, 175, 55, 0.08), transparent 34%),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.025), rgba(212, 175, 55, 0.055)),
+        #0f0f0f;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.manager-remarks-label {
+    display: block;
+    margin: 0 0 10px;
+    color: #ffdf73;
+    font-size: 0.9rem;
+    font-weight: 800;
+    letter-spacing: 0.075em;
+    text-align: left;
+    text-transform: uppercase;
+    line-height: 1.3;
+}
+
+.required-symbol {
+    color: #ff5757;
+    text-decoration: none;
+    margin-right: 4px;
+}
+
+.native-manager-textarea {
+    width: 100%;
+    min-height: 135px;
+    resize: vertical;
+    box-sizing: border-box;
+    border-radius: 12px;
+    border: 1px solid rgba(212, 175, 55, 0.42);
+    background-color: #101010;
+    color: #fdfcf0;
+    -webkit-text-fill-color: #fdfcf0;
+    caret-color: #ffdf73;
+    padding: 14px 16px;
+    font-family: "Aptos", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 0.98rem;
+    line-height: 1.5;
+    outline: none;
+}
+
+.native-manager-textarea::placeholder {
+    color: rgba(253, 252, 240, 0.42);
+    -webkit-text-fill-color: rgba(253, 252, 240, 0.42);
+}
+
+.native-manager-textarea:focus {
+    border-color: #d4af37;
+    box-shadow:
+        0 0 0 1px #d4af37,
+        0 0 20px rgba(212, 175, 55, 0.24);
+}
+
+.amendment-button-container {
+    margin-top: 18px;
+}
+
+/* ================================
+   FINAL STATUS
+================================ */
+
+.final-status-box {
+    margin-top: 8px;
+    padding-top: 4px;
+}
+
+.decision-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 220px;
+    padding: 11px 18px;
+    border-radius: 999px;
+    font-size: 0.86rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.approved-pill {
+    color: #45d483;
+    border: 1px solid rgba(34, 197, 94, 0.38);
+    background: rgba(34, 197, 94, 0.1);
+}
+
+.rejected-pill {
+    color: #ff8a8a;
+    border: 1px solid rgba(255, 87, 87, 0.38);
+    background: rgba(255, 87, 87, 0.1);
+}
+
+.pending-pill {
+    color: #ffdf73;
+    border: 1px solid rgba(212, 175, 55, 0.38);
+    background: rgba(212, 175, 55, 0.1);
+}
+
+.manager-comments {
+    margin: 18px auto 0;
+    color: rgba(253, 252, 240, 0.68);
+    font-size: 0.96rem;
+    line-height: 1.6;
+}
+
+.final-message {
+    margin: 18px auto 0;
+    color: rgba(253, 252, 240, 0.72);
+    font-size: 1rem;
+}
+
+/* ================================
+   MODALS
+================================ */
+
+.custom-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 20px;
-    border-radius: 8px;
+    box-sizing: border-box;
+    background: radial-gradient(circle at center, rgba(13, 13, 13, 0.86), rgba(0, 0, 0, 0.96));
+    backdrop-filter: blur(8px);
 }
 
-.animate-fade-in { animation: fadeIn 0.3s ease-in; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-
-.slds-badge { font-size: 1rem; padding: 8px 16px; }
-.final-message { font-size: 1.1rem; color: #555; }
-
-/* --- MODAL STYLES (Ensure they appear above everything) --- */
-.slds-modal {
-    z-index: 9001; /* Above backdrops */
+.custom-modal-box {
+    width: 100%;
+    max-width: 480px;
+    padding: 42px 34px;
+    border-radius: 22px;
+    text-align: center;
+    border: 1px solid rgba(212, 175, 55, 0.42);
+    border-top: 4px solid #d4af37;
+    background:
+        radial-gradient(circle at top, rgba(212, 175, 55, 0.14), transparent 58%),
+        linear-gradient(145deg, rgba(18, 18, 18, 0.98), rgba(8, 8, 8, 0.98));
+    box-shadow:
+        0 30px 90px rgba(0, 0, 0, 0.78),
+        0 0 46px rgba(212, 175, 55, 0.14);
+    animation: modalPop 0.24s ease-out;
 }
-.slds-backdrop {
-    z-index: 9000;
-}
-.slds-modal__header.slds-theme_success {
-    background-color: #04844b;
-    color: white;
+
+.modal-icon,
+.success-icon {
+    width: 66px;
+    height: 66px;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #ffdf73, #d4af37, #8a6514);
+    color: #050505;
+    font-size: 2rem;
+    font-weight: 900;
+    box-shadow: 0 16px 36px rgba(212, 175, 55, 0.34);
 }
 
-/* ========================================= */
-/* MOBILE RESPONSIVENESS (Max Width: 768px)  */
-/* ========================================= */
+.success-icon {
+    color: #050505;
+}
+
+.modal-title,
+.success-title {
+    margin: 0 0 12px;
+    color: #ffdf73;
+    font-size: 1.55rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.modal-message,
+.success-message {
+    margin: 0 auto 26px;
+    color: rgba(253, 252, 240, 0.84);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.return-btn {
+    min-width: 180px;
+}
+
+/* ================================
+   ANIMATIONS
+================================ */
+
+.animate-fade-in {
+    animation: fadeIn 0.35s ease-in;
+}
+
+.fade-delay-one {
+    animation-delay: 0.05s;
+}
+
+.fade-delay-two {
+    animation-delay: 0.12s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes modalPop {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ================================
+   MOBILE RESPONSIVENESS
+================================ */
+
 @media screen and (max-width: 768px) {
     .arelia-container {
-        padding: 15px 10px; 
+        padding: 34px 12px 48px;
+    }
+
+    .page-header-content {
+        margin-bottom: 26px;
+    }
+
+    .eyebrow {
+        margin-bottom: 14px;
+        font-size: 0.62rem;
+        letter-spacing: 0.1em;
+        padding: 7px 12px;
     }
 
     .main-title {
-        font-size: 1.8rem;
+        font-size: 1.72rem;
+        letter-spacing: 0.055em;
+        line-height: 1.35;
     }
 
     .main-subtitle {
-        font-size: 1rem;
-        padding: 0 10px;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        padding: 0 4px;
     }
 
-    .button-container {
-        flex-direction: column; 
-        gap: 15px;
+    .arelia-card {
+        padding: 28px 16px 32px;
+        border-radius: 20px;
+    }
+
+    .card-title {
+        font-size: 1.18rem;
+        letter-spacing: 0.065em;
+        margin-bottom: 24px;
+    }
+
+    .status-panel {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        text-align: center;
+        padding: 18px 16px;
+    }
+
+    .status-icon-wrap {
+        margin: 0 auto;
+    }
+
+    .note-box {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 12px;
+        padding: 18px 16px;
+    }
+
+    .button-container,
+    .modal-button-row {
+        flex-direction: column;
+        gap: 14px;
     }
 
     .arelia-btn {
         width: 100%;
-        min-width: unset; 
+        min-width: unset;
+        padding: 14px 18px;
+        font-size: 0.84rem;
+        letter-spacing: 0.07em;
     }
 
-    .arelia-card {
-        padding: 1.5rem !important; 
+    .comment-box-container {
+        padding: 18px 16px;
     }
 
-    .card-inner-content {
+    .native-manager-textarea {
+        min-height: 128px;
+        font-size: 0.94rem;
+    }
+
+    .decision-pill {
         width: 100%;
+        min-width: unset;
     }
-    
-    /* Mobile Modal Adjustment */
-    .slds-modal__container {
-        width: 90%;
-        max-width: none;
-        margin: 0 auto;
-        padding: 20px 0;
+
+    .custom-modal-box {
+        padding: 34px 22px;
+    }
+
+    .modal-title,
+    .success-title {
+        font-size: 1.3rem;
+    }
+
+    .modal-message,
+    .success-message {
+        font-size: 0.94rem;
     }
 }

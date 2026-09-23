@@ -1,0 +1,22 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;">Hi {{{Vendor_Assignment__c.Vendor__c}}},<br />
+<br />
+We are writing about the project&nbsp; {{{Vendor_Assignment__c.Project__c}}}.<br />
+<br />
+Our records show that work assigned to you on this project has been discontinued before completion. This is considered a breach of the agreement between your company and Arelia .<br />
+<br />
+Required action:<br />
+- Contact the project supervisor within 3 business days to explain the situation and provide a remediation plan.<br />
+- If applicable, compensation for incomplete work will be calculated and communicated to you.<br />
+<br />
+Project:&nbsp;<br />
+Supervisor:&nbsp;{{{Vendor_Assignment__c.Supervisor_User__c}}}<br />
+<br />
+Please treat this matter as urgent. If we do not hear from you within the stated timeline, we will proceed with further contractual measures.<br />
+<br />
+Regards,<br />
+Arelia Team.</body>
+</html>

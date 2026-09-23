@@ -1,104 +1,200 @@
-/**
- * @description Test class for MobileLoginService RestResource.
- * Ensures 90%+ code coverage and adheres to PMD best practices.
- */
 @IsTest
 private class MobileLoginServiceTest {
 
-    /**
-     * @description Test setup to create common data. 
-     * Uses TestDataUtility to create a test Contact.
-     */
-    @testSetup
-    static void setup() {
-        TestDataUtility.createContact('Tester', 'test@example.com', 'Password123');
+    private static Contact createContactRecord(
+        String firstName,
+        String lastName,
+        String email,
+        String password
+    ) {
+        Contact contactRecord = new Contact(
+            FirstName = firstName,
+            LastName = lastName,
+            Email = email,
+            Password__c = password
+        );
+
+        Database.DMLOptions options = new Database.DMLOptions();
+        options.DuplicateRuleHeader.allowSave = true;
+        contactRecord.setOptions(options);
+
+        insert contactRecord;
+        return contactRecord;
     }
 
-    /**
-     * @description Tests a successful login scenario.
-     */
-    @IsTest
-    static void testLoginSuccess() {
-        // Prepare RestContext
+    private static MobileLoginService.LoginResponse callLogin(String requestBody) {
         RestRequest req = new RestRequest();
         RestResponse res = new RestResponse();
-        
+
         req.requestURI = '/services/apexrest/mobileLogin/';
         req.httpMethod = 'POST';
-        
-        // Construct valid JSON body
-        Map<String, String> bodyMap = new Map<String, String>{
-            'username' => 'test@example.com',
-            'password' => 'Password123'
-        };
-        req.requestBody = Blob.valueOf(JSON.serialize(bodyMap));
-        
+        req.addHeader('Content-Type', 'application/json');
+
+        if (requestBody != null) {
+            req.requestBody = Blob.valueOf(requestBody);
+        }
+
         RestContext.request = req;
         RestContext.response = res;
 
-        Test.startTest();
-        MobileLoginService.LoginResponse response = MobileLoginService.login();
-        Test.stopTest();
-
-        // Assertions
-        System.assert(response.success, 'Login should be successful for valid credentials.');
-        System.assertEquals('Login Successful', response.message, 'Success message mismatch.');
-        System.assertNotEquals(null, response.contactId, 'Contact ID should not be null.');
-        System.assertNotEquals(null, response.sessionId, 'Session ID should be populated.');
+        return MobileLoginService.login();
     }
 
-    /**
-     * @description Tests login failure with an incorrect password.
-     */
     @IsTest
-    static void testLoginInvalidCredentials() {
-        RestRequest req = new RestRequest();
-        req.requestURI = '/services/apexrest/mobileLogin/';
-        req.httpMethod = 'POST';
-        
-        // Wrong password
-        Map<String, String> bodyMap = new Map<String, String>{
-            'username' => 'test@example.com',
-            'password' => 'WrongPassword'
-        };
-        req.requestBody = Blob.valueOf(JSON.serialize(bodyMap));
-        
-        RestContext.request = req;
+    static void testLoginSuccess() {
+        createContactRecord(
+            'Test',
+            'User',
+            'success@example.com',
+            'Password123'
+        );
+
+        String body = JSON.serialize(new Map<String, Object>{
+            'username' => 'success@example.com',
+            'password' => 'Password123'
+        });
 
         Test.startTest();
-        MobileLoginService.LoginResponse response = MobileLoginService.login();
+        MobileLoginService.LoginResponse response = callLogin(body);
         Test.stopTest();
 
-        // Assertions
-        System.assert(!response.success, 'Login should fail for incorrect password.');
-        System.assertEquals('Invalid Username or Password', response.message, 'Failure message mismatch.');
-        System.assertEquals(null, response.contactId, 'Contact ID should be null on failure.');
+        System.assertEquals(true, response.success);
+        System.assertEquals('Login Successful', response.message);
+        System.assertNotEquals(null, response.contactId);
+        System.assertEquals('Test User', response.name);
     }
 
-    /**
-     * @description Tests login failure with a non-existent username.
-     */
+    @IsTest
+    static void testLoginWithBlankFirstName() {
+        createContactRecord(
+            null,
+            'OnlyLastName',
+            'lastname@example.com',
+            'Password123'
+        );
+
+        String body = JSON.serialize(new Map<String, Object>{
+            'username' => 'lastname@example.com',
+            'password' => 'Password123'
+        });
+
+        Test.startTest();
+        MobileLoginService.LoginResponse response = callLogin(body);
+        Test.stopTest();
+
+        System.assertEquals(true, response.success);
+        System.assertEquals('Login Successful', response.message);
+        System.assertEquals('OnlyLastName', response.name);
+    }
+
+    @IsTest
+    static void testLoginInvalidPassword() {
+        createContactRecord(
+            'Test',
+            'User',
+            'invalidpassword@example.com',
+            'Password123'
+        );
+
+        String body = JSON.serialize(new Map<String, Object>{
+            'username' => 'invalidpassword@example.com',
+            'password' => 'WrongPassword'
+        });
+
+        Test.startTest();
+        MobileLoginService.LoginResponse response = callLogin(body);
+        Test.stopTest();
+
+        System.assertEquals(false, response.success);
+        System.assertEquals('Invalid Username or Password', response.message);
+        System.assertEquals(null, response.contactId);
+        System.assertEquals(null, response.name);
+    }
+
     @IsTest
     static void testLoginUserNotFound() {
-        RestRequest req = new RestRequest();
-        req.requestURI = '/services/apexrest/mobileLogin/';
-        req.httpMethod = 'POST';
-        
-        // Non-existent user
-        Map<String, String> bodyMap = new Map<String, String>{
-            'username' => 'nonexistent@example.com',
+        String body = JSON.serialize(new Map<String, Object>{
+            'username' => 'notfound@example.com',
             'password' => 'Password123'
-        };
-        req.requestBody = Blob.valueOf(JSON.serialize(bodyMap));
-        
-        RestContext.request = req;
+        });
 
         Test.startTest();
-        MobileLoginService.LoginResponse response = MobileLoginService.login();
+        MobileLoginService.LoginResponse response = callLogin(body);
         Test.stopTest();
 
-        // Assertions
-        System.assert(!response.success, 'Login should fail for non-existent user.');
-        System.assertEquals(null, response.contactId, 'Contact ID should be null.');
+        System.assertEquals(false, response.success);
+        System.assertEquals('Invalid Username or Password', response.message);
+        System.assertEquals(null, response.contactId);
+        System.assertEquals(null, response.name);
+    }
+
+    @IsTest
+    static void testLoginMissingUsernameAndPassword() {
+        String body = JSON.serialize(new Map<String, Object>());
+
+        Test.startTest();
+        MobileLoginService.LoginResponse response = callLogin(body);
+        Test.stopTest();
+
+        System.assertEquals(false, response.success);
+        System.assertEquals('Username and password are required.', response.message);
+        System.assertEquals(null, response.contactId);
+        System.assertEquals(null, response.name);
+    }
+
+    @IsTest
+    static void testLoginBlankRequestBody() {
+        Test.startTest();
+        MobileLoginService.LoginResponse response = callLogin(null);
+        Test.stopTest();
+
+        System.assertEquals(false, response.success);
+        System.assertEquals('Username and password are required.', response.message);
+        System.assertEquals(null, response.contactId);
+        System.assertEquals(null, response.name);
+    }
+
+    @IsTest
+    static void testLoginInvalidJsonException() {
+        Boolean exceptionThrown = false;
+
+        RestRequest req = new RestRequest();
+        RestResponse res = new RestResponse();
+
+        req.requestURI = '/services/apexrest/mobileLogin/';
+        req.httpMethod = 'POST';
+        req.addHeader('Content-Type', 'application/json');
+        req.requestBody = Blob.valueOf('{ invalid json');
+
+        RestContext.request = req;
+        RestContext.response = res;
+
+        try {
+            MobileLoginService.login();
+        } catch (Exception e) {
+            exceptionThrown = true;
+        }
+
+        System.assertEquals(
+            true,
+            exceptionThrown,
+            'Invalid JSON should throw exception because MobileLoginService does not have try-catch.'
+        );
+    }
+
+    @IsTest
+    static void testLoginResponseConstructor() {
+        MobileLoginService.LoginResponse response =
+            new MobileLoginService.LoginResponse(
+                true,
+                'Test Message',
+                '003000000000000AAA',
+                'Test Name'
+            );
+
+        System.assertEquals(true, response.success);
+        System.assertEquals('Test Message', response.message);
+        System.assertEquals('003000000000000AAA', response.contactId);
+        System.assertEquals('Test Name', response.name);
     }
 }

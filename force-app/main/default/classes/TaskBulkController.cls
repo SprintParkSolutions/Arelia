@@ -38,6 +38,23 @@ public with sharing class TaskBulkController {
         ];
     }
 
+    // New method for picklist field Status
+
+    @AuraEnabled(cacheable=true)
+    public static List<Map<String, String>> getTaskStatusOptions() {
+        List<Map<String, String>> options = new List<Map<String, String>>();
+        
+        for (Schema.PicklistEntry entry : Task.Status.getDescribe().getPicklistValues()) {
+            if (entry.isActive()) {
+                options.add(new Map<String, String>{
+                    'label' => entry.getLabel(),
+                    'value' => entry.getValue()
+                });
+            }
+        }
+        return options;
+    }
+
     // --- Wrapper ---
     public class FileData {
         @AuraEnabled public String fileName;

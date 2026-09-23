@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Sent to a vendor who has left the project before completion. Requests contact and informs about possible compensation.</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Vendor Abscond Notice</name>
+    <relatedEntityType>Vendor_Assignment__c</relatedEntityType>
+    <style>none</style>
+    <subject>Agreement Breach — Action Required</subject>
+    <type>custom</type>
+    <uiType>SFX</uiType>
+</EmailTemplate>

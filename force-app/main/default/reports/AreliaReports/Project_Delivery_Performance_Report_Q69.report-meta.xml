@@ -9,6 +9,15 @@
     <columns>
         <field>Project__c.Project_Health__c</field>
     </columns>
+    <filter>
+        <criteriaItems>
+            <column>CUST_RECORDTYPE</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>Project__c.Arelia</value>
+        </criteriaItems>
+    </filter>
     <format>Tabular</format>
     <name>Project Delivery Performance Report</name>
     <params>

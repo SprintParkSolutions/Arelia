@@ -22,7 +22,7 @@
                 FROM Opportunity WHERE Id = :oppId LIMIT 1];
 
         // --- EMAIL LOGIC ---
-        String labelValue = System.Label.Arelia_Living_Enrollment_Members;
+        String labelValue = System.Label.Arelia_Living_Management_Members;
         List<String> targetEmails = new List<String>();
 
         if (String.isNotBlank(labelValue)) {
@@ -76,10 +76,7 @@
         
         mail.setHtmlBody(htmlBody);
         
-        Id owdId = getOWD();
-        if (owdId != null) {
-            mail.setOrgWideEmailAddressId(owdId);
-        }
+        AreliaUtility.setOrgWideEmailAddress(mail, System.Label.Arelia_OWD);
 
         // 5. ATTACH PDF FROM FILES
         List<ContentDocumentLink> docLinks = [SELECT ContentDocumentId FROM ContentDocumentLink 
@@ -121,11 +118,5 @@
                                 WHERE Id = :quoteId LIMIT 1];
         q.Manager_Approval__c = true;
         update q;
-    }
-
-    private static Id getOWD() {
-        List<OrgWideEmailAddress> ow = [SELECT Id FROM OrgWideEmailAddress 
-                                    WHERE IsAllowAllProfiles = true LIMIT 1];
-        return ow.isEmpty() ? null : ow[0].Id;
     }
 }

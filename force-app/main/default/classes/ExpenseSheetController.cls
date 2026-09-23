@@ -117,8 +117,8 @@ public without sharing class ExpenseSheetController {
 
     // --- EMAIL TO MANAGERS ---
     private static void sendManagerApprovalEmail(Id sheetId) {
-        Project_Expense_Sheet__c sheet = [SELECT Id, Name, Grand_Total__c, Project__r.Name, CreatedBy.Name FROM Project_Expense_Sheet__c WHERE Id = :sheetId];
-        String managerEmails = System.Label.Arelia_Living_Enrollment_Members;
+        Project_Expense_Sheet__c sheet = [SELECT Id, Name, Grand_Total__c, Project__r.Name, CreatedBy.Name FROM Project_Expense_Sheet__c WHERE Id = :sheetId AND Project__r.RecordType.Name = 'Arelia'];
+        String managerEmails = System.Label.Arelia_Living_Management_Members;
         String fullUrl = System.Label.Arelia_Site_Label + System.Label.Arelia_Expense_Approval_Page + '?c__recordId=' + sheet.Id;
 
         EmailTemplate tpl = [SELECT Subject, HtmlValue FROM EmailTemplate WHERE DeveloperName = :System.Label.Arelia_Expense_Template LIMIT 1];
@@ -133,7 +133,8 @@ public without sharing class ExpenseSheetController {
         mail.setToAddresses(managerEmails.split(','));
         mail.setSubject(subject);
         mail.setHtmlBody(htmlBody);
-        mail.setSaveAsActivity(false); 
+        mail.setSaveAsActivity(false);
+        AreliaUtility.setOrgWideEmailAddress(mail, System.Label.Arelia_OWD);
 
         attachAllFilesToEmail(mail, sheetId);
         Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
@@ -142,7 +143,7 @@ public without sharing class ExpenseSheetController {
     // --- STATUS UPDATE & SUPERVISOR NOTIFICATION ---
     @AuraEnabled
     public static String updateSheetStatus(String sheetId, String status) {
-        Project_Expense_Sheet__c sheet = [SELECT Id, Project__c FROM Project_Expense_Sheet__c WHERE Id = :sheetId LIMIT 1];
+        Project_Expense_Sheet__c sheet = [SELECT Id, Project__c FROM Project_Expense_Sheet__c WHERE Id = :sheetId AND Project__r.RecordType.Name = 'Arelia' LIMIT 1];
         sheet.Status__c = status;
         update sheet;
 
@@ -167,6 +168,7 @@ public without sharing class ExpenseSheetController {
                    Project__r.Supervisor_User__r.LastName   // <--- Explicitly use LastName
             FROM Project_Expense_Sheet__c 
             WHERE Id = :sheetId
+            AND Project__r.RecordType.Name = 'Arelia'
         ];
 
         // 1. Build Proper Full Name (Prevents Nickname usage)
@@ -250,7 +252,7 @@ public without sharing class ExpenseSheetController {
         if (projectId == null) {
             return;
         }
-        AggregateResult[] results = [SELECT SUM(Grand_Total__c) totalAmount FROM Project_Expense_Sheet__c WHERE Project__c = :projectId AND Status__c = 'Approved'];
+        AggregateResult[] results = [SELECT SUM(Grand_Total__c) totalAmount FROM Project_Expense_Sheet__c WHERE Project__c = :projectId AND Project__r.RecordType.Name = 'Arelia' AND Status__c = 'Approved'];
         Decimal total = 0;
         if (!results.isEmpty() && results[0].get('totalAmount') != null) {
             total = (Decimal)results[0].get('totalAmount');
@@ -263,12 +265,12 @@ public without sharing class ExpenseSheetController {
     // --- OTHER HELPERS (DRAFT LOADING, ETC) ---
     @AuraEnabled(cacheable=true)
     public static Project_Expense_Sheet__c getSheetDetails(String sheetId) {
-        return [SELECT Id, Name, Grand_Total__c, Sheet_Date__c, Status__c, Project__r.Name, Project__r.Client__r.Name FROM Project_Expense_Sheet__c WHERE Id = :sheetId];
+        return [SELECT Id, Name, Grand_Total__c, Sheet_Date__c, Status__c, Project__r.Name, Project__r.Client__r.Name FROM Project_Expense_Sheet__c WHERE Id = :sheetId AND Project__r.RecordType.Name = 'Arelia'];
     }
     
     @AuraEnabled
     public static SheetData getDraftDetails(String sheetId) {
-        Project_Expense_Sheet__c sheet = [SELECT Id, Project__c, Grand_Total__c, Status__c FROM Project_Expense_Sheet__c WHERE Id = :sheetId];
+        Project_Expense_Sheet__c sheet = [SELECT Id, Project__c, Grand_Total__c, Status__c FROM Project_Expense_Sheet__c WHERE Id = :sheetId AND Project__r.RecordType.Name = 'Arelia'];
         List<Expense_Line_Item__c> lines = [SELECT Type__c, Item_Name__c, Brand__c, Quantity__c, Rate__c, Amount__c, Description__c FROM Expense_Line_Item__c WHERE Project_Expense_Sheet__c = :sheetId];
         List<ContentDocumentLink> fileLinks = [SELECT ContentDocument.LatestPublishedVersion.Title, ContentDocument.LatestPublishedVersion.FileExtension, ContentDocumentId FROM ContentDocumentLink WHERE LinkedEntityId = :sheetId];
 
@@ -303,7 +305,7 @@ public without sharing class ExpenseSheetController {
 
     @AuraEnabled(cacheable=true)
     public static List<Project_Expense_Sheet__c> getProjectExpenses(String projectId) {
-        return [SELECT Id, Name, Sheet_Date__c, Grand_Total__c, CreatedBy.Name, CreatedDate, Status__c FROM Project_Expense_Sheet__c WHERE Project__c = :projectId ORDER BY CreatedDate DESC];
+        return [SELECT Id, Name, Sheet_Date__c, Grand_Total__c, CreatedBy.Name, CreatedDate, Status__c FROM Project_Expense_Sheet__c WHERE Project__c = :projectId AND Project__r.RecordType.Name = 'Arelia' ORDER BY CreatedDate DESC];
     }
 
     private static Id createFile(Id parentId, String title, Blob body) {

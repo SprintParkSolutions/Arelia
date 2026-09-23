@@ -4,6 +4,8 @@
  */
 @SuppressWarnings('PMD.ApexCRUDViolation')
 public without sharing class ProformaInvoiceController {
+    private static final String ERROR_UNSUPPORTED_RECORD_TYPE =
+        'Proforma invoice approval is supported only for Arelia opportunities.';
 
     // --- Inner Classes ---
     private class NotificationData {
@@ -38,6 +40,8 @@ public without sharing class ProformaInvoiceController {
             if (fileIds == null || fileIds.isEmpty()) {
                 throw new AuraHandledException('Error: No files selected.');
             }
+
+            validateAreliaOpportunity(recordId);
 
             // 1. Create Transaction
             Proforma_Invoice__c invoiceRec = createInvoiceTransaction(recordId, fileIds);
@@ -263,6 +267,7 @@ public without sharing class ProformaInvoiceController {
         fields.put('APPROVAL_LINK', siteUrl + clientPage + '?id=' + invoiceId);
     }
 
+    @TestVisible
     private static String applyMergeFields(String text, Map<String, String> fields) {
         if (text == null) {
             return '';
@@ -281,26 +286,19 @@ public without sharing class ProformaInvoiceController {
     // --- 6. Database Queries & Utils ---
 
     private static Proforma_Invoice__c queryInvoiceForEmail(Id recordId) {
-        return [
-            SELECT Id, Related_File_Id__c, Status__c, Client_Comments__c, 
-                   Opportunity__r.Name, Opportunity__r.Lead_Name__c, 
-                   Opportunity__r.Primary_Contact__r.Email, 
-                   Opportunity__r.Supervisor_User_Email__c, 
-                   Opportunity__r.Supervisor_User__r.FirstName, 
-                   Opportunity__r.Supervisor_User__r.LastName, 
-                   Project__r.Name 
-            FROM Proforma_Invoice__c 
-            WHERE Id = :recordId 
-            LIMIT 1
-        ];
+        Id areliaOpportunityRecordTypeId = AreliaUtility.getAreliaOpportunityRecordTypeId();
+        List<Proforma_Invoice__c> invoices = [SELECT Id, Related_File_Id__c, Status__c, Client_Comments__c, Opportunity__r.Name, Opportunity__r.Lead_Name__c, Opportunity__r.Primary_Contact__r.Email, Opportunity__r.Supervisor_User_Email__c, 
+                   Opportunity__r.Supervisor_User__r.FirstName, Opportunity__r.Supervisor_User__r.LastName, Project__r.Name FROM Proforma_Invoice__c WHERE Id = :recordId AND (Opportunity__c = null OR Opportunity__r.RecordTypeId = :areliaOpportunityRecordTypeId) LIMIT 1];
+
+        if (invoices.isEmpty()) {
+            throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+        }
+
+        return invoices[0];
     }
 
     private static List<ContentVersion> getLatestContentVersions(List<String> fileIds) {
-        return [
-            SELECT Id, Title, FileExtension, ContentDocumentId, VersionData 
-            FROM ContentVersion 
-            WHERE ContentDocumentId IN :fileIds AND IsLatest = true
-        ];
+        return [SELECT Id, Title, FileExtension, ContentDocumentId, VersionData FROM ContentVersion WHERE ContentDocumentId IN :fileIds AND IsLatest = true];
     }
 
     private static void linkFilesToInvoice(Id invoiceId, List<String> fileIds, Id parentRecordId) {
@@ -342,8 +340,13 @@ public without sharing class ProformaInvoiceController {
         return 'Team';
     }
 
+    @TestVisible
+    private static String getSupervisorNameForTest(Proforma_Invoice__c invoiceRecord) {
+        return getSupervisorName(invoiceRecord);
+    }
+
     private static List<String> getManagerAddresses() {
-        String label = Label.Arelia_Living_Enrollment_Members;
+        String label = Label.Arelia_Living_Management_Members;
         if (String.isBlank(label)) {
             return new List<String>();
         }
@@ -379,18 +382,41 @@ public without sharing class ProformaInvoiceController {
         System.debug('Status update placeholder for: ' + recordId);
     }
 
+    private static void validateAreliaOpportunity(Id recordId) {
+        if (recordId == null) {
+            return;
+        }
+
+        String sObjName = recordId.getSObjectType().getDescribe().getName();
+        if (sObjName != 'Opportunity') {
+            return;
+        }
+
+        Id areliaOpportunityRecordTypeId = AreliaUtility.getAreliaOpportunityRecordTypeId();
+
+        // Filter by RecordTypeId in SOQL so only supported Opportunity records continue.
+        if (
+            areliaOpportunityRecordTypeId == null ||
+            [SELECT Id FROM Opportunity WHERE Id = :recordId
+                AND RecordTypeId = :areliaOpportunityRecordTypeId LIMIT 1]
+                .isEmpty()
+        ) {
+            throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+        }
+    }
+
     // --- 7. EXTERNAL: Get Details (Project Name = Opportunity Name) ---
 
     @AuraEnabled(cacheable=true)
     public static Map<String, String> getInvoiceById(String recordId) {
         try {
-            Proforma_Invoice__c invoice = [
-                SELECT Id, Status__c, Client_Comments__c, Related_File_Id__c,
-                       Opportunity__r.Name, Opportunity__r.Lead_Name__c
-                FROM Proforma_Invoice__c 
-                WHERE Id = :recordId 
-                LIMIT 1
-            ];
+            Id areliaOpportunityRecordTypeId = AreliaUtility.getAreliaOpportunityRecordTypeId();
+            List<Proforma_Invoice__c> invoices = [SELECT Id, Status__c, Client_Comments__c, Related_File_Id__c, Opportunity__r.Name, Opportunity__r.Lead_Name__c FROM Proforma_Invoice__c WHERE Id = :recordId
+                AND (Opportunity__c = null OR Opportunity__r.RecordTypeId = :areliaOpportunityRecordTypeId) LIMIT 1];
+            if (invoices.isEmpty()) {
+                throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+            }
+            Proforma_Invoice__c invoice = invoices[0];
             
             ContentDocument doc = [SELECT Title FROM ContentDocument WHERE Id = :invoice.Related_File_Id__c LIMIT 1];
             
@@ -434,7 +460,8 @@ public without sharing class ProformaInvoiceController {
     private static List<Proforma_Invoice__c> fetchInvoices(Id recordId) {
         String sObj = recordId.getSObjectType().getDescribe().getName();
         if (sObj == 'Opportunity') {
-            return [SELECT Id, Status__c, Client_Comments__c, Manager_Approval__c, Manager_Comments__c, Related_File_Id__c FROM Proforma_Invoice__c WHERE Opportunity__c = :recordId ORDER BY CreatedDate DESC];
+            Id areliaOpportunityRecordTypeId = AreliaUtility.getAreliaOpportunityRecordTypeId();
+            return [SELECT Id, Status__c, Client_Comments__c, Manager_Approval__c, Manager_Comments__c, Related_File_Id__c FROM Proforma_Invoice__c WHERE Opportunity__c = :recordId AND Opportunity__r.RecordTypeId = :areliaOpportunityRecordTypeId ORDER BY CreatedDate DESC];
         } 
         if (sObj == 'Project__c') {
             return [SELECT Id, Status__c, Client_Comments__c, Manager_Approval__c, Manager_Comments__c, Related_File_Id__c FROM Proforma_Invoice__c WHERE Project__c = :recordId ORDER BY CreatedDate DESC];

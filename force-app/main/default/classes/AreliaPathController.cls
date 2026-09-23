@@ -1,5 +1,10 @@
 @SuppressWarnings('PMD.CognitiveComplexity,PMD.ApexCRUDViolation,PMD.ExcessiveParameterList')
 public without sharing class AreliaPathController {
+    private static final String BUDGET_STATUS_CLIENT_APPROVED = 'Client Approved';
+    private static final String BUDGET_STATUS_MANAGER_APPROVED = 'Manager Approved';
+    private static final String PAYMENT_STATUS_CLIENT_APPROVED = 'Client Approved';
+    private static final String PAYMENT_STATUS_MANAGER_APPROVED = 'Manager Approved';
+    private static final String PAYMENT_STATUS_SENT_FOR_CLIENT_APPROVAL = 'Sent for Client Approval';
     
     @AuraEnabled(cacheable=true)
     public static List<Map<String, String>> getAllStages() {
@@ -129,19 +134,25 @@ public without sharing class AreliaPathController {
     }
 
     private static String checkBudgetAndPaymentStages(Opportunity opp) {
-        if (opp.Budget_Review_Status__c != 'Client Approved' && opp.Budget_Review_Status__c != 'Manager Approved') {
+        if (opp.Budget_Review_Status__c != BUDGET_STATUS_CLIENT_APPROVED && opp.Budget_Review_Status__c != BUDGET_STATUS_MANAGER_APPROVED) {
             return 'Budget Review Client Approval';
         }
-        if (opp.Budget_Review_Status__c != 'Manager Approved') {
+        if (opp.Budget_Review_Status__c != BUDGET_STATUS_MANAGER_APPROVED) {
             return 'Budget Review Manager Approval';
         }
-        if (opp.Payment_Terms_Status__c != 'Manager Approved' && opp.Payment_Terms_Status__c != 'Client Approved') {
+        if (!isPaymentTermsManagerApproved(opp.Payment_Terms_Status__c)) {
             return 'Payment Terms Manager Approval';
         }
-        if (opp.Payment_Terms_Status__c != 'Client Approved') {
+        if (opp.Payment_Terms_Status__c != PAYMENT_STATUS_CLIENT_APPROVED) {
             return 'Payment Terms Client Approval';
         }
         return null;
+    }
+
+    private static Boolean isPaymentTermsManagerApproved(String paymentTermsStatus) {
+        return paymentTermsStatus == PAYMENT_STATUS_MANAGER_APPROVED
+            || paymentTermsStatus == PAYMENT_STATUS_SENT_FOR_CLIENT_APPROVAL
+            || paymentTermsStatus == PAYMENT_STATUS_CLIENT_APPROVED;
     }
 
     private static String checkAgreementStages(Opportunity opp) {
@@ -151,17 +162,21 @@ public without sharing class AreliaPathController {
     }
 
     private static String checkVendorAndClosingStages(Opportunity opp) {
-        Boolean isVendorSent = false;
+        Boolean hasVendorOpportunity = false;
+        Boolean isVendorAgreementSent = false;
+
         if (opp.Vendor_Opportunities__r != null) {
             for (SObject vo : opp.Vendor_Opportunities__r) {
+                hasVendorOpportunity = true;
                 if (vo.get('Vendor_Agreement_Sent__c') == true) {
-                    isVendorSent = true;
+                    isVendorAgreementSent = true;
                     break; 
                 }
             }
         }
         
-        if (isVendorSent == false) { return 'Tender Invites'; }
+        if (hasVendorOpportunity == false) { return 'Tender Invites'; }
+        if (isVendorAgreementSent == false) { return 'Vendor Agreement Sent'; }
         if (opp.All_Vendors_Agreement_Completed__c == false) { return 'Vendor Agreement Signed'; }
         if (opp.StageName != 'Closed Won') { return 'Closed Won'; }
         return null;

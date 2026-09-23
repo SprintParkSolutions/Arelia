@@ -1,0 +1,30 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body style="height: auto; min-height: auto;"><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Dear <strong>{{{Vendor_Assignment__c.00NgL00000xbnUQ}}}</strong>,<br />
+<br />
+Congratulations! You have been shortlisted for the following project. Below are the project details.<br />
+<br />
+<strong>Project Details:</strong></span></span>
+<ul>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;"><strong>Project Name:</strong>&nbsp;{{{Vendor_Assignment__c.Project__c}}}</span></span></li>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;"><strong>Vendor Category:</strong>&nbsp;{{{Vendor_Assignment__c.Vendor_Category__c}}}</span></span></li>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;"><strong>Start Date:</strong>&nbsp;{{{Vendor_Assignment__c.Vendor_Work_Start_Date__c}}}</span></span></li>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;"><strong>End Date:</strong>&nbsp;{{{Vendor_Assignment__c.Vendor_Work_End_Date__c}}}</span></span></li>
+</ul>
+<span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">If you have any further quaries, feel free to contact your supervisor. Below are the Supervisor details.<br />
+<br />
+<strong>Supervisor Details:</strong></span></span>
+
+<ul>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;"><strong>Supervisor Name:</strong>&nbsp;</span></span>{{{Vendor_Assignment__c.Supervisor_User__c}}}</li>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;"><strong>Email:</strong>&nbsp;</span></span>{{{Vendor_Assignment__c.Supervisor_Email}}}</li>
+	<li><span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;"><strong>Phone:</strong></span></span>{{{Vendor_Assignment__c.Supervisor_Phone}}}</li>
+</ul>
+<br />
+<br />
+<span style="font-family:Times New Roman,Times New Roman,Times,serif;"><span style="font-size:16px;">Best Regards, &nbsp;<br />
+Arelia Team.</span></span><br />
+&nbsp;</body>
+</html>

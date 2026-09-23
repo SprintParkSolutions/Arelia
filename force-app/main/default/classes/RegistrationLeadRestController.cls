@@ -11,7 +11,7 @@ global without sharing class RegistrationLeadRestController {
             Map<String, Object> payload =
                 (Map<String, Object>) JSON.deserializeUntyped(body);
 
-            Id leadId = RegistrationFormController.registerLead(payload);
+            Id leadId = RegistrationFormController.registerLeadFromApi(payload);
 
             return new LeadResponse(true, leadId, null);
 

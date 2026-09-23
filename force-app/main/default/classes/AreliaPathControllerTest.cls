@@ -196,11 +196,17 @@ public class AreliaPathControllerTest {
 
         // STEP 14: Payment Terms Manager Approval Done
         opp = getTestOpp();
+        opp.Payment_Terms_Status__c = 'Sent for Client Approval';
+        update opp;
+
+        status = AreliaPathController.getPathStatus(opp.Id);
+        Assert.areEqual('Payment Terms Client Approval', status, 'Status should advance to "Payment Terms Client Approval" after manager sends payment terms for client approval');
+
         opp.Payment_Terms_Status__c = 'Manager Approved';
         update opp;
 
         status = AreliaPathController.getPathStatus(opp.Id);
-        Assert.areEqual('Payment Terms Client Approval', status, 'Status should advance to "Payment Terms Client Approval"');
+        Assert.areEqual('Payment Terms Client Approval', status, 'Status should still advance to "Payment Terms Client Approval" for manager approved payment terms');
 
         // STEP 15: Payment Terms Client Approval Done
         opp = getTestOpp();
@@ -224,18 +230,23 @@ public class AreliaPathControllerTest {
         update opp;
 
         status = AreliaPathController.getPathStatus(opp.Id);
-        Assert.areEqual('Tender Invites', status, 'Status should advance to "Tender Invites"');
+        Assert.areEqual('Tender Invites', status, 'Status should advance to "Tender Invites" before vendor opportunities are created');
 
-        // STEP 18: Vendor Agreement Sent
+        // STEP 18: Vendor Opportunity Created
         Vendor__c v = TestDataUtility.createVendor('Test Vendor', 'Electrical & Networking', 'v@test.com');
         Vendor_Opportunity__c vo = TestDataUtility.createVendorOpportunity(opp.Id, v.Id, 'Active');
+
+        status = AreliaPathController.getPathStatus(opp.Id);
+        Assert.areEqual('Vendor Agreement Sent', status, 'Status should advance to "Vendor Agreement Sent" after vendor opportunity creation');
+
+        // STEP 19: Vendor Agreement Sent
         vo.Vendor_Agreement_Sent__c = true;
         update vo;
 
         status = AreliaPathController.getPathStatus(opp.Id);
         Assert.areEqual('Vendor Agreement Signed', status, 'Status should advance to "Vendor Agreement Signed"');
 
-        // STEP 19: Vendor Agreements Completed
+        // STEP 20: Vendor Agreements Completed
         vo.Vendor_Agreement_Signed__c = true;
         update vo;
 
@@ -246,7 +257,7 @@ public class AreliaPathControllerTest {
         status = AreliaPathController.getPathStatus(opp.Id);
         Assert.areEqual('Closed Won', status, 'Status should advance to "Closed Won"');
 
-        // STEP 20: Final State
+        // STEP 21: Final State
         opp = getTestOpp();
         opp.StageName = 'Closed Won';
         update opp;
@@ -291,6 +302,26 @@ public class AreliaPathControllerTest {
         String status = AreliaPathController.getPathStatus(opp.Id);
         Test.stopTest();
 
-        Assert.areEqual('Tender Invites', status, 'When vendor agreement is not sent, status should return Tender Invites');
+        Assert.areEqual('Tender Invites', status, 'When vendor opportunities are not created, status should return Tender Invites');
+    }
+
+    @IsTest
+    static void testProformaStatusFallbackReturnsUploadStage() {
+        Opportunity opp = getTestOpp();
+
+        opp.Architect_Name__c = 'Fallback Architect';
+        opp.Architecture_Client_Approval_Sent__c = true;
+        opp.Architecture_Manager_Approval__c = true;
+        update opp;
+
+        ContentVersion cv = TestDataUtility.createContentVersion('Fallback Arch File', 'Content');
+        TestDataUtility.createArchitectureDesign(opp.Id, cv.Id, 'Approved');
+        TestDataUtility.createProformaInvoice(opp.Id);
+
+        Test.startTest();
+        String status = AreliaPathController.getPathStatus(opp.Id);
+        Test.stopTest();
+
+        Assert.areEqual('Upload Proforma Invoice', status, 'Proforma invoices without a status should stay on the upload stage');
     }
 }

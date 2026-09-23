@@ -136,6 +136,36 @@ public class TaskBulkControllerTest {
     }
 
     // ==========================================
+    // NEW TEST FOR PICKLIST METHOD
+    // ==========================================
+
+    @isTest
+    static void testGetTaskStatusOptions() {
+        Test.startTest();
+        List<Map<String, String>> options = TaskBulkController.getTaskStatusOptions();
+        Test.stopTest();
+
+        Assert.isNotNull(options, 'Options should not be null');
+        Assert.isTrue(options.size() > 0, 'There should be at least one status value');
+
+        // Validate structure
+        for (Map<String, String> opt : options) {
+            Assert.isTrue(opt.containsKey('label'), 'Each option must have label');
+            Assert.isTrue(opt.containsKey('value'), 'Each option must have value');
+            Assert.isNotNull(opt.get('label'), 'Label should not be null');
+            Assert.isNotNull(opt.get('value'), 'Value should not be null');
+        }
+
+        // Validate expected value using Set (PMD-friendly)
+        Set<String> values = new Set<String>();
+        for (Map<String, String> opt : options) {
+            values.add(opt.get('value'));
+        }
+
+        Assert.isTrue(values.contains('Not Started'), 'Should contain standard Task status');
+    }
+
+    // ==========================================
     // FILE HANDLING TESTS
     // ==========================================
 

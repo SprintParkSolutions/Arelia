@@ -152,4 +152,39 @@ private class AppointmentControllerToOppTest {
         Assert.isTrue(caught, 'Missing Opportunity ID should throw exception');
         Test.stopTest();
     }
+
+    @isTest
+    static void testAdditionalValidationBranches() {
+        User supervisor = [SELECT Id FROM User WHERE Alias = 'oppSup' LIMIT 1];
+        Opportunity opp = TestDataUtility.createOpportunity('Additional Exception Test', supervisor.Id);
+
+        Test.startTest();
+        Boolean caught = false;
+        try {
+            AppointmentControllerToOpp.updateAppointmentStatus(opp.Id, null, null, null, null);
+        } catch (AuraHandledException e) {
+            caught = true;
+            Assert.isNotNull(e.getMessage(), 'Blank status should return a message.');
+        }
+        Assert.isTrue(caught, 'Blank status should throw exception');
+
+        caught = false;
+        try {
+            AppointmentControllerToOpp.getAvailableTimeSlots(null, opp.Id);
+        } catch (AuraHandledException e) {
+            caught = true;
+            Assert.isNotNull(e.getMessage(), 'Missing date should return a message.');
+        }
+        Assert.isTrue(caught, 'Missing date should throw exception');
+
+        caught = false;
+        try {
+            AppointmentControllerToOpp.getAvailableTimeSlots(Date.today().addDays(2), null);
+        } catch (AuraHandledException e) {
+            caught = true;
+            Assert.isNotNull(e.getMessage(), 'Missing opportunity should return a message.');
+        }
+        Assert.isTrue(caught, 'Missing opportunity should throw exception');
+        Test.stopTest();
+    }
 }

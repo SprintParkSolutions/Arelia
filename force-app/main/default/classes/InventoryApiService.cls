@@ -84,19 +84,73 @@ public static Opportunity getOpportunitySummary(Id opportunityId) {
        Load Products (UNCHANGED)
     =============================== */
     @AuraEnabled(cacheable=true)
-    public static List<Interior_Product__c> getProducts(String roomType, String category) {
+public static List<Map<String,Object>> getProducts(String roomType, String category) {
 
-        if (String.isBlank(roomType) || String.isBlank(category)) {
-            return new List<Interior_Product__c>();
-        }
-
-        return [
-            SELECT Id, Name, Product_Category__c, Room_Type__c,
-                   Unit_Price__c, Image_File_Name__c
-            FROM Interior_Product__c
-            WHERE Room_Type__c = :roomType
-            AND Product_Category__c = :category
-            ORDER BY Name
-        ];
+    if (String.isBlank(roomType) || String.isBlank(category)) {
+        return new List<Map<String,Object>>();
     }
+
+    List<Interior_Product__c> products = [
+        SELECT Id, Name, Product_Category__c, Room_Type__c, Unit_Price__c
+        FROM Interior_Product__c
+        WHERE Room_Type__c = :roomType
+        AND Product_Category__c = :category
+        ORDER BY Name
+    ];
+
+    Set<Id> productIds = new Set<Id>();
+    for (Interior_Product__c p : products) {
+        productIds.add(p.Id);
+    }
+
+    Map<Id, ContentDocumentLink> fileByProduct = new Map<Id, ContentDocumentLink>();
+
+    if (!productIds.isEmpty()) {
+        for (ContentDocumentLink cdl : [
+            SELECT LinkedEntityId,
+                   ContentDocument.LatestPublishedVersionId
+            FROM ContentDocumentLink
+            WHERE LinkedEntityId IN :productIds
+        ]) {
+            if (!fileByProduct.containsKey(cdl.LinkedEntityId)) {
+                fileByProduct.put(cdl.LinkedEntityId, cdl);
+            }
+        }
+    }
+
+    List<Map<String,Object>> result = new List<Map<String,Object>>();
+
+    for (Interior_Product__c p : products) {
+
+        Map<String,Object> row = new Map<String,Object>();
+
+        row.put('Id', p.Id);
+        row.put('Name', p.Name);
+        row.put('Room_Type__c', p.Room_Type__c);
+        row.put('Product_Category__c', p.Product_Category__c);
+        row.put('Unit_Price__c', p.Unit_Price__c);
+
+        if (fileByProduct.containsKey(p.Id)) {
+
+    Id versionId = fileByProduct.get(p.Id)
+        .ContentDocument
+        .LatestPublishedVersionId;
+
+    String imageUrl =
+    '/sfsites/c/sfc/servlet.shepherd/version/download/' + versionId;
+
+    row.put('imageUrl', imageUrl);
+
+} else {
+
+    row.put('imageUrl',
+        '/sfsites/c/resource/Default_Product_Image'
+    );
+}
+
+        result.add(row);
+    }
+
+    return result;
+}
 }

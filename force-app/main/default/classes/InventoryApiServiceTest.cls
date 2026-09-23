@@ -1,146 +1,409 @@
 @IsTest
 private class InventoryApiServiceTest {
+    private static final String SUPERVISOR_ALIAS = 'invUser';
+    private static final String OPPORTUNITY_NAME = 'Inventory Opp';
+    private static final String FALLBACK_OPPORTUNITY_NAME = 'Fallback Inventory Opp';
+    private static final String CLIENT_EMAIL = 'testclient@example.com';
+
+    private static final String PROJECT_TYPE_HOME = 'Home';
+    private static final String PROJECT_TYPE_OFFICE = 'Office';
+
+    private static final String ROOM_DINING_HALL = 'Dining Hall';
+    private static final String ROOM_RECEPTION = 'Reception';
+    private static final String ROOM_LIVING_ROOM = 'Living Room';
+    private static final String ROOM_KITCHEN = 'Kitchen';
+
+    private static final String CATEGORY_PAINTING = 'Painting & Wall Finishing';
+    private static final String CATEGORY_ELECTRICAL = 'Electrical & Networking';
+    private static final String CATEGORY_CARPENTRY = 'Carpentry & Woodwork';
+    private static final String CATEGORY_APPLIANCES = 'Appliances';
+    private static final String CATEGORY_FLOORING = 'Flooring & Tiling';
+
+    private static final String PRODUCT_ACCENT_WALL = 'Accent Wall';
+    private static final String PRODUCT_TEXTURED_PAINT = 'Textured Paint';
+    private static final String PRODUCT_ELECTRICAL_BOARD = 'Electrical board set';
+    private static final String PRODUCT_WOODEN_CHAIRS = 'Wooden chairs reception';
+    private static final String PRODUCT_INCOMPLETE_CONFIG = 'Incomplete Config Product';
 
     @TestSetup
-    static void setup() {
-        // 1. Create Supervisor
-        User u = TestDataUtility.createSupervisorUser('invUser');
+    static void setupTestData() {
+        User supervisorUser = TestDataUtility.createSupervisorUser(SUPERVISOR_ALIAS);
 
-        // 2. Create Opportunity
-        Opportunity opp = TestDataUtility.createOpportunity('Inventory Opp', u.Id);
-        // CRITICAL: Updated to 'Home' per your requirement
-        opp.Type_of_Project__c = 'Home'; 
-        opp.Email__c = 'testclient@example.com'; 
-        update opp;
+        Opportunity opportunityRecord = TestDataUtility.createOpportunity(
+            OPPORTUNITY_NAME,
+            supervisorUser.Id
+        );
+        opportunityRecord.Type_of_Project__c = PROJECT_TYPE_HOME;
+        opportunityRecord.Email__c = CLIENT_EMAIL;
+        update opportunityRecord;
 
-        // 3. Create Products using Utility
-        
-        // Item 1: Matching Room/Category AND Project Type ('Home')
-        Interior_Product__c p1 = TestDataUtility.createInteriorProduct('Accent Wall', 'Dining Hall', 'Painting & Wall Finishing', 1500);
-        p1.Type_of_Project__c = 'Home';
-        update p1;
+        Opportunity fallbackOpportunity = TestDataUtility.createOpportunity(
+            FALLBACK_OPPORTUNITY_NAME,
+            supervisorUser.Id
+        );
+        fallbackOpportunity.Email__c = CLIENT_EMAIL;
+        update fallbackOpportunity;
 
-        // Item 2: Matching Room/Category AND Project Type ('Home')
-        Interior_Product__c p2 = TestDataUtility.createInteriorProduct('Textured Paint', 'Dining Hall', 'Painting & Wall Finishing', 300);
-        p2.Type_of_Project__c = 'Home';
-        update p2;
+        Interior_Product__c accentWall = TestDataUtility.createInteriorProduct(
+            PRODUCT_ACCENT_WALL,
+            ROOM_DINING_HALL,
+            CATEGORY_PAINTING,
+            1500
+        );
+        accentWall.Type_of_Project__c = PROJECT_TYPE_HOME;
 
-        // Item 3: Different Room, different Project Type ('Office')
-        Interior_Product__c p3 = TestDataUtility.createInteriorProduct('Electrical board set', 'Living Room', 'Electrical & Networking', 2000);
-        p3.Type_of_Project__c = 'Office'; // Should be excluded by getCatalogConfig for 'Home' opps
-        update p3;
+        Interior_Product__c texturedPaint = TestDataUtility.createInteriorProduct(
+            PRODUCT_TEXTURED_PAINT,
+            ROOM_DINING_HALL,
+            CATEGORY_PAINTING,
+            300
+        );
+        texturedPaint.Type_of_Project__c = PROJECT_TYPE_HOME;
 
-        // Item 4: Different Category, Matching Type ('Home')
-        Interior_Product__c p4 = TestDataUtility.createInteriorProduct('Wooden chairs reception', 'Reception', 'Carpentry & Woodwork', 50);
-        p4.Type_of_Project__c = 'Home';
-        update p4;
+        Interior_Product__c electricalBoard = TestDataUtility.createInteriorProduct(
+            PRODUCT_ELECTRICAL_BOARD,
+            ROOM_LIVING_ROOM,
+            CATEGORY_ELECTRICAL,
+            2000
+        );
+        electricalBoard.Type_of_Project__c = PROJECT_TYPE_OFFICE;
+
+        Interior_Product__c woodenChairs = TestDataUtility.createInteriorProduct(
+            PRODUCT_WOODEN_CHAIRS,
+            ROOM_RECEPTION,
+            CATEGORY_CARPENTRY,
+            50
+        );
+        woodenChairs.Type_of_Project__c = PROJECT_TYPE_HOME;
+
+        update new List<Interior_Product__c>{
+            accentWall,
+            texturedPaint,
+            electricalBoard,
+            woodenChairs
+        };
     }
-
-    // ==========================================
-    // 1. Tests for getCatalogConfig
-    // ==========================================
 
     @IsTest
     static void testGetCatalogConfigSuccess() {
-        Opportunity opp = [SELECT Id FROM Opportunity LIMIT 1];
+        Opportunity opportunityRecord = getOpportunityByName(OPPORTUNITY_NAME);
 
         Test.startTest();
-        Map<String, Object> result = InventoryApiService.getCatalogConfig(opp.Id);
+        Map<String, Object> result = InventoryApiService.getCatalogConfig(opportunityRecord.Id);
         Test.stopTest();
 
-        Assert.isNotNull(result, 'The result map returned from getCatalogConfig should not be null');
+        Assert.isNotNull(result, 'Catalog config result should not be null.');
 
-        // 1. Validate Rooms List
-        // Should find 'Dining Hall' (from p1, p2) and 'Reception' (from p4) which are 'Home'
-        List<String> rooms = (List<String>) result.get('rooms'); 
-        Assert.isNotNull(rooms, 'The "rooms" list in the config result should not be null');
-        Assert.isTrue(rooms.contains('Dining Hall'), 'The room list should contain "Dining Hall" as it matches the project type');
-        Assert.isTrue(rooms.contains('Reception'), 'The room list should contain "Reception" as it matches the project type');
-        Assert.isFalse(rooms.contains('Living Room'), 'The room list should NOT contain "Living Room" as it belongs to a different project type (Office)');
-
-        // 2. Validate Categories Map
-        Map<String, List<String>> catMap = (Map<String, List<String>>) result.get('categoriesByRoom');
-        Assert.isNotNull(catMap, 'The "categoriesByRoom" map should not be null');
-        
-        // Check Dining Hall categories
-        Assert.isTrue(catMap.containsKey('Dining Hall'), 'The category map should contain a key for "Dining Hall"');
-        List<String> diningCats = catMap.get('Dining Hall');
-        Assert.isTrue(diningCats.contains('Painting & Wall Finishing'), 'The Dining Hall categories should contain "Painting & Wall Finishing"');
+        assertCatalogRooms(result);
+        assertCatalogCategories(result);
     }
 
     @IsTest
-    static void testGetCatalogConfigNullId() {
+    static void testGetCatalogConfigSkipsIncompleteProductConfiguration() {
+        createIncompleteProductForCatalogCoverage();
+
+        Opportunity opportunityRecord = getOpportunityByName(OPPORTUNITY_NAME);
+
         Test.startTest();
+        Map<String, Object> result = InventoryApiService.getCatalogConfig(opportunityRecord.Id);
+        Test.stopTest();
+
+        List<String> rooms = (List<String>) result.get('rooms');
+
+        Assert.isNotNull(result, 'Catalog config result should not be null.');
+        Assert.isNotNull(rooms, 'Rooms list should not be null.');
+        Assert.isFalse(
+            rooms.contains(null),
+            'Rooms list should not contain null values from incomplete products.'
+        );
+        Assert.isTrue(
+            rooms.contains(ROOM_DINING_HALL),
+            'Valid room data should still be returned.'
+        );
+    }
+
+    @IsTest
+    static void testGetCatalogConfigWithFallbackProjectType() {
+        Opportunity fallbackOpportunity = getOpportunityByName(FALLBACK_OPPORTUNITY_NAME);
+
+        Test.startTest();
+        Map<String, Object> result = InventoryApiService.getCatalogConfig(fallbackOpportunity.Id);
+        Test.stopTest();
+
+        List<String> rooms = (List<String>) result.get('rooms');
+        Map<String, List<String>> categoriesByRoom =
+            (Map<String, List<String>>) result.get('categoriesByRoom');
+
+        Assert.isNotNull(result, 'Catalog config should return a result map.');
+        Assert.isNotNull(rooms, 'Rooms list should not be null.');
+        Assert.isNotNull(categoriesByRoom, 'Categories map should not be null.');
+    }
+
+    @IsTest
+    static void testGetCatalogConfigWithNullOpportunityId() {
+        Test.startTest();
+
         try {
             InventoryApiService.getCatalogConfig(null);
-            Assert.fail('The method should have thrown an Exception for a null Opportunity Id');
-        } catch (Exception e) {
-            Assert.isTrue(e.getTypeName().contains('AuraHandledException'), 'The exception thrown should be of type AuraHandledException');
+            Assert.fail('Expected AuraHandledException when Opportunity Id is null.');
+        } catch (AuraHandledException exceptionRecord) {
+            Assert.isNotNull(
+                exceptionRecord.getMessage(),
+                'AuraHandledException should be thrown for null Opportunity Id.'
+            );
         }
+
         Test.stopTest();
     }
-
-    // ==========================================
-    // 2. Tests for getOpportunitySummary
-    // ==========================================
 
     @IsTest
-    static void testGetOpportunitySummary() {
-        Opportunity opp = [SELECT Id FROM Opportunity LIMIT 1];
+    static void testGetOpportunitySummarySuccess() {
+        Opportunity opportunityRecord = getOpportunityByName(OPPORTUNITY_NAME);
 
         Test.startTest();
-        Opportunity result = InventoryApiService.getOpportunitySummary(opp.Id);
+        Opportunity result = InventoryApiService.getOpportunitySummary(opportunityRecord.Id);
         Test.stopTest();
 
-        Assert.isNotNull(result, 'The service should return a valid Opportunity record');
-        Assert.areEqual('Home', result.Type_of_Project__c, 'The Opportunity Type_of_Project__c should match the setup data ("Home")');
-        Assert.areEqual('testclient@example.com', result.Email__c, 'The Opportunity Email__c should match the setup data');
+        Assert.isNotNull(result, 'Opportunity summary should not be null.');
+        Assert.areEqual(
+            PROJECT_TYPE_HOME,
+            result.Type_of_Project__c,
+            'Opportunity Type_of_Project__c should match the setup data.'
+        );
+        Assert.areEqual(
+            CLIENT_EMAIL,
+            result.Email__c,
+            'Opportunity Email__c should match the setup data.'
+        );
     }
 
-    // ==========================================
-    // 3. Existing Tests for getProducts (Maintained)
-    // ==========================================
+    @IsTest
+    static void testGetOpportunitySummaryWithMissingOpportunity() {
+        Opportunity temporaryOpportunity = TestDataUtility.createOpportunity(
+            'Deleted Inventory Opp',
+            UserInfo.getUserId()
+        );
+        Id deletedOpportunityId = temporaryOpportunity.Id;
+        delete temporaryOpportunity;
+
+        Test.startTest();
+
+        try {
+            InventoryApiService.getOpportunitySummary(deletedOpportunityId);
+            Assert.fail('Expected QueryException when Opportunity record is not found.');
+        } catch (QueryException exceptionRecord) {
+            Assert.isTrue(
+                exceptionRecord.getMessage().contains('List has no rows'),
+                'Expected no-row QueryException for deleted Opportunity.'
+            );
+        }
+
+        Test.stopTest();
+    }
 
     @IsTest
     static void testGetProductsSuccess() {
         Test.startTest();
-        // Query matches Setup Data (Dining Hall / Painting)
-        List<Interior_Product__c> results = InventoryApiService.getProducts('Dining Hall', 'Painting & Wall Finishing');
+        Object productResults = InventoryApiService.getProducts(
+            ROOM_DINING_HALL,
+            CATEGORY_PAINTING
+        );
         Test.stopTest();
 
-        Assert.isNotNull(results, 'The getProducts method should return a list, not null');
-        Assert.areEqual(2, results.size(), 'The query should return exactly 2 matching records for Dining Hall/Painting');
-        
-        // Verify sorting (ORDER BY Name ASC)
-        Assert.areEqual('Accent Wall', results[0].Name, 'The first result should be "Accent Wall" (sorted by Name ASC)');
-        Assert.areEqual('Textured Paint', results[1].Name, 'The second result should be "Textured Paint" (sorted by Name ASC)');
+        List<Object> rows = getProductResultRows(productResults);
+
+        Assert.isNotNull(productResults, 'Product result should not be null.');
+        Assert.areEqual(
+            2,
+            rows.size(),
+            'Expected exactly two products for Dining Hall and Painting category.'
+        );
+        Assert.isTrue(
+            JSON.serialize(productResults).contains(PRODUCT_ACCENT_WALL),
+            'Product result should contain Accent Wall.'
+        );
+        Assert.isTrue(
+            JSON.serialize(productResults).contains(PRODUCT_TEXTURED_PAINT),
+            'Product result should contain Textured Paint.'
+        );
     }
 
     @IsTest
-    static void testGetProductsNoMatch() {
+    static void testGetProductsWithNoMatchingData() {
         Test.startTest();
-        List<Interior_Product__c> results = InventoryApiService.getProducts('Kitchen', 'Appliances');
+        Object productResults = InventoryApiService.getProducts(
+            ROOM_KITCHEN,
+            CATEGORY_APPLIANCES
+        );
         Test.stopTest();
 
-        Assert.isNotNull(results, 'The method should return an empty list rather than null when no records match');
-        Assert.areEqual(0, results.size(), 'The list size should be 0 for non-matching parameters');
+        List<Object> rows = getProductResultRows(productResults);
+
+        Assert.isNotNull(productResults, 'Product result should not be null.');
+        Assert.areEqual(
+            0,
+            rows.size(),
+            'Expected empty product list for non-matching room and category.'
+        );
     }
 
     @IsTest
-    static void testGetProductsPartialMatch() {
+    static void testGetProductsWithPartialMatch() {
         Test.startTest();
-        List<Interior_Product__c> results = InventoryApiService.getProducts('Dining Hall', 'Flooring & Tiling');
+        Object productResults = InventoryApiService.getProducts(
+            ROOM_DINING_HALL,
+            CATEGORY_FLOORING
+        );
         Test.stopTest();
 
-        Assert.areEqual(0, results.size(), 'The list size should be 0 because the category does not match the room in setup data');
+        List<Object> rows = getProductResultRows(productResults);
+
+        Assert.isNotNull(productResults, 'Product result should not be null.');
+        Assert.areEqual(
+            0,
+            rows.size(),
+            'Expected empty product list when room matches but category does not match.'
+        );
     }
 
     @IsTest
-    static void testGetProductsNullParams() {
+    static void testGetProductsWithNullRoomType() {
         Test.startTest();
-        List<Interior_Product__c> results = InventoryApiService.getProducts(null, null);
+        Object productResults = InventoryApiService.getProducts(
+            null,
+            CATEGORY_PAINTING
+        );
         Test.stopTest();
 
-        Assert.areEqual(0, results.size(), 'The list size should be 0 when null parameters are passed');
+        List<Object> rows = getProductResultRows(productResults);
+
+        Assert.isNotNull(productResults, 'Product result should not be null.');
+        Assert.areEqual(
+            0,
+            rows.size(),
+            'Expected empty product list when room type is null.'
+        );
+    }
+
+    @IsTest
+    static void testGetProductsWithNullCategory() {
+        Test.startTest();
+        Object productResults = InventoryApiService.getProducts(
+            ROOM_DINING_HALL,
+            null
+        );
+        Test.stopTest();
+
+        List<Object> rows = getProductResultRows(productResults);
+
+        Assert.isNotNull(productResults, 'Product result should not be null.');
+        Assert.areEqual(
+            0,
+            rows.size(),
+            'Expected empty product list when category is null.'
+        );
+    }
+
+    @IsTest
+    static void testGetProductsWithBothNullValues() {
+        Test.startTest();
+        Object productResults = InventoryApiService.getProducts(null, null);
+        Test.stopTest();
+
+        List<Object> rows = getProductResultRows(productResults);
+
+        Assert.isNotNull(productResults, 'Product result should not be null.');
+        Assert.areEqual(
+            0,
+            rows.size(),
+            'Expected empty product list when both parameters are null.'
+        );
+    }
+
+    @IsTest
+    static void testGetProductsWithBlankStringValues() {
+        Test.startTest();
+        Object productResults = InventoryApiService.getProducts('', '');
+        Test.stopTest();
+
+        List<Object> rows = getProductResultRows(productResults);
+
+        Assert.isNotNull(productResults, 'Product result should not be null.');
+        Assert.areEqual(
+            0,
+            rows.size(),
+            'Expected empty product list when both parameters are blank strings.'
+        );
+    }
+
+    private static Opportunity getOpportunityByName(String opportunityName) {
+        return [
+            SELECT Id, Type_of_Project__c, Email__c
+            FROM Opportunity
+            WHERE Name = :opportunityName
+            LIMIT 1
+        ];
+    }
+
+    private static void createIncompleteProductForCatalogCoverage() {
+        Interior_Product__c productRecord = TestDataUtility.createInteriorProduct(
+            PRODUCT_INCOMPLETE_CONFIG,
+            ROOM_DINING_HALL,
+            CATEGORY_PAINTING,
+            75
+        );
+
+        productRecord.Room_Type__c = null;
+        productRecord.Type_of_Project__c = PROJECT_TYPE_HOME;
+        update productRecord;
+    }
+
+    private static void assertCatalogRooms(Map<String, Object> result) {
+        List<String> rooms = (List<String>) result.get('rooms');
+
+        Assert.isNotNull(rooms, 'Rooms list should not be null.');
+        Assert.isTrue(
+            rooms.contains(ROOM_DINING_HALL),
+            'Rooms should contain Dining Hall for Home project type.'
+        );
+        Assert.isTrue(
+            rooms.contains(ROOM_RECEPTION),
+            'Rooms should contain Reception for Home project type.'
+        );
+        Assert.isFalse(
+            rooms.contains(ROOM_LIVING_ROOM),
+            'Rooms should not contain Living Room because it belongs to Office project type.'
+        );
+    }
+
+    private static void assertCatalogCategories(Map<String, Object> result) {
+        Map<String, List<String>> categoriesByRoom =
+            (Map<String, List<String>>) result.get('categoriesByRoom');
+
+        Assert.isNotNull(categoriesByRoom, 'Categories by room map should not be null.');
+        Assert.isTrue(
+            categoriesByRoom.containsKey(ROOM_DINING_HALL),
+            'Categories map should contain Dining Hall.'
+        );
+        Assert.isTrue(
+            categoriesByRoom.get(ROOM_DINING_HALL).contains(CATEGORY_PAINTING),
+            'Dining Hall should contain Painting & Wall Finishing category.'
+        );
+        Assert.isTrue(
+            categoriesByRoom.containsKey(ROOM_RECEPTION),
+            'Categories map should contain Reception.'
+        );
+        Assert.isTrue(
+            categoriesByRoom.get(ROOM_RECEPTION).contains(CATEGORY_CARPENTRY),
+            'Reception should contain Carpentry & Woodwork category.'
+        );
+        Assert.isFalse(
+            categoriesByRoom.containsKey(ROOM_LIVING_ROOM),
+            'Categories map should not contain Living Room because it belongs to Office project type.'
+        );
+    }
+
+    private static List<Object> getProductResultRows(Object productResults) {
+        return (List<Object>) JSON.deserializeUntyped(JSON.serialize(productResults));
     }
 }

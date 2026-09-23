@@ -1,5 +1,7 @@
 public with sharing class OpportunityTriggerHandler {
 
+    private static final String ARELIA_RECORD_TYPE_NAME = 'Arelia';
+
     /**
      * Updates related Projects when Negotiation/Review Budget field is updated in the Opportunity.
      * Bulk-safe and PMD-compliant.
@@ -15,7 +17,7 @@ public with sharing class OpportunityTriggerHandler {
         for (Opportunity newOpp : newOpps) {
             Opportunity oldOpp = oldMap.get(newOpp.Id);
 
-            if (isQualified(newOpp, oldOpp)) {
+            if (isAreliaOpportunity(newOpp) && isQualified(newOpp, oldOpp)) {
                 qualifiedOpportunities.put(newOpp.Id, newOpp);
             }
         }
@@ -30,6 +32,7 @@ public with sharing class OpportunityTriggerHandler {
             SELECT Id, Project_Name__c
             FROM Project__c
             WHERE Project_Name__c IN :qualifiedOpportunities.keySet()
+            AND RecordType.Name = :ARELIA_RECORD_TYPE_NAME
         ];
 
         // Update each Project record
@@ -60,6 +63,13 @@ public with sharing class OpportunityTriggerHandler {
         return stageIsResumed && budgetNotNull && stageOrBudgetChanged;
     }
 
+    private static Boolean isAreliaOpportunity(Opportunity opp) {
+        Schema.RecordTypeInfo rtInfo = Opportunity.SObjectType.getDescribe()
+            .getRecordTypeInfosByName()
+            .get(ARELIA_RECORD_TYPE_NAME);
+        return rtInfo != null && opp.RecordTypeId == rtInfo.getRecordTypeId();
+    }
+
     /**
      * Applies required field updates to a Project record
      *
@@ -68,6 +78,6 @@ public with sharing class OpportunityTriggerHandler {
      */
     private static void applyProjectUpdate(Project__c project, Opportunity opp) {
         project.Supervisor_Estimated_Budget__c = opp.Negotiation_Review_Budget__c;
-        project.Status__c = 'In progress';
+        project.Status__c = 'In Progress';
     }
 }

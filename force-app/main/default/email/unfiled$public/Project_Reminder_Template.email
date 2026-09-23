@@ -1,37 +1,250 @@
 <html>
-<head>
-	<title></title>
-</head>
-<body style="height: auto; min-height: auto;">
-<p><span style="font-family:Arial,Helvetica,sans-serif;">Dear <strong>{{RecipientName}}</strong>,<br />
-<br />
-This is an official reminder regarding the ongoing project "<strong>{{ProjectName}}</strong>".<br />
-<br />
-Please review the project details below:<br />
-<br />
-<strong>Project Information:</strong></span></p>
-
-<ul>
-	<li><span style="font-family:Arial,Helvetica,sans-serif;">&nbsp;<strong>Project Name:</strong> {{ProjectName}}</span></li>
-	<li><span style="font-family:Arial,Helvetica,sans-serif;">&nbsp;<strong>Client:</strong> {{ClientName}}</span></li>
-	<li><span style="font-family:Arial,Helvetica,sans-serif;">&nbsp;<strong>Completion Status:</strong> {{CompletionStatus}}</span></li>
-	<li><span style="font-family:Arial,Helvetica,sans-serif;">&nbsp;<strong>Type of Project: </strong>{{TypeOfProject}}</span></li>
-	<li><span style="font-family:Arial,Helvetica,sans-serif;">&nbsp;<strong>Start Date:</strong> {{StartDate}}</span></li>
-	<li><span style="font-family:Arial,Helvetica,sans-serif;">&nbsp;<strong>End Date</strong>: {{EndDate}}</span></li>
-</ul>
-
-<p><br />
-<span style="font-family:Arial,Helvetica,sans-serif;"><strong>Supervisor Information:</strong></span></p>
-
-<ul>
-	<li><span style="font-family:Arial,Helvetica,sans-serif;">&nbsp;<strong>Supervisor Name:</strong> {{SupervisorName}}</span></li>
-	<li><span style="font-family:Arial,Helvetica,sans-serif;">&nbsp;<strong>Supervisor Contact:</strong> {{SupervisorContact}}</span></li>
-</ul>
-
-<p><br />
-<span style="font-family:Arial,Helvetica,sans-serif;">Please ensure the necessary actions are taken to keep the project on track.<br />
-<br />
-Thank you, &nbsp;<br />
-Arelia Team.</span></p>
-</body>
+ <head>
+  <title></title>
+ </head>
+ <body style="height: auto; min-height: auto;">
+  <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+              border-collapse:collapse;
+              background-color:#ffffff;" width="100%">
+   <tbody>
+    <tr>
+     <td align="center" style="padding:0;">
+      <table border="0" cellpadding="0" cellspacing="0" style="max-width:760px;
+                              width:100%;
+                              background-color:#ffffff;
+                              border:2px solid #c9a75d;
+                              border-collapse:collapse;" width="100%">
+       <tbody>
+        <tr>
+         <td style="padding:0;"><img alt="Arelia Email Banner Image" src="{[devName:Arelia_Email_Banner_Image]}" style="display:block;
+                                           width:100%;
+                                           max-width:100%;
+                                           height:auto;
+                                           border:0;" title="Arelia Email Banner Image" /></td>
+        </tr>
+        <tr>
+         <td style="padding:30px 34px 32px 34px;"><p style="margin:0 0 18px 0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">Dear <strong>{{RecipientName}}</strong>,</p> <p style="margin:0 0 18px 0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">This is an official reminder regarding the ongoing project "<strong>{{ProjectName}}</strong>".</p> <p style="margin:0 0 22px 0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">Please review the project details below:</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;
+                                              margin-bottom:20px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+                                                       padding-top:20px;"><p style="margin:0;
+                                                          font-size:20px;
+                                                          line-height:1.4;
+                                                          font-family:Times New Roman,Times,serif;
+                                                          color:#1f1f1f;"><strong>Project Information:</strong></p></td>
+            </tr>
+           </tbody>
+          </table>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;
+                                              margin-bottom:26px;
+                                              background-color:#faf8f3;
+                                              border-left:3px solid #c9a75d;" width="100%">
+           <tbody>
+            <tr>
+             <td style="padding:16px 10px 10px 18px;
+                                                       width:200px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Project Name:</strong></td>
+             <td style="padding:16px 18px 10px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;">{{ProjectName}}</td>
+            </tr>
+            <tr>
+             <td style="padding:0 10px 10px 18px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Client:</strong></td>
+             <td style="padding:0 18px 10px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;">{{ClientName}}</td>
+            </tr>
+            <tr>
+             <td style="padding:0 10px 10px 18px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Completion Status:</strong></td>
+             <td style="padding:0 18px 10px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>{{CompletionStatus}}</strong></td>
+            </tr>
+            <tr>
+             <td style="padding:0 10px 10px 18px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Type of Project:</strong></td>
+             <td style="padding:0 18px 10px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;">{{TypeOfProject}}</td>
+            </tr>
+            <tr>
+             <td style="padding:0 10px 10px 18px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Start Date:</strong></td>
+             <td style="padding:0 18px 10px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;">{{StartDate}}</td>
+            </tr>
+            <tr>
+             <td style="padding:0 10px 16px 18px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>End Date:</strong></td>
+             <td style="padding:0 18px 16px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;">{{EndDate}}</td>
+            </tr>
+           </tbody>
+          </table>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;
+                                              margin-bottom:20px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+                                                       padding-top:20px;"><p style="margin:0;
+                                                          font-size:20px;
+                                                          line-height:1.4;
+                                                          font-family:Times New Roman,Times,serif;
+                                                          color:#1f1f1f;"><strong>Supervisor Information:</strong></p></td>
+            </tr>
+           </tbody>
+          </table>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;
+                                              margin-bottom:26px;
+                                              background-color:#faf8f3;
+                                              border-left:3px solid #c9a75d;" width="100%">
+           <tbody>
+            <tr>
+             <td style="padding:16px 10px 10px 18px;
+                                                       width:200px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Supervisor Name:</strong></td>
+             <td style="padding:16px 18px 10px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;">{{SupervisorName}}</td>
+            </tr>
+            <tr>
+             <td style="padding:0 10px 16px 18px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;"><strong>Supervisor Contact:</strong></td>
+             <td style="padding:0 18px 16px 15px;
+                                                       vertical-align:top;
+                                                       font-size:18px;
+                                                       line-height:1.5;
+                                                       font-family:Times New Roman,Times,serif;
+                                                       color:#222222;">{{SupervisorContact}}</td>
+            </tr>
+           </tbody>
+          </table> <p style="margin:0 0 22px 0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">Please ensure the necessary actions are taken to keep the project on track.</p> <p style="margin:0;
+                                          font-size:18px;
+                                          line-height:1.5;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#222222;">Thank you,<br /> <strong>Arelia Team.</strong></p></td>
+        </tr>
+        <tr>
+         <td align="center" style="background-color:#171717;
+                                       border-top:2px solid #C99A3D;
+                                       padding:24px 32px 22px 32px;
+                                       text-align:center;"><p style="margin:0 0 5px 0;
+                                          font-size:24px;
+                                          line-height:1.3;
+                                          font-family:Times New Roman,Times,serif;
+                                          color:#D6B36A;
+                                          font-weight:bold;
+                                          text-align:center;">Arelia</p> <p style="margin:0 0 18px 0;
+                                          font-size:11px;
+                                          line-height:1.5;
+                                          font-family:Arial,Helvetica,sans-serif;
+                                          color:#C99A3D;
+                                          letter-spacing:2px;
+                                          text-align:center;">PREMIUM &amp; LUXURY INTERIOR DESIGNS</p>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+                                              border-collapse:collapse;" width="100%">
+           <tbody>
+            <tr>
+             <td align="center" style="border-top:1px solid #6E5427;
+                                                       padding-top:16px;
+                                                       text-align:center;"><p style="margin:0 0 5px 0;
+                                                          font-size:11px;
+                                                          line-height:1.6;
+                                                          font-family:Arial,Helvetica,sans-serif;
+                                                          color:#8F887F;
+                                                          text-align:center;">This email was sent as an official reminder regarding an ongoing Arelia project.</p> <p style="margin:0;
+                                                          font-size:11px;
+                                                          line-height:1.6;
+                                                          font-family:Arial,Helvetica,sans-serif;
+                                                          color:#8F887F;
+                                                          text-align:center;">© 2026 Arelia. All rights reserved.</p></td>
+            </tr>
+           </tbody>
+          </table></td>
+        </tr>
+       </tbody>
+      </table></td>
+    </tr>
+   </tbody>
+  </table>
+ </body>
 </html>

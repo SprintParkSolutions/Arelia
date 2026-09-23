@@ -290,7 +290,7 @@ public without sharing class ProjectAdditionalBudgetController {
        EMAILS
     =============================== */
     private static void sendManagerApprovalEmail(Project__c project, Decimal amt, String rsn, List<Id> contentDocumentIds) {
-        List<String> toEmails = parseEmails(System.Label.Arelia_Living_Enrollment_Members);
+        List<String> toEmails = parseEmails(System.Label.Arelia_Living_Management_Members);
         if (toEmails.isEmpty()) { return; }
 
         EmailTemplate t = getTemplateByDevName(TPL_MANAGER_APPROVAL);
@@ -314,14 +314,14 @@ public without sharing class ProjectAdditionalBudgetController {
 
     /**
      * @description
-     *  Sends approved notification email to Client + Supervisor + Enrollment Members.
+     *  Sends approved notification email to Client + Supervisor + Management Members.
      *  Also attaches files uploaded during the request (stored in Additional_Budget_ContentDocumentIds__c).
      */
     private static void sendApprovedEmail(Project__c project, Decimal amt, String rsn, List<Id> contentDocumentIds) {
         List<String> toEmails = new List<String>();
         toEmails.addAll(parseEmails(project.Client_Email__c));
         toEmails.addAll(parseEmails(project.Supervisor_Email_Text_c__c));
-        toEmails.addAll(parseEmails(Label.Arelia_Living_Enrollment_Members));
+        toEmails.addAll(parseEmails(Label.Arelia_Living_Management_Members));
         toEmails = dedupe(toEmails);
         if (toEmails.isEmpty()) { return; }
 
@@ -345,13 +345,13 @@ public without sharing class ProjectAdditionalBudgetController {
 
     /**
      * @description
-     *  Sends rejected notification email to Supervisor + Enrollment Members.
+     *  Sends rejected notification email to Supervisor + Management Members.
      *  Includes rejection reason token and attaches the original uploaded files.
      */
     private static void sendRejectedEmail(Project__c project, Decimal amt, String reqReason, String rejReason, List<Id> contentDocumentIds) {
         List<String> toEmails = new List<String>();
         toEmails.addAll(parseEmails(project.Supervisor_Email_Text_c__c));
-        toEmails.addAll(parseEmails(Label.Arelia_Living_Enrollment_Members));
+        toEmails.addAll(parseEmails(Label.Arelia_Living_Management_Members));
         toEmails = dedupe(toEmails);
         if (toEmails.isEmpty()) { return; }
 

@@ -1,79 +1,446 @@
-/* --- DESKTOP FIRST STYLES --- */
-.approval-card {
-    border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    border: 1px solid #dddbda;
-    background-color: #ffffff;
+/* ========================================= */
+/* ARELIA BLACK & GOLD EXPENSE APPROVAL UI   */
+/* ========================================= */
+
+:host {
+    --arelia-black: #050505;
+    --arelia-card: #0d0d0d;
+    --arelia-gold: #d4af37;
+    --arelia-gold-light: #ffdf73;
+    --arelia-gold-muted: #a8872d;
+    --arelia-white: #fdfcf0;
+    --arelia-muted: rgba(253, 252, 240, 0.68);
+    --arelia-border: rgba(212, 175, 55, 0.22);
+    --arelia-glow: rgba(212, 175, 55, 0.24);
+    --green: #22c55e;
 }
 
-/* Default spacing for Desktop */
-.custom-margin-top {
-    margin-top: 4rem; 
+.arelia-container {
+    min-height: 100vh;
+    max-width: none;
+    margin: 0;
+    padding: 70px 20px;
+    position: relative;
+    box-sizing: border-box;
+    overflow: hidden;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: var(--arelia-white);
+    background:
+        radial-gradient(circle at top center, rgba(86, 65, 20, 0.55) 0%, rgba(5, 5, 5, 0.95) 42%, #000000 100%),
+        linear-gradient(145deg, #000000, #090909);
 }
 
-.company-title {
-    color: #0176d3; /* Arelia Brand Blue */
-    letter-spacing: 1px;
+.arelia-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(rgba(212, 175, 55, 0.18) 0.6px, transparent 0.6px),
+        linear-gradient(90deg, rgba(212, 175, 55, 0.035), transparent, rgba(212, 175, 55, 0.025));
+    background-size: 34px 34px, 100% 100%;
+    opacity: 0.22;
+    pointer-events: none;
 }
 
-/* Typography for fields */
-.field-label {
-    font-size: 0.75rem;
-    color: #696969;
-    text-transform: uppercase;
-    font-weight: 600;
-    margin-bottom: 2px;
+.arelia-container::after {
+    content: '';
+    position: absolute;
+    top: -120px;
+    left: 50%;
+    width: 520px;
+    height: 520px;
+    transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.18), transparent 70%);
+    filter: blur(8px);
+    pointer-events: none;
 }
 
-.field-value {
-    font-size: 1rem;
-    color: #181818;
+.submit-spinner {
+    z-index: 9999;
+    position: absolute;
 }
 
-.grand-total {
-    font-size: 2.2rem;
-    color: #0176d3;
+.header-section,
+.arelia-card,
+.error-alert {
+    position: relative;
+    z-index: 1;
+}
+
+.header-section {
+    max-width: 950px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.main-title {
+    font-size: 2.75rem;
+    font-weight: 800;
     line-height: 1.2;
+    margin-bottom: 12px;
+    text-align: center;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, var(--arelia-gold-light), var(--arelia-gold), var(--arelia-gold-muted));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 16px 42px var(--arelia-glow);
 }
 
-/* Button enhancements */
-.action-btn {
-    height: 50px; /* Taller for better visual weight */
-    font-weight: bold;
-    font-size: 1.1rem;
-    border-radius: 6px;
+.main-subtitle {
+    color: var(--arelia-gold-light);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    text-align: center;
+    opacity: 0.94;
 }
 
-.status-box {
-    border: 1px dashed #dddbda;
-    background-color: #f3f2f2;
+.arelia-card {
+    width: 100%;
+    max-width: 950px;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+    border-radius: 18px;
+    border: 1px solid var(--arelia-border);
+    border-top: 3px solid var(--arelia-gold);
+    overflow: hidden;
+    background:
+        linear-gradient(145deg, rgba(18, 18, 18, 0.96), rgba(8, 8, 8, 0.98)),
+        radial-gradient(circle at top, rgba(212, 175, 55, 0.09), transparent 58%);
+    box-shadow:
+        0 28px 80px rgba(0, 0, 0, 0.78),
+        0 0 42px rgba(212, 175, 55, 0.07),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-.success-modal {
-    border-radius: 8px;
+.project-details-col {
+    padding: 34px;
+    border-right: 1px solid rgba(212, 175, 55, 0.14);
+    background: rgba(255, 255, 255, 0.015);
 }
 
-/* --- MOBILE RESPONSIVENESS --- */
+.budget-summary-col {
+    padding: 34px;
+    background:
+        linear-gradient(145deg, rgba(212, 175, 55, 0.055), rgba(255, 255, 255, 0.015)),
+        #101010;
+}
+
+.section-label {
+    display: block;
+    margin-bottom: 26px;
+    color: var(--arelia-gold-light);
+    font-size: 0.86rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-weight: 800;
+}
+
+.detail-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 26px;
+}
+
+.detail-item:last-child {
+    margin-bottom: 0;
+}
+
+.icon-box {
+    min-width: 42px;
+    min-height: 42px;
+    border-radius: 10px;
+    padding: 8px;
+    margin-right: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        linear-gradient(145deg, rgba(212, 175, 55, 0.12), rgba(255, 255, 255, 0.025)),
+        #151515;
+    border: 1px solid rgba(212, 175, 55, 0.16);
+}
+
+.info-content label {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--arelia-muted);
+    font-size: 0.82rem;
+}
+
+.info-content .value {
+    color: var(--arelia-gold-light);
+    font-size: 1.12rem;
+    font-weight: 700;
+}
+
+.final-row {
+    text-align: right;
+}
+
+.final-row label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--arelia-muted);
+    font-size: 0.9rem;
+}
+
+.big-number {
+    color: var(--arelia-gold-light);
+    font-size: 2.25rem;
+    font-weight: 850;
+    line-height: 1.1;
+    text-shadow: 0 12px 30px rgba(212, 175, 55, 0.25);
+}
+
+.action-card {
+    padding: 30px !important;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 22px;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.arelia-btn {
+    min-width: 210px;
+    border-radius: 4px;
+    padding: 13px 26px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    color: var(--arelia-white);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.035em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        background-color 0.25s ease,
+        border-color 0.25s ease,
+        color 0.25s ease;
+}
+
+.arelia-btn:hover {
+    transform: translateY(-2px);
+}
+
+.button-icon {
+    --slds-c-icon-color-foreground-default: currentColor;
+    flex-shrink: 0;
+}
+
+.approve-icon {
+    color: var(--green);
+    --slds-c-icon-color-foreground-default: var(--green);
+}
+
+.btn-approve {
+    color: #070707;
+    border-color: rgba(255, 223, 115, 0.45);
+    background: linear-gradient(135deg, var(--arelia-gold-light), var(--arelia-gold), var(--arelia-gold-muted));
+    box-shadow: 0 14px 30px rgba(212, 175, 55, 0.22);
+}
+
+.btn-approve:hover {
+    color: #000000;
+    filter: brightness(1.08);
+    box-shadow: 0 18px 42px rgba(212, 175, 55, 0.36);
+}
+
+.btn-back {
+    color: var(--arelia-gold-light);
+    border: 1px solid rgba(212, 175, 55, 0.42);
+    background:
+        linear-gradient(145deg, rgba(212, 175, 55, 0.06), rgba(255, 255, 255, 0.02)),
+        #111111;
+}
+
+.btn-back:hover {
+    color: #050505;
+    border-color: var(--arelia-gold);
+    background: linear-gradient(135deg, var(--arelia-gold-light), var(--arelia-gold));
+}
+
+.info-box {
+    padding: 34px;
+    border-radius: 13px;
+    border: 1px solid rgba(212, 175, 55, 0.24);
+    background:
+        linear-gradient(145deg, rgba(212, 175, 55, 0.095), rgba(255, 255, 255, 0.025)),
+        #101010;
+    color: var(--arelia-muted);
+}
+
+.info-box h2 {
+    color: var(--arelia-gold-light);
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+}
+
+.processed-message {
+    color: var(--arelia-muted);
+}
+
+.error-alert {
+    max-width: 950px;
+    margin: 24px auto 0 auto;
+    border-radius: 10px;
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    background: #160d0d !important;
+    color: var(--arelia-white);
+}
+
+/* Modal Styling */
+.custom-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.78);
+    -webkit-backdrop-filter: blur(7px); 
+    backdrop-filter: blur(7px);
+}
+
+.custom-modal-box {
+    width: 90%;
+    max-width: 480px;
+    padding: 46px 36px;
+    border-radius: 18px;
+    text-align: center;
+    border: 1px solid rgba(212, 175, 55, 0.28);
+    border-top: 3px solid var(--arelia-gold);
+    background:
+        linear-gradient(145deg, rgba(18, 18, 18, 0.98), rgba(8, 8, 8, 0.98)),
+        radial-gradient(circle at top, rgba(212, 175, 55, 0.12), transparent 58%);
+    box-shadow:
+        0 28px 80px rgba(0, 0, 0, 0.78),
+        0 0 42px rgba(212, 175, 55, 0.12);
+}
+
+.success-icon {
+    width: 68px;
+    height: 68px;
+    margin: 0 auto 22px auto;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #050505;
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--arelia-gold-light), var(--arelia-gold), var(--arelia-gold-muted));
+    box-shadow: 0 16px 34px rgba(212, 175, 55, 0.32);
+}
+
+.success-title {
+    color: var(--arelia-gold-light);
+    font-size: 1.9rem;
+    font-weight: 750;
+    margin-bottom: 14px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.success-message {
+    color: var(--arelia-muted);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.success-message b {
+    color: var(--arelia-gold-light);
+}
+
+.return-btn {
+    margin: 0;
+}
+
+/* Animations */
+.animate-fade-in {
+    animation: fadeIn 0.35s ease-in forwards;
+    opacity: 0;
+}
+
+.fade-delay-one {
+    animation-delay: 0.1s;
+}
+
+.fade-delay-two {
+    animation-delay: 0.2s;
+}
+
+.fade-delay-three {
+    animation-delay: 0.3s;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mobile Responsiveness */
 @media screen and (max-width: 768px) {
-    /* Reduce top margin so the card doesn't sit too low on small phone screens */
-    .custom-margin-top {
-        margin-top: 1.5rem; 
+    .arelia-container {
+        padding: 38px 12px;
     }
 
-    /* Scale down the grand total text slightly */
-    .grand-total {
-        font-size: 1.8rem;
-    }
-    
-    /* Ensure the card breathes slightly off the edges of the phone screen */
-    .approval-card {
-        margin-left: 10px;
-        margin-right: 10px;
-        width: auto; 
+    .main-title {
+        font-size: 2rem;
+        letter-spacing: 0.03em;
     }
 
-    /* Tweak padding for modal content on mobile */
-    .success-modal {
-        padding: 1.5rem;
+    .project-details-col {
+        border-right: none;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.14);
+        padding: 24px;
+    }
+
+    .budget-summary-col {
+        padding: 24px;
+    }
+
+    .final-row {
+        text-align: center;
+    }
+
+    .big-number {
+        font-size: 1.9rem;
+    }
+
+    .button-container {
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .arelia-btn {
+        width: 100%;
+        min-width: auto;
+        font-size: 0.98rem;
+        padding: 14px 20px;
+        margin: 0;
+    }
+
+    .custom-modal-box {
+        padding: 36px 24px;
     }
 }

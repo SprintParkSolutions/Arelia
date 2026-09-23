@@ -1,11 +1,15 @@
 <template>
     <section class="page">
+        <!-- Subtle Ambient Background Blobs for Added Depth -->
+        <div class="bg-glow"></div>
+        
         <div class="outer">
             <div class="pageTitle">
-                <h1>Review for Arelia Living – Site Visit</h1>
+                <h1>Review for Arelia Living – Site Re-Visit</h1>
+                <div class="header-line"></div>
                 <p class="pageSub">
-                    Hello, please review the site visit details shared with you. Once reviewed, kindly provide your
-                    approval or request reschedule using the options below.
+                    Welcome. Please review your scheduled site visit details below. Once reviewed, kindly provide your
+                    approval or request a reschedule using the options provided.
                 </p>
             </div>
 
@@ -17,61 +21,94 @@
                     <div class="cardHeadText">
                         <div class="cardTitle">Submission Decision</div>
                         <div class="cardDesc">
-                            This page is only for submitting your decision. Your response will be shared with our
-                            supervisor team
-                            and you will also receive a confirmation email.
+                            Your response will be shared directly with our supervisory team. A confirmation email will follow.
                         </div>
                     </div>
                 </div>
 
-                <div class="note">
-                    <lightning-icon icon-name="utility:info" size="x-small" class="noteIcon"></lightning-icon>
-                    <div class="noteText">
-                        <b>Note:</b> If you choose <b>Reschedule</b>, please select a new date and time slot and submit.
+                <div class="appointment-details">
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <lightning-icon icon-name="utility:event" size="small"></lightning-icon>
+                        </div>
+                        <div class="detail-text">
+                            <span class="detail-label">Scheduled Date</span>
+                            <span class="detail-value">{formattedAppointmentDate}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-divider"></div>
+
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <lightning-icon icon-name="utility:clock" size="small"></lightning-icon>
+                        </div>
+                        <div class="detail-text">
+                            <span class="detail-label">Scheduled Time</span>
+                            <span class="detail-value">{displayAppointmentTime}</span>
+                        </div>
                     </div>
                 </div>
 
                 <div class="whatBox">
-                    <div class="whatTitle">What you can do</div>
+                    <div class="whatTitle">Available Actions</div>
                     <ul class="whatList">
-                        <li><b>Approve</b> — confirms the site visit at the scheduled date &amp; time.</li>
-                        <li><b>Reschedule</b> — choose a new date &amp; time slot that works for you.</li>
+                        <li><b>Approve</b> — Secure and confirm the site visit at the scheduled date and time.</li>
+                        <li><b>Reschedule</b> — Select a new, convenient date and time slot.</li>
                     </ul>
                 </div>
 
-                <div class="actions">
-                    <button class="btn primary" onclick={onApproveClick} disabled={buttonsDisabled}>
-                        Approve
-                    </button>
-                    <button class="btn secondary" onclick={onRescheduleClick} disabled={buttonsDisabled}>
-                        Reschedule
-                    </button>
-                </div>
+                <!-- Hides these action buttons if the reschedule panel is currently active -->
+                <template if:false={showReschedule}>
+                    <div class="actions">
+                        <button type="button" class="btn primary" onclick={onApproveClick} disabled={buttonsDisabled}>
+                            Approve Visit
+                        </button>
+                        <button type="button" class="btn secondary" onclick={onRescheduleClick} disabled={buttonsDisabled}>
+                            Reschedule
+                        </button>
+                    </div>
+                </template>
 
                 <template if:true={showReschedule}>
                     <div class="panel">
                         <div class="panelTitle">Reschedule appointment</div>
+                        
+                        <div class="note">
+                            <lightning-icon icon-name="utility:info" size="x-small" class="noteIcon"></lightning-icon>
+                            <div class="noteText">
+                                Please select a new available date and time slot before submitting.
+                            </div>
+                        </div>
 
                         <div class="grid">
                             <div class="field">
-                                <lightning-input type="date" label="New Date" min={minDate} value={selectedDate}
+                                <lightning-input
+                                    type="date"
+                                    label="New Date"
+                                    min={minDate}
+                                    value={selectedDate}
                                     onchange={handleDateChange}>
                                 </lightning-input>
                             </div>
 
                             <div class="field">
-                                <lightning-combobox name="TimeSlot" label="Time Slot" value={selectedTimeSlot}
-                                    placeholder="Select a time slot" options={timeSlotOptions}
+                                <lightning-combobox
+                                    name="TimeSlot"
+                                    label="Time Slot"
+                                    value={selectedTimeSlot}
+                                    placeholder="Select a time slot"
+                                    options={timeSlotOptions}
                                     onchange={handleTimeSlotChange}>
                                 </lightning-combobox>
                             </div>
                         </div>
 
                         <div class="panelActions">
-                            <button class="btn primary" onclick={onRescheduleSubmitClick} disabled={buttonsDisabled}>
+                            <button type="button" class="btn primary" onclick={onRescheduleSubmitClick} disabled={buttonsDisabled}>
                                 Submit
                             </button>
-                            <button class="btn ghost" onclick={cancelReschedule} disabled={buttonsDisabled}>
+                            <button type="button" class="btn ghost" onclick={cancelReschedule} disabled={buttonsDisabled}>
                                 Cancel
                             </button>
                         </div>
@@ -82,24 +119,21 @@
 
         <!-- CONFIRM MODAL -->
         <template if:true={showConfirm}>
-            <div class="overlay" role="dialog" aria-modal="true">
+            <div class="overlay" role="dialog" aria-modal="true" aria-labelledby="modal-confirm-title">
                 <div class="modal">
-                    <div class="modalTitle">{confirmTitle}</div>
+                    <div id="modal-confirm-title" class="modalTitle">{confirmTitle}</div>
                     <div class="modalMsg">{confirmMessage}</div>
 
                     <div class="modalActions">
-                        <button class="btn primary" onclick={confirmYes} disabled={confirmbuttonsdisabled}>
-                            <template if:false={issubmitting}>
-                                Yes
-                            </template>
-                            <template if:true={issubmitting}>
+                        <button type="button" class="btn primary" onclick={confirmYes} disabled={confirmButtonsDisabled}>
+                            <template if:false={isSubmitting}>Yes, Confirm</template>
+                            <template if:true={isSubmitting}>
                                 <span class="spinner"></span>
-                                Submitting…
+                                Processing…
                             </template>
                         </button>
-
-                        <button class="btn ghost" onclick={confirmNo} disabled={confirmbuttonsdisabled}>
-                            No
+                        <button type="button" class="btn ghost" onclick={confirmNo} disabled={confirmButtonsDisabled}>
+                            Cancel
                         </button>
                     </div>
                 </div>
@@ -108,20 +142,19 @@
 
         <!-- THANK YOU MODAL -->
         <template if:true={showThankYou}>
-            <div class="overlay" role="dialog" aria-modal="true">
+            <div class="overlay" role="dialog" aria-modal="true" aria-labelledby="modal-thank-title">
                 <div class="thank">
                     <div class="tick">
                         <lightning-icon icon-name="utility:success" size="small"></lightning-icon>
                     </div>
 
-                    <div class="thankTitle">Thank you!</div>
+                    <div id="modal-thank-title" class="thankTitle">Thank you!</div>
                     <div class="thankMsg">
-                        We received your response. Our supervisor team will contact you soon if anything is needed.
-                        You’ll also receive an email confirmation.
+                        We have successfully received your response. Our team will contact you shortly if anything further is required. A confirmation email is on its way.
                     </div>
 
                     <div class="modalActions">
-                        <button class="btn primary" onclick={handleClose}>Close</button>
+                        <button type="button" class="btn primary" onclick={handleClose}>Close</button>
                     </div>
                 </div>
             </div>

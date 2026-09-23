@@ -31,6 +31,7 @@ public with sharing class ProjectMilestoneController {
             SELECT Project_Completion_Status__c
             FROM Project__c
             WHERE Id = :projectId
+            AND RecordType.Name = 'Arelia'
             LIMIT 1
         ];
 
@@ -47,6 +48,7 @@ public with sharing class ProjectMilestoneController {
                    Payment_Received__c
             FROM Payment_Term__c
             WHERE Project__c = :projectId
+            AND Project__r.RecordType.Name = 'Arelia'
             ORDER BY CreatedDate
         ];
 

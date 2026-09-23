@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Customer Case Emai to Supervisor User</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Customer Case Email to Supervisor User</name>
+    <relatedEntityType>Case</relatedEntityType>
+    <style>none</style>
+    <subject>New Customer Case Assigned – Action Required - {{{Case.CaseNumber}}}</subject>
+    <type>custom</type>
+    <uiType>SFX</uiType>
+</EmailTemplate>

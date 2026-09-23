@@ -1,9 +1,9 @@
 /**
  * @description       : 
- * @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+ * @author            : 
  * @group             : 
- * @last modified on  : 02-04-2026
- * @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+ * @last modified on  : 
+ * @last modified by  : 
 **/
 trigger SiteVisitReportTrigger on Site_Visit_Report__c (after insert, after update) {
     if (Trigger.isAfter) {

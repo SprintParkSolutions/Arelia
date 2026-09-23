@@ -14,6 +14,13 @@
             <operator>equals</operator>
             <value>Active</value>
         </criteriaItems>
+        <criteriaItems>
+            <column>CUST_RECORDTYPE</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>Project__c.Arelia</value>
+        </criteriaItems>
     </filter>
     <format>Summary</format>
     <groupingsDown>

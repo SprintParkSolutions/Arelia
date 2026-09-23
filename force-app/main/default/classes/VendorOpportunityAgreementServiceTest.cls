@@ -1,262 +1,504 @@
-@isTest
-public class VendorOpportunityAgreementServiceTest {
+/**
+ * @description Test class for VendorOpportunityAgreementService.
+ * Validates agreement recalculation, Opportunity completion updates,
+ * no-file-copy behavior, empty input handling, and bulk scenarios.
+ */
+@IsTest
+@SuppressWarnings('PMD.ApexCRUDViolation,PMD.ApexDoc')
+private class VendorOpportunityAgreementServiceTest {
+    private static final String SUPERVISOR_ALIAS = 'SupAgre';
+    private static final String OPPORTUNITY_NAME = 'Agreement Opp';
+    private static final String NO_VENDOR_OPP_NAME = 'No Vendor Agreement Opp';
+    private static final String BULK_OPP_ONE_NAME = 'Bulk Agreement Opp One';
+    private static final String BULK_OPP_TWO_NAME = 'Bulk Agreement Opp Two';
 
-    @testSetup
+    private static final String VENDOR_ONE_NAME = 'Vendor One';
+    private static final String VENDOR_TWO_NAME = 'Vendor Two';
+    private static final String VENDOR_THREE_NAME = 'Vendor Three';
+
+    private static final String VENDOR_CATEGORY_CARPENTRY =
+        'Carpentry & Woodwork';
+    private static final String VENDOR_CATEGORY_ELECTRICAL =
+        'Electrical & Networking';
+
+    private static final String VENDOR_ONE_EMAIL = 'v1@test.com';
+    private static final String VENDOR_TWO_EMAIL = 'v2@test.com';
+    private static final String VENDOR_THREE_EMAIL = 'v3@test.com';
+
+    private static final String STATUS_ACTIVE = 'Active';
+
+    @TestSetup
     static void setupData() {
-        // 1. Create Supervisor using Utility
-        User supervisor = TestDataUtility.createSupervisorUser('SupAgree');
+        User supervisor =
+            TestDataUtility.createSupervisorUser(SUPERVISOR_ALIAS);
 
-        // 2. Create Opportunity using Utility
-        Opportunity opp = TestDataUtility.createOpportunity('Agreement Opp', supervisor.Id);
-        
-        // FIX: Satisfy Validation Rule ("You cannot create a Vendor Opportunity until...")
-        opp.Client_Agreement_Sent__c = true;
-        opp.Client_Agreement_Signed__c = true;
-        opp.All_Vendors_Agreement_Completed__c = false;
-        update opp;
+        Opportunity opportunityRecord =
+            TestDataUtility.createOpportunity(
+                OPPORTUNITY_NAME,
+                supervisor.Id
+            );
 
-        // 3. Create Vendors using Utility
-        Vendor__c v1 = TestDataUtility.createVendor('Vendor One', 'Carpentry & Woodwork', 'v1@test.com');
-        Vendor__c v2 = TestDataUtility.createVendor('Vendor Two', 'Electrical & Networking', 'v2@test.com');
+        opportunityRecord.Client_Agreement_Sent__c = true;
+        opportunityRecord.Client_Agreement_Signed__c = true;
+        opportunityRecord.All_Vendors_Agreement_Completed__c = false;
+        update opportunityRecord;
 
-        // 4. Create Vendor Opportunities (Not Signed initially)
-        Vendor_Opportunity__c vo1 = TestDataUtility.createVendorOpportunity(opp.Id, v1.Id, 'Active');
-        vo1.Vendor_Agreement_Signed__c = false;
-        update vo1;
+        Vendor__c vendorOne =
+            TestDataUtility.createVendor(
+                VENDOR_ONE_NAME,
+                VENDOR_CATEGORY_CARPENTRY,
+                VENDOR_ONE_EMAIL
+            );
 
-        Vendor_Opportunity__c vo2 = TestDataUtility.createVendorOpportunity(opp.Id, v2.Id, 'Active');
-        vo2.Vendor_Agreement_Signed__c = false;
-        update vo2;
+        Vendor__c vendorTwo =
+            TestDataUtility.createVendor(
+                VENDOR_TWO_NAME,
+                VENDOR_CATEGORY_ELECTRICAL,
+                VENDOR_TWO_EMAIL
+            );
 
-        // 5. Create a File for one Vendor Opportunity to test Copy Logic
-        ContentVersion cv = TestDataUtility.createContentVersion('Vendor Agreement Doc', 'Signed Contract');
-        TestDataUtility.linkFileToRecord(cv.Id, vo1.Id);
+        TestDataUtility.createVendor(
+            VENDOR_THREE_NAME,
+            VENDOR_CATEGORY_CARPENTRY,
+            VENDOR_THREE_EMAIL
+        );
+
+        Vendor_Opportunity__c vendorOppOne =
+            TestDataUtility.createVendorOpportunity(
+                opportunityRecord.Id,
+                vendorOne.Id,
+                STATUS_ACTIVE
+            );
+
+        vendorOppOne.Vendor_Agreement_Signed__c = false;
+
+        Vendor_Opportunity__c vendorOppTwo =
+            TestDataUtility.createVendorOpportunity(
+                opportunityRecord.Id,
+                vendorTwo.Id,
+                STATUS_ACTIVE
+            );
+
+        vendorOppTwo.Vendor_Agreement_Signed__c = false;
+
+        update new List<Vendor_Opportunity__c>{
+            vendorOppOne,
+            vendorOppTwo
+        };
+
+        Assert.isNotNull(
+            supervisor.Id,
+            'Supervisor user should be created through TestDataUtility.'
+        );
     }
 
-    @isTest
-    static void testPartialCompletion() {
-        Opportunity opp = [SELECT Id FROM Opportunity LIMIT 1];
-        Vendor_Opportunity__c vo1 = [SELECT Id FROM Vendor_Opportunity__c WHERE Vendor__r.Name = 'Vendor One' LIMIT 1];
-
-        // Action: Sign only ONE vendor
-        vo1.Vendor_Agreement_Signed__c = true;
-        update vo1;
-
+    @IsTest
+    static void testNullAndEmptyInputReturnSafely() {
         Test.startTest();
-        // Manually invoke service (simulating Trigger)
-        VendorOpportunityAgreementService.recalculateAndCopyFiles(new Set<Id>{opp.Id});
-        Test.stopTest();
-
-        // Verify: Opportunity flag should still be FALSE (waiting for Vendor Two)
-        Opportunity result = [SELECT All_Vendors_Agreement_Completed__c FROM Opportunity WHERE Id = :opp.Id];
-        System.assertEquals(false, result.All_Vendors_Agreement_Completed__c, 'Opp should not be complete if one vendor is pending');
-    }
-
-    @isTest
-    static void testFullCompletionAndFileCopy() {
-        Opportunity opp = [SELECT Id FROM Opportunity LIMIT 1];
-        List<Vendor_Opportunity__c> vos = [SELECT Id FROM Vendor_Opportunity__c];
-
-        // Action: Sign ALL vendors
-        for (Vendor_Opportunity__c vo : vos) {
-            vo.Vendor_Agreement_Signed__c = true;
-        }
-        update vos;
-
-        Test.startTest();
-        VendorOpportunityAgreementService.recalculateAndCopyFiles(new Set<Id>{opp.Id});
-        Test.stopTest();
-
-        // Verify 1: Flag is TRUE
-        Opportunity result = [SELECT All_Vendors_Agreement_Completed__c FROM Opportunity WHERE Id = :opp.Id];
-        System.assertEquals(true, result.All_Vendors_Agreement_Completed__c, 'Opp should be complete when all vendors sign');
-
-        // Verify 2: File was copied to Opportunity
-        List<ContentDocumentLink> oppLinks = [
-            SELECT ContentDocument.Title 
-            FROM ContentDocumentLink 
-            WHERE LinkedEntityId = :opp.Id 
-        ];
-        
-        System.assertEquals(1, oppLinks.size(), 'File from Vendor Opp should be copied to Parent Opp');
-        System.assertEquals('Vendor Agreement Doc', oppLinks[0].ContentDocument.Title, 'File title should match the original');
-    }
-
-    @isTest
-    static void testReversionToFalse() {
-        Opportunity opp = [SELECT Id FROM Opportunity LIMIT 1];
-        List<Vendor_Opportunity__c> vos = [SELECT Id FROM Vendor_Opportunity__c];
-
-        // 1. Set all to Signed first
-        for (Vendor_Opportunity__c vo : vos) {
-            vo.Vendor_Agreement_Signed__c = true;
-        }
-        update vos;
-        VendorOpportunityAgreementService.recalculateAndCopyFiles(new Set<Id>{opp.Id});
-
-        // Verify initial state is TRUE
-        Opportunity midResult = [SELECT All_Vendors_Agreement_Completed__c FROM Opportunity WHERE Id = :opp.Id];
-        System.assertEquals(true, midResult.All_Vendors_Agreement_Completed__c, 'Initial state should be true before unsigning');
-
-        Test.startTest();
-        // 2. Unsign one vendor
-        vos[0].Vendor_Agreement_Signed__c = false;
-        update vos[0];
-        
-        VendorOpportunityAgreementService.recalculateAndCopyFiles(new Set<Id>{opp.Id});
-        Test.stopTest();
-
-        // Verify: Flag flips back to FALSE
-        Opportunity endResult = [SELECT All_Vendors_Agreement_Completed__c FROM Opportunity WHERE Id = :opp.Id];
-        System.assertEquals(false, endResult.All_Vendors_Agreement_Completed__c, 'Opp should revert to false if a vendor is unsigned');
-    }
-
-    @isTest
-    static void testEmptyInput() {
-        Test.startTest();
-        // Covers: if (opportunityIds == null || opportunityIds.isEmpty()) return;
-        VendorOpportunityAgreementService.recalculateAndCopyFiles(new Set<Id>());
         VendorOpportunityAgreementService.recalculateAndCopyFiles(null);
+        VendorOpportunityAgreementService.recalculateAndCopyFiles(
+            new Set<Id>()
+        );
         Test.stopTest();
-        
-        System.assert(true, 'Should handle empty/null input gracefully');
+
+        Opportunity opportunityRecord =
+            getOpportunityByName(OPPORTUNITY_NAME);
+
+        Assert.areEqual(
+            false,
+            opportunityRecord.All_Vendors_Agreement_Completed__c,
+            'Null and empty input should not update Opportunity.'
+        );
     }
-    
-    @isTest
-    static void testBulkOperations() {
-        User sup = [SELECT Id FROM User WHERE Alias = 'SupAgree' LIMIT 1];
-        Vendor__c v = [SELECT Id FROM Vendor__c LIMIT 1];
-        
-        // Create 5 Opps, each with 1 signed vendor
-        List<Opportunity> newOpps = new List<Opportunity>();
-        for(Integer i=0; i<5; i++) {
-            newOpps.add(new Opportunity(
-                Name='Bulk Opp '+i, 
-                StageName='Prospecting', 
-                CloseDate=Date.today(), 
-                Supervisor_User__c=sup.Id,
-                Client_Agreement_Sent__c = true,
-                Client_Agreement_Signed__c = true
-            ));
-        }
-        insert newOpps;
-        
-        List<Vendor_Opportunity__c> newVos = new List<Vendor_Opportunity__c>();
-        for(Opportunity o : newOpps) {
-            newVos.add(new Vendor_Opportunity__c(
-                Opportunity__c = o.Id, 
-                Vendor__c = v.Id, 
-                Vendor_Agreement_Signed__c = true // Already signed
-            ));
-        }
-        insert newVos;
-        
+
+    @IsTest
+    static void testPartialCompletionKeepsOpportunityIncomplete() {
+        Opportunity opportunityRecord =
+            getOpportunityByName(OPPORTUNITY_NAME);
+
+        Vendor_Opportunity__c vendorOppOne =
+            getVendorOpportunityByVendorName(VENDOR_ONE_NAME);
+
+        vendorOppOne.Vendor_Agreement_Signed__c = true;
+        update vendorOppOne;
+
+        resetOpportunityVendorCompletionFlag(opportunityRecord.Id);
+
         Test.startTest();
-        // Pass all IDs at once
-        Set<Id> oppIds = new Map<Id, Opportunity>(newOpps).keySet();
-        VendorOpportunityAgreementService.recalculateAndCopyFiles(oppIds);
+        VendorOpportunityAgreementService.recalculateAndCopyFiles(
+            new Set<Id>{ opportunityRecord.Id }
+        );
         Test.stopTest();
-        
-        // Verify all 5 flipped to True
-        List<Opportunity> results = [SELECT Id FROM Opportunity WHERE Id IN :oppIds AND All_Vendors_Agreement_Completed__c = true];
-        System.assertEquals(5, results.size(), 'All bulk opportunities should be updated');
+
+        Opportunity result = getOpportunityById(opportunityRecord.Id);
+
+        Assert.areEqual(
+            false,
+            result.All_Vendors_Agreement_Completed__c,
+            'Opportunity should remain incomplete when only one vendor agreement is signed.'
+        );
     }
 
-    // ==========================================
-    // NEW COVERAGE TESTS (Guard Clauses)
-    // ==========================================
+    @IsTest
+    static void testFullCompletionMarksOpportunityCompleteWithoutCopyingFiles() {
+        Opportunity opportunityRecord =
+            getOpportunityByName(OPPORTUNITY_NAME);
 
-    @isTest
-    static void testFlipWithNoFiles() {
-        // 
-        
-        // 1. Create clean data set
-        User sup = [SELECT Id FROM User LIMIT 1];
-        Vendor__c v = [SELECT Id FROM Vendor__c LIMIT 1];
-        
-        Opportunity cleanOpp = new Opportunity(
-            Name = 'Clean Opp',
-            StageName = 'Prospecting',
-            CloseDate = Date.today(),
-            Supervisor_User__c = sup.Id,
-            Client_Agreement_Sent__c = true,
-            Client_Agreement_Signed__c = true,
+        List<Vendor_Opportunity__c> vendorOpps =
+            getVendorOpportunities(opportunityRecord.Id);
+
+        for (Vendor_Opportunity__c vendorOpp : vendorOpps) {
+            vendorOpp.Vendor_Agreement_Signed__c = true;
+        }
+
+        update vendorOpps;
+
+        resetOpportunityVendorCompletionFlag(opportunityRecord.Id);
+
+        Test.startTest();
+        VendorOpportunityAgreementService.recalculateAndCopyFiles(
+            new Set<Id>{ opportunityRecord.Id }
+        );
+        Test.stopTest();
+
+        Opportunity result = getOpportunityById(opportunityRecord.Id);
+
+        Integer opportunityFileCount = [
+            SELECT COUNT()
+            FROM ContentDocumentLink
+            WHERE LinkedEntityId = :opportunityRecord.Id
+        ];
+
+        Assert.areEqual(
+            true,
+            result.All_Vendors_Agreement_Completed__c,
+            'Opportunity should be complete when all vendor agreements are signed.'
+        );
+
+        Assert.areEqual(
+            0,
+            opportunityFileCount,
+            'Vendor Opportunity files should not be copied to the parent Opportunity.'
+        );
+    }
+
+    @IsTest
+    static void testReversionToFalseWhenVendorIsUnsigned() {
+        Opportunity opportunityRecord =
+            getOpportunityByName(OPPORTUNITY_NAME);
+
+        List<Vendor_Opportunity__c> vendorOpps =
+            getVendorOpportunities(opportunityRecord.Id);
+
+        for (Vendor_Opportunity__c vendorOpp : vendorOpps) {
+            vendorOpp.Vendor_Agreement_Signed__c = true;
+        }
+
+        update vendorOpps;
+
+        resetOpportunityVendorCompletionFlag(opportunityRecord.Id);
+
+        VendorOpportunityAgreementService.recalculateAndCopyFiles(
+            new Set<Id>{ opportunityRecord.Id }
+        );
+
+        vendorOpps[0].Vendor_Agreement_Signed__c = false;
+        update vendorOpps[0];
+
+        Test.startTest();
+        VendorOpportunityAgreementService.recalculateAndCopyFiles(
+            new Set<Id>{ opportunityRecord.Id }
+        );
+        Test.stopTest();
+
+        Opportunity result = getOpportunityById(opportunityRecord.Id);
+
+        Assert.areEqual(
+            false,
+            result.All_Vendors_Agreement_Completed__c,
+            'Opportunity should revert to incomplete when one vendor agreement is unsigned.'
+        );
+    }
+
+    @IsTest
+    static void testNoVendorOpportunitiesKeepsOpportunityIncomplete() {
+        Opportunity opportunityRecord =
+            createAgreementReadyOpportunity(NO_VENDOR_OPP_NAME);
+
+        Test.startTest();
+        VendorOpportunityAgreementService.recalculateAndCopyFiles(
+            new Set<Id>{ opportunityRecord.Id }
+        );
+        Test.stopTest();
+
+        Opportunity result = getOpportunityById(opportunityRecord.Id);
+
+        Assert.areEqual(
+            false,
+            result.All_Vendors_Agreement_Completed__c,
+            'Opportunity should remain incomplete when it has no Vendor Opportunity records.'
+        );
+    }
+
+    @IsTest
+    static void testNoUpdateNeededWhenCurrentStateAlreadyMatchesTrue() {
+        Opportunity opportunityRecord =
+            createAgreementReadyOpportunity('Already Complete Opp');
+
+        Vendor__c vendorRecord = getVendorByName(VENDOR_THREE_NAME);
+
+        Vendor_Opportunity__c vendorOpp =
+            TestDataUtility.createVendorOpportunity(
+                opportunityRecord.Id,
+                vendorRecord.Id,
+                STATUS_ACTIVE
+            );
+
+        vendorOpp.Vendor_Agreement_Signed__c = true;
+        update vendorOpp;
+
+        opportunityRecord.All_Vendors_Agreement_Completed__c = true;
+        update opportunityRecord;
+
+        Test.startTest();
+        VendorOpportunityAgreementService.recalculateAndCopyFiles(
+            new Set<Id>{ opportunityRecord.Id }
+        );
+        Test.stopTest();
+
+        Opportunity result = getOpportunityById(opportunityRecord.Id);
+
+        Assert.areEqual(
+            true,
+            result.All_Vendors_Agreement_Completed__c,
+            'Opportunity should stay complete when current value already matches desired state.'
+        );
+    }
+
+    @IsTest
+    static void testNoUpdateNeededWhenCurrentStateAlreadyMatchesFalse() {
+        Opportunity opportunityRecord =
+            createAgreementReadyOpportunity('Already Incomplete Opp');
+
+        Test.startTest();
+        VendorOpportunityAgreementService.recalculateAndCopyFiles(
+            new Set<Id>{ opportunityRecord.Id }
+        );
+        Test.stopTest();
+
+        Opportunity result = getOpportunityById(opportunityRecord.Id);
+
+        Assert.areEqual(
+            false,
+            result.All_Vendors_Agreement_Completed__c,
+            'Opportunity should stay incomplete when no vendor records exist and current state is false.'
+        );
+    }
+
+    @IsTest
+    static void testSingleVendorCompletionMarksOpportunityComplete() {
+        Opportunity opportunityRecord =
+            createAgreementReadyOpportunity('Single Vendor Completion Opp');
+
+        Vendor__c vendorRecord = getVendorByName(VENDOR_THREE_NAME);
+
+        Vendor_Opportunity__c vendorOpp =
+            TestDataUtility.createVendorOpportunity(
+                opportunityRecord.Id,
+                vendorRecord.Id,
+                STATUS_ACTIVE
+            );
+
+        vendorOpp.Vendor_Agreement_Signed__c = true;
+        update vendorOpp;
+
+        resetOpportunityVendorCompletionFlag(opportunityRecord.Id);
+
+        Test.startTest();
+        VendorOpportunityAgreementService.recalculateAndCopyFiles(
+            new Set<Id>{ opportunityRecord.Id }
+        );
+        Test.stopTest();
+
+        Opportunity result = getOpportunityById(opportunityRecord.Id);
+
+        Integer opportunityFileCount = [
+            SELECT COUNT()
+            FROM ContentDocumentLink
+            WHERE LinkedEntityId = :opportunityRecord.Id
+        ];
+
+        Assert.areEqual(
+            true,
+            result.All_Vendors_Agreement_Completed__c,
+            'Opportunity should be complete when the only vendor agreement is signed.'
+        );
+
+        Assert.areEqual(
+            0,
+            opportunityFileCount,
+            'No vendor agreement files should be copied to Opportunity.'
+        );
+    }
+
+    @IsTest
+    static void testBulkOpportunitiesRecalculateCorrectly() {
+        Opportunity bulkOppOne =
+            createAgreementReadyOpportunity(BULK_OPP_ONE_NAME);
+
+        Opportunity bulkOppTwo =
+            createAgreementReadyOpportunity(BULK_OPP_TWO_NAME);
+
+        Vendor__c vendorOne = getVendorByName(VENDOR_ONE_NAME);
+        Vendor__c vendorTwo = getVendorByName(VENDOR_TWO_NAME);
+
+        Vendor_Opportunity__c signedVendorOpp =
+            TestDataUtility.createVendorOpportunity(
+                bulkOppOne.Id,
+                vendorOne.Id,
+                STATUS_ACTIVE
+            );
+
+        signedVendorOpp.Vendor_Agreement_Signed__c = true;
+
+        Vendor_Opportunity__c unsignedVendorOpp =
+            TestDataUtility.createVendorOpportunity(
+                bulkOppTwo.Id,
+                vendorTwo.Id,
+                STATUS_ACTIVE
+            );
+
+        unsignedVendorOpp.Vendor_Agreement_Signed__c = false;
+
+        update new List<Vendor_Opportunity__c>{
+            signedVendorOpp,
+            unsignedVendorOpp
+        };
+
+        resetOpportunityVendorCompletionFlag(bulkOppOne.Id);
+        resetOpportunityVendorCompletionFlag(bulkOppTwo.Id);
+
+        Test.startTest();
+        VendorOpportunityAgreementService.recalculateAndCopyFiles(
+            new Set<Id>{ bulkOppOne.Id, bulkOppTwo.Id }
+        );
+        Test.stopTest();
+
+        Map<Id, Opportunity> results =
+            new Map<Id, Opportunity>([
+                SELECT Id,
+                       All_Vendors_Agreement_Completed__c
+                FROM Opportunity
+                WHERE Id IN :new Set<Id>{
+                    bulkOppOne.Id,
+                    bulkOppTwo.Id
+                }
+            ]);
+
+        Assert.areEqual(
+            true,
+            results.get(bulkOppOne.Id).All_Vendors_Agreement_Completed__c,
+            'Bulk Opportunity One should be complete.'
+        );
+
+        Assert.areEqual(
+            false,
+            results.get(bulkOppTwo.Id).All_Vendors_Agreement_Completed__c,
+            'Bulk Opportunity Two should remain incomplete.'
+        );
+    }
+
+    private static Opportunity createAgreementReadyOpportunity(
+        String opportunityName
+    ) {
+        Opportunity opportunityRecord =
+            TestDataUtility.createOpportunity(
+                opportunityName,
+                getSupervisorUser().Id
+            );
+
+        opportunityRecord.Client_Agreement_Sent__c = true;
+        opportunityRecord.Client_Agreement_Signed__c = true;
+        opportunityRecord.All_Vendors_Agreement_Completed__c = false;
+        update opportunityRecord;
+
+        return opportunityRecord;
+    }
+
+    private static void resetOpportunityVendorCompletionFlag(
+        Id opportunityId
+    ) {
+        update new Opportunity(
+            Id = opportunityId,
             All_Vendors_Agreement_Completed__c = false
         );
-        insert cleanOpp;
-        
-        // 2. Create Signed Vendor Opp (but attach NO files)
-        Vendor_Opportunity__c vo = new Vendor_Opportunity__c(
-            Opportunity__c = cleanOpp.Id,
-            Vendor__c = v.Id,
-            Vendor_Agreement_Signed__c = true
-        );
-        insert vo;
-        
-        Test.startTest();
-        VendorOpportunityAgreementService.recalculateAndCopyFiles(new Set<Id>{cleanOpp.Id});
-        Test.stopTest();
-        
-        // Verify: Flag is True, but Files count is 0
-        Opportunity res = [SELECT All_Vendors_Agreement_Completed__c FROM Opportunity WHERE Id = :cleanOpp.Id];
-        System.assert(res.All_Vendors_Agreement_Completed__c, 'Should flip to true');
-        
-        Integer fileCount = [SELECT COUNT() FROM ContentDocumentLink WHERE LinkedEntityId = :cleanOpp.Id];
-        System.assertEquals(0, fileCount, 'No files should be copied (Coverage: vendorLinks.isEmpty return)');
     }
 
-    @isTest
-    static void testDuplicateFileLogic() {
-        // 1. Setup Data
-        User sup = [SELECT Id FROM User LIMIT 1];
-        Vendor__c v = [SELECT Id FROM Vendor__c LIMIT 1];
-        
-        Opportunity dupOpp = new Opportunity(
-            Name = 'Dup Opp',
-            StageName = 'Prospecting',
-            CloseDate = Date.today(),
-            Supervisor_User__c = sup.Id,
-            Client_Agreement_Sent__c = true,
-            Client_Agreement_Signed__c = true,
-            All_Vendors_Agreement_Completed__c = false
-        );
-        insert dupOpp;
-        
-        Vendor_Opportunity__c vo = new Vendor_Opportunity__c(
-            Opportunity__c = dupOpp.Id,
-            Vendor__c = v.Id,
-            Vendor_Agreement_Signed__c = true
-        );
-        insert vo;
-        
-        // 2. Create File and Link to BOTH VO and Parent Opp manually
-        ContentVersion cv = TestDataUtility.createContentVersion('Dup File', 'Content');
-        Id docId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cv.Id].ContentDocumentId;
-        
-        TestDataUtility.linkFileToRecord(cv.Id, vo.Id);
-        TestDataUtility.linkFileToRecord(cv.Id, dupOpp.Id); // Pre-existing link
-        
-        Test.startTest();
-        VendorOpportunityAgreementService.recalculateAndCopyFiles(new Set<Id>{dupOpp.Id});
-        Test.stopTest();
-        
-        // Verify: Service runs but finds duplicate and inserts nothing
-        // Coverage: hits 'if (isDuplicate) continue' and 'if (links.isEmpty()) return'
-        Opportunity res = [SELECT All_Vendors_Agreement_Completed__c FROM Opportunity WHERE Id = :dupOpp.Id];
-        System.assert(res.All_Vendors_Agreement_Completed__c, 'Should still flip to true');
+    private static User getSupervisorUser() {
+        return [
+            SELECT Id
+            FROM User
+            WHERE Alias = :SUPERVISOR_ALIAS
+            LIMIT 1
+        ];
     }
 
-    @isTest
-    static void testNoUpdateNeeded() {
-        // Setup: Opp is already False, and should remain False
-        Opportunity opp = [SELECT Id FROM Opportunity LIMIT 1];
-        
-        Test.startTest();
-        // Call logic - should calculate False, see existing False, and skip update
-        // Coverage: hits 'if (toUpdate.isEmpty()) return' in performOppUpdates
-        VendorOpportunityAgreementService.recalculateAndCopyFiles(new Set<Id>{opp.Id});
-        Test.stopTest();
-        
-        System.assert(true, 'Ran without error');
+    private static Opportunity getOpportunityByName(
+        String opportunityName
+    ) {
+        return [
+            SELECT Id,
+                   All_Vendors_Agreement_Completed__c
+            FROM Opportunity
+            WHERE Name = :opportunityName
+            LIMIT 1
+        ];
+    }
+
+    private static Opportunity getOpportunityById(
+        Id opportunityId
+    ) {
+        return [
+            SELECT Id,
+                   All_Vendors_Agreement_Completed__c
+            FROM Opportunity
+            WHERE Id = :opportunityId
+            LIMIT 1
+        ];
+    }
+
+    private static Vendor__c getVendorByName(
+        String vendorName
+    ) {
+        return [
+            SELECT Id,
+                   Name
+            FROM Vendor__c
+            WHERE Name = :vendorName
+            LIMIT 1
+        ];
+    }
+
+    private static Vendor_Opportunity__c getVendorOpportunityByVendorName(
+        String vendorName
+    ) {
+        return [
+            SELECT Id,
+                   Vendor_Agreement_Signed__c
+            FROM Vendor_Opportunity__c
+            WHERE Vendor__r.Name = :vendorName
+            LIMIT 1
+        ];
+    }
+
+    private static List<Vendor_Opportunity__c> getVendorOpportunities(
+        Id opportunityId
+    ) {
+        return [
+            SELECT Id,
+                   Vendor_Agreement_Signed__c
+            FROM Vendor_Opportunity__c
+            WHERE Opportunity__c = :opportunityId
+        ];
     }
 }
