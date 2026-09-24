@@ -9,12 +9,10 @@ import updateTasks from '@salesforce/apex/TaskBulkController.updateTasks';
 import hasExistingTasks from '@salesforce/apex/TaskBulkController.hasExistingTasks';
 import getExistingTasks from '@salesforce/apex/TaskBulkController.getExistingTasks';
 import getTaskFiles from '@salesforce/apex/TaskBulkController.getTaskFiles';
+import getAreliaTaskRecordTypeId from '@salesforce/apex/TaskBulkController.getAreliaTaskRecordTypeId';
 
-import OWNER_ID_FIELD from '@salesforce/schema/Vendor_Assignment__c.OwnerId';
-
-// import { getObjectInfo, getPicklistValues } from 'lightning/uiObjectInfoApi';
-// import TASK_OBJECT from '@salesforce/schema/Task';
-// import STATUS_FIELD from '@salesforce/schema/Task.Status';
+// import OWNER_ID_FIELD from '@salesforce/schema/Vendor_Assignment__c.Supervisor_User__r.Id';
+const SUPERVISOR_FIELD = 'Vendor_Assignment__c.Supervisor_User__c';
 
 import getTaskStatusOptions from '@salesforce/apex/TaskBulkController.getTaskStatusOptions';
 
@@ -46,47 +44,37 @@ export default class VendorTaskCreator extends LightningElement {
 
     @track taskList = []; 
     @track previewData = [];
+    @track areliaTaskRecordTypeId;
 
     // Helper to view raw data if fields are still blank
     @track debugInfo = ''; 
 
-    @wire(getRecord, { recordId: '$recordId', fields: [OWNER_ID_FIELD] })
+    @wire(getRecord, { recordId: '$recordId', fields: [SUPERVISOR_FIELD] })
     vendorRecord;
 
-    get vendorOwnerId() { return getFieldValue(this.vendorRecord.data, OWNER_ID_FIELD); }
-
-    // get statusOptions() {
-    //     return [
-    //         { label: 'Not Started', value: 'Not Started' },
-    //         { label: 'In Progress', value: 'In Progress' },
-    //         { label: 'Completed', value: 'Completed' },
-    //         { label: 'Waiting on someone else', value: 'Waiting on someone else' },
-    //         { label: 'Deferred', value: 'Deferred' }
-    //     ];
-    // }
-
-    // ---------------- Dynamic Picklist ---------------- //
-
-    // @wire(getObjectInfo, { objectApiName: TASK_OBJECT })
-    // taskMetadata;
-
-    // @wire(getPicklistValues, {
-    //     recordTypeId: '$recordTypeId',
-    //     fieldApiName: STATUS_FIELD
-    // })
-    // wiredStatusValues({ error, data }) {
-    //     if (data) {
-    //         this.statusOptions = data.values.map(item => ({
-    //             label: item.label,
-    //             value: item.value
-    //         }));
-    //     } else if (error) {
-    //         console.error('Error fetching Status picklist', error);
-    //     }
-    // }
+    // get vendorOwnerId() { return getFieldValue(this.vendorRecord.data, OWNER_ID_FIELD); }
+    get supervisorId() { return getFieldValue(this.vendorRecord.data, SUPERVISOR_FIELD);}
 
     connectedCallback() {
         this.loadStatusOptions();
+        this.loadAreliaTaskRecordTypeId();
+    }
+
+    loadAreliaTaskRecordTypeId() {
+        getAreliaTaskRecordTypeId()
+            .then(result => {
+                this.areliaTaskRecordTypeId = result;
+                console.log(
+                    'Arelia Task Record Type Id:',
+                    this.areliaTaskRecordTypeId
+                );
+            })
+            .catch(error => {
+                console.error(
+                    'Error fetching Arelia Task Record Type Id',
+                    error
+                );
+            });
     }
 
     loadStatusOptions() {
@@ -165,11 +153,17 @@ export default class VendorTaskCreator extends LightningElement {
             return;
         }
 
+        if (!this.areliaTaskRecordTypeId) {
+            this.showToast('Error', 'Arelia Task Record Type could not be retrieved.', 'error');
+            return;
+        }
+
         this.isLoading = true;
         const tasksToInsert = this.taskList.map(row => ({
             sobjectType: 'Task',
+            RecordTypeId: this.areliaTaskRecordTypeId,
             WhatId: this._recordId,
-            OwnerId: this.vendorOwnerId, // OwnerId: UserInfo.getUserId(),
+            OwnerId: this.supervisorId, // OwnerId: UserInfo.getUserId(),
             Subject: row.Subject,
             Status: row.Status,
             Start_Date__c: row.Start_Date__c,
