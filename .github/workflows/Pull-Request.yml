@@ -61,13 +61,16 @@ jobs:
  
       - name: Install Salesforce Code Analyzer v5
         shell: bash
+        env:
+          CI: "true"
+          SF_DISABLE_TELEMETRY: "true"
         run: |
           set -euo pipefail
- 
-          printf "y\n" | sf plugins install code-analyzer@latest
- 
-          echo "Installed Salesforce plugins:"
-          sf plugins list
+
+          sf plugins install @salesforce/plugin-code-analyzer@5.16.0
+
+          echo "Verifying Salesforce Code Analyzer command..."
+          sf code-analyzer run --help
 
       # ------------------------------------------------------------
       # 4. Prepare report folder
