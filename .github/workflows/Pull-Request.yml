@@ -45,13 +45,18 @@ jobs:
       # ------------------------------------------------------------
       # 3. Install Salesforce CLI and Code Analyzer v5
       # ------------------------------------------------------------
-      - name: Install Salesforce CLI
-        run: npm install -g @salesforce/cli@latest
-
       - name: Install Salesforce Code Analyzer v5
+        shell: bash
+        env:
+          CI: "true"
+          SF_DISABLE_TELEMETRY: "true"
         run: |
-          echo "y" | sf plugins install code-analyzer@latest
-          sf plugins
+          set -euo pipefail
+
+          sf plugins install @salesforce/plugin-code-analyzer@5.16.0
+
+          echo "Verifying Salesforce Code Analyzer command..."
+          sf code-analyzer run --help
 
       # ------------------------------------------------------------
       # 4. Prepare report folder
