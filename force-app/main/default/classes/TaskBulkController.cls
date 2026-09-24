@@ -93,4 +93,15 @@ public with sharing class TaskBulkController {
         }
         return fileMap;
     }
+
+    @AuraEnabled(cacheable=true)
+    public static Id getAreliaTaskRecordTypeId() {
+        Schema.RecordTypeInfo rtInfo = Schema.SObjectType.Task.getRecordTypeInfosByDeveloperName().get('Arelia');
+
+        if (rtInfo == null) {
+            throw new AuraHandledException('Arelia record type was not found for Task.');
+        }
+
+        return rtInfo.getRecordTypeId();
+    }
 }
