@@ -29,7 +29,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22.x"
+          check-latest: true
 
       - name: Setup Java 17
         uses: actions/setup-java@v4
@@ -46,12 +47,30 @@ jobs:
       # 3. Install Salesforce CLI and Code Analyzer v5
       # ------------------------------------------------------------
       - name: Install Salesforce CLI
-        run: npm install -g @salesforce/cli@latest
-
-      - name: Install Salesforce Code Analyzer v5
+        shell: bash
         run: |
-          echo "y" | sf plugins install code-analyzer@latest
-          sf plugins
+          set -euo pipefail
+ 
+          npm install --global @salesforce/cli@latest
+ 
+          echo "Node version:"
+          node --version
+ 
+          echo "Salesforce CLI version:"
+          sf --version
+ 
+      - name: Install Salesforce Code Analyzer v5
+        shell: bash
+        env:
+          CI: "true"
+          SF_DISABLE_TELEMETRY: "true"
+        run: |
+          set -euo pipefail
+
+          sf plugins install @salesforce/plugin-code-analyzer@5.16.0
+
+          echo "Verifying Salesforce Code Analyzer command..."
+          sf code-analyzer run --help
 
       # ------------------------------------------------------------
       # 4. Prepare report folder
