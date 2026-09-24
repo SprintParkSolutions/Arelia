@@ -3,7 +3,7 @@
     <fullName>Total_Estimated_Cost__c</fullName>
     <label>Total Estimated Cost</label>
     <precision>18</precision>
-    <required>true</required>
+    <required>false</required>
     <scale>2</scale>
     <trackHistory>true</trackHistory>
     <trackTrending>false</trackTrending>
