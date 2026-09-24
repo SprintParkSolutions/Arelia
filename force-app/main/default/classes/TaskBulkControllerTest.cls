@@ -166,6 +166,22 @@ public class TaskBulkControllerTest {
     }
 
     // ==========================================
+    // ARELIA TASK RECORD TYPE TEST
+    // ==========================================
+
+    @isTest
+    static void testGetAreliaTaskRecordTypeId() {
+
+        Schema.RecordTypeInfo expectedRecordType = Schema.SObjectType.Task.getRecordTypeInfosByDeveloperName().get('Arelia');
+        Assert.isNotNull(expectedRecordType, 'Arelia Task Record Type should exist in the org');
+        Test.startTest();
+        Id actualRecordTypeId = TaskBulkController.getAreliaTaskRecordTypeId();
+        Test.stopTest();
+        Assert.isNotNull(actualRecordTypeId, 'Arelia Task Record Type Id should not be null');
+        Assert.areEqual(expectedRecordType.getRecordTypeId(), actualRecordTypeId, 'Controller should return the Arelia Task Record Type Id');
+    }
+
+    // ==========================================
     // FILE HANDLING TESTS
     // ==========================================
 

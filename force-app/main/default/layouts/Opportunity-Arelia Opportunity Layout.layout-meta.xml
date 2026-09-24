@@ -329,6 +329,10 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
+                <field>Estimated_Budget_Description__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
                 <field>Project_Estimated_Completion_Months__c</field>
             </layoutItems>
         </layoutColumns>
@@ -585,6 +589,9 @@
         <fields>Manager_Approval__c</fields>
         <fields>Rejection_Reason__c</fields>
         <relatedList>Quotation__c.Opportunity__c</relatedList>
+    </relatedLists>
+    <relatedLists>
+        <relatedList>RelatedEntityHistoryList</relatedList>
     </relatedLists>
     <relatedLists>
         <fields>NAME</fields>
