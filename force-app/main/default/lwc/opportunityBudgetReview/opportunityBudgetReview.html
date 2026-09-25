@@ -1,104 +1,242 @@
 <template>
-    <section class="shell">
-        <div class="header">
-            <div class="hTitle">
-                <h1 class="title">Budget Review</h1>
-            </div>
-        </div>
+    <section
+        class="shell"
+        aria-label="Budget review"
+        aria-busy={isWorking}
+    >
+        <header class="header">
+            <div class="heading">
+                <div class="icon-wrap">
+                    <lightning-icon
+                        icon-name="standard:forecasts"
+                        size="small"
+                        alternative-text="Budget"
+                    ></lightning-icon>
+                </div>
 
-        <template if:true={loading}>
-            <div class="center">
-                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                <div>
+                    <h1>Budget Review</h1>
+                    <p>
+                        Review the estimate, design costs and payment schedule.
+                    </p>
+                </div>
+            </div>
+
+            <span class="mode">{modeLabel}</span>
+        </header>
+
+        <template lwc:if={isWorking}>
+            <lightning-spinner
+                alternative-text="Loading budget review"
+                size="medium"
+            ></lightning-spinner>
+        </template>
+
+        <template lwc:if={errorText}>
+            <div class="error" role="alert">
+                {errorText}
             </div>
         </template>
 
-        <template if:false={loading}>
-            <template if:true={errorText}>
-                <div class="error">{errorText}</div>
-            </template>
-
-            <div class="cards">
-                <div class="card">
-                    <div class="cardTop">
-                        <div class="label">Customer Budget</div>
+        <template lwc:elseif={savedDto}>
+            <div class="summary-grid">
+                <article class="summary-card">
+                    <div class="eyebrow">
+                        Customer Budget
                     </div>
-                    <div class="money">
-                        <lightning-formatted-number value={customerBudget} format-style="currency" currency-code="INR"></lightning-formatted-number>
+
+                    <div class="amount">
+                        <lightning-formatted-number
+                            value={customerBudget}
+                            format-style="currency"
+                            currency-code="INR"
+                        ></lightning-formatted-number>
+                    </div>
+
+                    <p>Customer's proposed investment</p>
+                </article>
+
+                <article class="summary-card">
+                    <div class="eyebrow">
+                        Supervisor Estimated Budget
+                    </div>
+
+                    <div class="amount">
+                        <lightning-formatted-number
+                            value={supervisorBudget}
+                            format-style="currency"
+                            currency-code="INR"
+                        ></lightning-formatted-number>
+                    </div>
+
+                    <p>Current project estimate</p>
+                </article>
+
+                <article class="summary-card final-card">
+                    <div class="eyebrow">
+                        Final Budget
+                    </div>
+
+                    <div class="amount">
+                        <lightning-formatted-number
+                            value={finalBudget}
+                            format-style="currency"
+                            currency-code="INR"
+                        ></lightning-formatted-number>
+                    </div>
+
+                    <p>Based on the supervisor estimate</p>
+                </article>
+            </div>
+
+            <section
+                class="section"
+                aria-label="Estimate details"
+            >
+                <div class="section-heading">
+                    <div>
+                        <h2>Estimate Details</h2>
+                        <p>
+                            Budget, scope and expected completion time.
+                        </p>
+                    </div>
+
+                    <div class="duration-badge">
+                        Duration: {durationLabel}
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="cardTop">
-                        <div class="label">Supervisor Estimated Budget</div>
-                    </div>
-                    <div class="money">
-                        <lightning-formatted-number value={supervisorBudget} format-style="currency" currency-code="INR"></lightning-formatted-number>
-                    </div>
-                    <div class="chip">
-                        <span>Duration</span>
-                        <b>{durationLabel}</b>
-                    </div>
-                    <lightning-input 
-                        data-id="supervisorBudget" 
-                        type="text" 
+                <div class="estimate-form">
+                    <lightning-input
+                        data-id="supervisorBudget"
+                        type="number"
                         label="Edit Supervisor Budget"
-                        value={supervisorBudgetText} 
-                        onchange={onSupervisorInput} 
-                        disabled={isReadOnly}>
-                    </lightning-input>
-                    <lightning-input 
-                        data-id="duration" 
-                        type="text" 
-                        label="Edit Duration (Months)" 
+                        value={supervisorBudgetText}
+                        step="0.01"
+                        min="0"
+                        onchange={onSupervisorInput}
+                        disabled={inputsDisabled}
+                    ></lightning-input>
+
+                    <lightning-textarea
+                        class="description-input"
+                        data-id="estimatedBudgetDescription"
+                        label="Edit estimated budget description"
+                        value={estimatedBudgetDescription}
+                        placeholder="Describe the estimate, included work, materials and exclusions."
+                        onchange={onDescriptionInput}
+                        disabled={inputsDisabled}
+                    ></lightning-textarea>
+
+                    <lightning-input
+                        data-id="duration"
+                        type="text"
+                        label="Edit Duration (Months)"
                         value={duration}
-                        onchange={onDurationInput} 
-                        disabled={isReadOnly}>
-                    </lightning-input>
+                        placeholder="e.g. 5 Months"
+                        onchange={onDurationInput}
+                        disabled={inputsDisabled}
+                    ></lightning-input>
                 </div>
+            </section>
 
-                <div class="card final">
-                    <div class="cardTop">
-                        <div class="label">Final Budget</div>
+            <section
+                class="section"
+                aria-label="Architecture design"
+            >
+                <div class="section-heading">
+                    <div>
+                        <h2>Architecture Design</h2>
+                        <p>
+                            Review the budget allocated to each design.
+                        </p>
                     </div>
-                    <div class="finalMoney">
-                        <lightning-formatted-number value={finalBudget} format-style="currency" currency-code="INR"></lightning-formatted-number>
+                </div>
+
+                <template lwc:if={hasArchitectureRows}>
+                    <div class="table-wrap">
+                        <lightning-datatable
+                            key-field="id"
+                            data={architectureRows}
+                            columns={architectureColumns}
+                            draft-values={architectureDraftValues}
+                            hide-checkbox-column
+                            suppress-bottom-bar
+                            oncellchange={onArchChange}
+                        ></lightning-datatable>
+                    </div>
+                </template>
+
+                <template lwc:else>
+                    <div class="empty">
+                        No architecture designs have been added.
+                    </div>
+                </template>
+            </section>
+
+            <section
+                class="section"
+                aria-label="Payment terms"
+            >
+                <div class="section-heading">
+                    <div>
+                        <h2>Payment Terms</h2>
+                        <p>
+                            Review payment milestones, percentages and due dates.
+                        </p>
                     </div>
                 </div>
-            </div>
 
-            <div class="section">
-                <div class="secTop">
-                    <div class="secTitle">Architecture Design</div>
+                <template lwc:if={hasPaymentTerms}>
+                    <div class="table-wrap">
+                        <lightning-datatable
+                            key-field="id"
+                            data={paymentTermRows}
+                            columns={paymentTermColumns}
+                            draft-values={paymentTermDraftValues}
+                            hide-checkbox-column
+                            suppress-bottom-bar
+                            oncellchange={onTermChange}
+                        ></lightning-datatable>
+                    </div>
+                </template>
+
+                <template lwc:else>
+                    <div class="empty">
+                        No payment terms have been added.
+                    </div>
+                </template>
+            </section>
+
+            <footer class="footer">
+                <p>
+                    Review all details before sending for approval.
+                </p>
+
+                <div class="actions">
+                    <lightning-button
+                        variant="neutral"
+                        label={editButtonLabel}
+                        onclick={toggleEdit}
+                        disabled={isActionDisabled}
+                    ></lightning-button>
+
+                    <lightning-button
+                        variant="brand"
+                        label="Save"
+                        onclick={save}
+                        disabled={isSaveDisabled}
+                    ></lightning-button>
+
+                    <lightning-button
+                        variant="success"
+                        label="Send for Client Approval"
+                        icon-name="utility:email"
+                        onclick={handleSendToClient}
+                        disabled={isActionDisabled}
+                    ></lightning-button>
                 </div>
-                <lightning-datatable 
-                    key-field="id" 
-                    data={architectureRows} 
-                    columns={architectureColumns}
-                    draft-values={architectureDraftValues} 
-                    hide-checkbox-column="true"
-                    oncellchange={onArchChange}>
-                </lightning-datatable>
-            </div>
-
-            <div class="section">
-                <div class="secTop">
-                    <div class="secTitle">Payment Terms</div>
-                </div>
-                <lightning-datatable 
-                    key-field="id" 
-                    data={paymentTermRows} 
-                    columns={paymentTermColumns}
-                    draft-values={paymentTermDraftValues} 
-                    hide-checkbox-column="true"
-                    oncellchange={onTermChange}>
-                </lightning-datatable>
-            </div>
-
-            <div class="footer">
-                <lightning-button variant="neutral" label={editButtonLabel} onclick={toggleEdit}></lightning-button>
-                <lightning-button class="ml" variant="brand" label="Save" onclick={save} disabled={isSaveDisabled}></lightning-button>
-                <lightning-button class="ml" variant="success" label="Send for Client Approval" icon-name="utility:email" onclick={handleSendToClient} disabled={loading}></lightning-button>
-            </div>
+            </footer>
         </template>
     </section>
 </template>
