@@ -1,5 +1,6 @@
 import { LightningElement, api, wire } from "lwc";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
+import { CloseActionScreenEvent } from "lightning/actions";
 import { refreshApex } from "@salesforce/apex";
 import { notifyRecordUpdateAvailable } from "lightning/uiRecordApi";
 
@@ -328,6 +329,8 @@ export default class OpportunityBudgetReview extends LightningElement {
                 "Budget sent for Client Approval.",
                 "success"
             );
+
+            this.dispatchEvent(new CloseActionScreenEvent());
         } catch (error) {
             this.toast(
                 "Unable to submit",
