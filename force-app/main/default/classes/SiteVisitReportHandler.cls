@@ -13,6 +13,20 @@ public without sharing class SiteVisitReportHandler {
      * @param reportIds List of Site_Visit_Report__c record IDs
      */
     public static void sendApprovalEmails(List<Id> reportIds) {
+        sendApprovalEmails(reportIds, new Map<Id, Boolean>());
+    }
+
+    /**
+     * @description Sends approval notification emails for the given Site Visit Report IDs.
+     * @param reportIds List of Site_Visit_Report__c record IDs
+     * @param resubmittedFromNegotiableByReportId Per-report flag, true when this update transitioned
+     * the record out of the 'Negotiable' status - i.e. this is a post-negotiation resubmission.
+     * Passed in from the trigger's old/new comparison because Negotiate__c itself can be reset to
+     * false in the very same save that resubmits the report (e.g. a full record edit that re-saves
+     * every field on the layout), which would otherwise make a resubmission look like a first-time
+     * approval.
+     */
+    public static void sendApprovalEmails(List<Id> reportIds, Map<Id, Boolean> resubmittedFromNegotiableByReportId) {
         if (reportIds == null || reportIds.isEmpty()) {return;}
 
         List<Site_Visit_Report__c> reports = fetchReportsWithDetails(reportIds);
@@ -22,7 +36,7 @@ public without sharing class SiteVisitReportHandler {
         if (recipients.isEmpty()) {return;}
 
         Map<String, EmailTemplate> templates = getEmailTemplatesMap();
-        List<Messaging.SingleEmailMessage> emails = buildEmailMessages(reports, recipients, templates);
+        List<Messaging.SingleEmailMessage> emails = buildEmailMessages(reports, recipients, templates, resubmittedFromNegotiableByReportId);
 
         if (!emails.isEmpty()) {
             sendEmailBatch(emails);
@@ -74,28 +88,20 @@ public without sharing class SiteVisitReportHandler {
     // -------------------------------------------------------------------------
 
     private static List<Messaging.SingleEmailMessage> buildEmailMessages(List<Site_Visit_Report__c> reports,
-                        List<String> recipients,Map<String, EmailTemplate> templates)
+                        List<String> recipients,Map<String, EmailTemplate> templates,
+                        Map<Id, Boolean> resubmittedFromNegotiableByReportId)
     {
         List<Messaging.SingleEmailMessage> emails = new List<Messaging.SingleEmailMessage>();
 
         for (Site_Visit_Report__c report : reports) {
 
-            // ✅ Identify “Negotiation second-time approval”
-            Boolean isNegotiationReapproval = report.Negotiate__c == true && String.isNotBlank(report.Negotation_Reason__c);
-            String templateName;
-
-            // ✅ If negotiation is present, send a DIFFERENT template
-            if (isNegotiationReapproval) {
-                templateName = (report.RecordType.DeveloperName == 'Opportunity_Site_Visit_Report')
-                    ? Label.Arelia_Living_Opportunity_Site_Manager_Review_Approval_Email_Template
-                    : Label.Arelia_Living_Lead_Site_Manager_Review_Approval_Email_Template;
-
-            } else {
-                // ✅ Existing “first-time approval” templates (your current logic)
-                templateName = (report.RecordType.DeveloperName == 'Opportunity_Site_Visit_Report')
-                    ? Label.Arelia_Living_Opportunity_Re_Visit_Site_Manager_Approval_Email_Template
-                    : Label.Arelia_Living_Lead_Conversion_Approval_Email_Template;
-            }
+            // ✅ Identify "Negotiation second-time approval". Prefer the trigger-supplied
+            // "just came from Negotiable" signal - it's immune to Negotiate__c being reset to
+            // false in the same save that resubmits the report. Fall back to the field-based
+            // check for direct callers (e.g. tests) that don't have trigger old/new context.
+            Boolean cameFromNegotiable = resubmittedFromNegotiableByReportId != null
+                && resubmittedFromNegotiableByReportId.get(report.Id) == true;
+            String templateName = resolveTemplateName(report, cameFromNegotiable);
             EmailTemplate selectedTemplate = templates.get(templateName);
             if (selectedTemplate != null) {
                 emails.add(createSingleEmail(report, recipients, selectedTemplate));
@@ -105,6 +111,32 @@ public without sharing class SiteVisitReportHandler {
         return emails;
     }
 
+    /**
+     * @description Resolves the DeveloperName of the template to use for a report's manager
+     * approval email: the negotiation "review" template when this is a post-negotiation
+     * resubmission, otherwise the first-time approval template.
+     * @param report The report, with RecordType.DeveloperName, Negotiate__c and Negotation_Reason__c queried.
+     * @param cameFromNegotiable True when the trigger's old value for Site_Visit_Report_Status__c
+     * was 'Negotiable' - i.e. this update is resubmitting after a negotiation round.
+     */
+    private static String resolveTemplateName(Site_Visit_Report__c report, Boolean cameFromNegotiable) {
+        Boolean isNegotiationReapproval = cameFromNegotiable
+            || (report.Negotiate__c == true && String.isNotBlank(report.Negotation_Reason__c));
+
+        if (isNegotiationReapproval) {
+            return (report.RecordType.DeveloperName == 'Opportunity_Site_Visit_Report')
+                ? Label.Arelia_Living_Opportunity_Site_Manager_Review_Approval_Email_Template
+                : Label.Arelia_Living_Lead_Site_Manager_Review_Approval_Email_Template;
+        }
+        return (report.RecordType.DeveloperName == 'Opportunity_Site_Visit_Report')
+            ? Label.Arelia_Living_Opportunity_Re_Visit_Site_Manager_Approval_Email_Template
+            : Label.Arelia_Living_Lead_Conversion_Approval_Email_Template;
+    }
+
+    @TestVisible
+    private static String resolveTemplateNameForTest(Site_Visit_Report__c report, Boolean cameFromNegotiable) {
+        return resolveTemplateName(report, cameFromNegotiable);
+    }
 
     private static Messaging.SingleEmailMessage createSingleEmail(Site_Visit_Report__c report,
         List<String> recipients, EmailTemplate template)
@@ -292,6 +324,7 @@ public without sharing class SiteVisitReportHandler {
 
         List<Site_Visit_Report__c> reportsForSync = new List<Site_Visit_Report__c>();
         Set<Id> emailReportIds = new Set<Id>();
+        Map<Id, Boolean> resubmittedFromNegotiableByReportId = new Map<Id, Boolean>();
 
         for (Site_Visit_Report__c newRec : newList) {
             if (newRec == null) { continue; }
@@ -308,6 +341,7 @@ public without sharing class SiteVisitReportHandler {
             // 3. ✅ Email candidates (FIXED)
             if (oldRec != null && shouldSendManagerEmail(newRec, oldRec)) {
                 emailReportIds.add(newRec.Id);
+                resubmittedFromNegotiableByReportId.put(newRec.Id, oldRec.Site_Visit_Report_Status__c == 'Negotiable');
             }
         }
 
@@ -316,7 +350,7 @@ public without sharing class SiteVisitReportHandler {
         }
 
         if (!emailReportIds.isEmpty()) {
-            SiteVisitReportHandler.sendApprovalEmails(new List<Id>(emailReportIds));
+            SiteVisitReportHandler.sendApprovalEmails(new List<Id>(emailReportIds), resubmittedFromNegotiableByReportId);
         }
 
         // Part 4 (unchanged)

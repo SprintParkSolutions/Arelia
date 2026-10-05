@@ -15,7 +15,9 @@ public without sharing class PaymentReceiptPdfController {
     public String receiptNumber { get; private set; }
     public String projectName { get; private set; }
     public String customerName { get; private set; }
+    public String customerEmail { get; private set; }
     public String installmentLabel { get; private set; }
+    public String percentage { get; private set; }
     public String paymentDate { get; private set; }
     public String status { get; private set; }
     public String currencyCode { get; private set; }
@@ -28,7 +30,9 @@ public without sharing class PaymentReceiptPdfController {
 
         projectName = params.get('project');
         customerName = params.get('customer');
+        customerEmail = params.get('customerEmail');
         installmentLabel = params.get('installment');
+        percentage = params.get('percentage');
         amount = params.get('amount');
         currencyCode = params.get('currency');
         paymentDate = params.get('paymentDate');
