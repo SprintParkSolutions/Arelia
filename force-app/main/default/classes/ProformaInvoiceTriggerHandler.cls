@@ -263,11 +263,15 @@ public without sharing class ProformaInvoiceTriggerHandler {
             Map<Id, Id> opportunityToLeadMap =
                 new Map<Id, Id>();
 
+            Map<Id, Id> opportunityToContactMap =
+                new Map<Id, Id>();
+
 
             for (Lead prospectLead : [
                 SELECT
                     Id,
-                    ConvertedOpportunityId
+                    ConvertedOpportunityId,
+                    ConvertedContactId
                 FROM Lead
                 WHERE IsConverted = true
                 AND ConvertedOpportunityId IN :opportunityIds
@@ -284,6 +288,13 @@ public without sharing class ProformaInvoiceTriggerHandler {
                         prospectLead.ConvertedOpportunityId,
                         prospectLead.Id
                     );
+
+                    if (prospectLead.ConvertedContactId != null) {
+                        opportunityToContactMap.put(
+                            prospectLead.ConvertedOpportunityId,
+                            prospectLead.ConvertedContactId
+                        );
+                    }
                 }
             }
 
@@ -296,15 +307,15 @@ public without sharing class ProformaInvoiceTriggerHandler {
             /*
              * =================================================
              * STEP 4:
-             * Collect only those customer Lead IDs
+             * Collect only those customer Contact IDs
              * =================================================
              */
-            Set<Id> leadIds =
+            Set<Id> contactIds =
                 new Set<Id>();
 
 
-            leadIds.addAll(
-                opportunityToLeadMap.values()
+            contactIds.addAll(
+                opportunityToContactMap.values()
             );
 
 
@@ -314,9 +325,8 @@ public without sharing class ProformaInvoiceTriggerHandler {
              * Find active mobile devices belonging ONLY
              * to those Leads.
              *
-             * YOUR CORRECT FIELD:
-             *
-             * Prospect_Lead__c
+             * Mobile_Device_Token__c is keyed by Contact__c,
+             * so we look up tokens via the converted Contact.
              *
              * NOT Lead__c.
              *
@@ -324,18 +334,18 @@ public without sharing class ProformaInvoiceTriggerHandler {
              * so we don't filter blank values in SOQL.
              * =================================================
              */
-            Map<Id, Set<String>> leadToTokensMap =
+            Map<Id, Set<String>> contactToTokensMap =
                 new Map<Id, Set<String>>();
 
 
-            for (Prospect_Device_Token__c device : [
+            for (Mobile_Device_Token__c device : [
                 SELECT
                     Id,
-                    Prospect_Lead__c,
+                    Contact__c,
                     FCM_Token__c,
                     Active__c
-                FROM Prospect_Device_Token__c
-                WHERE Prospect_Lead__c IN :leadIds
+                FROM Mobile_Device_Token__c
+                WHERE Contact__c IN :contactIds
                 AND Active__c = true
             ]) {
 
@@ -343,7 +353,7 @@ public without sharing class ProformaInvoiceTriggerHandler {
                  * Skip invalid device records.
                  */
                 if (
-                    device.Prospect_Lead__c == null ||
+                    device.Contact__c == null ||
                     String.isBlank(device.FCM_Token__c)
                 ) {
                     continue;
@@ -351,16 +361,16 @@ public without sharing class ProformaInvoiceTriggerHandler {
 
 
                 /*
-                 * Create token set for this Lead.
+                 * Create token set for this Contact.
                  */
                 if (
-                    !leadToTokensMap.containsKey(
-                        device.Prospect_Lead__c
+                    !contactToTokensMap.containsKey(
+                        device.Contact__c
                     )
                 ) {
 
-                    leadToTokensMap.put(
-                        device.Prospect_Lead__c,
+                    contactToTokensMap.put(
+                        device.Contact__c,
                         new Set<String>()
                     );
                 }
@@ -372,15 +382,15 @@ public without sharing class ProformaInvoiceTriggerHandler {
                  * Set prevents duplicate notification
                  * if same FCM token exists twice.
                  */
-                leadToTokensMap
-                    .get(device.Prospect_Lead__c)
+                contactToTokensMap
+                    .get(device.Contact__c)
                     .add(
                         device.FCM_Token__c.trim()
                     );
             }
 
 
-            if (leadToTokensMap.isEmpty()) {
+            if (contactToTokensMap.isEmpty()) {
                 return;
             }
 
@@ -402,18 +412,23 @@ public without sharing class ProformaInvoiceTriggerHandler {
                         invoice.Opportunity__c
                     );
 
+                Id customerContactId =
+                    opportunityToContactMap.get(
+                        invoice.Opportunity__c
+                    );
 
-                if (prospectLeadId == null) {
+
+                if (prospectLeadId == null || customerContactId == null) {
                     continue;
                 }
 
 
                 /*
-                 * Get ONLY this Lead's tokens.
+                 * Get ONLY this Contact's tokens.
                  */
                 Set<String> customerTokens =
-                    leadToTokensMap.get(
-                        prospectLeadId
+                    contactToTokensMap.get(
+                        customerContactId
                     );
 
 
