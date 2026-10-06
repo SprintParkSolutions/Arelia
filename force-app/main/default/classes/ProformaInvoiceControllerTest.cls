@@ -16,10 +16,8 @@ private class ProformaInvoiceControllerTest {
         Opportunity opp = TestDataUtility.createOpportunity('Test Opportunity', supervisor.Id);
         opp.Primary_Contact__c = clientContact.Id;
         update opp;
-
         // 3. Create Project
         Project__c proj = TestDataUtility.createProject('Test Project', 50000, clientContact.Id);
-        
         // 4. Create File (ContentVersion)
         TestDataUtility.createContentVersion('Proforma_Invoice_Draft', 'Test PDF Content Data');
 
@@ -103,10 +101,10 @@ private class ProformaInvoiceControllerTest {
 
     @isTest
     static void testSubmitClientDecisionApproved() {
-        Opportunity opp = [SELECT Id FROM Opportunity LIMIT 1];
+        Opportunity opp = createIsolatedOpportunity('Client Decision Opp');
         Proforma_Invoice__c invoice = TestDataUtility.createProformaInvoice(opp.Id);
-        ContentVersion cv = [SELECT ContentDocumentId FROM ContentVersion LIMIT 1];
-        
+        ContentVersion cv = createIsolatedFile('Proforma_Invoice_Draft');
+
         invoice.Related_File_Id__c = cv.ContentDocumentId;
         update invoice;
         TestDataUtility.linkFileToRecord(cv.ContentDocumentId, invoice.Id);
@@ -122,7 +120,7 @@ private class ProformaInvoiceControllerTest {
 
     @isTest
     static void testSubmitClientDecisionNoFilesAndDefaultComments() {
-        Opportunity opp = [SELECT Id FROM Opportunity LIMIT 1];
+        Opportunity opp = createIsolatedOpportunity('Default Comments Opp');
         Proforma_Invoice__c invoice = TestDataUtility.createProformaInvoice(opp.Id);
 
         Test.startTest();
@@ -149,13 +147,13 @@ private class ProformaInvoiceControllerTest {
 
     @isTest
     static void testGetInvoiceByIdSuccess() {
-        Opportunity opp = [SELECT Id, Name, Lead_Name__c FROM Opportunity LIMIT 1];
+        Opportunity opp = createIsolatedOpportunity('Get Invoice Opp');
         opp.Lead_Name__c = 'Named Client';
         update opp;
 
         Proforma_Invoice__c invoice = TestDataUtility.createProformaInvoice(opp.Id);
-        
-        ContentVersion cv = [SELECT ContentDocumentId FROM ContentVersion LIMIT 1];
+
+        ContentVersion cv = createIsolatedFile('Proforma_Invoice_Draft');
         invoice.Related_File_Id__c = cv.ContentDocumentId;
         invoice.Status__c = 'Sent';
         update invoice;
@@ -224,7 +222,11 @@ private class ProformaInvoiceControllerTest {
     @isTest
     static void testGetRelatedInvoicesMissingFileFallback() {
         Opportunity opp = [SELECT Id FROM Opportunity LIMIT 1];
-        Proforma_Invoice__c invoice = new Proforma_Invoice__c( Opportunity__c = opp.Id, Status__c = 'Sent', Client_Comments__c = 'Project invoice' );
+        Proforma_Invoice__c invoice = new Proforma_Invoice__c(
+            Opportunity__c = opp.Id,
+            Status__c = 'Sent',
+            Client_Comments__c = 'Project invoice'
+        );
         insert invoice;
 
         Test.startTest();
@@ -251,5 +253,15 @@ private class ProformaInvoiceControllerTest {
         System.assertEquals('', nullText, 'Null merge text should become blank.');
         System.assertEquals('Value=', replacedText, 'Null merge values should become blank.');
         System.assertEquals('Team', supervisorName, 'Missing supervisor relationship should use Team fallback.');
+    }
+
+    private static Opportunity createIsolatedOpportunity(String name) {
+        Id supervisorId = [SELECT Id FROM User WHERE Alias = 'spvUser' LIMIT 1].Id;
+        return TestDataUtility.createOpportunity(name, supervisorId);
+    }
+
+    private static ContentVersion createIsolatedFile(String title) {
+        Id contentVersionId = TestDataUtility.createContentVersion(title, 'Test PDF Content Data').Id;
+        return [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :contentVersionId LIMIT 1];
     }
 }
