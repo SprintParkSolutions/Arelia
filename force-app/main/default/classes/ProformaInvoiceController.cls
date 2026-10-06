@@ -31,32 +31,173 @@ public without sharing class ProformaInvoiceController {
         @AuraEnabled public Boolean managerApproved; 
         @AuraEnabled public String managerComments;
     }
-
-    // --- 1. INTERNAL: Send Email & Create Invoice Record ---
-
+/**
+ * Sends Proforma Invoice approval push notification
+ * asynchronously to the related Prospect mobile device.
+ */
+ 
+ // =========================================================
+// LWC - SEND PROFORMA INVOICE FOR CLIENT APPROVAL
+// =========================================================
     @AuraEnabled
-    public static void sendInvoiceForApproval(Id recordId, List<String> fileIds) {
+    public static void sendInvoiceForApproval(Id recordId,List<String> fileIds )
+    {
         try {
+
+            // 1. VALIDATE FILES
             if (fileIds == null || fileIds.isEmpty()) {
                 throw new AuraHandledException('Error: No files selected.');
             }
 
+            // 2. VALIDATE OPPORTUNITY
             validateAreliaOpportunity(recordId);
 
-            // 1. Create Transaction
-            Proforma_Invoice__c invoiceRec = createInvoiceTransaction(recordId, fileIds);
-            
-            // 2. Send Email
-            List<ContentVersion> cvList = getLatestContentVersions(fileIds);
-            sendClientRequestEmail(invoiceRec.Id, cvList);
-            
+            // 3. CREATE PROFORMA INVOICE
+            // Client approval request email is sent by
+            // ProformaInvoiceTriggerHandler once Status__c
+            // transitions to 'Sent' below, so it fires the
+            // same way for any source that submits an invoice.
+            Proforma_Invoice__c invoiceRec = createInvoiceTransaction(recordId,fileIds);
+
+            // 4. MOBILE PUSH NOTIFICATION
+            sendProformaNotificationAsync(String.valueOf(invoiceRec.Id));
+
+            // 5. EXISTING OPPORTUNITY LOGIC
+
             updateOpportunityStatus(recordId);
 
+        } catch (AuraHandledException e) {
+            throw e;
         } catch (Exception e) {
             throw new AuraHandledException('Error: ' + e.getMessage());
         }
     }
+ 
+    @future(callout=true)
+    public static void sendProformaNotificationAsync(String invoiceIdValue) {
 
+        // ==========================================
+        // 1. VALIDATE INVOICE ID
+        // ==========================================
+        if (String.isBlank(invoiceIdValue)) {
+            System.debug(LoggingLevel.WARN,'PROFORMA PUSH: Invoice Id is blank.');
+            return;
+        }
+        Id invoiceId;
+
+        try {
+            invoiceId = (Id) invoiceIdValue.trim();
+            if (invoiceId.getSObjectType() != Proforma_Invoice__c.SObjectType) {
+                System.debug(LoggingLevel.WARN,'PROFORMA PUSH: Invalid Invoice Id type.');
+                return;
+            }
+
+        } catch (Exception e) {
+            System.debug(LoggingLevel.ERROR,'PROFORMA PUSH: Invalid Invoice Id. ' +e.getMessage());
+            return;
+        }
+
+        // ==========================================
+        // 2. GET PROFORMA INVOICE
+        // ==========================================
+        List<Proforma_Invoice__c> invoiceRecords = [SELECT Id, Name,Opportunity__c, Related_File_Id__c, Status__c
+            FROM Proforma_Invoice__c WHERE Id = :invoiceId LIMIT 1 ];
+
+        if (invoiceRecords.isEmpty()) {
+            System.debug( LoggingLevel.WARN, 'PROFORMA PUSH: Invoice not found.' );
+            return;
+        }
+
+        Proforma_Invoice__c invoiceRecord = invoiceRecords[0];
+        
+        System.debug(LoggingLevel.INFO,'PROFORMA PUSH: Invoice = ' + invoiceRecord.Id);
+        System.debug(LoggingLevel.INFO,'PROFORMA PUSH: Opportunity = ' + invoiceRecord.Opportunity__c);
+        System.debug(LoggingLevel.INFO,'PROFORMA PUSH: File = ' + invoiceRecord.Related_File_Id__c);
+
+        // ==========================================
+        // 3. VALIDATE OPPORTUNITY + FILE
+        // ==========================================
+        if (invoiceRecord.Opportunity__c == null || String.isBlank(invoiceRecord.Related_File_Id__c))
+        {
+            System.debug(LoggingLevel.WARN,'PROFORMA PUSH: Opportunity or file is missing.');
+            return;
+        }
+
+        // ==========================================
+        // 4. OPPORTUNITY -> CONVERTED LEAD
+        // ==========================================
+        List<Lead> convertedLeads = [SELECT Id, ConvertedOpportunityId, ConvertedDate FROM Lead
+                WHERE IsConverted = true AND ConvertedOpportunityId =:invoiceRecord.Opportunity__c
+                ORDER BY ConvertedDate DESC LIMIT 1 ];
+
+        if (convertedLeads.isEmpty()) {
+            System.debug( LoggingLevel.WARN, 'PROFORMA PUSH: No converted Lead found ' + 'for Opportunity: ' + invoiceRecord.Opportunity__c );
+            return;
+        }
+
+        Id leadId = convertedLeads[0].Id;
+
+        System.debug(LoggingLevel.INFO,'PROFORMA PUSH: Related Lead = ' +leadId);
+
+
+        // ==========================================
+        // 5. GET CLIENT DEVICE TOKENS
+        // ==========================================
+        List<Prospect_Device_Token__c> tokenRecords = [SELECT Id,Prospect_Lead__c,FCM_Token__c,Active__c,Last_Seen__c
+                FROM Prospect_Device_Token__c WHERE Prospect_Lead__c = :leadId AND Active__c = true 
+                ORDER BY Last_Seen__c DESC NULLS LAST LIMIT 90 ];
+        
+        System.debug(LoggingLevel.INFO,'PROFORMA PUSH: Token Count = ' + tokenRecords.size());
+        
+        if (tokenRecords.isEmpty()) {
+            System.debug(LoggingLevel.WARN,'PROFORMA PUSH: No active device token '+ 'found for Lead: '+ leadId);
+            return;
+        }
+
+
+        // ==========================================
+        // 6. FIREBASE DATA PAYLOAD
+        // ==========================================
+        Map<String, String> dataPayload = new Map<String, String>
+                    { 'recipientType' => 'prospect', 'leadId' => String.valueOf(leadId),
+                        'opportunityId' => String.valueOf( invoiceRecord.Opportunity__c ),
+                        'invoiceId' => String.valueOf( invoiceRecord.Id ),'notificationType' => 'PROFORMA_INVOICE_UPLOADED',
+                        'actionType' => 'OPEN_PROFORMA_INVOICE', 'route' => 'prospect_proforma_invoice'
+                    };
+
+        // Avoid duplicate notifications
+        Set<String> processedTokens = new Set<String>();
+        
+        // ==========================================
+        // 7. SEND FIREBASE NOTIFICATION
+        // ==========================================
+        for ( Prospect_Device_Token__c tokenRecord : tokenRecords ) 
+        {
+            String fcmToken = tokenRecord.FCM_Token__c;
+            if (String.isBlank(fcmToken)) {
+                continue;
+            }
+            if (processedTokens.contains(fcmToken))
+            {
+                continue;
+            }
+            processedTokens.add(fcmToken);
+        
+            try {
+
+                System.debug(LoggingLevel.INFO,'PROFORMA PUSH: Sending notification '+ 'for Lead = '
+                    + leadId+ ', Invoice = '+ invoiceRecord.Id);
+
+                FirebasePushService.sendPushToToken(fcmToken, 'Proforma Invoice Approval Required', 'Your Proforma Invoice has been '
+                    + 'submitted for your approval. ' + 'Tap to review the document ' + 'and respond.', dataPayload );
+
+                System.debug( LoggingLevel.INFO, 'PROFORMA PUSH: Firebase call completed.' );
+
+            } catch (Exception e) {
+                System.debug( LoggingLevel.ERROR, 'PROFORMA PUSH FAILED: ' + e.getMessage() );
+            }
+        }
+    }
     private static Proforma_Invoice__c createInvoiceTransaction(Id recordId, List<String> fileIds) {
         Proforma_Invoice__c invoiceRec = new Proforma_Invoice__c();
         invoiceRec.Related_File_Id__c = fileIds[0];
@@ -69,11 +210,35 @@ public without sharing class ProformaInvoiceController {
         }
         
         invoiceRec.Secure_Token__c = UUID.randomUUID().toString();
-        invoiceRec.Status__c = 'Sent';
         upsert invoiceRec;
 
         linkFilesToInvoice(invoiceRec.Id, fileIds, recordId);
+
+        // Status flips to 'Sent' only after files are linked, so the
+        // ProformaInvoiceTriggerHandler (which reacts to this update)
+        // can find the linked files when it sends the approval email.
+        invoiceRec.Status__c = 'Sent';
+        update invoiceRec;
+
         return invoiceRec;
+    }
+
+    /**
+     * @description Sends the client approval request email for an invoice whose Status__c
+     * just transitioned to 'Sent'. Called from ProformaInvoiceTriggerHandler so it fires
+     * for any source that saves a Proforma_Invoice__c into that state, not just this class.
+     */
+    public static void sendClientApprovalRequestEmail(Id invoiceId) {
+        sendClientRequestEmail(invoiceId, fetchAllLinkedFiles(invoiceId));
+    }
+
+    /**
+     * @description Sends the post-decision notifications (supervisor, and manager when approved)
+     * for an invoice whose Status__c just changed away from 'Sent'. Called from
+     * ProformaInvoiceTriggerHandler so it fires regardless of what updated the record.
+     */
+    public static void sendClientDecisionNotifications(Id invoiceId, String status, String comments) {
+        handleNotifications(queryInvoiceForEmail(invoiceId), status, comments);
     }
 
     private static void sendClientRequestEmail(Id invoiceId, List<ContentVersion> files) {
@@ -108,15 +273,13 @@ public without sharing class ProformaInvoiceController {
     // --- 2. EXTERNAL: Submit Client Decision ---
 
     @AuraEnabled
-    public static void submitClientDecision(String recordId, String status, String comments) {
+    public static void submitClientDecision(String token, String status, String comments) {
         try {
-            Proforma_Invoice__c invoice = queryInvoiceForEmail(recordId);
+            Proforma_Invoice__c invoice = queryInvoiceByToken(token);
             invoice.Status__c = status;
             invoice.Client_Comments__c = String.isNotBlank(comments) ? comments : 'Approved by Client';
-            
-            update invoice;
 
-            handleNotifications(invoice, status, comments);
+            update invoice;
         } catch (Exception e) {
             throw new AuraHandledException(e.getMessage());
         }
@@ -137,14 +300,22 @@ public without sharing class ProformaInvoiceController {
     }
 
     private static void notifySupervisor(Proforma_Invoice__c invoice, NotificationData data) {
-        if (invoice.Opportunity__r != null && String.isNotBlank(invoice.Opportunity__r.Supervisor_User_Email__c)) {
+        String supervisorEmail = getSupervisorEmail(invoice);
+        if (String.isNotBlank(supervisorEmail)) {
             EmailConfig config = new EmailConfig();
             config.templateName = Label.Proforma_Client_Response_Template;
-            config.toAddresses = new List<String>{ invoice.Opportunity__r.Supervisor_User_Email__c };
+            config.toAddresses = new List<String>{ supervisorEmail };
             config.data = data;
             config.isManagerRequest = false;
             sendTemplatedEmail(config);
         }
+    }
+
+    private static String getSupervisorEmail(Proforma_Invoice__c inv) {
+        if (inv.Opportunity__r != null && String.isNotBlank(inv.Opportunity__r.Supervisor_User_Email__c)) {
+            return inv.Opportunity__r.Supervisor_User_Email__c;
+        }
+        return '';
     }
 
     private static void notifyManager(NotificationData data) {
@@ -213,7 +384,7 @@ public without sharing class ProformaInvoiceController {
         populateDecisionDetails(fields, config);
         populatePeopleDetails(fields, inv);
         
-        resolveLinks(fields, config, inv.Id);
+        resolveLinks(fields, config, inv.Secure_Token__c);
         
         String titles = (config.data.fileAttachments != null) ? getFileTitlesCommaSeparated(config.data.fileAttachments) : '';
         fields.put('FILE_TITLE', titles);
@@ -222,9 +393,14 @@ public without sharing class ProformaInvoiceController {
     }
 
     private static void populateProjectDetails(Map<String, String> fields, Proforma_Invoice__c inv) {
-        String oppName = (inv.Opportunity__r != null) ? inv.Opportunity__r.Name : 'Project';
-        fields.put('PROJECT_NAME', oppName);
-        fields.put('OPPORTUNITY_NAME', oppName);
+        String projectLabel = 'Project';
+        if (inv.Opportunity__r != null) {
+            projectLabel = inv.Opportunity__r.Name;
+        } else if (inv.Project__r != null) {
+            projectLabel = inv.Project__r.Name;
+        }
+        fields.put('PROJECT_NAME', projectLabel);
+        fields.put('OPPORTUNITY_NAME', projectLabel);
     }
 
     private static void populateDecisionDetails(Map<String, String> fields, EmailConfig config) {
@@ -249,22 +425,24 @@ public without sharing class ProformaInvoiceController {
         fields.put('SUPERVISOR_NAME', getSupervisorName(inv));
     }
 
-    private static void resolveLinks(Map<String, String> fields, EmailConfig config, String invoiceId) {
+    private static void resolveLinks(Map<String, String> fields, EmailConfig config, String secureToken) {
         String siteUrl = System.Label.Arelia_Site_Label.removeEnd('/');
-        
+
         String managerPage = System.Label.Proforma_Manager_Site_Page;
         if (!managerPage.startsWith('/')) {
             managerPage = '/' + managerPage;
         }
-        
+
         String clientPage = System.Label.Proforma_Invoice_Site_Page;
         if (!clientPage.startsWith('/')) {
             clientPage = '/' + clientPage;
         }
 
-        fields.put('MANAGER_LINK_URL', config.isManagerRequest ? (siteUrl + managerPage + '?id=' + invoiceId) : '');
-        fields.put('MANAGER_LINK', ''); 
-        fields.put('APPROVAL_LINK', siteUrl + clientPage + '?id=' + invoiceId);
+        // Links carry the invoice's Secure_Token__c (not its record Id) so the public site
+        // can resolve/authorize the record without exposing a guessable Salesforce Id.
+        fields.put('MANAGER_LINK_URL', config.isManagerRequest ? (siteUrl + managerPage + '?id=' + secureToken) : '');
+        fields.put('MANAGER_LINK', '');
+        fields.put('APPROVAL_LINK', siteUrl + clientPage + '?id=' + secureToken);
     }
 
     @TestVisible
@@ -287,7 +465,7 @@ public without sharing class ProformaInvoiceController {
 
     private static Proforma_Invoice__c queryInvoiceForEmail(Id recordId) {
         Id areliaOpportunityRecordTypeId = AreliaUtility.getAreliaOpportunityRecordTypeId();
-        List<Proforma_Invoice__c> invoices = [SELECT Id, Related_File_Id__c, Status__c, Client_Comments__c, Opportunity__r.Name, Opportunity__r.Lead_Name__c, Opportunity__r.Primary_Contact__r.Email, Opportunity__r.Supervisor_User_Email__c, 
+        List<Proforma_Invoice__c> invoices = [SELECT Id, Related_File_Id__c, Status__c, Client_Comments__c, Secure_Token__c, Opportunity__r.Name, Opportunity__r.Lead_Name__c, Opportunity__r.Primary_Contact__r.Email, Opportunity__r.Supervisor_User_Email__c,
                    Opportunity__r.Supervisor_User__r.FirstName, Opportunity__r.Supervisor_User__r.LastName, Project__r.Name FROM Proforma_Invoice__c WHERE Id = :recordId AND (Opportunity__c = null OR Opportunity__r.RecordTypeId = :areliaOpportunityRecordTypeId) LIMIT 1];
 
         if (invoices.isEmpty()) {
@@ -297,8 +475,24 @@ public without sharing class ProformaInvoiceController {
         return invoices[0];
     }
 
-    private static List<ContentVersion> getLatestContentVersions(List<String> fileIds) {
-        return [SELECT Id, Title, FileExtension, ContentDocumentId, VersionData FROM ContentVersion WHERE ContentDocumentId IN :fileIds AND IsLatest = true];
+    /**
+     * @description Resolves a Proforma_Invoice__c by its Secure_Token__c for public site access,
+     * instead of by record Id, so the public approval link doesn't expose a guessable Salesforce Id.
+     */
+    private static Proforma_Invoice__c queryInvoiceByToken(String token) {
+        if (String.isBlank(token)) {
+            throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+        }
+
+        Id areliaOpportunityRecordTypeId = AreliaUtility.getAreliaOpportunityRecordTypeId();
+        List<Proforma_Invoice__c> invoices = [SELECT Id, Related_File_Id__c, Status__c, Client_Comments__c, Secure_Token__c, Opportunity__r.Name, Opportunity__r.Lead_Name__c, Opportunity__r.Primary_Contact__r.Email, Opportunity__r.Supervisor_User_Email__c,
+                   Opportunity__r.Supervisor_User__r.FirstName, Opportunity__r.Supervisor_User__r.LastName, Project__r.Name FROM Proforma_Invoice__c WHERE Secure_Token__c = :token AND (Opportunity__c = null OR Opportunity__r.RecordTypeId = :areliaOpportunityRecordTypeId) LIMIT 1];
+
+        if (invoices.isEmpty()) {
+            throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
+        }
+
+        return invoices[0];
     }
 
     private static void linkFilesToInvoice(Id invoiceId, List<String> fileIds, Id parentRecordId) {
@@ -328,7 +522,10 @@ public without sharing class ProformaInvoiceController {
     }
 
     private static String getClientEmail(Proforma_Invoice__c inv) {
-        return (inv.Opportunity__r != null && inv.Opportunity__r.Primary_Contact__r != null) ? inv.Opportunity__r.Primary_Contact__r.Email : '';
+        if (inv.Opportunity__r != null && inv.Opportunity__r.Primary_Contact__r != null && String.isNotBlank(inv.Opportunity__r.Primary_Contact__r.Email)) {
+            return inv.Opportunity__r.Primary_Contact__r.Email;
+        }
+        return '';
     }
 
     private static String getSupervisorName(Proforma_Invoice__c inv) {
@@ -408,27 +605,27 @@ public without sharing class ProformaInvoiceController {
     // --- 7. EXTERNAL: Get Details (Project Name = Opportunity Name) ---
 
     @AuraEnabled(cacheable=true)
-    public static Map<String, String> getInvoiceById(String recordId) {
+    public static Map<String, String> getInvoiceById(String token) {
         try {
             Id areliaOpportunityRecordTypeId = AreliaUtility.getAreliaOpportunityRecordTypeId();
-            List<Proforma_Invoice__c> invoices = [SELECT Id, Status__c, Client_Comments__c, Related_File_Id__c, Opportunity__r.Name, Opportunity__r.Lead_Name__c FROM Proforma_Invoice__c WHERE Id = :recordId
+            List<Proforma_Invoice__c> invoices = [SELECT Id, Status__c, Client_Comments__c, Related_File_Id__c, Opportunity__r.Name, Opportunity__r.Lead_Name__c, Project__r.Name FROM Proforma_Invoice__c WHERE Secure_Token__c = :token
                 AND (Opportunity__c = null OR Opportunity__r.RecordTypeId = :areliaOpportunityRecordTypeId) LIMIT 1];
             if (invoices.isEmpty()) {
                 throw new AuraHandledException(ERROR_UNSUPPORTED_RECORD_TYPE);
             }
             Proforma_Invoice__c invoice = invoices[0];
-            
-            ContentDocument doc = [SELECT Title FROM ContentDocument WHERE Id = :invoice.Related_File_Id__c LIMIT 1];
-            
+
             Map<String, String> result = new Map<String, String>();
-            result.put('title', doc.Title);
+            result.put('title', getPrimaryFileTitle(invoice));
             result.put('status', invoice.Status__c);
             result.put('comments', invoice.Client_Comments__c);
 
-            // Logic: Force Project Name to be Opportunity Name
+            // Logic: Force Project Name to be Opportunity Name (or the Project's own Name for Project-linked invoices)
             String projectName = 'Proforma Invoice';
             if (invoice.Opportunity__r != null) {
                 projectName = invoice.Opportunity__r.Name;
+            } else if (invoice.Project__r != null) {
+                projectName = invoice.Project__r.Name;
             }
             result.put('projectName', projectName);
 
@@ -444,6 +641,32 @@ public without sharing class ProformaInvoiceController {
         }
     }
 
+    /**
+     * @description Resolves a display title for the invoice's primary file. Falls back to any
+     * file linked via ContentDocumentLink when Related_File_Id__c is blank - which happens for
+     * invoices created by clients (e.g. the mobile app) that insert Proforma_Invoice__c directly
+     * via the REST API instead of going through createInvoiceTransaction.
+     */
+    private static String getPrimaryFileTitle(Proforma_Invoice__c invoice) {
+        if (String.isNotBlank(invoice.Related_File_Id__c)) {
+            List<ContentDocument> docs = [SELECT Title FROM ContentDocument WHERE Id = :invoice.Related_File_Id__c LIMIT 1];
+            if (!docs.isEmpty()) {
+                return docs[0].Title;
+            }
+        }
+
+        Set<Id> linkedDocIds = new Set<Id>();
+        for (ContentDocumentLink link : [SELECT ContentDocumentId FROM ContentDocumentLink WHERE LinkedEntityId = :invoice.Id LIMIT 1]) {
+            linkedDocIds.add(link.ContentDocumentId);
+        }
+        if (linkedDocIds.isEmpty()) {
+            return 'Proforma Invoice';
+        }
+
+        List<ContentDocument> linkedDocs = [SELECT Title FROM ContentDocument WHERE Id IN :linkedDocIds LIMIT 1];
+        return linkedDocs.isEmpty() ? 'Proforma Invoice' : linkedDocs[0].Title;
+    }
+
     // --- 8. HISTORY TABLE DATA ---
 
     @AuraEnabled(cacheable=true)
@@ -453,8 +676,8 @@ public without sharing class ProformaInvoiceController {
             return new List<InvoiceHistoryWrapper>();
         }
 
-        Map<Id, String> fNames = getFileMap(listInv);
-        return createWrappers(listInv, fNames);
+        Map<Id, String> fileNamesByInvoiceId = resolveFileNames(listInv);
+        return createWrappers(listInv, fileNamesByInvoiceId);
     }
 
     private static List<Proforma_Invoice__c> fetchInvoices(Id recordId) {
@@ -469,35 +692,80 @@ public without sharing class ProformaInvoiceController {
         return new List<Proforma_Invoice__c>();
     }
 
-    private static Map<Id, String> getFileMap(List<Proforma_Invoice__c> listInv) {
-        Set<Id> fIds = new Set<Id>();
+    /**
+     * @description Resolves a display file name per invoice. Prefers the ContentDocument
+     * pointed to by Related_File_Id__c; falls back to whatever file is linked via
+     * ContentDocumentLink when that's blank or stale - which happens for invoices inserted
+     * directly via REST by external clients (e.g. the mobile app) that never populate
+     * Related_File_Id__c, mirroring the fallback in getPrimaryFileTitle.
+     */
+    private static Map<Id, String> resolveFileNames(List<Proforma_Invoice__c> listInv) {
+        Set<Id> directFileIds = new Set<Id>();
         for (Proforma_Invoice__c i : listInv) {
             if (String.isNotBlank(i.Related_File_Id__c)) {
-                fIds.add(i.Related_File_Id__c);
+                directFileIds.add(i.Related_File_Id__c);
             }
         }
-        
-        Map<Id, String> fNames = new Map<Id, String>();
-        if (!fIds.isEmpty()) {
-            for (ContentDocument d : [SELECT Id, Title FROM ContentDocument WHERE Id IN :fIds]) {
-                fNames.put(d.Id, d.Title);
+
+        Map<Id, String> directTitles = new Map<Id, String>();
+        if (!directFileIds.isEmpty()) {
+            for (ContentDocument d : [SELECT Id, Title FROM ContentDocument WHERE Id IN :directFileIds]) {
+                directTitles.put(d.Id, d.Title);
             }
         }
-        return fNames;
+
+        Set<Id> invoiceIdsNeedingFallback = new Set<Id>();
+        for (Proforma_Invoice__c i : listInv) {
+            if (!directTitles.containsKey(i.Related_File_Id__c)) {
+                invoiceIdsNeedingFallback.add(i.Id);
+            }
+        }
+
+        Map<Id, Id> invoiceToFirstDoc = new Map<Id, Id>();
+        if (!invoiceIdsNeedingFallback.isEmpty()) {
+            for (ContentDocumentLink link : [
+                SELECT LinkedEntityId, ContentDocumentId
+                FROM ContentDocumentLink
+                WHERE LinkedEntityId IN :invoiceIdsNeedingFallback
+                ORDER BY ContentDocumentId
+            ]) {
+                if (!invoiceToFirstDoc.containsKey(link.LinkedEntityId)) {
+                    invoiceToFirstDoc.put(link.LinkedEntityId, link.ContentDocumentId);
+                }
+            }
+        }
+
+        Map<Id, String> fallbackTitles = new Map<Id, String>();
+        if (!invoiceToFirstDoc.isEmpty()) {
+            for (ContentDocument d : [SELECT Id, Title FROM ContentDocument WHERE Id IN :invoiceToFirstDoc.values()]) {
+                fallbackTitles.put(d.Id, d.Title);
+            }
+        }
+
+        Map<Id, String> fileNamesByInvoiceId = new Map<Id, String>();
+        for (Proforma_Invoice__c i : listInv) {
+            String title = directTitles.get(i.Related_File_Id__c);
+            if (title == null) {
+                Id fallbackDocId = invoiceToFirstDoc.get(i.Id);
+                title = fallbackDocId != null ? fallbackTitles.get(fallbackDocId) : null;
+            }
+            fileNamesByInvoiceId.put(i.Id, String.isNotBlank(title) ? title : 'File Not Found');
+        }
+        return fileNamesByInvoiceId;
     }
 
-    private static List<InvoiceHistoryWrapper> createWrappers(List<Proforma_Invoice__c> listInv, Map<Id, String> fNames) {
+    private static List<InvoiceHistoryWrapper> createWrappers(List<Proforma_Invoice__c> listInv, Map<Id, String> fileNamesByInvoiceId) {
         List<InvoiceHistoryWrapper> results = new List<InvoiceHistoryWrapper>();
         for (Proforma_Invoice__c i : listInv) {
             InvoiceHistoryWrapper w = new InvoiceHistoryWrapper();
             w.id = i.Id;
-            w.fileName = fNames.containsKey(i.Related_File_Id__c) ? fNames.get(i.Related_File_Id__c) : 'File Not Found';
+            w.fileName = fileNamesByInvoiceId.get(i.Id);
             w.clientStatus = i.Status__c;
             w.clientComments = i.Client_Comments__c;
             w.managerApproved = i.Manager_Approval__c;
             w.managerComments = i.Manager_Comments__c;
             results.add(w);
-        }   
+        }
         return results;
     }
 }
