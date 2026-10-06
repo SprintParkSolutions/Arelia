@@ -16,10 +16,8 @@ private class ProformaInvoiceControllerTest {
         Opportunity opp = TestDataUtility.createOpportunity('Test Opportunity', supervisor.Id);
         opp.Primary_Contact__c = clientContact.Id;
         update opp;
-
         // 3. Create Project
         Project__c proj = TestDataUtility.createProject('Test Project', 50000, clientContact.Id);
-
         // 4. Create File (ContentVersion)
         TestDataUtility.createContentVersion('Proforma_Invoice_Draft', 'Test PDF Content Data');
 
@@ -78,7 +76,7 @@ private class ProformaInvoiceControllerTest {
             ProformaInvoiceController.sendInvoiceForApproval(opp.Id, new List<String>());
             System.assert(false, 'Exception should have been thrown due to missing files.');
         } catch (Exception e) {
-            // AuraHandledException messages are masked in Apex Tests as "Script-thrown exception". We verify the Type instead.
+            // AuraHandledException messages are masked in Apex Tests as "Script-thrown exception".
             System.assert(e.getTypeName() == 'System.AuraHandledException' || e.getMessage().contains('Script-thrown'), 'Should throw AuraHandledException for missing files.');
         }
         Test.stopTest();
