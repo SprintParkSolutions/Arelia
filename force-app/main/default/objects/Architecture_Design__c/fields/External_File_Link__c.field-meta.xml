@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>External_File_Link__c</fullName>
+    <description>Optional link to a Google Drive/OneDrive file or folder, used when a design file (video, 3D render, etc.) is too large to upload directly as a Salesforce File.</description>
+    <label>External File Link</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Url</type>
+</CustomField>
