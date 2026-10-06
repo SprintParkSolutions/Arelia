@@ -16,8 +16,10 @@ private class ProformaInvoiceControllerTest {
         Opportunity opp = TestDataUtility.createOpportunity('Test Opportunity', supervisor.Id);
         opp.Primary_Contact__c = clientContact.Id;
         update opp;
+
         // 3. Create Project
         Project__c proj = TestDataUtility.createProject('Test Project', 50000, clientContact.Id);
+        
         // 4. Create File (ContentVersion)
         TestDataUtility.createContentVersion('Proforma_Invoice_Draft', 'Test PDF Content Data');
 
@@ -222,11 +224,7 @@ private class ProformaInvoiceControllerTest {
     @isTest
     static void testGetRelatedInvoicesMissingFileFallback() {
         Opportunity opp = [SELECT Id FROM Opportunity LIMIT 1];
-        Proforma_Invoice__c invoice = new Proforma_Invoice__c(
-            Opportunity__c = opp.Id,
-            Status__c = 'Sent',
-            Client_Comments__c = 'Project invoice'
-        );
+        Proforma_Invoice__c invoice = new Proforma_Invoice__c( Opportunity__c = opp.Id, Status__c = 'Sent', Client_Comments__c = 'Project invoice' );
         insert invoice;
 
         Test.startTest();
