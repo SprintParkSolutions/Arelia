@@ -16,10 +16,8 @@ private class ProformaInvoiceControllerTest {
         Opportunity opp = TestDataUtility.createOpportunity('Test Opportunity', supervisor.Id);
         opp.Primary_Contact__c = clientContact.Id;
         update opp;
-
         // 3. Create Project
         Project__c proj = TestDataUtility.createProject('Test Project', 50000, clientContact.Id);
-
         // 4. Create File (ContentVersion)
         TestDataUtility.createContentVersion('Proforma_Invoice_Draft', 'Test PDF Content Data');
 
@@ -78,7 +76,7 @@ private class ProformaInvoiceControllerTest {
             ProformaInvoiceController.sendInvoiceForApproval(opp.Id, new List<String>());
             System.assert(false, 'Exception should have been thrown due to missing files.');
         } catch (Exception e) {
-            // AuraHandledException messages are masked in Apex Tests as "Script-thrown exception". We verify the Type instead.
+            // AuraHandledException messages are masked in Apex Tests as "Script-thrown exception".
             System.assert(e.getTypeName() == 'System.AuraHandledException' || e.getMessage().contains('Script-thrown'), 'Should throw AuraHandledException for missing files.');
         }
         Test.stopTest();
@@ -112,7 +110,7 @@ private class ProformaInvoiceControllerTest {
         TestDataUtility.linkFileToRecord(cv.ContentDocumentId, invoice.Id);
 
         Test.startTest();
-        ProformaInvoiceController.submitClientDecision(invoice.Id, 'Approved', 'Looks great, please proceed.');
+        ProformaInvoiceController.submitClientDecision(invoice.Secure_Token__c, 'Approved', 'Looks great, please proceed.');
         Test.stopTest();
 
         Proforma_Invoice__c updatedInvoice = [SELECT Status__c, Client_Comments__c FROM Proforma_Invoice__c WHERE Id = :invoice.Id];
@@ -126,7 +124,7 @@ private class ProformaInvoiceControllerTest {
         Proforma_Invoice__c invoice = TestDataUtility.createProformaInvoice(opp.Id);
 
         Test.startTest();
-        ProformaInvoiceController.submitClientDecision(invoice.Id, 'Approved', null);
+        ProformaInvoiceController.submitClientDecision(invoice.Secure_Token__c, 'Approved', null);
         Test.stopTest();
 
         Proforma_Invoice__c updatedInvoice = [SELECT Status__c, Client_Comments__c FROM Proforma_Invoice__c WHERE Id = :invoice.Id];
@@ -161,7 +159,7 @@ private class ProformaInvoiceControllerTest {
         update invoice;
 
         Test.startTest();
-        Map<String, String> result = ProformaInvoiceController.getInvoiceById(invoice.Id);
+        Map<String, String> result = ProformaInvoiceController.getInvoiceById(invoice.Secure_Token__c);
         Test.stopTest();
 
         System.assertNotEquals(null, result, 'Result map should not be null.');
