@@ -2,7 +2,7 @@
 public without sharing class ProjectAdditionalBudgetController {
 
     /* ===============================
-       CONFIG
+       CONFIG 
     =============================== */
     private static final String FIELDSET_API_NAME = System.Label.Additional_Request_FieldSet_Label;
 
@@ -34,6 +34,15 @@ public without sharing class ProjectAdditionalBudgetController {
             this.label = label;
             this.required = required;
         }
+    }
+
+    // Uploaded file, sent as base64 and inserted server-side in submitRequest(). Guest-user
+    // sessions cannot reliably create Files via the client-side lightning-file-upload component,
+    // but an Apex-mediated insert (system mode, without sharing) does succeed - matching the
+    // approach already used by ExpenseSheetController.saveExpenseSheet.
+    public class FileData {
+        @AuraEnabled public String name;
+        @AuraEnabled public String base64;
     }
 
     public class ProjectDTO {
@@ -87,7 +96,7 @@ public without sharing class ProjectAdditionalBudgetController {
        READ (Approval Page)
        - Loads current project + pending request details for the approval UI.
     =============================== */
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static ProjectDTO getProject(Id projectId) {
         if (projectId == null) {
             throw new AuraHandledException('Project Id is required.');
@@ -123,10 +132,38 @@ public without sharing class ProjectAdditionalBudgetController {
 
     /* ===============================
        SUBMIT (Request Page)
-       ✅ Supports file attachments via ContentDocumentIds
+       ✅ Supports file attachments - uploaded as base64 and inserted here server-side, since
+       guest-user sessions cannot reliably create Files via lightning-file-upload directly.
     =============================== */
+    /**
+     * @description Aura-facing entry point. Takes the file list as a JSON string rather than
+     * List<FileData> directly: passing a custom Apex wrapper type as an @AuraEnabled parameter
+     * has been observed to fail deserialization when called from this Experience Cloud site
+     * (the FileData objects arrive with every field blank even though the client sent real
+     * data) - a plain String parameter, manually deserialized below, sidesteps that entirely.
+     */
     @AuraEnabled
-    public static void submitRequest(Id projectId, Decimal amount, String reason, List<Id> contentDocumentIds) {
+    public static void submitRequest(Id projectId, Decimal amount, String reason, String filesJson) {
+        List<FileData> files = parseFilesJson(filesJson);
+        submitRequestWithFiles(projectId, amount, reason, files);
+    }
+
+    @TestVisible
+    private static List<FileData> parseFilesJson(String filesJson) {
+        if (String.isBlank(filesJson)) {
+            return new List<FileData>();
+        }
+        try {
+            return (List<FileData>) JSON.deserialize(filesJson, List<FileData>.class);
+        } catch (Exception ex) {
+            throw new AuraHandledException('Could not read attached file data: ' + ex.getMessage());
+        }
+    }
+
+    // Not named submitRequest(): an overload distinguished only by List<FileData> vs String
+    // makes any caller passing a literal null for the files argument ambiguous at compile time.
+    @TestVisible
+    private static void submitRequestWithFiles(Id projectId, Decimal amount, String reason, List<FileData> files) {
         if (projectId == null) { throw new AuraHandledException('Project Id is required.'); }
         if (amount == null || amount <= 0) { throw new AuraHandledException('Amount must be greater than 0.'); }
         if (String.isBlank(reason)) { throw new AuraHandledException('Reason is required.'); }
@@ -143,8 +180,9 @@ public without sharing class ProjectAdditionalBudgetController {
         p.Pending_Additional_Reason__c = oneLine(reason);
         p.Additional_Request_Status__c = STATUS_PENDING;
 
-        // ✅ Store uploaded ContentDocumentIds (comma separated) for approve email
-        List<Id> ids = normalizeIds(contentDocumentIds);
+        // ✅ Insert uploaded files server-side and store their ContentDocumentIds (comma
+        // separated) for the approval/rejection emails
+        List<Id> ids = insertFiles(projectId, files);
         p.Additional_Budget_ContentDocumentIds__c = joinIds(ids);
 
         String history = safeTrim(p.Additional_Budget_History__c);
@@ -161,8 +199,9 @@ public without sharing class ProjectAdditionalBudgetController {
 
         update p;
 
-        // Email to manager label emails + attach uploaded files
-        sendManagerApprovalEmail(p, amount, reason, normalizeIds(contentDocumentIds));
+        // Manager approval-request email is sent by ProjectAdditionalBudgetTriggerHandler once
+        // Additional_Request_Status__c transitions to 'Pending', so it fires the same way for
+        // any source that submits a request.
     }
 
     /* ===============================
@@ -177,10 +216,6 @@ public without sharing class ProjectAdditionalBudgetController {
         validatePending(p);
 
         Decimal amt = p.Pending_Additional_Amount__c;
-        String rsn = p.Pending_Additional_Reason__c;
-
-        // ✅ Pull stored document ids and attach
-        List<Id> contentDocIds = parseIds(p.Additional_Budget_ContentDocumentIds__c);
 
         p.Additional_Budget__c = (p.Additional_Budget__c == null ? 0 : p.Additional_Budget__c) + amt;
         p.Supervisor_Estimated_Budget__c =
@@ -201,7 +236,9 @@ public without sharing class ProjectAdditionalBudgetController {
 
         update p;
 
-        sendApprovedEmail(p, amt, rsn, contentDocIds);
+        // Approved notification is sent by ProjectAdditionalBudgetTriggerHandler once
+        // Additional_Request_Status__c transitions to 'Approved', so it fires the same way for
+        // any source that approves a request.
     }
 
     /* ===============================
@@ -218,11 +255,6 @@ public without sharing class ProjectAdditionalBudgetController {
         Project__c p = fetchProject(projectId, true, true);
         validatePending(p);
 
-        // ✅ Pull stored document ids and attach
-        List<Id> contentDocIds = parseIds(p.Additional_Budget_ContentDocumentIds__c);
-
-        Decimal amt = p.Pending_Additional_Amount__c;
-        String reqReason = p.Pending_Additional_Reason__c;
         String rejReason = oneLine(rejectionReason);
 
         p.Additional_Request_Status__c = STATUS_REJECTED;
@@ -242,7 +274,144 @@ public without sharing class ProjectAdditionalBudgetController {
         p.Additional_Budget_ContentDocumentIds__c = null;
         update p;
 
-        sendRejectedEmail(p, amt, reqReason, rejReason, contentDocIds);
+        // Rejected notification is sent by ProjectAdditionalBudgetTriggerHandler once
+        // Additional_Request_Status__c transitions to 'Rejected', so it fires the same way for
+        // any source that rejects a request.
+    }
+
+    /* ===============================
+       TRIGGER-DRIVEN EMAIL DISPATCH
+       Called from ProjectAdditionalBudgetTriggerHandler based on Additional_Request_Status__c
+       transitions, so these fire regardless of what updated the record. The amount/reason/
+       attachment values must be passed in explicitly (not re-read from the Project__c row)
+       because approveRequest/rejectRequest clear the pending fields in the very same update
+       that flips the status - by the time the trigger runs, only the pre-update values (from
+       Trigger.oldMap) still reflect what the request actually was.
+    =============================== */
+    public static void sendManagerApprovalRequest(Id projectId, Decimal amount, String reason, String contentDocumentIdsCsv) {
+        Project__c p = fetchProject(projectId, false, false);
+        sendManagerApprovalEmail(p, amount, reason, parseIds(contentDocumentIdsCsv));
+    }
+
+    public static void sendApprovedNotifications(Id projectId, Decimal amount, String reason, String contentDocumentIdsCsv) {
+        Project__c p = fetchProject(projectId, false, false);
+        sendApprovedEmail(p, amount, reason, parseIds(contentDocumentIdsCsv));
+    }
+
+    public static void sendRejectedNotifications(Id projectId, Decimal amount, String requestReason, String rejectionReason, String contentDocumentIdsCsv) {
+        Project__c p = fetchProject(projectId, false, false);
+        sendRejectedEmail(p, amount, requestReason, rejectionReason, parseIds(contentDocumentIdsCsv));
+    }
+
+    /* ===============================
+       BACKFILL FOR NON-APEX SOURCES (e.g. the mobile app's raw REST client)
+       submitRequest() normally builds the history line and stores uploaded ContentDocumentIds
+       in the same update that sets Additional_Request_Status__c = 'Pending'. A source that
+       PATCHes the status field directly - bypassing submitRequest entirely - never touches
+       either of those fields, even though it may have uploaded real files (linked to the
+       Project via FirstPublishLocationId) moments before. Called from
+       ProjectAdditionalBudgetTriggerHandler on every transition into 'Pending' so history and
+       attachments still work regardless of what updated the record.
+       Returns the ContentDocumentIds CSV to use for the manager email sent in this same
+       transaction (the trigger's in-memory Trigger.new won't reflect this backfill otherwise).
+    =============================== */
+    public static String backfillPendingRequestIfNeeded(Id projectId, Project__c newProj, Project__c oldProj) {
+        Boolean historyUntouched = (newProj.Additional_Budget_History__c == oldProj.Additional_Budget_History__c);
+
+        Project__c p = new Project__c(Id = projectId);
+        Boolean needsUpdate = false;
+
+        if (historyUntouched) {
+            String history = safeTrim(newProj.Additional_Budget_History__c);
+            Integer seq = nextSequence(history);
+            String line =
+                seq + ') +' + String.valueOf(newProj.Pending_Additional_Amount__c) +
+                ' | ' + oneLine(newProj.Pending_Additional_Reason__c) +
+                ' | Status=PENDING' +
+                ' | ReqBy=' + UserInfo.getName() +
+                ' | ReqOn=' + String.valueOf(System.today());
+            p.Additional_Budget_History__c = String.isBlank(history) ? line : (history + '\n' + line);
+            needsUpdate = true;
+        }
+
+        String resultCsv = resolveAttachmentIdsForThisRequest(projectId, newProj, oldProj);
+        if (resultCsv != newProj.Additional_Budget_ContentDocumentIds__c) {
+            p.Additional_Budget_ContentDocumentIds__c = resultCsv;
+            needsUpdate = true;
+        }
+
+        if (needsUpdate) {
+            update p;
+        }
+        return resultCsv;
+    }
+
+    /**
+     * @description Resolves which ContentDocumentIds belong to THIS request. Some clients (the
+     * mobile app's raw REST bypass observed in production) carry over a ContentDocumentId from a
+     * prior, already-processed request into this field alongside the genuinely new one - e.g. a
+     * client-side attachment list that never got cleared between requests - so whatever is on the
+     * incoming record is never trusted as-is. It's always cross-checked against files actually
+     * linked to the project since it was last saved; anything older is dropped as belonging to a
+     * previous request. Falls back to the client-supplied (or auto-detected) value when nothing
+     * recent can be independently verified, e.g. in a fast-running test with no real elapsed time.
+     */
+    @TestVisible
+    private static String resolveAttachmentIdsForThisRequest(Id projectId, Project__c newProj, Project__c oldProj) {
+        String suppliedCsv = newProj.Additional_Budget_ContentDocumentIds__c;
+        Boolean attachmentsUntouched = (suppliedCsv == oldProj.Additional_Budget_ContentDocumentIds__c);
+
+        if (String.isBlank(suppliedCsv) && !attachmentsUntouched) {
+            return null; // client explicitly cleared it - respect that
+        }
+
+        List<Id> recentIds = findRecentlyLinkedFileIds(projectId, oldProj.LastModifiedDate);
+        if (recentIds.isEmpty()) {
+            return suppliedCsv; // nothing to verify against - trust the supplied/prior value
+        }
+
+        if (String.isBlank(suppliedCsv)) {
+            return joinIds(recentIds); // auto-detect: mobile bypass never touched this field at all
+        }
+
+        Set<Id> recentIdSet = new Set<Id>(recentIds);
+        List<Id> verified = new List<Id>();
+        for (Id docId : parseIds(suppliedCsv)) {
+            if (recentIdSet.contains(docId)) {
+                verified.add(docId);
+            }
+        }
+
+        return verified.isEmpty() ? suppliedCsv : joinIds(verified);
+    }
+
+    /**
+     * @description Files linked to this project since it was last saved - a prior request's file
+     * was necessarily linked BEFORE that save (submitRequest/approveRequest/rejectRequest, and
+     * this same backfill method, all end with an update to this record), while the current
+     * request's file can only have been linked AFTER it (the upload always happens before the
+     * PATCH that follows it, never before a save that already completed). So the previous save's
+     * timestamp is used as the window start with no backward buffer at all - a buffer here would
+     * reach back into the moments just before that save, which is exactly when the PRIOR request's
+     * own file was uploaded (files are typically uploaded seconds before their own save), pulling
+     * it back in. Falls back to a 15-minute window when there's no prior save to anchor to.
+     */
+    @TestVisible
+    private static List<Id> findRecentlyLinkedFileIds(Id projectId, Datetime previousLastModifiedDate) {
+        List<Id> ids = new List<Id>();
+        Datetime windowStart = (previousLastModifiedDate != null)
+            ? previousLastModifiedDate
+            : Datetime.now().addMinutes(-15);
+        for (ContentDocumentLink link : [
+            SELECT ContentDocumentId
+            FROM ContentDocumentLink
+            WHERE LinkedEntityId = :projectId AND ContentDocument.CreatedDate >= :windowStart
+            ORDER BY ContentDocument.CreatedDate DESC
+            LIMIT :MAX_ATTACHMENTS
+        ]) {
+            ids.add(link.ContentDocumentId);
+        }
+        return ids;
     }
 
     /* ===============================
@@ -639,11 +808,34 @@ public without sharing class ProjectAdditionalBudgetController {
         return new List<String>(uniq);
     }
 
-    private static List<Id> normalizeIds(List<Id> ids) {
+    /**
+     * @description
+     *  Inserts uploaded files (sent as base64) as ContentVersions linked to the project and
+     *  returns their ContentDocumentIds. Runs server-side (system mode) so it succeeds for
+     *  guest-user sessions even though the client-side lightning-file-upload component does not.
+     */
+    private static List<Id> insertFiles(Id projectId, List<FileData> files) {
         List<Id> outList = new List<Id>();
-        if (ids == null) { return outList; }
-        for (Id x : ids) {
-            if (x != null) { outList.add(x); }
+        if (files == null || files.isEmpty()) { return outList; }
+
+        List<ContentVersion> cvList = new List<ContentVersion>();
+        for (FileData f : files) {
+            if (f == null || String.isBlank(f.base64)) { continue; }
+            ContentVersion cv = new ContentVersion();
+            cv.Title = String.isBlank(f.name) ? 'Attachment' : f.name;
+            cv.PathOnClient = cv.Title;
+            cv.VersionData = EncodingUtil.base64Decode(f.base64);
+            cv.FirstPublishLocationId = projectId;
+            cvList.add(cv);
+        }
+        if (cvList.isEmpty()) { return outList; }
+
+        insert cvList;
+
+        Set<Id> cvIds = new Set<Id>();
+        for (ContentVersion cv : cvList) { cvIds.add(cv.Id); }
+        for (ContentVersion cv : [SELECT ContentDocumentId FROM ContentVersion WHERE Id IN :cvIds]) {
+            outList.add(cv.ContentDocumentId);
         }
         return outList;
     }
