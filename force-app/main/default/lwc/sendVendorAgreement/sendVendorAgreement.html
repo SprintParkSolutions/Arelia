@@ -24,49 +24,84 @@
             </lightning-input>
 
             <div class="slds-m-top_medium">
+
+                <!-- EDIT MODE -->
                 <template if:true={isEditing}>
+
+                    <!--
+                        Protected logo.
+
+                        This is intentionally outside
+                        lightning-input-rich-text so the user cannot
+                        delete it with Backspace, Delete, Ctrl+A, etc.
+                    -->
+                    <div class="protected-brand-header">
+                        <img
+                            src={areliaLogoUrl}
+                            alt="Arelia Space"
+                            class="arelia-agreement-logo"
+                            draggable="false"
+                        />
+                    </div>
+
                     <lightning-input-rich-text
-                        value={agreementHtml}
+                        value={editableAgreementHtml}
                         formats={formats}
                         onchange={handleAgreementChange}>
                     </lightning-input-rich-text>
                 </template>
 
-                <template if:false={isEditing}>
+                <!-- PREVIEW MODE -->
+                <!--<template if:false={isEditing}>
+
                     <div class="agreement-preview">
 
-                        <!--
-                            Fixed preview header.
-
-                            This header is separate from the editable
-                            Agreement_HTML__c content so its alignment
-                            remains identical before and after editing.
-                        -->
-                        <div class="preview-agreement-header">
-                            <div class="preview-company-name">
-                                ARELIA SPACE
-                            </div>
-
-                            <div class="preview-agreement-title">
-                                VENDOR AGREEMENT
-                            </div>
-
-                            <div class="preview-agreement-subtitle">
-                                Interior Design Vendor /
-                                Contractor Agreement
-                            </div>
+                        <div class="protected-brand-header">
+                            <img
+                                src={areliaLogoUrl}
+                                alt="Arelia Space"
+                                class="arelia-agreement-logo"
+                                draggable="false"
+                            />
                         </div>
 
-                        <!--
-                            Render only the agreement body because the
-                            fixed header above already displays the
-                            agreement heading.
-                        -->
                         <lightning-formatted-rich-text
                             value={previewAgreementBodyHtml}>
                         </lightning-formatted-rich-text>
+
                     </div>
+
+                </template>-->
+
+                <!-- PREVIEW MODE -->
+                <template if:false={isEditing}>
+
+                    <div class="agreement-preview">
+
+                        <!-- Protected Arelia Logo -->
+                        <div class="protected-brand-header">
+                            <img
+                                src={areliaLogoUrl}
+                                alt="Arelia Space"
+                                class="arelia-agreement-logo"
+                                draggable="false"
+                            />
+                        </div>
+
+                        <!--
+                            Agreement preview is rendered manually so the modal can
+                            use the same visual styling as the Vendor Agreement PDF.
+                            Agreement_HTML__c itself is NOT modified.
+                        -->
+                        <div
+                            class="modal-agreement-content"
+                            lwc:dom="manual">
+                        </div>
+
+                    </div>
+
                 </template>
+
             </div>
 
         </div>
