@@ -878,11 +878,18 @@ Sat: By Appointment</value>
         <shortDescription>Vendor Agreement Vendor Email Template API Name</shortDescription>
         <value>00XRk0000084sTdMAI</value>
     </labels>
-    <labels>
+    	 <labels>
         <fullName>Vendor_Agreement_Signed_Vendor_Email_Template_ID</fullName>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Vendor Agreement Signed Vendor Email Template ID</shortDescription>
         <value>00XU9000006M5lZMAS</value>
+    </labels>
+	  <labels>
+        <fullName>ARELIA_SPACE_URL</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>ARELIA_SPACE_URL</shortDescription>
+        <value>https://www.areliaspace.com</value>
     </labels>
 </CustomLabels>

@@ -54,10 +54,10 @@ private class ProformaManagerControllerTest {
     @IsTest
     static void testGetInvoiceByIdSuccess() {
         // Query the necessary fields to compare against the dynamic org defaults
-        Proforma_Invoice__c testInvoice = [SELECT Id, Status__c, Manager_Approval__c FROM Proforma_Invoice__c LIMIT 1];
+        Proforma_Invoice__c testInvoice = [SELECT Id, Status__c, Manager_Approval__c, Secure_Token__c FROM Proforma_Invoice__c LIMIT 1];
 
         Test.startTest();
-        Map<String, Object> result = ProformaManagerController.getInvoiceById(testInvoice.Id);
+        Map<String, Object> result = ProformaManagerController.getInvoiceById(testInvoice.Secure_Token__c);
         Test.stopTest();
 
         Assert.isNotNull(result, 'The result map should not be null.');
@@ -87,10 +87,10 @@ private class ProformaManagerControllerTest {
 
     @IsTest
     static void testSubmitManagerDecisionApprove() {
-        Proforma_Invoice__c testInvoice = [SELECT Id FROM Proforma_Invoice__c LIMIT 1];
+        Proforma_Invoice__c testInvoice = [SELECT Id, Secure_Token__c FROM Proforma_Invoice__c LIMIT 1];
 
         Test.startTest();
-        ProformaManagerController.submitManagerDecision(testInvoice.Id, 'Approve', 'Looks luxurious and aligned with standards.');
+        ProformaManagerController.submitManagerDecision(testInvoice.Secure_Token__c, 'Approve', 'Looks luxurious and aligned with standards.');
         Test.stopTest();
 
         Proforma_Invoice__c updatedInvoice = [
@@ -105,10 +105,10 @@ private class ProformaManagerControllerTest {
 
     @IsTest
     static void testSubmitManagerDecisionReject() {
-        Proforma_Invoice__c testInvoice = [SELECT Id FROM Proforma_Invoice__c LIMIT 1];
+        Proforma_Invoice__c testInvoice = [SELECT Id, Secure_Token__c FROM Proforma_Invoice__c LIMIT 1];
 
         Test.startTest();
-        ProformaManagerController.submitManagerDecision(testInvoice.Id, 'Reject', 'Budget needs revision.');
+        ProformaManagerController.submitManagerDecision(testInvoice.Secure_Token__c, 'Reject', 'Budget needs revision.');
         Test.stopTest();
 
         Proforma_Invoice__c updatedInvoice = [
@@ -125,11 +125,13 @@ private class ProformaManagerControllerTest {
     static void testSubmitManagerDecisionWithMissingOpportunity() {
         // This test specifically covers the early return block inside the notification logic 
         // to ensure it fails safely and coverage hits those specific conditional branches.
-        Proforma_Invoice__c orphanInvoice = new Proforma_Invoice__c();
+        Proforma_Invoice__c orphanInvoice = new Proforma_Invoice__c(
+            Secure_Token__c = UUID.randomUUID().toString()
+        );
         insert orphanInvoice;
 
         Test.startTest();
-        ProformaManagerController.submitManagerDecision(orphanInvoice.Id, 'Approve', 'No Opp tied to this one');
+        ProformaManagerController.submitManagerDecision(orphanInvoice.Secure_Token__c, 'Approve', 'No Opp tied to this one');
         Test.stopTest();
 
         Proforma_Invoice__c updatedInvoice = [
