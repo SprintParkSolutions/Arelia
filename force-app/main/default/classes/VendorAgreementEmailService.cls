@@ -1,7 +1,7 @@
 /**
  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
  * Class Name      : VendorAgreementEmailService
- * Author          : <YourName>
+ * Author          : Arelia
  * Created Date    : Jun 26, 2026
  * Last Modified By: <YourName>
  * Last Modified On: Jun 26, 2026
@@ -13,18 +13,15 @@
  * Change History  :
  *  Date          │   Author     │   Change
  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
- *  Jun 26, 2026  │ <YourName>   │ Initial version
+ *  Jun 26, 2026  │ Arelia   │ Initial version
  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
  */
 
 
 public inherited sharing class VendorAgreementEmailService {
 
-    public static void sendVendorAgreement(
-        Vendor_Agreement__c agreementRecord
-    ) {
-        Vendor_Agreement__c agreementWithDetails =
-            getAgreementWithDetails(agreementRecord.Id);
+    public static void sendVendorAgreement(Vendor_Agreement__c agreementRecord) {
+        Vendor_Agreement__c agreementWithDetails = getAgreementWithDetails(agreementRecord.Id);
 
         if (String.isBlank(agreementWithDetails.Vendor_Email__c)) {
             throw new AuraHandledException(
@@ -32,26 +29,10 @@ public inherited sharing class VendorAgreementEmailService {
             );
         }
 
-        Id templateId =
-            VendorAgreementUtil.getEmailTemplateIdFromLabel(
-                System.Label.Vendor_Agreement_Vendor_Email_Template_API_Name,
-                'Vendor_Agreement_Vendor_Email_Template_API_Name'
-            );
-
-        Messaging.SingleEmailMessage renderedEmail =
-            Messaging.renderStoredEmailTemplate(
-                templateId,
-                UserInfo.getUserId(),
-                agreementWithDetails.Id
-            );
-
-        Blob pdfBlob =
-            VendorAgreementFileService.getLatestVersionData(
-                agreementWithDetails.Unsigned_File_Id__c
-            );
-
-        Messaging.EmailFileAttachment attachment =
-            new Messaging.EmailFileAttachment();
+        Id templateId = VendorAgreementUtil.getEmailTemplateIdFromLabel(System.Label.Vendor_Agreement_Vendor_Email_Template_API_Name, 'Vendor_Agreement_Vendor_Email_Template_API_Name');
+        Messaging.SingleEmailMessage renderedEmail = Messaging.renderStoredEmailTemplate(templateId, UserInfo.getUserId(), agreementWithDetails.Id);
+        Blob pdfBlob = VendorAgreementFileService.getLatestVersionData(agreementWithDetails.Unsigned_File_Id__c);
+        Messaging.EmailFileAttachment attachment = new Messaging.EmailFileAttachment();
 
         attachment.setFileName(
             'Vendor Agreement - '
@@ -74,18 +55,9 @@ public inherited sharing class VendorAgreementEmailService {
             agreementWithDetails
         );
 
-        plainTextBody = replaceTemplateTokens(
-            plainTextBody,
-            agreementWithDetails
-        );
-
-        String emailSubject = replaceTemplateTokens(
-            renderedEmail.getSubject(),
-            agreementWithDetails
-        );
-
-        Messaging.SingleEmailMessage emailMessage =
-            new Messaging.SingleEmailMessage();
+        plainTextBody = replaceTemplateTokens(plainTextBody, agreementWithDetails);
+        String emailSubject = replaceTemplateTokens(renderedEmail.getSubject(), agreementWithDetails);
+        Messaging.SingleEmailMessage emailMessage = new Messaging.SingleEmailMessage();
 
         emailMessage.setToAddresses(
             new List<String>{
@@ -107,11 +79,8 @@ public inherited sharing class VendorAgreementEmailService {
         sendEmail(emailMessage);
     }
 
-    public static void sendSignedAgreementToSupervisor(
-        Vendor_Agreement__c agreementRecord
-    ) {
-        Vendor_Agreement__c agreementWithDetails =
-            getAgreementWithDetails(agreementRecord.Id);
+    public static void sendSignedAgreementToSupervisor(Vendor_Agreement__c agreementRecord) {
+        Vendor_Agreement__c agreementWithDetails = getAgreementWithDetails(agreementRecord.Id);
 
         if (
             String.isBlank(
@@ -136,13 +105,8 @@ public inherited sharing class VendorAgreementEmailService {
                 agreementWithDetails.Id
             );
 
-        Blob pdfBlob =
-            VendorAgreementFileService.getLatestVersionData(
-                agreementWithDetails.Signed_File_Id__c
-            );
-
-        Messaging.EmailFileAttachment attachment =
-            new Messaging.EmailFileAttachment();
+        Blob pdfBlob = VendorAgreementFileService.getLatestVersionData(agreementWithDetails.Signed_File_Id__c);
+        Messaging.EmailFileAttachment attachment = new Messaging.EmailFileAttachment();
 
         attachment.setFileName(
             'Signed Vendor Agreement - '
@@ -151,7 +115,6 @@ public inherited sharing class VendorAgreementEmailService {
         );
 
         attachment.setBody(pdfBlob);
-
         String htmlBody = renderedEmail.getHtmlBody();
 
         if (String.isBlank(htmlBody)) {
@@ -159,24 +122,15 @@ public inherited sharing class VendorAgreementEmailService {
         }
 
         String plainTextBody = renderedEmail.getPlainTextBody();
-
-        htmlBody = replaceTemplateTokens(
-            htmlBody,
-            agreementWithDetails
-        );
-
-        plainTextBody = replaceTemplateTokens(
-            plainTextBody,
-            agreementWithDetails
-        );
+        htmlBody = replaceTemplateTokens(htmlBody, agreementWithDetails);
+        plainTextBody = replaceTemplateTokens(plainTextBody, agreementWithDetails);
 
         String emailSubject = replaceTemplateTokens(
             renderedEmail.getSubject(),
             agreementWithDetails
         );
 
-        Messaging.SingleEmailMessage emailMessage =
-            new Messaging.SingleEmailMessage();
+        Messaging.SingleEmailMessage emailMessage = new Messaging.SingleEmailMessage();
 
         emailMessage.setToAddresses(
             new List<String>{
@@ -198,23 +152,74 @@ public inherited sharing class VendorAgreementEmailService {
         sendEmail(emailMessage);
     }
 
-    private static Vendor_Agreement__c getAgreementWithDetails(
-        Id agreementId
-    ) {
-        List<Vendor_Agreement__c> agreements = [
-            SELECT Id,
-                   Name,
-                   Vendor_Email__c,
-                   Supervisor_Email__c,
-                   Supervisor_Name__c,
-                   Signing_Link__c,
-                   Unsigned_File_Id__c,
-                   Signed_File_Id__c,
-                   Vendor__r.Name
-            FROM Vendor_Agreement__c
-            WHERE Id = :agreementId
-            LIMIT 1
-        ];
+    public static void sendSignedAgreementToVendor(Vendor_Agreement__c agreementRecord) {
+        Vendor_Agreement__c agreementWithDetails = getAgreementWithDetails(agreementRecord.Id);
+
+        if (String.isBlank(agreementWithDetails.Vendor_Email__c)) {
+            throw new AuraHandledException(
+                'Vendor email address is missing on the Vendor Agreement.'
+            );
+        }
+
+        Id templateId =
+            VendorAgreementUtil.getEmailTemplateIdFromLabel(
+                System.Label.Vendor_Agreement_Signed_Vendor_Email_Template_ID,
+                'Vendor_Agreement_Signed_Vendor_Email_Template_API_Name'
+            );
+
+        Messaging.SingleEmailMessage renderedEmail =
+            Messaging.renderStoredEmailTemplate(
+                templateId,
+                UserInfo.getUserId(),
+                agreementWithDetails.Id
+            );
+
+        Blob pdfBlob = VendorAgreementFileService.getLatestVersionData(agreementWithDetails.Signed_File_Id__c);
+        Messaging.EmailFileAttachment attachment = new Messaging.EmailFileAttachment();
+
+        attachment.setFileName(
+            VendorAgreementConstants.SIGNED_FILE_PREFIX
+            + agreementWithDetails.Name
+            + VendorAgreementConstants.PDF_EXTENSION
+        );
+
+        attachment.setBody(pdfBlob);
+        attachment.setContentType('application/pdf');
+        String htmlBody = renderedEmail.getHtmlBody();
+
+        if (String.isBlank(htmlBody)) {
+            htmlBody = renderedEmail.getPlainTextBody();
+        }
+
+        String plainTextBody = renderedEmail.getPlainTextBody();
+        htmlBody = replaceTemplateTokens(htmlBody, agreementWithDetails);
+        plainTextBody = replaceTemplateTokens(plainTextBody, agreementWithDetails);
+        String emailSubject = replaceTemplateTokens(renderedEmail.getSubject(), agreementWithDetails);
+        Messaging.SingleEmailMessage emailMessage = new Messaging.SingleEmailMessage();
+
+        emailMessage.setToAddresses(
+            new List<String>{
+                agreementWithDetails.Vendor_Email__c
+            }
+        );
+
+        emailMessage.setSubject(emailSubject);
+        emailMessage.setHtmlBody(htmlBody);
+        emailMessage.setPlainTextBody(plainTextBody);
+        emailMessage.setOrgWideEmailAddressId(VendorAgreementUtil.getOrgWideEmailAddressId());
+        emailMessage.setSaveAsActivity(false);
+        emailMessage.setFileAttachments(
+            new List<Messaging.EmailFileAttachment>{
+                attachment
+            }
+        );
+
+        sendEmail(emailMessage);
+    }
+
+    private static Vendor_Agreement__c getAgreementWithDetails(Id agreementId) {
+        List<Vendor_Agreement__c> agreements = [SELECT Id, Name, Vendor_Email__c, Supervisor_Email__c, Supervisor_Name__c, Signing_Link__c, Unsigned_File_Id__c,
+                   Signed_File_Id__c, Vendor__r.Name FROM Vendor_Agreement__c WHERE Id = :agreementId LIMIT 1];
 
         if (agreements.isEmpty()) {
             throw new AuraHandledException(
@@ -225,10 +230,7 @@ public inherited sharing class VendorAgreementEmailService {
         return agreements[0];
     }
 
-    private static String replaceTemplateTokens(
-        String value,
-        Vendor_Agreement__c agreementRecord
-    ) {
+    private static String replaceTemplateTokens(String value, Vendor_Agreement__c agreementRecord) {
         if (String.isBlank(value)) {
             return '';
         }
@@ -254,9 +256,7 @@ public inherited sharing class VendorAgreementEmailService {
             .replace('[[SIGNING_LINK]]', signingLink);
     }
 
-    private static void sendEmail(
-        Messaging.SingleEmailMessage emailMessage
-    ) {
+    private static void sendEmail(Messaging.SingleEmailMessage emailMessage) {
         Messaging.SendEmailResult[] results = Messaging.sendEmail(
             new List<Messaging.SingleEmailMessage>{ emailMessage }
         );

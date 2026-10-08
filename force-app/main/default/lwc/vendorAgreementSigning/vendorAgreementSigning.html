@@ -166,7 +166,7 @@
 
                     <p class="success-message">
                         Thank you,
-                        <strong>{vendorName}</strong>.
+                        <strong> {vendorName}</strong>.
                         Your signed Vendor Agreement has been
                         submitted successfully.
                     </p>
@@ -202,7 +202,7 @@
                     <p>
                         Review the vendor agreement carefully,
                         draw your digital signature, and click
-                        <strong>Done</strong>
+                        <strong> Done </strong>
                         to submit the signed agreement.
                     </p>
                 </div>
@@ -241,9 +241,20 @@
                     </div>
 
                     <div class="agreement-preview">
+
+                        <div class="protected-brand-header">
+                            <img
+                                src={areliaLogoUrl}
+                                alt="Arelia Space"
+                                class="arelia-agreement-logo"
+                                draggable="false"
+                            />
+                        </div>
+
                         <lightning-formatted-rich-text
-                            value={agreementHtml}>
+                            value={previewAgreementBodyHtml}>
                         </lightning-formatted-rich-text>
+
                     </div>
                 </div>
 
