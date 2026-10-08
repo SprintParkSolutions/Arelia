@@ -879,10 +879,10 @@ Sat: By Appointment</value>
         <value>00XRk0000084sTdMAI</value>
     </labels>
     <labels>
-        <fullName>ARELIA_SPACE_URL</fullName>
+        <fullName>Vendor_Agreement_Signed_Vendor_Email_Template_ID</fullName>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>ARELIA_SPACE_URL</shortDescription>
-        <value>https://www.areliaspace.com</value>
+        <shortDescription>Vendor Agreement Signed Vendor Email Template ID</shortDescription>
+        <value>00XU9000006M5lZMAS</value>
     </labels>
 </CustomLabels>
