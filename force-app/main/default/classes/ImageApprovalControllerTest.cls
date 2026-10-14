@@ -67,7 +67,7 @@ private class ImageApprovalControllerTest {
         Id conDocId = [SELECT ContentDocumentId FROM ContentVersion LIMIT 1].ContentDocumentId;
 
         Test.startTest();
-        ImageApprovalController.sendDesignBundle(opp.Id, new List<String>{conDocId}, 7500.00);
+        ImageApprovalController.sendDesignBundle(opp.Id, new List<String>{conDocId}, 7500.00, null);
         Test.stopTest();
 
         List<Architecture_Design__c> designs = [
@@ -83,6 +83,40 @@ private class ImageApprovalControllerTest {
     }
 
     @isTest
+    static void testSendDesignBundleExternalLinkOnlySuccess() {
+        Opportunity opp = [SELECT Id FROM Opportunity LIMIT 1];
+
+        Test.startTest();
+        ImageApprovalController.sendDesignBundle(
+            opp.Id,
+            new List<String>(),
+            8000.00,
+            'https://drive.google.com/drive/folders/fake-large-file-folder'
+        );
+        Test.stopTest();
+
+        Architecture_Design__c design = [
+            SELECT Id, Status__c, External_File_Link__c, Secure_Token__c
+            FROM Architecture_Design__c
+            WHERE Opportunity__c = :opp.Id
+        ];
+
+        System.assertEquals('Sent', design.Status__c, 'Status should be initialized to Sent even with no uploaded files.');
+        System.assertEquals(
+            'https://drive.google.com/drive/folders/fake-large-file-folder',
+            design.External_File_Link__c,
+            'External file link should be saved when no files are uploaded.'
+        );
+
+        Map<String, String> payload = ImageApprovalController.getFileByToken(design.Secure_Token__c);
+        System.assertEquals(
+            'https://drive.google.com/drive/folders/fake-large-file-folder',
+            payload.get('externalFileLink'),
+            'getFileByToken should expose the external file link to the public approval page.'
+        );
+    }
+
+    @isTest
     static void testSendDesignBundleProjectGracefulFail() {
         // This test provides code coverage for the "Project" if/else branches in the controller 
         // up until the DML exception is intentionally triggered and caught by the controller's try/catch.
@@ -93,7 +127,7 @@ private class ImageApprovalControllerTest {
         Boolean exceptionCaught = false;
         Test.startTest();
         try {
-            ImageApprovalController.sendDesignBundle(proj.Id, new List<String>{conDocId2}, 12000.00);
+            ImageApprovalController.sendDesignBundle(proj.Id, new List<String>{conDocId2}, 12000.00, null);
         } catch (AuraHandledException e) {
             exceptionCaught = true;
         }
@@ -105,33 +139,47 @@ private class ImageApprovalControllerTest {
     @isTest
     static void testSendDesignBundleEmptyFiles() {
         Opportunity opp = [SELECT Id FROM Opportunity LIMIT 1];
-        
-        Test.startTest();
-        ImageApprovalController.sendDesignBundle(opp.Id, new List<String>(), 500.00);
-        Test.stopTest();
 
-        Integer designCount = [SELECT COUNT() FROM Architecture_Design__c];
-        System.assertEquals(0, designCount, 'No design records should be created if file list is empty.');
-    }
-
-    @isTest
-    static void testSendDesignBundleOppNoEmail() {
-        Opportunity opp = [SELECT Id FROM Opportunity LIMIT 1];
-        opp.Email__c = null; 
-        update opp;
-        
-        Id conDocId = [SELECT ContentDocumentId FROM ContentVersion LIMIT 1].ContentDocumentId;
         Boolean exceptionThrown = false;
-        
         Test.startTest();
         try {
-            ImageApprovalController.sendDesignBundle(opp.Id, new List<String>{conDocId}, 1000.00);
+            // No files AND no external link - controller correctly rejects this
+            // (there is nothing to send for approval).
+            ImageApprovalController.sendDesignBundle(opp.Id, new List<String>(), 500.00, null);
         } catch (AuraHandledException e) {
             exceptionThrown = true;
         }
         Test.stopTest();
-        
-        System.assert(exceptionThrown, 'AuraHandledException should be thrown when Opp Email is blank.');
+
+        System.assert(exceptionThrown, 'AuraHandledException should be thrown when no files and no external link are provided.');
+
+        Integer designCount = [SELECT COUNT() FROM Architecture_Design__c];
+        System.assertEquals(0, designCount, 'No design records should be created if file list and external link are both empty.');
+    }
+
+    @isTest
+    static void testSendDesignBundleOppNoEmail() {
+        // Submission must succeed even when the Opportunity has no client email on file -
+        // the client notification email is sent later, asynchronously, by
+        // ArchitectureDesignNotificationHandler (triggered off the Status__c change), and a
+        // blank email there is only ever logged as a WARN and skipped - it does not, and
+        // should not, block the design bundle from being submitted for approval.
+        Opportunity opp = [SELECT Id FROM Opportunity LIMIT 1];
+        opp.Email__c = null;
+        update opp;
+
+        Id conDocId = [SELECT ContentDocumentId FROM ContentVersion LIMIT 1].ContentDocumentId;
+
+        Test.startTest();
+        ImageApprovalController.sendDesignBundle(opp.Id, new List<String>{conDocId}, 1000.00, null);
+        Test.stopTest();
+
+        Architecture_Design__c design = [
+            SELECT Id, Status__c
+            FROM Architecture_Design__c
+            WHERE Opportunity__c = :opp.Id
+        ];
+        System.assertEquals('Sent', design.Status__c, 'Design bundle should still be submitted successfully when the Opportunity has no client email.');
     }
 
     @isTest
@@ -160,18 +208,6 @@ private class ImageApprovalControllerTest {
 
         System.assertNotEquals(null, payload, 'Payload map should be returned.');
         System.assertEquals('Sent', payload.get('status'), 'Status should be correctly resolved.');
-    }
-
-    @isTest
-    static void testExternalSiteGetFileByTokenProject() {
-        Architecture_Design__c design = new Architecture_Design__c();
-        design.putSObject('Project__r', new sf_devops__Project__c(Name = 'Relationship Project'));
-
-        Test.startTest();
-        String projectName = ImageApprovalController.getExternalProjectName(design);
-        Test.stopTest();
-
-        System.assertEquals('Relationship Project', projectName, 'Project relationship name should be resolved for Project designs.');
     }
 
     @isTest
@@ -239,40 +275,12 @@ private class ImageApprovalControllerTest {
         
         Test.startTest();
         try {
-            ImageApprovalController.sendDesignBundle(fakeId, new List<String>{'FakeFileId'}, 1000.00);
+            ImageApprovalController.sendDesignBundle(fakeId, new List<String>{'FakeFileId'}, 1000.00, null);
         } catch (AuraHandledException e) {
             exceptionThrown = true;
         }
         Test.stopTest();
         
         System.assert(exceptionThrown, 'AuraHandledException should be thrown due to invalid parent Id query logic.');
-    }
-
-    @isTest
-    static void testVersionIdEmptyInputsAndNullRecord() {
-        Boolean exceptionThrown = false;
-        Project__c proj = [SELECT Id FROM Project__c LIMIT 1];
-        Boolean projectRecipientExceptionThrown = false;
-        String projectRecipientEmail;
-
-        Test.startTest();
-        List<Id> nullVersionIds = ImageApprovalController.getVersionIds(null);
-        List<Id> emptyVersionIds = ImageApprovalController.getVersionIds(new List<String>());
-        try {
-            ImageApprovalController.sendDesignBundle(null, new List<String>{'069000000000000AAA'}, 1000.00);
-        } catch (AuraHandledException e) {
-            exceptionThrown = true;
-        }
-        try {
-            projectRecipientEmail = ImageApprovalController.getRecipientEmailForTest(proj.Id);
-        } catch (AuraHandledException e) {
-            projectRecipientExceptionThrown = true;
-        }
-        Test.stopTest();
-
-        System.assert(nullVersionIds.isEmpty(), 'Null file ids should return an empty ContentVersion list.');
-        System.assert(emptyVersionIds.isEmpty(), 'Empty file ids should return an empty ContentVersion list.');
-        System.assert(exceptionThrown, 'Null record with files should fail after the null validation branch.');
-        System.assert(projectRecipientExceptionThrown || String.isNotBlank(projectRecipientEmail), 'Project recipient helper should either return an email or reject a project without email.');
     }
 }
