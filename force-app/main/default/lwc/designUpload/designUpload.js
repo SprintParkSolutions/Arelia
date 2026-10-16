@@ -21,13 +21,14 @@ export default class DesignSubmission extends LightningElement {
     @track files = [];
     @track uploadedFiles = [];
     @track budget;
+    @track externalLink;
     @track isLoading = false;
     wiredFilesResult;
     columns = COLUMNS;
 
-    get acceptedFormats() { return ['.pdf', '.png', '.jpg', '.zip', '.dwg']; }
     get hasFiles() { return this.files && this.files.length > 0; }
     get hasUploadedFiles() { return this.uploadedFiles && this.uploadedFiles.length > 0; }
+    get showSubmitSection() { return this.hasUploadedFiles || !!this.externalLink; }
 
     @wire(getRelatedImages, { recordId: '$recordId' })
     wiredFiles(result) {
@@ -45,6 +46,10 @@ export default class DesignSubmission extends LightningElement {
 
     handleBudgetChange(event) {
         this.budget = event.target.value;
+    }
+
+    handleExternalLinkChange(event) {
+        this.externalLink = event.target.value;
     }
 
    
@@ -69,9 +74,9 @@ export default class DesignSubmission extends LightningElement {
             return;
         }
         
-        // Ensure at least one file is present
-        if (this.uploadedFiles.length === 0) {
-            this.showToast('Error', 'Please upload at least one design file.', 'error');
+        // Ensure at least one file or an external link is present
+        if (this.uploadedFiles.length === 0 && !this.externalLink) {
+            this.showToast('Error', 'Please upload at least one design file, or provide a Google Drive/OneDrive link for large files.', 'error');
             return;
         }
 
@@ -82,14 +87,16 @@ export default class DesignSubmission extends LightningElement {
             await sendDesignBundle({
                 recordId: this.recordId,
                 fileIds: fileIds,
-                budget: this.budget
+                budget: this.budget,
+                externalFileLink: this.externalLink
             });
-            
+
             this.showToast('Success', 'Design Package Submitted!', 'success');
-            
+
             // Clear UI
             this.uploadedFiles = [];
             this.budget = null;
+            this.externalLink = null;
             
             this.dispatchEvent(new CloseActionScreenEvent());
             refreshApex(this.wiredFilesResult);
