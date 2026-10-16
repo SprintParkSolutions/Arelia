@@ -72,24 +72,34 @@
                         label="Drag and drop files here, or click to browse"
                         name="fileUploader"
                         record-id={recordId}
-                        accept={acceptedFormats}
                         multiple
                         onuploadfinished={handleUploadFinished}
                         class="file-upload-input">
                     </lightning-file-upload>
-                    <p class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">Supported formats: PDF, PNG, JPG, DWG, ZIP</p>
+                    <p class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">All file types are supported (PDF, images, video, CAD, 3D formats, etc.).</p>
+                </div>
+
+                <div class="slds-p-left_large slds-p-top_medium">
+                    <lightning-input
+                        type="url"
+                        label="Large File Link (Google Drive / OneDrive) - optional"
+                        placeholder="https://drive.google.com/... or https://onedrive.live.com/..."
+                        value={externalLink}
+                        onchange={handleExternalLinkChange}>
+                    </lightning-input>
+                    <p class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">For very large files (videos, 3D scenes, etc.), upload to Google Drive or OneDrive, set sharing to "Anyone with the link", and paste the link here instead.</p>
                 </div>
             </div>
         </div>
 
-        <template if:true={hasUploadedFiles}>
+        <template if:true={showSubmitSection}>
             <div class="footer-section slds-m-bottom_large bounce-in">
                 <div class="footer-header slds-p-horizontal_medium slds-p-vertical_small">
                      <h3 class="slds-text-heading_small"><strong>Files Ready ({uploadedFiles.length})</strong></h3>
                 </div>
-               
+
                 <div class="action-row slds-p-around_medium">
-                    
+
                     <div class="file-list-container">
                         <template for:each={uploadedFiles} for:item="file">
                             <div key={file.documentId} class="file-item-card">
