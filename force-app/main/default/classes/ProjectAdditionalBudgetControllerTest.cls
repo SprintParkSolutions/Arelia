@@ -67,14 +67,23 @@ private class ProjectAdditionalBudgetControllerTest {
     @IsTest
     static void testSubmitRequestWithAttachments() {
         Project__c p = [SELECT Id FROM Project__c LIMIT 1];
-        ContentVersion cv = [SELECT ContentDocumentId FROM ContentVersion LIMIT 1];
+
+        // submitRequest's 4th parameter is a JSON-encoded list of {name, base64} file
+        // objects (parsed via parseFilesJson/insertFiles), not a List<Id> of existing
+        // ContentDocumentIds - files are inserted fresh server-side from the raw bytes.
+        String filesJson = JSON.serialize(new List<Map<String, String>>{
+            new Map<String, String>{
+                'name' => 'receipt.txt',
+                'base64' => EncodingUtil.base64Encode(Blob.valueOf('Test attachment content'))
+            }
+        });
 
         Test.startTest();
         ProjectAdditionalBudgetController.submitRequest(
             p.Id,
             600,
             'Extra attachment test',
-            new List<Id>{ cv.ContentDocumentId }
+            filesJson
         );
         Test.stopTest();
 
@@ -82,7 +91,8 @@ private class ProjectAdditionalBudgetControllerTest {
             SELECT Pending_Additional_Amount__c,
                    Pending_Additional_Reason__c,
                    Additional_Request_Status__c,
-                   Additional_Budget_History__c
+                   Additional_Budget_History__c,
+                   Additional_Budget_ContentDocumentIds__c
             FROM Project__c WHERE Id = :p.Id
         ];
 
@@ -90,6 +100,7 @@ private class ProjectAdditionalBudgetControllerTest {
         System.assertEquals('Pending', updated.Additional_Request_Status__c, 'Status should be Pending.');
         System.assert(updated.Pending_Additional_Reason__c != null, 'Reason must be saved.');
         System.assert(updated.Additional_Budget_History__c != null, 'History must be updated.');
+        System.assert(String.isNotBlank(updated.Additional_Budget_ContentDocumentIds__c), 'Uploaded file should be inserted and linked to the project.');
     }
 
     /* =========================================================

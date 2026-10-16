@@ -7,8 +7,6 @@ public without sharing class ArchitectureDesignTriggerHandler {
 
     private static final String STATUS_APPROVED         = 'Approved';
     private static final String TEMPLATE_DEVELOPER_NAME = 'Architecture_Manager_Approval';
-    private static final String ARELIA_OPPORTUNITY_RECORD_TYPE_NAME = 'Arelia';
-    private static Id cachedAreliaOpportunityRecordTypeId;
 
     // --- Inner Classes ---
 
@@ -204,20 +202,12 @@ public without sharing class ArchitectureDesignTriggerHandler {
     }
 
     private static Id getAreliaOpportunityRecordTypeId() {
-        if (cachedAreliaOpportunityRecordTypeId != null) {
-            return cachedAreliaOpportunityRecordTypeId;
-        }
-
-        Schema.RecordTypeInfo recordTypeInfo = Schema.SObjectType.Opportunity
-            .getRecordTypeInfosByName()
-            .get(ARELIA_OPPORTUNITY_RECORD_TYPE_NAME);
-
-        if (recordTypeInfo == null) {
-            return null;
-        }
-
-        cachedAreliaOpportunityRecordTypeId = recordTypeInfo.getRecordTypeId();
-        return cachedAreliaOpportunityRecordTypeId;
+        // Delegates to AreliaUtility, which resolves this via a direct RecordType SOQL query
+        // rather than Schema.describe().getRecordTypeInfosByName(). The describe-based lookup
+        // only returns Record Types visible to the CURRENT USER'S PROFILE, so it silently
+        // returned null (blocking shouldHandleDesign) for Guest Users, while working fine for
+        // Admin.
+        return AreliaUtility.getAreliaOpportunityRecordTypeId();
     }
 
     private static Messaging.SingleEmailMessage buildSingleEmail(Architecture_Design__c design, EmailContext ctx) {

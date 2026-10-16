@@ -8,7 +8,6 @@ import { loadScript } from 'lightning/platformResourceLoader';
 
 import JSPDF from '@salesforce/resourceUrl/jspdfs';
 import ARELIA_LOGO from '@salesforce/resourceUrl/AreliaLogo';
-// import HTML2CANVAS from '@salesforce/resourceUrl/html2canvas';
 
 export default class SendClientAgreement extends LightningElement {
     @api recordId;
@@ -22,14 +21,37 @@ export default class SendClientAgreement extends LightningElement {
     isEditing = false;
     scriptsLoaded = false;
     uploadedSupportingDocumentIds = [];
-    // removedSupportingDocumentIds = [];
+    /*
+    * Protected Project Information section.
+    *
+    * Project Information is generated from Opportunity data and must
+    * remain read-only even while the rest of the agreement is editable.
+    */
+    protectedProjectInformationHeadingHtml = '';
+    protectedProjectInformationTableHtml = '';
+    protectedPaymentTermsTableHtml = '';
     errorMessage;
     errorDetails;
     areliaLogoDataUrl;
     areliaLogoWidth;
     areliaLogoHeight;
 
+    /*
+    * Tracks files removed only from the Supporting Images / PDFs
+    * selection in this modal.
+    *
+    * IMPORTANT:
+    * This does NOT delete the Salesforce File,
+    * ContentDocument, ContentVersion, ContentDocumentLink,
+    * Notes & Attachments record, or Opportunity file.
+    *
+    * It only prevents the file from being sent with
+    * this Client Agreement.
+    */
+    removedSupportingDocumentIds = [];
     @track supportingFiles = [];
+
+    richTextFormats = ['font', 'size', 'bold', 'italic', 'underline', 'strike', 'list', 'indent', 'align', 'link', 'clean', 'table', 'header', 'color'];
 
     get saveDisabled() {
         return !this.isEditing;
@@ -37,6 +59,10 @@ export default class SendClientAgreement extends LightningElement {
 
     get hasError() {
         return this.errorMessage || this.errorDetails;
+    }
+
+    get areliaLogoUrl() {
+        return ARELIA_LOGO;
     }
 
     async connectedCallback() {
@@ -227,7 +253,14 @@ export default class SendClientAgreement extends LightningElement {
         this.supervisorEmail = result.supervisorEmail;
         this.agreementHtml = result.agreementHtml;
 
-        // this.supportingFiles = result.supportingFiles || [];
+        /*
+        * Capture Project Information exactly as it was generated from Salesforce.
+        * This snapshot is used to prevent users from modifying,
+        * deleting, backspacing, formatting, or replacing the
+        * Project Information section.
+        */
+        this.captureProtectedProjectInformation(this.agreementHtml);
+        this.captureProtectedPaymentTermsTable(this.agreementHtml);
 
         this.supportingFiles = this.prepareSupportingFiles(result.supportingFiles || []);
 
@@ -244,36 +277,108 @@ export default class SendClientAgreement extends LightningElement {
         }
     }
 
-    // renderPreview() {
-    //     const preview = this.template.querySelector('.preview-box');
-
-    //     if (preview && this.agreementHtml && !this.isEditing) {
-    //         /*
-    //         * Preview shows only agreement/rich-text images.
-    //         * File-upload-section images/PDFs are supporting attachments.
-    //         */
-    //         preview.innerHTML =
-    //             this.applyAgreementProfessionalStyles(this.agreementHtml) +
-    //             this.buildSupportingImagesHtml(
-    //                 this.getAgreementImageFiles(this.agreementHtml, this.supportingFiles)
-    //             );
-    //     }
-    // }
-
     renderPreview() {
-        const preview = this.template.querySelector('.preview-box');
+        const preview =
+            this.template.querySelector(
+                '.preview-box'
+            );
 
-        if (preview && this.agreementHtml && !this.isEditing) {
+        if (
+            preview &&
+            this.agreementHtml &&
+            !this.isEditing
+        ) {
             /*
-            * Preview shows only agreement/rich-text images.
-            * File-upload-section images/PDFs are supporting attachments.
+            * Existing preview functionality.
             */
             preview.innerHTML =
-                this.applyAgreementProfessionalStyles(this.agreementHtml) +
+                this.applyAgreementProfessionalStyles(
+                    this.agreementHtml
+                ) +
                 this.buildSupportingImagesHtml(
-                    this.getAgreementImageFiles(this.supportingFiles)
+                    this.getAgreementImageFiles(
+                        this.supportingFiles
+                    )
                 );
+
+            /*
+            * NEW:
+            * lightning-input-rich-text understands ql-indent-*
+            * classes automatically while editing.
+            *
+            * The manual preview does not, so apply equivalent
+            * inline indentation after the HTML is rendered.
+            */
+            this.applyPreviewIndentStyles(
+                preview
+            );
         }
+    }
+
+    /**
+     * Applies Quill/Salesforce indentation classes to the
+     * manually rendered agreement preview.
+     *
+     * This changes only the visual preview.
+     * agreementHtml itself is not modified.
+     */
+    applyPreviewIndentStyles(previewElement) {
+        if (!previewElement) {
+            return;
+        }
+
+        const indentedElements =
+            previewElement.querySelectorAll(
+                '[class*="ql-indent-"]'
+            );
+
+        indentedElements.forEach((element) => {
+            let indentLevel = 0;
+
+            Array.from(
+                element.classList || []
+            ).forEach((className) => {
+                if (
+                    !className.startsWith(
+                        'ql-indent-'
+                    )
+                ) {
+                    return;
+                }
+
+                const parsedLevel =
+                    Number.parseInt(
+                        className.replace(
+                            'ql-indent-',
+                            ''
+                        ),
+                        10
+                    );
+
+                if (
+                    Number.isFinite(parsedLevel) &&
+                    parsedLevel > indentLevel
+                ) {
+                    indentLevel =
+                        parsedLevel;
+                }
+            });
+
+            if (indentLevel <= 0) {
+                return;
+            }
+
+            /*
+            * Keep preview indentation aligned with the
+            * indentation interpretation already used by
+            * the PDF renderer.
+            */
+            const indentPixels =
+                indentLevel * 24;
+
+            element.style.marginLeft =
+                indentPixels + 'px';
+        });
     }
 
     handleEdit() {
@@ -282,32 +387,595 @@ export default class SendClientAgreement extends LightningElement {
     }
 
     handleAgreementChange(event) {
-        this.agreementHtml = event.target.value;
+        const editedHtml =
+            event && event.target
+                ? event.target.value
+                : '';
+
+        if (!editedHtml) {
+            this.agreementHtml = editedHtml;
+            return;
+        }
+
+        /*
+        * Check only protected sections.
+        *
+        * Normal changes elsewhere must not rewrite the rich-text
+        * editor because doing so can affect cursor/scroll position.
+        */
+        const projectInformationChanged =
+            this.hasProtectedProjectInformationChanged(
+                editedHtml
+            );
+
+        const paymentTermsTableChanged =
+            this.hasProtectedPaymentTermsTableChanged(
+                editedHtml
+            );
+
+        /*
+        * Normal edit.
+        * Nothing protected was changed.
+        */
+        if (
+            !projectInformationChanged &&
+            !paymentTermsTableChanged
+        ) {
+            this.agreementHtml = editedHtml;
+            return;
+        }
+
+        let restoredHtml = editedHtml;
+
+        /*
+        * Restore Project Information only if it was changed.
+        */
+        if (projectInformationChanged) {
+            restoredHtml =
+                this.restoreProtectedProjectInformation(
+                    restoredHtml
+                );
+        }
+
+        /*
+        * Restore Payment Terms table only if it was changed.
+        */
+        if (paymentTermsTableChanged) {
+            restoredHtml =
+                this.restoreProtectedPaymentTermsTable(
+                    restoredHtml
+                );
+        }
+
+        this.agreementHtml = restoredHtml;
+
+        /*
+        * Synchronize the editor only when protected content
+        * was actually changed.
+        */
+        if (
+            event &&
+            event.target &&
+            event.target.value !== restoredHtml
+        ) {
+            event.target.value = restoredHtml;
+        }
     }
 
-    
+    /**
+     * Checks whether Project Information has actually been changed.
+     *
+     * Normal edits elsewhere in the agreement return false, which prevents
+     * unnecessary rich-text editor rerenders.
+     */
+    hasProtectedProjectInformationChanged(html) {
+        if (!html) {
+            return false;
+        }
+
+        if (
+            !this.protectedProjectInformationHeadingHtml &&
+            !this.protectedProjectInformationTableHtml
+        ) {
+            return false;
+        }
+
+        const container = document.createElement('div');
+
+        container.innerHTML = html;
+
+        const currentHeading = this.findProjectInformationHeading(container);
+
+        /*
+        * Project Information heading was deleted.
+        */
+        if (!currentHeading) {
+            return true;
+        }
+
+        const currentTable = this.findProjectInformationTable(currentHeading);
+
+        /*
+        * Project Information table was deleted.
+        */
+        if (
+            this.protectedProjectInformationTableHtml &&
+            !currentTable
+        ) {
+            return true;
+        }
+
+        /*
+        * Compare heading content.
+        */
+        if (
+            this.protectedProjectInformationHeadingHtml
+        ) {
+            const protectedHeading = this.createElementFromHtml(this.protectedProjectInformationHeadingHtml);
+
+            if (
+                protectedHeading &&
+                !this.areProtectedElementsEquivalent(
+                    currentHeading,
+                    protectedHeading
+                )
+            ) {
+                return true;
+            }
+        }
+
+        /*
+        * Compare table content.
+        */
+        if (
+            this.protectedProjectInformationTableHtml &&
+            currentTable
+        ) {
+            const protectedTable = this.createElementFromHtml(this.protectedProjectInformationTableHtml);
+
+            if (
+                protectedTable &&
+                !this.areProtectedElementsEquivalent(
+                    currentTable,
+                    protectedTable
+                )
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Compares protected elements using meaningful content instead of
+     * comparing raw HTML strings.
+     *
+     * Salesforce rich-text may normalize harmless HTML/style details,
+     * so comparing outerHTML directly can incorrectly report a change.
+     */
+    areProtectedElementsEquivalent(currentElement, protectedElement) {
+        if (!currentElement || !protectedElement) {
+            return false;
+        }
+
+        /*
+        * Clone both elements before normalization.
+        */
+        const currentClone = currentElement.cloneNode(true);
+
+        const protectedClone = protectedElement.cloneNode(true);
+
+        this.normalizeProtectedElementForComparison(currentClone);
+
+        this.normalizeProtectedElementForComparison(protectedClone);
+
+        return (currentClone.innerHTML === protectedClone.innerHTML);
+    }
+
+    /**
+     * Removes harmless formatting differences introduced by
+     * lightning-input-rich-text so that only real changes to
+     * Project Information are detected.
+     */
+    normalizeProtectedElementForComparison(element) {
+        if (!element) {
+            return;
+        }
+
+        const elements = [
+            element,
+            ...Array.from(
+                element.querySelectorAll('*')
+            )
+        ];
+
+        elements.forEach((node) => {
+            /*
+            * Normalize whitespace.
+            */
+            if (
+                node.childNodes &&
+                node.childNodes.length
+            ) {
+                Array.from(node.childNodes).forEach(
+                    (childNode) => {
+                        if (
+                            childNode.nodeType ===
+                            Node.TEXT_NODE
+                        ) {
+                            childNode.textContent =
+                                String(
+                                    childNode.textContent || ''
+                                )
+                                    .replace(/\u00a0/g, ' ')
+                                    .replace(/\s+/g, ' ');
+                        }
+                    }
+                );
+            }
+        });
+    }
+
+    /**
+     * Captures the original Payment Terms table generated
+     * from Salesforce.
+     *
+     * Only the table itself is protected.
+     * The heading and surrounding agreement text remain editable.
+     */
+    captureProtectedPaymentTermsTable(html) {
+        this.protectedPaymentTermsTableHtml = '';
+
+        if (!html) {
+            return;
+        }
+
+        const container =
+            document.createElement('div');
+
+        container.innerHTML = html;
+
+        const paymentTermsHeading =
+            this.findPaymentTermsHeading(
+                container
+            );
+
+        if (!paymentTermsHeading) {
+            console.warn(
+                'Payment Terms & Conditions heading was not found. ' +
+                'Payment Terms table protection could not be initialized.'
+            );
+
+            return;
+        }
+
+        const paymentTermsTable =
+            this.findPaymentTermsTable(
+                paymentTermsHeading
+            );
+
+        if (!paymentTermsTable) {
+            console.warn(
+                'Payment Terms table was not found. ' +
+                'Payment Terms table protection could not be initialized.'
+            );
+
+            return;
+        }
+
+        /*
+        * Store exactly what Salesforce generated.
+        */
+        this.protectedPaymentTermsTableHtml =
+            paymentTermsTable.outerHTML;
+
+        console.log(
+            'Payment Terms table protection initialized:',
+            Boolean(
+                this.protectedPaymentTermsTableHtml
+            )
+        );
+    }
+
+
+    /**
+     * Finds the Payment Terms & Conditions heading.
+     */
+    findPaymentTermsHeading(container) {
+        if (!container) {
+            return null;
+        }
+
+        const headings =
+            Array.from(
+                container.querySelectorAll(
+                    'h1, h2, h3, h4, h5, h6'
+                )
+            );
+
+        return (
+            headings.find((heading) => {
+                const text =
+                    this.normalizeSectionText(
+                        heading.textContent
+                    );
+
+                /*
+                * Works whether the heading is:
+                *
+                * 4. PAYMENT TERMS & CONDITIONS
+                * or
+                * PAYMENT TERMS & CONDITIONS
+                */
+                return (
+                    text ===
+                        '4. PAYMENT TERMS & CONDITIONS' ||
+                    text ===
+                        'PAYMENT TERMS & CONDITIONS'
+                );
+            }) || null
+        );
+    }
+
+
+    /**
+     * Finds the table belonging to the Payment Terms section.
+     *
+     * There may be a paragraph such as:
+     * "The following payment terms shall apply..."
+     * between the heading and the table.
+     */
+    findPaymentTermsTable(paymentTermsHeading) {
+        if (!paymentTermsHeading) {
+            return null;
+        }
+
+        let currentNode =
+            paymentTermsHeading.nextElementSibling;
+
+        while (currentNode) {
+            const tagName =
+                currentNode.tagName
+                    ? currentNode.tagName.toLowerCase()
+                    : '';
+
+            if (tagName === 'table') {
+                return currentNode;
+            }
+
+            /*
+            * Stop when the next agreement section starts.
+            */
+            if (
+                tagName === 'h1' ||
+                tagName === 'h2' ||
+                tagName === 'h3' ||
+                tagName === 'h4' ||
+                tagName === 'h5' ||
+                tagName === 'h6'
+            ) {
+                break;
+            }
+
+            currentNode =
+                currentNode.nextElementSibling;
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Determines whether the protected Payment Terms table
+     * was changed, deleted, backspaced, reformatted, or replaced.
+     */
+    hasProtectedPaymentTermsTableChanged(html) {
+        if (
+            !html ||
+            !this.protectedPaymentTermsTableHtml
+        ) {
+            return false;
+        }
+
+        const container =
+            document.createElement('div');
+
+        container.innerHTML = html;
+
+        const paymentTermsHeading =
+            this.findPaymentTermsHeading(
+                container
+            );
+
+        /*
+        * If the Payment Terms heading cannot be found, don't
+        * assume the table itself was changed.
+        *
+        * Only the table is protected.
+        */
+        if (!paymentTermsHeading) {
+            return false;
+        }
+
+        const currentTable =
+            this.findPaymentTermsTable(
+                paymentTermsHeading
+            );
+
+        /*
+        * Backspace/Delete removed the entire table.
+        */
+        if (!currentTable) {
+            return true;
+        }
+
+        const protectedTable =
+            this.createElementFromHtml(
+                this.protectedPaymentTermsTableHtml
+            );
+
+        if (!protectedTable) {
+            return false;
+        }
+
+        return !this.areProtectedElementsEquivalent(
+            currentTable,
+            protectedTable
+        );
+    }
+
+
+    /**
+     * Restores the Payment Terms table without changing any
+     * other agreement content.
+     */
+    restoreProtectedPaymentTermsTable(html) {
+        if (
+            !html ||
+            !this.protectedPaymentTermsTableHtml
+        ) {
+            return html || '';
+        }
+
+        const container =
+            document.createElement('div');
+
+        container.innerHTML = html;
+
+        const paymentTermsHeading =
+            this.findPaymentTermsHeading(
+                container
+            );
+
+        if (!paymentTermsHeading) {
+            /*
+            * Do not reconstruct the heading because the requirement
+            * is to protect only the table.
+            */
+            return container.innerHTML;
+        }
+
+        const currentTable =
+            this.findPaymentTermsTable(
+                paymentTermsHeading
+            );
+
+        const protectedTable =
+            this.createElementFromHtml(
+                this.protectedPaymentTermsTableHtml
+            );
+
+        if (!protectedTable) {
+            return container.innerHTML;
+        }
+
+        /*
+        * Normal case:
+        * table still exists but was edited.
+        */
+        if (currentTable) {
+            currentTable.replaceWith(
+                protectedTable
+            );
+
+            return container.innerHTML;
+        }
+
+        /*
+        * Table was completely deleted.
+        *
+        * Find the correct position after the Payment Terms
+        * introductory paragraph and restore the table there.
+        */
+        let insertionPoint =
+            paymentTermsHeading.nextElementSibling;
+
+        let lastNodeBeforeNextSection =
+            paymentTermsHeading;
+
+        while (insertionPoint) {
+            const tagName =
+                insertionPoint.tagName
+                    ? insertionPoint.tagName.toLowerCase()
+                    : '';
+
+            if (
+                tagName === 'h1' ||
+                tagName === 'h2' ||
+                tagName === 'h3' ||
+                tagName === 'h4' ||
+                tagName === 'h5' ||
+                tagName === 'h6'
+            ) {
+                break;
+            }
+
+            lastNodeBeforeNextSection =
+                insertionPoint;
+
+            insertionPoint =
+                insertionPoint.nextElementSibling;
+        }
+
+        lastNodeBeforeNextSection.insertAdjacentElement(
+            'afterend',
+            protectedTable
+        );
+
+        return container.innerHTML;
+    }
 
     handleSave() {
         this.clearError();
 
         /*
-        * Re-apply professional formatting after lightning-input-rich-text
-        * normalizes/sanitizes the HTML.
+        * Protect Project Information.
         */
-
-        // this.agreementHtml = this.applyAgreementProfessionalStyles(this.agreementHtml);
-
-        const normalizedAgreementHtml =
-            this.normalizeRichTextLists(
+        let protectedAgreementHtml =
+            this.restoreProtectedProjectInformation(
                 this.agreementHtml
             );
 
-        this.agreementHtml =
+        /*
+        * Protect Payment Terms table.
+        */
+        protectedAgreementHtml =
+            this.restoreProtectedPaymentTermsTable(
+                protectedAgreementHtml
+            );
+
+        /*
+        * Existing list normalization.
+        */
+        const normalizedAgreementHtml =
+            this.normalizeRichTextLists(
+                protectedAgreementHtml
+            );
+
+        /*
+        * Existing professional formatting.
+        */
+        const professionallyStyledHtml =
             this.applyAgreementProfessionalStyles(
                 normalizedAgreementHtml
             );
 
-        // this.agreementHtml = this.buildProfessionalAgreementDisplayHtml(this.agreementHtml);
+        /*
+        * Re-apply both protected sections after formatting.
+        */
+        let finalAgreementHtml =
+            this.restoreProtectedProjectInformation(
+                professionallyStyledHtml
+            );
+
+        finalAgreementHtml =
+            this.restoreProtectedPaymentTermsTable(
+                finalAgreementHtml
+            );
+
+        this.agreementHtml =
+            finalAgreementHtml;
 
         this.isEditing = false;
 
@@ -430,6 +1098,13 @@ export default class SendClientAgreement extends LightningElement {
             }
 
             /*
+            * Final Project Information protection before PDF generation
+            * and Apex submission.
+            */
+            this.agreementHtml = this.restoreProtectedProjectInformation(this.agreementHtml);
+            this.agreementHtml = this.restoreProtectedPaymentTermsTable(this.agreementHtml);
+
+            /*
             * Refresh latest Opportunity files before generating PDF/sending email.
             * Removed files remain excluded because selectedSupportingFiles filters them out.
             */
@@ -548,11 +1223,6 @@ export default class SendClientAgreement extends LightningElement {
 
     addPdfBrandHeader(ctx) {
         const pdf = ctx.pdf;
-
-        // const logoWidth = 112;
-        // const logoHeight = 54;
-        // const logoX = (ctx.pageWidth - logoWidth) / 2;
-        // const logoY = ctx.y;
 
         if (this.areliaLogoDataUrl) {
             const maximumLogoWidth = 92;
@@ -1129,6 +1799,22 @@ export default class SendClientAgreement extends LightningElement {
         this.errorDetails = null;
     }
 
+    // showError(error) {
+    //     console.error('Full error object:', error);
+
+    //     let message = this.extractErrorMessage(error);
+    //     let details = this.extractErrorDetails(error);
+
+    //     if (!message) {
+    //         message = 'Unknown error';
+    //     }
+
+    //     this.errorMessage = message;
+    //     this.errorDetails = details;
+
+    //     this.showToast('Error', message, 'error');
+    // }
+
     showError(error) {
         console.error('Full error object:', error);
 
@@ -1139,10 +1825,28 @@ export default class SendClientAgreement extends LightningElement {
             message = 'Unknown error';
         }
 
-        this.errorMessage = message;
-        this.errorDetails = details;
+        const isAlreadySignedValidation =
+            message.includes(
+                'The Client Agreement has already been signed. Another Client Agreement cannot be sent.'
+            );
 
-        this.showToast('Error', message, 'error');
+        this.errorMessage = message;
+
+        this.errorDetails =
+            isAlreadySignedValidation
+                ? null
+                : details;
+
+        /*
+        * For already-signed validation:
+        * show only the modal error message.
+        *
+        * For all other errors:
+        * keep the existing toast behavior.
+        */
+        if (!isAlreadySignedValidation) {
+            this.showToast('Error', message, 'error');
+        }
     }
 
     extractErrorMessage(error) {
@@ -1282,51 +1986,44 @@ export default class SendClientAgreement extends LightningElement {
         return this.selectedSupportingFiles && this.selectedSupportingFiles.length > 0;
     }
 
-    // async handleUploadFinished(event) {
-    //     this.clearError();
-
-    //     const uploadedFiles = event.detail.files || [];
-
-    //     this.showToast(
-    //         'Files Uploaded',
-    //         uploadedFiles.length + ' supporting file(s) uploaded.',
-    //         'success'
-    //     );
-
-    //     /*
-    //     * Force fresh reload from Apex after upload.
-    //     */
-    //     this.supportingFiles = [];
-
-    //     await this.loadInitData();
-
-    //     console.log('Supporting files after upload:', {
-    //         count: this.supportingFiles ? this.supportingFiles.length : 0,
-    //         files: this.supportingFiles
-    //     });
-
-    //     this.renderPreview();
-    // }
-
     async handleUploadFinished(event) {
         this.clearError();
 
         const uploadedFiles = event.detail.files || [];
 
         uploadedFiles.forEach((file) => {
-            if (file.documentId && !this.uploadedSupportingDocumentIds.includes(file.documentId)) {
-                this.uploadedSupportingDocumentIds.push(file.documentId);
+
+            /*
+            * Existing functionality:
+            * remember files uploaded using this component.
+            */
+            if (
+                file.documentId &&
+                !this.uploadedSupportingDocumentIds.includes(file.documentId)
+            ) {
+                this.uploadedSupportingDocumentIds = [
+                    ...this.uploadedSupportingDocumentIds,
+                    file.documentId
+                ];
             }
 
             /*
-            * If the same document Id was previously removed, allow it again after upload.
+            * If this same document was previously removed from the
+            * current modal selection, selecting/uploading it again
+            * makes it eligible for sending again.
+            *
+            * This only modifies component state.
+            * No Salesforce File is deleted or modified.
             */
-
-            // if (file.documentId && this.removedSupportingDocumentIds.includes(file.documentId)) {
-            //     this.removedSupportingDocumentIds = this.removedSupportingDocumentIds.filter(
-            //         (documentId) => documentId !== file.documentId
-            //     );
-            // }
+            if (
+                file.documentId &&
+                this.removedSupportingDocumentIds.includes(file.documentId)
+            ) {
+                this.removedSupportingDocumentIds =
+                    this.removedSupportingDocumentIds.filter(
+                        (documentId) => documentId !== file.documentId
+                    );
+            }
         });
 
         this.showToast(
@@ -1335,43 +2032,91 @@ export default class SendClientAgreement extends LightningElement {
             'success'
         );
 
+        /*
+        * Refresh files from the Opportunity.
+        * removedSupportingDocumentIds is intentionally preserved,
+        * so files removed from this modal remain excluded.
+        */
         await this.refreshSupportingFilesOnly();
 
-        console.log('Uploaded supporting document Ids:', this.uploadedSupportingDocumentIds);
-        // console.log('Removed supporting document Ids:', this.removedSupportingDocumentIds);
-        console.log('Selected supporting document Ids:', this.selectedSupportingDocumentIds);
+        console.log(
+            'Uploaded supporting document Ids:',
+            this.uploadedSupportingDocumentIds
+        );
+
+        console.log(
+            'Removed supporting document Ids:',
+            this.removedSupportingDocumentIds
+        );
+
+        console.log(
+            'Selected supporting document Ids:',
+            this.selectedSupportingDocumentIds
+        );
 
         this.renderPreview();
     }
 
-    // handleRemoveSupportingFile(event) {
-    //     this.clearError();
+    handleRemoveSupportingFile(event) {
+        this.clearError();
 
-    //     const documentId = event.currentTarget.dataset.documentId;
+        const documentId =
+            event.currentTarget.dataset.documentId;
 
-    //     if (!documentId) {
-    //         return;
-    //     }
+        if (!documentId) {
+            this.showToast(
+                'Unable to Remove File',
+                'The selected file does not have a valid Salesforce File Id.',
+                'error'
+            );
 
-    //     if (!this.removedSupportingDocumentIds.includes(documentId)) {
-    //         this.removedSupportingDocumentIds = [
-    //             ...this.removedSupportingDocumentIds,
-    //             documentId
-    //         ];
-    //     }
+            return;
+        }
 
-    //     this.uploadedSupportingDocumentIds = this.uploadedSupportingDocumentIds.filter(
-    //         (uploadedDocumentId) => uploadedDocumentId !== documentId
-    //     );
+        /*
+        * IMPORTANT:
+        *
+        * Do NOT delete the ContentDocument.
+        * Do NOT delete ContentVersion.
+        * Do NOT delete ContentDocumentLink.
+        * Do NOT delete Attachment.
+        *
+        * We only remember that this document must be excluded
+        * from the current Client Agreement selection.
+        */
+        if (
+            !this.removedSupportingDocumentIds.includes(documentId)
+        ) {
+            this.removedSupportingDocumentIds = [
+                ...this.removedSupportingDocumentIds,
+                documentId
+            ];
+        }
 
-    //     this.showToast(
-    //         'File Removed',
-    //         'The file has been removed from this agreement. It was not deleted from Salesforce Files.',
-    //         'success'
-    //     );
+        console.log(
+            'Removed supporting document Id:',
+            documentId
+        );
 
-    //     this.renderPreview();
-    // }
+        console.log(
+            'Removed supporting document Ids:',
+            this.removedSupportingDocumentIds
+        );
+
+        console.log(
+            'Remaining selected supporting document Ids:',
+            this.selectedSupportingDocumentIds
+        );
+
+        /*
+        * selectedSupportingFiles is a getter.
+        * Updating removedSupportingDocumentIds causes the UI
+        * to automatically stop displaying this file.
+        *
+        * The actual Salesforce File remains untouched.
+        */
+        this.renderPreview();
+    }
 
     addSupportingImagesToPdf(
         pdf,
@@ -1628,82 +2373,46 @@ export default class SendClientAgreement extends LightningElement {
         return container.innerHTML;
     }
 
-    // getAgreementImageFiles(html, supportingFiles = []) {
-    //     const imageFiles = (supportingFiles || []).filter(
-    //         (file) => file && file.isImage && file.base64Data
-    //     );
-
-    //     if (!html || !imageFiles.length) {
-    //         return [];
-    //     }
-
-    //     return imageFiles.filter((file) => {
-    //         return this.isFileReferencedInAgreementHtml(file, html);
-    //     });
-    // }
-
-    // getSeparateAttachmentFiles(html, supportingFiles = []) {
-    //     return (supportingFiles || []).filter((file) => {
-    //         if (!file) {
-    //             return false;
-    //         }
-
-    //         if (file.isPdf === true) {
-    //             return true;
-    //         }
-
-    //         if (file.isImage === true) {
-    //             return !this.isFileReferencedInAgreementHtml(file, html);
-    //         }
-
-    //         return false;
-    //     });
-    // }
-
-    // isFileReferencedInAgreementHtml(file, html) {
-    //     if (!file || !html) {
-    //         return false;
-    //     }
-
-    //     const candidates = this.getFileIdCandidates(file);
-
-    //     return candidates.some((candidate) => html.includes(candidate));
-    // }
-
-    // getFileIdCandidates(file) {
-    //     const candidates = [];
-
-    //     if (file.contentDocumentId) {
-    //         candidates.push(file.contentDocumentId);
-
-    //         if (file.contentDocumentId.length >= 15) {
-    //             candidates.push(file.contentDocumentId.substring(0, 15));
-    //         }
-    //     }
-
-    //     if (file.contentVersionId) {
-    //         candidates.push(file.contentVersionId);
-
-    //         if (file.contentVersionId.length >= 15) {
-    //             candidates.push(file.contentVersionId.substring(0, 15));
-    //         }
-    //     }
-
-    //     return candidates;
-    // }
-
     getAgreementImageFiles(supportingFiles = []) {
         return (supportingFiles || []).filter((file) => {
-            if (!file || file.isImage !== true || !file.base64Data) {
+
+            if (
+                !file ||
+                file.isImage !== true ||
+                !file.base64Data
+            ) {
+                return false;
+            }
+
+            const documentId =
+                this.getFileDocumentId(file);
+
+            /*
+            * NEW:
+            * If the user removed this file from the
+            * Supporting Images / PDFs component,
+            * it must not appear in the modal Agreement Preview.
+            *
+            * This does NOT delete the Salesforce File.
+            */
+            if (
+                documentId &&
+                this.removedSupportingDocumentIds.includes(documentId)
+            ) {
                 return false;
             }
 
             /*
-            * File-upload-section images are sent as separate attachments.
-            * They should not be embedded into agreement PDF.
+            * Existing functionality:
+            *
+            * Files uploaded through the Supporting Images / PDFs
+            * component are sent as separate attachments and are
+            * therefore not embedded into the agreement preview/PDF.
             */
-            if (file.contentDocumentId
-                && this.uploadedSupportingDocumentIds.includes(file.contentDocumentId)) {
+            if (
+                documentId &&
+                this.uploadedSupportingDocumentIds.includes(documentId)
+            ) {
                 return false;
             }
 
@@ -1722,16 +2431,35 @@ export default class SendClientAgreement extends LightningElement {
         });
     }
 
-    // get selectedSupportingFiles() {
-    //     return (this.supportingFiles || []).filter((file) => {
-    //         const documentId = this.getFileDocumentId(file);
-    //         return documentId && !this.removedSupportingDocumentIds.includes(documentId);
-    //     });
-    // }
-
     get selectedSupportingFiles() {
         return (this.supportingFiles || []).filter((file) => {
-            return this.getFileDocumentId(file);
+
+            const documentId =
+                this.getFileDocumentId(file);
+
+            /*
+            * Existing requirement:
+            * only Salesforce Files having a ContentDocumentId
+            * participate in the selected-file workflow.
+            */
+            if (!documentId) {
+                return false;
+            }
+
+            /*
+            * New functionality:
+            * hide files that the user removed from this modal.
+            *
+            * The Salesforce File itself still exists on
+            * the Opportunity / Notes & Attachments / Files.
+            */
+            if (
+                this.removedSupportingDocumentIds.includes(documentId)
+            ) {
+                return false;
+            }
+
+            return true;
         });
     }
 
@@ -2581,5 +3309,344 @@ export default class SendClientAgreement extends LightningElement {
 
             currentX += runWidth;
         });
+    }
+
+    /**
+     * Captures the original Project Information heading and table.
+     *
+     * The values in this section come from Salesforce Opportunity data
+     * and therefore should not be editable by the user.
+     */
+    captureProtectedProjectInformation(html) {
+        this.protectedProjectInformationHeadingHtml = '';
+        this.protectedProjectInformationTableHtml = '';
+
+        if (!html) {
+            return;
+        }
+
+        const container = document.createElement('div');
+
+        container.innerHTML = html;
+
+        const projectHeading = this.findProjectInformationHeading(container);
+
+        if (!projectHeading) {
+            console.warn(
+                'Project Information heading was not found. ' +
+                'Read-only protection could not be initialized.'
+            );
+            return;
+        }
+
+        const projectTable = this.findProjectInformationTable(projectHeading);
+
+        /*
+        * Store the exact original HTML generated by Apex.
+        */
+        this.protectedProjectInformationHeadingHtml = projectHeading.outerHTML;
+
+        if (projectTable) {
+            this.protectedProjectInformationTableHtml = projectTable.outerHTML;
+        }
+
+        console.log(
+            'Project Information protection initialized.',
+            {
+                headingProtected:
+                    Boolean(
+                        this.protectedProjectInformationHeadingHtml
+                    ),
+
+                tableProtected:
+                    Boolean(
+                        this.protectedProjectInformationTableHtml
+                    )
+            }
+        );
+    }
+
+
+    /**
+     * Restores the Project Information section to the authoritative
+     * version originally loaded from Salesforce.
+     *
+     * All other agreement content remains editable.
+     */
+    restoreProtectedProjectInformation(html) {
+        if (!html) {
+            return html || '';
+        }
+
+        /*
+        * If the protected snapshot was not captured for some reason,
+        * don't modify the user's agreement.
+        */
+        if (
+            !this.protectedProjectInformationHeadingHtml &&
+            !this.protectedProjectInformationTableHtml
+        ) {
+            return html;
+        }
+
+        const container = document.createElement('div');
+
+        container.innerHTML = html;
+
+        let currentHeading = this.findProjectInformationHeading(container);
+
+        /*
+        * Normal case:
+        * heading still exists in editor HTML.
+        */
+        if (currentHeading) {
+            const currentTable = this.findProjectInformationTable(currentHeading);
+
+            /*
+            * Restore heading.
+            */
+            if (
+                this.protectedProjectInformationHeadingHtml
+            ) {
+                const protectedHeading = this.createElementFromHtml(this.protectedProjectInformationHeadingHtml);
+
+                if (protectedHeading) {
+                    currentHeading.replaceWith(protectedHeading);
+
+                    currentHeading = protectedHeading;
+                }
+            }
+
+            /*
+            * Restore Project Information table.
+            */
+            if (
+                this.protectedProjectInformationTableHtml
+            ) {
+                const protectedTable =
+                    this.createElementFromHtml(this.protectedProjectInformationTableHtml);
+
+                const tableAfterRestoredHeading = this.findProjectInformationTable(currentHeading);
+
+                if (
+                    tableAfterRestoredHeading &&
+                    protectedTable
+                ) {
+                    tableAfterRestoredHeading.replaceWith(
+                        protectedTable
+                    );
+                } else if (
+                    currentTable &&
+                    protectedTable
+                ) {
+                    currentTable.replaceWith(
+                        protectedTable
+                    );
+                } else if (
+                    protectedTable &&
+                    currentHeading.parentNode
+                ) {
+                    currentHeading.insertAdjacentElement(
+                        'afterend',
+                        protectedTable
+                    );
+                }
+            }
+
+            return container.innerHTML;
+        }
+
+        /*
+        * Additional protection:
+        * User may have selected the entire heading/table and deleted it.
+        *
+        * In that case locate the next known section:
+        * "1. Definitions"
+        *
+        * and restore Project Information immediately before it.
+        */
+        const definitionsHeading =
+            this.findHeadingByText(
+                container,
+                '1. DEFINITIONS'
+            );
+
+        if (definitionsHeading) {
+            const protectedNodes = this.createProtectedProjectInformationNodes();
+
+            protectedNodes.forEach((node) => {
+                definitionsHeading.parentNode.insertBefore(
+                    node,
+                    definitionsHeading
+                );
+            });
+
+            return container.innerHTML;
+        }
+
+        /*
+        * Very defensive fallback.
+        *
+        * If the structure has been heavily edited and we cannot
+        * reliably determine where Project Information belongs,
+        * return the user's current HTML rather than corrupting
+        * the remaining agreement.
+        */
+        return container.innerHTML;
+    }
+
+
+    /**
+     * Finds the Project Information heading.
+     *
+     * Supports H1/H2/H3 because Salesforce rich text may normalize
+     * heading elements.
+     */
+    findProjectInformationHeading(container) {
+        if (!container) {
+            return null;
+        }
+
+        const headings =
+            Array.from(
+                container.querySelectorAll(
+                    'h1, h2, h3, h4, h5, h6'
+                )
+            );
+
+        return (
+            headings.find((heading) => {
+                return this.normalizeSectionText(
+                    heading.textContent
+                ) === 'PROJECT INFORMATION';
+            }) || null
+        );
+    }
+
+
+    /**
+     * Finds the first table associated with Project Information.
+     *
+     * Normally this is the next sibling generated by
+     * ClientAgreementInternalController.
+     */
+    findProjectInformationTable(projectHeading) {
+        if (!projectHeading) {
+            return null;
+        }
+
+        let currentNode = projectHeading.nextElementSibling;
+
+        while (currentNode) {
+            const tagName =
+                currentNode.tagName
+                    ? currentNode.tagName.toLowerCase()
+                    : '';
+
+            if (tagName === 'table') {
+                return currentNode;
+            }
+
+            /*
+            * Stop if another heading begins before a table.
+            * This prevents accidentally protecting another section.
+            */
+            if (
+                tagName === 'h1' ||
+                tagName === 'h2' ||
+                tagName === 'h3' ||
+                tagName === 'h4' ||
+                tagName === 'h5' ||
+                tagName === 'h6'
+            ) {
+                break;
+            }
+
+            currentNode = currentNode.nextElementSibling;
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Finds another section heading by normalized text.
+     */
+    findHeadingByText(container, expectedText) {
+        if (!container || !expectedText) {
+            return null;
+        }
+
+        const normalizedExpected = this.normalizeSectionText(expectedText);
+
+        const headings =
+            Array.from(
+                container.querySelectorAll(
+                    'h1, h2, h3, h4, h5, h6'
+                )
+            );
+
+        return (
+            headings.find((heading) => {
+                return this.normalizeSectionText(
+                    heading.textContent
+                ) === normalizedExpected;
+            }) || null
+        );
+    }
+
+
+    /**
+     * Normalizes heading text so formatting differences do not
+     * affect section detection.
+     */
+    normalizeSectionText(value) {
+        return String(value || '')
+            .replace(/\u00a0/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .toUpperCase();
+    }
+
+
+    /**
+     * Safely converts stored HTML into one DOM element.
+     */
+    createElementFromHtml(html) {
+        if (!html) {
+            return null;
+        }
+
+        const holder = document.createElement('div');
+
+        holder.innerHTML = html;
+
+        return holder.firstElementChild
+            ? holder.firstElementChild.cloneNode(true)
+            : null;
+    }
+
+
+    /**
+     * Recreates both protected Project Information nodes.
+     *
+     * Used if a user manages to delete the entire section.
+     */
+    createProtectedProjectInformationNodes() {
+        const nodes = [];
+
+        const heading = this.createElementFromHtml(this.protectedProjectInformationHeadingHtml);
+
+        const table = this.createElementFromHtml(this.protectedProjectInformationTableHtml);
+
+        if (heading) {
+            nodes.push(heading);
+        }
+
+        if (table) {
+            nodes.push(table);
+        }
+
+        return nodes;
     }
 }

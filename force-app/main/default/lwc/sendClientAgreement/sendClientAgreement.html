@@ -32,6 +32,126 @@
                     disabled>
                 </lightning-input>
 
+                <!-- =====================================================
+                     USER INSTRUCTIONS
+                     Added only for guidance.
+                     No existing functionality is changed.
+                     ===================================================== -->
+                <div class="workflow-instruction-box slds-m-top_medium">
+
+                    <div class="workflow-instruction-header">
+                        <lightning-icon
+                            icon-name="utility:info"
+                            size="x-small"
+                            alternative-text="Important Instructions"
+                            class="workflow-instruction-icon">
+                        </lightning-icon>
+
+                        <span class="workflow-instruction-title">
+                            Before You Continue
+                        </span>
+                    </div>
+
+                    <p class="workflow-instruction-intro">
+                        Please follow the steps below in sequence to ensure your
+                        agreement changes are retained correctly.
+                    </p>
+
+                    <div class="workflow-step">
+                        <span class="workflow-step-number">1</span>
+
+                        <div class="workflow-step-content">
+                            <strong>Upload supporting documents first</strong>
+                            <p>
+                                Use <strong>Upload Supporting Files</strong> below
+                                to add any required PNG, JPG, JPEG, or PDF files.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <span class="workflow-step-number">2</span>
+
+                        <div class="workflow-step-content">
+                            <strong>Edit the agreement after uploading</strong>
+                            <p>
+                                Once all supporting documents are uploaded, click
+                                <strong> Edit</strong> to make text or formatting changes.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <span class="workflow-step-number">3</span>
+
+                        <div class="workflow-step-content">
+                            <strong>Save and send</strong>
+                            <p>
+                                After completing your changes, click
+                                <strong> Save</strong> and then <strong>Send</strong>.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-warning">
+                        <strong>Important: </strong>
+                        Uploading supporting files after editing the agreement may
+                        refresh the preview and cause your saved text formatting
+                        changes to be lost. Please upload all supporting files first.
+                    </div>
+
+                </div>
+
+                <!--<div class="slds-m-top_medium">
+                    <template if:true={isEditing}>
+                        <lightning-input-rich-text
+                            label="Agreement Body"
+                            value={agreementHtml}
+                            share-with-entity-id={recordId}
+                            onchange={handleAgreementChange}>
+                        </lightning-input-rich-text>
+                    </template>
+
+                    <template if:false={isEditing}>
+                        <div
+                            class="preview-box"
+                            lwc:dom="manual">
+                        </div>
+                    </template>
+                </div>-->
+
+                <div class="slds-m-top_medium">
+
+                    <div class="protected-brand-header">
+                        <img
+                            src={areliaLogoUrl}
+                            alt="Arelia Space"
+                            class="arelia-agreement-logo"
+                            draggable="false"
+                        />
+
+                        <div class="brand-divider"></div>
+                    </div>
+
+                    <template if:true={isEditing}>
+                        <lightning-input-rich-text
+                            label="Agreement Body"
+                            value={agreementHtml}
+                            share-with-entity-id={recordId}
+                            formats={richTextFormats}
+                            onchange={handleAgreementChange}>
+                        </lightning-input-rich-text>
+                    </template>
+
+                    <template if:false={isEditing}>
+                        <div
+                            class="preview-box"
+                            lwc:dom="manual">
+                        </div>
+                    </template>
+
+                </div>
+
                 <div class="slds-m-top_medium">
                     <lightning-button
                         label="Edit"
@@ -56,27 +176,10 @@
                     </lightning-button>
                 </div>
 
-                <div class="slds-m-top_medium">
-                    <template if:true={isEditing}>
-                        <lightning-input-rich-text
-                            label="Agreement Body"
-                            value={agreementHtml}
-                            share-with-entity-id={recordId}
-                            onchange={handleAgreementChange}>
-                        </lightning-input-rich-text>
-                    </template>
-
-                    <template if:false={isEditing}>
-                        <div
-                            class="preview-box"
-                            lwc:dom="manual">
-                        </div>
-                    </template>
-                </div>
-
                 <div class="slds-m-top_medium upload-section">
 
                     <h3>Supporting Images / PDFs</h3>
+
                     <p class="helper-text">
                         Upload supporting PNG, JPG, JPEG, or PDF files. Images will appear inside the agreement PDF. PDF files will be sent as separate attachments.
                     </p>
@@ -92,33 +195,40 @@
 
                     <template if:true={hasSupportingFiles}>
                         <div class="supporting-file-list slds-m-top_small">
+
                             <strong>Selected supporting files:</strong>
 
                             <template for:each={selectedSupportingFiles} for:item="file">
+
                                 <div
                                     key={file.uiKey}
                                     class="supporting-file-row slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-m-top_x-small"
                                 >
+
                                     <div>
                                         <span>{file.fileName}</span>
+
                                         <span class="file-type-pill slds-m-left_x-small">
                                             {file.displayType}
                                         </span>
                                     </div>
 
-                                    <!--<lightning-button-icon
+                                    <lightning-button-icon
                                         icon-name="utility:close"
-                                        alternative-text="Remove file"
-                                        title="Remove file from this agreement"
-                                        data-document-id={file.contentDocumentId}
-                                        onclick={handleRemoveSupportingFile}
                                         variant="bare"
-                                    >
-                                    </lightning-button-icon>-->
+                                        alternative-text="Remove file"
+                                        title="Remove file"
+                                        data-document-id={file.contentDocumentId}
+                                        onclick={handleRemoveSupportingFile}>
+                                    </lightning-button-icon>
+
                                 </div>
+
                             </template>
+
                         </div>
                     </template>
+
                 </div>
 
                 <!-- Hidden PDF source -->

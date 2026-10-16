@@ -2,6 +2,7 @@ import { LightningElement, track, wire } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getAvailableTimeSlots from '@salesforce/apex/AppointmentControllerToOpp.getAvailableTimeSlots';
 import updateAppointmentStatus from '@salesforce/apex/AppointmentControllerToOpp.updateAppointmentStatus';
+import getSupervisorContact from '@salesforce/apex/AppointmentControllerToOpp.getSupervisorContact';
 import { getRecord } from 'lightning/uiRecordApi';
 
 import OPP_APPT_STATUS from '@salesforce/schema/Opportunity.Re_Visit_Site_Appointment_Status__c';
@@ -31,22 +32,46 @@ export default class AppointmentApprovalToOpp extends LightningElement {
 
     recordId;
     minDate;
-    
+
     // Tracked Record Data
     currentStatus;
     appointmentDate;
     appointmentTime;
+    rescheduledDate;
+    rescheduledTime;
+
+    // @track so showing the already-responded status banner on initial load
+    // (set from wiredOpp, not from a user action) reliably re-renders the template.
+    @track alreadyResponded = false;
+
+    @track supervisorName = '';
+    @track supervisorEmail = '';
+    @track supervisorPhone = '';
 
     get confirmButtonsDisabled() {
         return this.isSubmitting;
     }
 
+    get isRescheduledResponse() {
+        return this.currentStatus === 'Rescheduled';
+    }
+
+    get statusBadgeText() {
+        return this.isRescheduledResponse ? 'Reschedule Requested' : 'Approved';
+    }
+
+    // Once the customer requests a reschedule, the original Re_Visit_Appointment_Date__c/
+    // Time_Slots__c are cleared server-side and the requested date/time moves to
+    // Re_Visit_Appointment_Rescheduled_Date__c/Re_Visit_Appointm_Rescheduled_Time_Slots__c -
+    // so these getters must follow whichever pair is actually populated.
     get formattedAppointmentDate() {
-        return this.appointmentDate ? this.prettyDate(this.appointmentDate) : 'Not Scheduled';
+        const relevantDate = this.isRescheduledResponse ? this.rescheduledDate : this.appointmentDate;
+        return relevantDate ? this.prettyDate(relevantDate) : 'Not Scheduled';
     }
 
     get displayAppointmentTime() {
-        return this.appointmentTime ? this.appointmentTime : '--:--';
+        const relevantTime = this.isRescheduledResponse ? this.rescheduledTime : this.appointmentTime;
+        return relevantTime ? relevantTime : '--:--';
     }
 
     connectedCallback() {
@@ -60,23 +85,65 @@ export default class AppointmentApprovalToOpp extends LightningElement {
         this.minDate = `${yyyy}-${mm}-${dd}`;
     }
 
-    @wire(getRecord, { 
-        recordId: '$recordId', 
+    @wire(getRecord, {
+        recordId: '$recordId',
         fields: [
             OPP_APPT_STATUS,
             'Opportunity.Re_Visit_Appointment_Date__c',
-            'Opportunity.Re_Visit_Appointment_Time_Slots__c'
-        ] 
+            'Opportunity.Re_Visit_Appointment_Time_Slots__c',
+            'Opportunity.Re_Visit_Appointment_Rescheduled_Date__c',
+            'Opportunity.Re_Visit_Appointm_Rescheduled_Time_Slots__c'
+        ]
     })
     wiredOpp({ data, error }) {
         if (data) {
             this.currentStatus = data.fields.Re_Visit_Site_Appointment_Status__c?.value;
             this.appointmentDate = data.fields.Re_Visit_Appointment_Date__c ? data.fields.Re_Visit_Appointment_Date__c.value : null;
             this.appointmentTime = data.fields.Re_Visit_Appointment_Time_Slots__c ? data.fields.Re_Visit_Appointment_Time_Slots__c.value : null;
+            this.rescheduledDate = data.fields.Re_Visit_Appointment_Rescheduled_Date__c ? data.fields.Re_Visit_Appointment_Rescheduled_Date__c.value : null;
+            this.rescheduledTime = data.fields.Re_Visit_Appointm_Rescheduled_Time_Slots__c ? data.fields.Re_Visit_Appointm_Rescheduled_Time_Slots__c.value : null;
+
+            // Both Approved and Rescheduled are final from the customer's side here -
+            // ScheduleAppointmentonOppController resets status back to 'Pending' only when
+            // the supervisor schedules a new appointment, so 'Rescheduled' is not an
+            // invitation for the customer to respond again via this same link. Show the
+            // already-responded status + appointment details instead of the approve/
+            // reschedule form when this link is opened again.
+            if (this.currentStatus === 'Approved' || this.isRescheduledResponse) {
+                this.buttonsDisabled = true;
+                this.alreadyResponded = true;
+                this.loadSupervisorContact();
+            }
         } else if (error) {
             // eslint-disable-next-line no-console
             console.error('Error fetching record data:', error);
         }
+    }
+
+    // =========================================================
+    // SUPERVISOR CONTACT (shown on the already-responded screen)
+    // =========================================================
+    loadSupervisorContact() {
+        getSupervisorContact({ opportunityId: this.recordId })
+            .then((contact) => {
+                this.supervisorName = contact?.name || '';
+                this.supervisorEmail = contact?.email || '';
+                this.supervisorPhone = contact?.phone || '';
+            })
+            .catch((error) => {
+                // eslint-disable-next-line no-console
+                console.error('Error fetching supervisor contact:', error);
+            });
+    }
+
+    get hasSupervisorContact() {
+        return !!(this.supervisorEmail || this.supervisorPhone);
+    }
+
+    get supervisorContactLine() {
+        const details = [this.supervisorEmail, this.supervisorPhone].filter(Boolean).join(' / ');
+        const namePart = this.supervisorName ? ` (${this.supervisorName})` : '';
+        return `If you have any queries, please contact your supervisor${namePart}: ${details}`;
     }
 
     onApproveClick() {

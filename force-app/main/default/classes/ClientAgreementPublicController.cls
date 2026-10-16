@@ -78,11 +78,7 @@ public without sharing class ClientAgreementPublicController {
         response.supervisorEmail = agreement.Opportunity__r.Supervisor_User_Email__c;
         response.status = agreement.Status__c;
 
-        response.supportingFiles =
-            ClientAgreementAttachmentService.getAgreementImageFilesExcludingAgreementAttachments(
-                agreement.Opportunity__c,
-                agreement.Id
-            );
+        response.supportingFiles = ClientAgreementAttachmentService.getAgreementImageFilesExcludingAgreementAttachments(agreement.Opportunity__c, agreement.Id, agreement.Agreement_HTML__c);
 
         System.debug(DEBUG_PREFIX + 'getAgreementByToken END - Success');
         return response;
@@ -160,11 +156,7 @@ public without sharing class ClientAgreementPublicController {
         response.supervisorEmail = agreement.Opportunity__r.Supervisor_User_Email__c;
         response.status = agreement.Status__c;
 
-        response.supportingFiles =
-            ClientAgreementAttachmentService.getAgreementImageFilesExcludingAgreementAttachments(
-                agreement.Opportunity__c,
-                agreement.Id
-            );
+        response.supportingFiles = ClientAgreementAttachmentService.getAgreementImageFilesExcludingAgreementAttachments(agreement.Opportunity__c, agreement.Id, agreement.Agreement_HTML__c);
 
         System.debug(DEBUG_PREFIX + 'getAgreementById END - Success');
         return response;

@@ -39,7 +39,7 @@ export default class ProformaClientResponse extends LightningElement {
             return;
         }
 
-        getInvoice({ recordId: this.recordId })
+        getInvoice({ token: this.recordId })
             .then((result) => {
                 this.invoiceData = result;
                 this.isSubmitted = this.isFinalStatus(result.status);
@@ -131,7 +131,7 @@ export default class ProformaClientResponse extends LightningElement {
         this.error = null;
 
         submitDecision({
-            recordId: this.recordId,
+            token: this.recordId,
             status,
             comments: this.comments
         })
