@@ -7,6 +7,10 @@ global without sharing class ProspectProjectDetailsApi {
         public Id leadId;
         public List<ProjectDetailsResponse> projects;
 
+        public Boolean isConverted;
+        public Id convertedOpportunityId;
+        public Id convertedAccountId;
+        public Id convertedContactId;
         public Boolean projectSubmitted;
         public String approvalStatus;
 
@@ -57,7 +61,7 @@ global without sharing class ProspectProjectDetailsApi {
             }
             List<Lead> leadRecords = [SELECT Id, Portal_Account_Key__c, FirstName, LastName, Email, Phone, Site_Space__c,
                         Type_Of_Project__c, Project_Scope__c, Plan_Level__c, Customer_Budget__c, Site_Location__c,
-                        Project_Description__c, Approval_Status__c, Project_Request_Submitted__c FROM Lead WHERE Id = :leadId LIMIT 1 ];
+                        Project_Description__c, Approval_Status__c, Project_Request_Submitted__c, IsConverted, ConvertedOpportunityId, ConvertedAccountId, ConvertedContactId FROM Lead WHERE Id = :leadId LIMIT 1 ];
             
             if (leadRecords.isEmpty()) {
                 RestContext.response.statusCode = 404;
@@ -70,6 +74,10 @@ global without sharing class ProspectProjectDetailsApi {
             response.leadId = leadRecord.Id;
             response.projectSubmitted = leadRecord.Project_Request_Submitted__c == true;
             response.approvalStatus = leadRecord.Approval_Status__c;
+            response.isConverted = leadRecord.IsConverted;
+            response.convertedOpportunityId = leadRecord.ConvertedOpportunityId;
+            response.convertedAccountId = leadRecord.ConvertedAccountId;
+            response.convertedContactId = leadRecord.ConvertedContactId;
             response.firstName = leadRecord.FirstName;
             response.lastName = leadRecord.LastName;
             response.email = leadRecord.Email;
@@ -82,12 +90,11 @@ global without sharing class ProspectProjectDetailsApi {
             response.siteLocation = leadRecord.Site_Location__c;
             response.projectDescription = leadRecord.Project_Description__c;
             
-            String accountKey = String.isBlank(leadRecord.Portal_Account_Key__c)
-                ? String.valueOf(leadRecord.Id) : leadRecord.Portal_Account_Key__c;
+            String accountKey = String.isBlank(leadRecord.Portal_Account_Key__c) ? String.valueOf(leadRecord.Id) : leadRecord.Portal_Account_Key__c;
             response.projects = new List<ProjectDetailsResponse>();
             for (Lead project : [SELECT Id, Site_Space__c, Type_Of_Project__c, Project_Scope__c,
                 Plan_Level__c, Customer_Budget__c, Site_Location__c, Project_Description__c,
-                Project_Request_Submitted__c, Approval_Status__c FROM Lead
+                Project_Request_Submitted__c, Approval_Status__c, IsConverted, ConvertedOpportunityId, ConvertedAccountId, ConvertedContactId FROM Lead
                 WHERE Id = :accountKey OR Portal_Account_Key__c = :accountKey
                 ORDER BY CreatedDate ASC, Id ASC]) {
                 ProjectDetailsResponse item = new ProjectDetailsResponse();
@@ -95,6 +102,10 @@ global without sharing class ProspectProjectDetailsApi {
                 item.leadId = project.Id;
                 item.projectSubmitted = project.Project_Request_Submitted__c == true;
                 item.approvalStatus = project.Approval_Status__c;
+                item.isConverted = project.IsConverted;
+                item.convertedOpportunityId = project.ConvertedOpportunityId;
+                item.convertedAccountId = project.ConvertedAccountId;
+                item.convertedContactId = project.ConvertedContactId;
                 item.siteSpace = project.Site_Space__c == null ? null : String.valueOf(project.Site_Space__c);
                 item.typeOfProject = project.Type_Of_Project__c;
                 item.projectScope = project.Project_Scope__c;
@@ -133,6 +144,7 @@ global without sharing class ProspectProjectDetailsApi {
     global static ProjectDetailsResponse updateProjectDetails() {
 
         ProjectDetailsResponse response = new ProjectDetailsResponse();
+        Savepoint checkpoint = Database.setSavepoint();
         try {
             RestContext.response.addHeader('Content-Type','application/json');
             
@@ -193,6 +205,18 @@ global without sharing class ProspectProjectDetailsApi {
             Set<String> validProjectScopes = new Set<String>{'Full Home Interiors','Home Decor','Kitchen','Bed Room','Hall Interior',
                                             'Conference Hall','Fully Office Interiors','Office Decor','Office Space','Dining Hall',
                                             'Cabins','1BHK','2BHK','3BHK','4BHK','5BHK','1RK'};
+
+            Set<String> homeScopes = new Set<String>{'Full Home Interiors', 'Home Decor',
+                'Kitchen', 'Bed Room', 'Hall Interior', 'Dining Hall',
+                '1BHK', '2BHK', '3BHK', '4BHK', '5BHK', '1RK'};
+            Set<String> officeScopes = new Set<String>{'Conference Hall',
+                'Fully Office Interiors', 'Office Decor', 'Office Space', 'Cabins'};
+            if ((typeOfProject == 'Home' && !homeScopes.contains(projectScope)) ||
+                (typeOfProject == 'Office' && !officeScopes.contains(projectScope))) {
+                RestContext.response.statusCode = 400;
+                response.message = 'Select a project scope matching the type of project.';
+                return response;
+            }
 
             Set<String> validPlanLevels = new Set<String>{'Standard','Premium','Luxury'};
             
@@ -281,8 +305,7 @@ global without sharing class ProspectProjectDetailsApi {
                 leadRecord = new Lead(FirstName = firstName, LastName = lastName,
                     Company = source.Company, Email = email, Phone = phone,
                     Enter_Password__c = password, Confirm_password__c = password,
-                    Portal_Account_Key__c = String.isBlank(source.Portal_Account_Key__c)
-                        ? String.valueOf(source.Id) : source.Portal_Account_Key__c);
+                    Portal_Account_Key__c = String.isBlank(source.Portal_Account_Key__c) ? String.valueOf(source.Id) : source.Portal_Account_Key__c);
             }
 
             leadRecord.Site_Space__c = siteSpace;
@@ -305,6 +328,9 @@ global without sharing class ProspectProjectDetailsApi {
                     response.message = saved.getErrors()[0].getMessage();
                     return response;
                 }
+                // Use the ID returned by DML explicitly for the token lookup and response.
+                leadRecord.Id = saved.getId();
+                ProspectDeviceTokenRestController.copyActiveDevicesToNewProject(leadId, leadRecord.Id);
             } else {
                 update as system leadRecord;
             }
@@ -317,18 +343,25 @@ global without sharing class ProspectProjectDetailsApi {
             return response;
 
         } catch (DmlException exceptionValue) {
+            Database.rollback(checkpoint);
             RestContext.response.statusCode = 400;
             response.success = false;
             response.message = exceptionValue.getDmlMessage(0);
             return response;
             
         } catch (QueryException exceptionValue) {
-            RestContext.response.statusCode = 404;
+            Database.rollback(checkpoint);
+            System.debug(LoggingLevel.ERROR,
+                'Project creation query failed: ' + exceptionValue.getMessage() +
+                '\n' + exceptionValue.getStackTraceString());
+            RestContext.response.statusCode = 500;
             response.success = false;
-            response.message = 'The prospect Lead record was not found.';
+            response.message = 'Project creation query failed at line ' +
+                exceptionValue.getLineNumber() + ': ' + exceptionValue.getMessage();
             return response;
-            
+
         } catch (Exception exceptionValue) {
+            Database.rollback(checkpoint);
             RestContext.response.statusCode = 500;
             response.success = false;
             response.message = exceptionValue.getMessage();
