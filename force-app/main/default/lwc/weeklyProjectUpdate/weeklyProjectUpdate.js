@@ -15,7 +15,8 @@ export default class WeeklyProjectUpdate extends LightningElement {
     message = '';
    
     @track uploadedFiles = [];      // for UI display
-uploadedFileIds = []; 
+uploadedFileIds = [];
+    externalFileLink = '';
 
     acceptedFormats = ['.pdf', '.jpg', '.jpeg', '.png', '.mp4', '.mov'];
 
@@ -41,6 +42,7 @@ uploadedFileIds = [];
     // RESET FILE STATE
     this.uploadedFiles = [];
     this.uploadedFileIds = [];
+    this.externalFileLink = '';
     this.message = '';
 
     this.showProjectList = false;
@@ -77,18 +79,24 @@ uploadedFileIds = [];
     });
 }
 
+    handleExternalFileLinkChange(event) {
+        this.externalFileLink = event.target.value;
+    }
+
     goBack() {
         this.showProjectList = true;
         this.showUpdatePanel = false;
         this.message = '';
         this.uploadedFileIds = [];
+        this.externalFileLink = '';
     }
 
     sendUpdate() {
         sendWeeklyEmail({
     projectId: this.selectedProjectId,
-    weeklySummary: this.message,   
-    fileIds: this.uploadedFileIds
+    weeklySummary: this.message,
+    fileIds: this.uploadedFileIds,
+    externalFileLink: this.externalFileLink
 })
         .then(() => {
             this.dispatchEvent(
@@ -98,9 +106,10 @@ uploadedFileIds = [];
                     variant: 'success'
                 })
             );
-            
+
             this.uploadedFiles = [];
     this.uploadedFileIds = [];
+    this.externalFileLink = '';
     this.message = '';
     this.goBack();
         })

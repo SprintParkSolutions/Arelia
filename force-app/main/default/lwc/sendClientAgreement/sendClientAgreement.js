@@ -15,6 +15,7 @@ export default class SendClientAgreement extends LightningElement {
     @track clientEmail;
     @track supervisorEmail;
     @track agreementHtml;
+    @track externalSupportingLinks = '';
 
     isLoading = true;
     isSending = false;
@@ -64,6 +65,12 @@ export default class SendClientAgreement extends LightningElement {
     get areliaLogoUrl() {
         return ARELIA_LOGO;
     }
+
+    
+    handleExternalSupportingLinksChange(event) {
+        this.externalSupportingLinks = event.target.value;
+    }
+
 
     async connectedCallback() {
         try {
@@ -1138,7 +1145,8 @@ export default class SendClientAgreement extends LightningElement {
                 opportunityId: this.recordId,
                 agreementHtml: this.agreementHtml,
                 pdfBase64: pdfBase64,
-                separateAttachmentContentDocumentIds: this.selectedSupportingDocumentIds
+                separateAttachmentContentDocumentIds: this.selectedSupportingDocumentIds,
+                externalSupportingLinks: this.externalSupportingLinks
             });
 
             this.showToast(

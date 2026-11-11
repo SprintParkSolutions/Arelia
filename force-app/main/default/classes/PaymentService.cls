@@ -10,8 +10,13 @@
  * endpoints run in plain system mode. The real security boundary is the
  * explicit contactId ownership check below, not object permissions.
  */
+/**
+ * Payment amounts are supplied by one project-wide allocation.
+ * Paid_Amount__c is the immutable amount actually received.
+ * Order_Amount__c is the server-side amount used to create a Razorpay order.
+ * Existing guest-facing access conventions are retained.
+ */
 public without sharing class PaymentService {
-
     private static final String STATUS_PENDING = 'Pending';
     private static final String STATUS_PAID = 'Paid';
     private static final String STATUS_FAILED = 'Failed';
@@ -32,8 +37,8 @@ public without sharing class PaymentService {
         public String razorpayOrderId;
         public String razorpayPaymentId;
         public String paymentDate;
+        public Decimal orderAmount;
     }
-
     public class PaymentHistoryItem {
         public Id paymentTermId;
         public String projectName;
@@ -45,7 +50,6 @@ public without sharing class PaymentService {
         public String paymentDate;
         public String razorpayPaymentId;
     }
-
     public class ReceiptData {
         public String receiptNumber;
         public String projectName;
@@ -61,91 +65,136 @@ public without sharing class PaymentService {
         public String status;
     }
 
-    // Payment_Term__c has no Amount__c field -- the installment amount is
-    // derived from the parent Project__c's Supervisor_Estimated_Budget__c
-    // ("Project Final Approval Budget", the finalized contract value) times
-    // this term's Percentage__c.
     private static final String TERM_FIELDS =
-        'Id, Name, Percentage__c, Due_Date__c, Transaction_Status__c, ' +
-        'Payment_Received__c, Payment_Date__c, Razorpay_Order_Id__c, Razorpay_Payment_Id__c, ' +
-        'Project__c, Project__r.Name, Project__r.Supervisor_Estimated_Budget__c, Project__r.Client__c, ' +
+        'Id, Name, Term_Label__c, Percentage__c, Due_Date__c, Transaction_Status__c, ' +
+        'Paid_Amount__c, Order_Amount__c, Payment_Received__c, Payment_Date__c, ' +
+        'Razorpay_Order_Id__c, Razorpay_Payment_Id__c, Project__c, Project__r.Name, ' +
+        'Project__r.Supervisor_Estimated_Budget__c, Project__r.Client__c, ' +
         'Project__r.Client__r.Name, Project__r.Client__r.Email, Project__r.Client__r.Phone';
 
-    public static PaymentTermDetail getPayableTerm(Id paymentTermId, Id contactId) {
-        if (paymentTermId == null) {
-            throw new PaymentException('A payment term is required.');
-        }
-
+    private static Payment_Term__c readTerm(Id paymentTermId, Id contactId) {
+        if (paymentTermId == null) throw new PaymentException('A payment term is required.');
         List<Payment_Term__c> terms = Database.query(
             'SELECT ' + TERM_FIELDS + ' FROM Payment_Term__c WHERE Id = :paymentTermId LIMIT 1'
         );
-
-        if (terms.isEmpty()) {
-            throw new PaymentException('Payment term not found.');
-        }
-
+        if (terms.isEmpty()) throw new PaymentException('Payment term not found.');
         Payment_Term__c term = terms[0];
-
         if (contactId != null && term.Project__r != null && term.Project__r.Client__c != contactId) {
             throw new PaymentException('You are not authorized to view this payment term.');
         }
+        return term;
+    }
 
-        return toDetail(term);
+    public static PaymentTermDetail getPayableTerm(Id paymentTermId, Id contactId) {
+        Payment_Term__c term = readTerm(paymentTermId, contactId);
+        return toDetail(term, getProjectScheduleAmounts(new Set<Id>{term.Project__c}).get(term.Id));
+    }
+
+    // Queries all siblings, even when a caller needs only a single installment
+    // or a contact's history spans more than one project.
+    public static Map<Id, Decimal> getProjectScheduleAmounts(Set<Id> projectIds) {
+        projectIds = new Set<Id>(projectIds);
+        projectIds.remove(null);
+        Map<Id, Decimal> result = new Map<Id, Decimal>();
+        if (projectIds.isEmpty()) return result;
+        List<Payment_Term__c> terms = Database.query(
+            'SELECT ' + TERM_FIELDS + ' FROM Payment_Term__c WHERE Project__c IN :projectIds ' +
+            'ORDER BY Due_Date__c ASC NULLS LAST, Id ASC'
+        );
+        Map<Id, List<PaymentScheduleCalculator.Line>> groups = new Map<Id, List<PaymentScheduleCalculator.Line>>();
+        Map<Id, Decimal> budgets = new Map<Id, Decimal>();
+        for (Payment_Term__c term : terms) {
+            if (!groups.containsKey(term.Project__c)) {
+                groups.put(term.Project__c, new List<PaymentScheduleCalculator.Line>());
+                budgets.put(term.Project__c, term.Project__r.Supervisor_Estimated_Budget__c);
+            }
+            groups.get(term.Project__c).add(new PaymentScheduleCalculator.Line(
+                term.Id, term.Percentage__c, resolveStatus(term) == STATUS_PAID, term.Paid_Amount__c
+            ));
+        }
+        for (Id projectId : groups.keySet()) {
+            result.putAll(PaymentScheduleCalculator.allocate(budgets.get(projectId), groups.get(projectId)));
+        }
+        return result;
     }
 
     public static void assertPending(PaymentTermDetail detail) {
         if (detail == null || detail.status != STATUS_PENDING) {
             throw new PaymentException('This installment has already been paid or is not currently payable.');
         }
-        // Amount is derived from Project__r.Supervisor_Estimated_Budget__c -- if that's not set
-        // on the parent project, fail fast with a clear message rather than
-        // silently sending Razorpay a 0-amount order (which it rejects with
-        // a confusing "less than minimum amount" error).
         if (detail.amount == null || detail.amount <= 0) {
-            throw new PaymentException('The payment amount for this installment could not be determined. Please contact support.');
+            throw new PaymentException('The payment amount could not be determined. Please contact support to reconcile the payment schedule.');
         }
     }
 
-    // Returns true if this call transitioned the term to Paid, false if it was
-    // already Paid (e.g. the webhook and the client-side /verify call both
-    // fired for the same payment) -- callers use this to avoid sending the
-    // payment-success email twice for one payment.
+    public static void recordPaymentOrder(Id paymentTermId, String orderId, Decimal amount) {
+        if (String.isBlank(orderId) || amount == null || amount <= 0) {
+            throw new PaymentException('A valid payment order and amount are required.');
+        }
+        Payment_Term__c term = [
+            SELECT Id, Transaction_Status__c, Payment_Received__c, Razorpay_Order_Id__c, Order_Amount__c
+            FROM Payment_Term__c WHERE Id = :paymentTermId LIMIT 1 FOR UPDATE
+        ];
+        if (resolveStatus(term) != STATUS_PENDING) throw new PaymentException('This installment is no longer payable.');
+        if (term.Order_Amount__c != null && String.isNotBlank(term.Razorpay_Order_Id__c) &&
+            term.Razorpay_Order_Id__c != orderId) {
+            throw new PaymentException('Another payment order already exists for this installment. Please try again.');
+        }
+        term.Razorpay_Order_Id__c = orderId;
+        term.Order_Amount__c = amount.setScale(2, RoundingMode.HALF_UP);
+        update term;
+    }
+
+    @TestVisible private static Decimal getRecordedOrderAmount(Payment_Term__c term, String orderId) {
+        if (String.isBlank(orderId) || term.Razorpay_Order_Id__c != orderId ||
+            term.Order_Amount__c == null || term.Order_Amount__c <= 0) {
+            throw new PaymentException('The original payment order amount is unavailable. Please contact support to reconcile this payment.');
+        }
+        return term.Order_Amount__c;
+    }
+
+    // Verification and PDF/email generation must use the order's original
+    // amount, even if the budget changed after that order was created.
+    public static PaymentTermDetail getPaymentVerificationDetail(Id paymentTermId, Id contactId, String orderId) {
+        Payment_Term__c term = readTerm(paymentTermId, contactId);
+        if (resolveStatus(term) == STATUS_PAID) {
+            if (term.Razorpay_Order_Id__c != orderId || term.Paid_Amount__c == null) {
+                throw new PaymentException('This payment does not match the recorded installment.');
+            }
+            return toDetail(term, term.Paid_Amount__c);
+        }
+        if (resolveStatus(term) == STATUS_REFUNDED) throw new PaymentException('This installment has been refunded.');
+        return toDetail(term, getRecordedOrderAmount(term, orderId));
+    }
+
     public static Boolean markPaymentSuccess(Id paymentTermId, String orderId, String paymentId, String signature, Decimal amountPaid) {
         List<Payment_Term__c> terms = [
-            SELECT Id, Transaction_Status__c, Description__c
-            FROM Payment_Term__c
-            WHERE Id = :paymentTermId
-            LIMIT 1
-            FOR UPDATE
+            SELECT Id, Transaction_Status__c, Payment_Received__c, Description__c,
+                   Paid_Amount__c, Order_Amount__c, Razorpay_Order_Id__c, Razorpay_Payment_Id__c
+            FROM Payment_Term__c WHERE Id = :paymentTermId LIMIT 1 FOR UPDATE
         ];
-
-        if (terms.isEmpty()) {
-            throw new PaymentException('Payment term not found.');
-        }
-
+        if (terms.isEmpty()) throw new PaymentException('Payment term not found.');
         Payment_Term__c term = terms[0];
-        if (term.Transaction_Status__c == STATUS_PAID) {
+        if (resolveStatus(term) == STATUS_PAID) {
+            if (term.Razorpay_Order_Id__c != orderId || term.Razorpay_Payment_Id__c != paymentId) {
+                throw new PaymentException('A different payment has already settled this installment.');
+            }
             return false;
         }
-
+        // Never accept a recomputed budget percentage as proof of how much
+        // Razorpay charged. The amount was captured server-side at order creation.
+        if (resolveStatus(term) == STATUS_REFUNDED) throw new PaymentException('This installment has been refunded.');
+        Decimal capturedAmount = getRecordedOrderAmount(term, orderId);
+        if (String.isBlank(paymentId)) throw new PaymentException('A payment identifier is required.');
         Datetime paymentDate = Datetime.now();
-
         term.Transaction_Status__c = STATUS_PAID;
         term.Payment_Received__c = true;
+        term.Paid_Amount__c = capturedAmount;
         term.Payment_Date__c = paymentDate;
         term.Razorpay_Order_Id__c = orderId;
         term.Razorpay_Payment_Id__c = paymentId;
         term.Razorpay_Signature__c = signature;
-        term.Description__c = appendPaymentDescription(term.Description__c, paymentDate, amountPaid, paymentId);
-
-        // Guest users can only ever be granted Read/Create at the object
-        // permission level (Salesforce platform restriction) -- they can
-        // never have Update. So this write intentionally runs as a plain
-        // system-mode DML rather than through Security.stripInaccessible,
-        // which would otherwise strip every field being written (since the
-        // object itself is never "updatable" for the guest user) and turn
-        // this into a silent no-op. The curated, reviewed logic in this
-        // method is the security boundary here, not object-level CRUD.
+        term.Description__c = appendPaymentDescription(term.Description__c, paymentDate, capturedAmount, paymentId);
         update term;
         return true;
     }
@@ -155,75 +204,55 @@ public without sharing class PaymentService {
             'Date: ' + paymentDate.format('dd MMM yyyy, hh:mm a') + '\n' +
             'Amount: ' + PaymentUtil.formatIndianCurrency(amountPaid) + ' (' + PaymentUtil.amountToWords(amountPaid) + ')\n' +
             'Razorpay Payment ID: ' + paymentId;
-
         return String.isNotBlank(existingDescription) ? existingDescription + '\n\n' + entry : entry;
     }
 
-    // Records the customer's choice to pay this installment outside Razorpay.
-    // Transaction_Status__c is deliberately left untouched (still Pending) --
-    // this is not a payment confirmation, just a note for the supervisor who
-    // must follow up and record the payment once it's actually received.
     public static void saveOfflinePaymentDetails(Id paymentTermId, Id contactId, String description) {
         PaymentTermDetail detail = getPayableTerm(paymentTermId, contactId);
         assertPending(detail);
-
-        if (String.isBlank(description)) {
-            throw new PaymentException('Please describe how you will complete this payment offline.');
-        }
-
-        Payment_Term__c term = new Payment_Term__c(
-            Id = paymentTermId,
-            Payment_Mode__c = 'Offline',
-            Offline_Payment_Description__c = description
-        );
-        update term;
+        if (String.isBlank(description)) throw new PaymentException('Please describe how you will complete this payment offline.');
+        update new Payment_Term__c(Id = paymentTermId, Payment_Mode__c = 'Offline', Offline_Payment_Description__c = description);
     }
 
     public static void markPaymentFailed(Id paymentTermId, String orderId) {
-        Payment_Term__c term = new Payment_Term__c(
-            Id = paymentTermId,
-            Transaction_Status__c = STATUS_FAILED,
-            Razorpay_Order_Id__c = orderId
-        );
+        List<Payment_Term__c> terms = [
+            SELECT Id, Transaction_Status__c, Payment_Received__c, Razorpay_Order_Id__c
+            FROM Payment_Term__c WHERE Id = :paymentTermId LIMIT 1 FOR UPDATE
+        ];
+        if (terms.isEmpty()) return;
+        Payment_Term__c term = terms[0];
+        // A late failure must never overwrite a successful payment.
+        if (resolveStatus(term) == STATUS_PAID || term.Razorpay_Order_Id__c != orderId) return;
+        term.Transaction_Status__c = STATUS_FAILED;
         update term;
     }
 
     public static void markPaymentRefunded(String razorpayOrderId) {
         List<Payment_Term__c> terms = [
-            SELECT Id, Transaction_Status__c
-            FROM Payment_Term__c
-            WHERE Razorpay_Order_Id__c = :razorpayOrderId
-            LIMIT 1
+            SELECT Id, Transaction_Status__c FROM Payment_Term__c
+            WHERE Razorpay_Order_Id__c = :razorpayOrderId LIMIT 1
         ];
-
-        if (terms.isEmpty()) {
-            return;
-        }
-
-        Payment_Term__c term = terms[0];
-        term.Transaction_Status__c = STATUS_REFUNDED;
-
-        update term;
+        if (terms.isEmpty()) return;
+        terms[0].Transaction_Status__c = STATUS_REFUNDED;
+        update terms[0];
     }
 
     public static List<PaymentHistoryItem> getPaymentHistory(Id contactId) {
-        if (contactId == null) {
-            throw new PaymentException('A contact is required.');
-        }
-
+        if (contactId == null) throw new PaymentException('A contact is required.');
         List<Payment_Term__c> terms = Database.query(
-            'SELECT ' + TERM_FIELDS + ' FROM Payment_Term__c ' +
-            'WHERE Project__r.Client__c = :contactId ' +
-            'ORDER BY Due_Date__c ASC NULLS LAST'
+            'SELECT ' + TERM_FIELDS + ' FROM Payment_Term__c WHERE Project__r.Client__c = :contactId ' +
+            'ORDER BY Due_Date__c ASC NULLS LAST, Id ASC'
         );
-
+        Set<Id> projectIds = new Set<Id>();
+        for (Payment_Term__c term : terms) projectIds.add(term.Project__c);
+        Map<Id, Decimal> amounts = getProjectScheduleAmounts(projectIds);
         List<PaymentHistoryItem> history = new List<PaymentHistoryItem>();
         for (Payment_Term__c term : terms) {
             PaymentHistoryItem item = new PaymentHistoryItem();
             item.paymentTermId = term.Id;
             item.projectName = term.Project__r != null ? term.Project__r.Name : null;
-            item.installmentLabel = term.Name;
-            item.amount = calculateAmount(term);
+            item.installmentLabel = String.isNotBlank(term.Term_Label__c) ? term.Term_Label__c : term.Name;
+            item.amount = amounts.get(term.Id);
             item.percentage = term.Percentage__c;
             item.status = resolveStatus(term);
             item.dueDate = term.Due_Date__c != null ? term.Due_Date__c.format() : null;
@@ -236,13 +265,10 @@ public without sharing class PaymentService {
 
     public static ReceiptData getReceipt(Id paymentTermId, Id contactId) {
         PaymentTermDetail detail = getPayableTerm(paymentTermId, contactId);
-
-        if (detail.status != STATUS_PAID) {
-            throw new PaymentException('No receipt is available until this installment is paid.');
-        }
-
+        if (detail.status != STATUS_PAID) throw new PaymentException('No receipt is available until this installment is paid.');
+        if (detail.amount == null) throw new PaymentException('The original paid amount must be reconciled before a receipt can be issued.');
         ReceiptData receipt = new ReceiptData();
-        receipt.receiptNumber = detail.razorpayPaymentId;
+        receipt.receiptNumber = String.isNotBlank(detail.razorpayPaymentId) ? detail.razorpayPaymentId : String.valueOf(detail.paymentTermId);
         receipt.projectName = detail.projectName;
         receipt.customerName = detail.customerName;
         receipt.customerEmail = detail.customerEmail;
@@ -257,42 +283,28 @@ public without sharing class PaymentService {
         return receipt;
     }
 
-    // Transaction_Status__c was added for this Razorpay flow and was never
-    // backfilled on pre-existing Payment_Term__c records -- it's blank on
-    // every legacy record, which otherwise tracked paid/pending purely via
-    // the Payment_Received__c checkbox. Fall back to that so legacy records
-    // are still payable instead of being permanently stuck as "unknown".
-    private static String resolveStatus(Payment_Term__c term) {
-        if (String.isNotBlank(term.Transaction_Status__c)) {
-            return term.Transaction_Status__c;
-        }
+    public static String resolveStatus(Payment_Term__c term) {
+        if (String.isNotBlank(term.Transaction_Status__c)) return term.Transaction_Status__c;
         return term.Payment_Received__c == true ? STATUS_PAID : STATUS_PENDING;
     }
 
-    private static Decimal calculateAmount(Payment_Term__c term) {
-        Decimal budget = term.Project__r != null ? term.Project__r.Supervisor_Estimated_Budget__c : null;
-        if (budget == null || term.Percentage__c == null) {
-            return null;
-        }
-        return (budget * term.Percentage__c) / 100;
-    }
-
-    private static PaymentTermDetail toDetail(Payment_Term__c term) {
+    private static PaymentTermDetail toDetail(Payment_Term__c term, Decimal amount) {
         PaymentTermDetail detail = new PaymentTermDetail();
         detail.paymentTermId = term.Id;
         detail.projectName = term.Project__r != null ? term.Project__r.Name : null;
         detail.customerName = term.Project__r != null && term.Project__r.Client__r != null ? term.Project__r.Client__r.Name : null;
         detail.customerEmail = term.Project__r != null && term.Project__r.Client__r != null ? term.Project__r.Client__r.Email : null;
         detail.customerPhone = term.Project__r != null && term.Project__r.Client__r != null ? term.Project__r.Client__r.Phone : null;
-        detail.installmentLabel = term.Name;
+        detail.installmentLabel = String.isNotBlank(term.Term_Label__c) ? term.Term_Label__c : term.Name;
         detail.percentage = term.Percentage__c;
-        detail.amount = calculateAmount(term);
+        detail.amount = amount;
         detail.totalAmount = term.Project__r != null ? term.Project__r.Supervisor_Estimated_Budget__c : null;
         detail.dueDate = term.Due_Date__c != null ? term.Due_Date__c.format() : null;
         detail.status = resolveStatus(term);
         detail.razorpayOrderId = term.Razorpay_Order_Id__c;
         detail.razorpayPaymentId = term.Razorpay_Payment_Id__c;
         detail.paymentDate = term.Payment_Date__c != null ? term.Payment_Date__c.format() : null;
+        detail.orderAmount = term.Order_Amount__c;
         return detail;
     }
 }

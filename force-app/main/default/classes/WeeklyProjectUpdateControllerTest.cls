@@ -73,7 +73,7 @@ private class WeeklyProjectUpdateControllerTest {
         Integer initialEmails = Limits.getEmailInvocations();
         
         // Execute Action
-        WeeklyProjectUpdateController.sendWeeklyEmail(proj.Id, 'Great progress this week!', documentIds);
+        WeeklyProjectUpdateController.sendWeeklyEmail(proj.Id, 'Great progress this week!', documentIds, null);
         
         Integer finalEmails = Limits.getEmailInvocations();
         Test.stopTest();
@@ -96,8 +96,8 @@ private class WeeklyProjectUpdateControllerTest {
         Integer initialEmails = Limits.getEmailInvocations();
         
         // Execute Action with null files
-        WeeklyProjectUpdateController.sendWeeklyEmail(proj.Id, 'Weekly progress', null); 
-        
+        WeeklyProjectUpdateController.sendWeeklyEmail(proj.Id, 'Weekly progress', null, null);
+
         Integer finalEmails = Limits.getEmailInvocations();
         Test.stopTest();
 
@@ -115,7 +115,7 @@ private class WeeklyProjectUpdateControllerTest {
 
         Test.startTest();
         try {
-            WeeklyProjectUpdateController.sendWeeklyEmail(proj.Id, 'This should fail', null);
+            WeeklyProjectUpdateController.sendWeeklyEmail(proj.Id, 'This should fail', null, null);
             Assert.fail('Expected an AuraHandledException because the client email is null');
         } catch (Exception e) {
             Assert.isTrue(e.getTypeName().contains('AuraHandledException'), 'Exception should be of type AuraHandledException');
@@ -124,16 +124,25 @@ private class WeeklyProjectUpdateControllerTest {
     }
 
     // ==========================================
-    // 5. Test Org-Wide Email Address Retrieval
+    // 5. Test External File Link (Google Drive/OneDrive) Is Included
     // ==========================================
     @IsTest
-    static void testGetOWD() {
+    static void testSendWeeklyEmailWithExternalFileLink() {
+        Project__c proj = [SELECT Id FROM Project__c LIMIT 1];
+
         Test.startTest();
-        Id owdId = WeeklyProjectUpdateController.getOWD();
+        Integer initialEmails = Limits.getEmailInvocations();
+
+        WeeklyProjectUpdateController.sendWeeklyEmail(
+            proj.Id,
+            'Large walkthrough video uploaded externally',
+            null,
+            'https://drive.google.com/drive/folders/fake-large-file-folder'
+        );
+
+        Integer finalEmails = Limits.getEmailInvocations();
         Test.stopTest();
 
-        // OWD might be null depending on the Sandbox setup. 
-        // We assert true to guarantee the query executes cleanly without breaking.
-        Assert.isTrue(true, 'The getOWD method executed successfully');
+        Assert.areEqual(initialEmails + 1, finalEmails, 'Email should be sent successfully with only an external file link and no uploaded files.');
     }
 }

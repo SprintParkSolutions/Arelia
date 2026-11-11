@@ -2,8 +2,8 @@
 // Enforces that the sum of Task.Assigned_Percentage__c for all Tasks whose
 // WhatId = a Vendor_Assignment__c never exceeds Vendor_Assignment__c.Budget_Percentage__c.
 // Also maintains Vendor_Assignment__c.Vendor_Tasks_Remaining_Percentage__c.
-public without sharing class TaskVendorBudgetHandler {
 
+public without sharing class TaskVendorBudgetHandler {
 
     // =========================
     // 1) VALIDATION (BEFORE DML)
@@ -29,13 +29,9 @@ public without sharing class TaskVendorBudgetHandler {
 
         // existing totals in DB (exclude the rows currently in the trigger)
         Map<Id, Decimal> currentTotalsByVA = new Map<Id, Decimal>();
-        for (AggregateResult ar : [
-            SELECT WhatId wid, SUM(Assigned_Percentage__c) sumPct
-            FROM Task
-            WHERE WhatId IN :vaIds
-              AND Id NOT IN :contextTaskIds
-            GROUP BY WhatId
-        ]) {
+        for (AggregateResult ar : [SELECT WhatId wid, SUM(Assigned_Percentage__c) sumPct
+            FROM Task WHERE WhatId IN :vaIds AND Id NOT IN :contextTaskIds GROUP BY WhatId])
+        {
             currentTotalsByVA.put((Id)ar.get('wid'), (Decimal)ar.get('sumPct'));
         }
 
@@ -50,11 +46,7 @@ public without sharing class TaskVendorBudgetHandler {
         }
 
         // vendor caps
-        Map<Id, Vendor_Assignment__c> vaMap = new Map<Id, Vendor_Assignment__c>([
-            SELECT Id, Name, Budget_Percentage__c
-            FROM Vendor_Assignment__c
-            WHERE Id IN :vaIds
-        ]);
+        Map<Id, Vendor_Assignment__c> vaMap = new Map<Id, Vendor_Assignment__c>([SELECT Id, Name, Budget_Percentage__c FROM Vendor_Assignment__c WHERE Id IN :vaIds ]);
 
         // detect over-limit and compose friendly errors
         for (Task t : newList) {
@@ -108,6 +100,41 @@ public without sharing class TaskVendorBudgetHandler {
         if (!vaIds.isEmpty()) recalcAndUpdate(vaIds);
     }
 
+
+    // =============================================
+    // 3) RECALCULATE WHEN BUDGET PERCENTAGE CHANGES  Newly Added for Vendor remaing percentage changes ---Naresh
+    // =============================================
+    public static void recalculateWhenBudgetChanges(
+        List<Vendor_Assignment__c> newList,
+        Map<Id, Vendor_Assignment__c> oldMap
+    ) {
+        if (newList == null || newList.isEmpty()) {
+            return;
+        }
+
+        Set<Id> vendorAssignmentIds = new Set<Id>();
+
+        for (Vendor_Assignment__c newRecord : newList) {
+
+            Vendor_Assignment__c oldRecord =
+                oldMap != null ? oldMap.get(newRecord.Id) : null;
+
+            // On insert, calculate the initial remaining percentage.
+            // On update, calculate only when the budget changes.
+            if (oldRecord == null ||
+                newRecord.Budget_Percentage__c !=
+                oldRecord.Budget_Percentage__c) {
+
+                vendorAssignmentIds.add(newRecord.Id);
+            }
+        }
+
+        if (!vendorAssignmentIds.isEmpty()) {
+            recalcAndUpdate(vendorAssignmentIds);
+        }
+    }
+
+
     // Core rollup: recompute totals and update Vendor_Tasks_Remaining_Percentage__c
     private static void recalcAndUpdate(Set<Id> vaIds) {
         if (vaIds == null || vaIds.isEmpty()) return;
@@ -115,18 +142,14 @@ public without sharing class TaskVendorBudgetHandler {
         // Caps
         Map<Id, Vendor_Assignment__c> vaMap = new Map<Id, Vendor_Assignment__c>([
             SELECT Id, Budget_Percentage__c, Vendor_Tasks_Remaining_Percentage__c
-            FROM Vendor_Assignment__c
-            WHERE Id IN :vaIds
-        ]);
+            FROM Vendor_Assignment__c WHERE Id IN :vaIds ]);
 
         // Current assigned total per VA
         Map<Id, Decimal> totalAssignedByVA = new Map<Id, Decimal>();
         for (AggregateResult ar : [
             SELECT WhatId wid, SUM(Assigned_Percentage__c) totalPct
-            FROM Task
-            WHERE WhatId IN :vaIds
-            GROUP BY WhatId
-        ]) {
+            FROM Task WHERE WhatId IN :vaIds GROUP BY WhatId ])
+        {
             totalAssignedByVA.put((Id)ar.get('wid'), (Decimal)ar.get('totalPct'));
         }
 
@@ -142,10 +165,7 @@ public without sharing class TaskVendorBudgetHandler {
             if (remaining < 0) remaining = 0;
 
             if (va.Vendor_Tasks_Remaining_Percentage__c != remaining) {
-                updates.add(new Vendor_Assignment__c(
-                    Id = vaId,
-                    Vendor_Tasks_Remaining_Percentage__c = remaining
-                ));
+                updates.add(new Vendor_Assignment__c( Id = vaId, Vendor_Tasks_Remaining_Percentage__c = remaining ));
             }
         }
 

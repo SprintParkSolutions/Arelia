@@ -26,6 +26,7 @@ global without sharing class ClientAgreementNotificationApi {
         public String clientEmail;
 
         public Boolean clientAgreementSent = false;
+        public Boolean clientAgreementSigned = false;
 
         public Boolean showNotification = false;
         public String notificationTitle;
@@ -118,7 +119,8 @@ global without sharing class ClientAgreementNotificationApi {
                     Id,
                     Name,
                     Email__c,
-                    Client_Agreement_Sent__c
+                    Client_Agreement_Sent__c,
+                    Client_Agreement_Signed__c
                 FROM Opportunity
                 WHERE Id = :opportunityId
                 LIMIT 1
@@ -150,7 +152,13 @@ global without sharing class ClientAgreementNotificationApi {
 
 
             // Client Agreement notification
-            if (opp.Client_Agreement_Sent__c == true) {
+            response.clientAgreementSigned = opp.Client_Agreement_Signed__c;
+            if (opp.Client_Agreement_Signed__c == true) {
+                response.showNotification = true;
+                response.notificationTitle = 'Client Agreement Signed';
+                response.notificationMessage = 'Your Client Agreement has been successfully signed. Please check your registered email address to download a copy of the signed agreement.';
+                response.notificationType = 'CLIENT_AGREEMENT_SIGNED';
+            } else if (opp.Client_Agreement_Sent__c == true) {
 
                 response.showNotification = true;
 

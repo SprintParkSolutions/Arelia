@@ -8,7 +8,11 @@ public class ProjectMilestoneControllerTest {
             ProjectMilestoneController.getMilestones(null);
         Test.stopTest();
 
-        System.assertNotEquals(null, response, 'Response should not be null');
+        System.assertNotEquals(
+            null,
+            response,
+            'Response should not be null'
+        );
         System.assertEquals(
             0,
             response.completionPercentage,
@@ -73,12 +77,24 @@ public class ProjectMilestoneControllerTest {
         update project;
 
         Payment_Term__c term1 =
-            TestDataUtility.createPaymentTerm(project.Id, 'Advance', 40);
+            TestDataUtility.createPaymentTerm(
+                project.Id,
+                'Advance',
+                40
+            );
+
+        // Populate actual payment amount before marking paid.
+        term1.Paid_Amount__c = 80000;
         term1.Payment_Received__c = true;
         update term1;
 
         Payment_Term__c term2 =
-            TestDataUtility.createPaymentTerm(project.Id, 'Final', 30);
+            TestDataUtility.createPaymentTerm(
+                project.Id,
+                'Final',
+                30
+            );
+
         term2.Payment_Received__c = false;
         update term2;
 
@@ -98,7 +114,9 @@ public class ProjectMilestoneControllerTest {
             'Exactly two milestones should be returned'
         );
 
-        ProjectMilestoneController.MilestoneDTO m1 = response.milestones[0];
+        ProjectMilestoneController.MilestoneDTO m1 =
+            response.milestones[0];
+
         System.assertEquals(
             40,
             m1.cumulativePercentage,
@@ -115,7 +133,9 @@ public class ProjectMilestoneControllerTest {
             'First milestone payment should be received'
         );
 
-        ProjectMilestoneController.MilestoneDTO m2 = response.milestones[1];
+        ProjectMilestoneController.MilestoneDTO m2 =
+            response.milestones[1];
+
         System.assertEquals(
             70,
             m2.cumulativePercentage,
@@ -150,7 +170,11 @@ public class ProjectMilestoneControllerTest {
         project.Project_Completion_Status__c = 50;
         update project;
 
-        TestDataUtility.createPaymentTerm(project.Id, 'Milestone 1', 50);
+        TestDataUtility.createPaymentTerm(
+            project.Id,
+            'Milestone 1',
+            50
+        );
 
         Test.startTest();
         ProjectMilestoneController.MilestoneResponse response =
