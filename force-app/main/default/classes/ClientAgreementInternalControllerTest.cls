@@ -1,16 +1,16 @@
 /**
  * @description Test class for ClientAgreementInternalController.
  * Covers agreement init data, supporting files, agreement/PDF creation,
- * validation failures, missing email failures, and Arelia Record Type validation.
+ * external supporting links, validation failures, missing email failures,
+ * signed agreement restrictions, and Arelia Record Type validation.
  */
 @IsTest
 @SuppressWarnings('PMD.ApexCRUDViolation,PMD.ApexDoc,PMD.TooManyMethods')
 private class ClientAgreementInternalControllerTest {
+
     private static final String CLIENT_EMAIL = 'client@example.com';
     private static final String SUPERVISOR_ALIAS = 'supagr';
-    private static final String TEMPLATE_FALLBACK_NAME =
-        'Client_Agreement_Test_Template';
-
+    private static final String TEMPLATE_FALLBACK_NAME = 'Client_Agreement_Test_Template';
     private static final String ACCOUNT_NAME = 'Arelia Test Account';
     private static final String OPPORTUNITY_NAME = 'Arelia Test Opportunity';
     private static final String FILE_BODY = 'Test file content';
@@ -44,10 +44,12 @@ private class ClientAgreementInternalControllerTest {
         );
 
         Test.startTest();
+
         ClientAgreementDTO.InitResponse response =
             ClientAgreementInternalController.getAgreementInitData(
                 opportunityRecord.Id
             );
+
         Test.stopTest();
 
         String expectedDuration = formatExpectedDuration(
@@ -61,67 +63,82 @@ private class ClientAgreementInternalControllerTest {
             response.opportunityId,
             'Opportunity Id should match.'
         );
+
         System.assertEquals(
             opportunityRecord.Name,
             response.opportunityName,
             'Opportunity name should match.'
         );
+
         System.assertEquals(
             CLIENT_EMAIL,
             response.clientEmail,
             'Client email should match.'
         );
+
         System.assertNotEquals(
             null,
             response.supervisorEmail,
             'Supervisor email should be returned.'
         );
+
         System.assertNotEquals(
             null,
             response.agreementHtml,
             'Agreement HTML should be generated.'
         );
+
         System.assert(
             response.agreementHtml.contains('Client Interior Design'),
             'Agreement HTML should contain agreement title.'
         );
+
         System.assert(
             response.agreementHtml.contains('Client Name'),
             'Agreement HTML should contain client name label.'
         );
+
         System.assert(
             response.agreementHtml.contains('Test Client'),
             'Agreement HTML should contain client name.'
         );
+
         System.assert(
             response.agreementHtml.contains('Hyderabad Site'),
             'Agreement HTML should contain site location.'
         );
+
         System.assert(
             response.agreementHtml.contains('INR 250000.00'),
             'Agreement HTML should contain revisit budget.'
         );
+
         System.assert(
             response.agreementHtml.contains(expectedDuration),
             'Agreement HTML should contain expected project duration.'
         );
+
         System.assert(
             response.agreementHtml.contains('Booking Advance'),
             'Agreement HTML should contain payment term.'
         );
+
         System.assert(
             response.agreementHtml.contains('10%'),
             'Agreement HTML should contain payment percentage.'
         );
+
         System.assert(
             response.agreementHtml.contains('INR 25000.00'),
             'Agreement HTML should contain calculated payment amount.'
         );
+
         System.assertNotEquals(
             null,
             response.supportingFiles,
             'Supporting files should not be null.'
         );
+
         System.assertEquals(
             1,
             response.supportingFiles.size(),
@@ -134,10 +151,12 @@ private class ClientAgreementInternalControllerTest {
         Opportunity opportunityRecord = createAreliaOpportunity(false, false);
 
         Test.startTest();
+
         ClientAgreementDTO.InitResponse response =
             ClientAgreementInternalController.getAgreementInitData(
                 opportunityRecord.Id
             );
+
         Test.stopTest();
 
         String expectedDuration = formatExpectedDuration(
@@ -150,10 +169,12 @@ private class ClientAgreementInternalControllerTest {
             response.agreementHtml.contains('INR 100000.00'),
             'Agreement HTML should contain fallback budget.'
         );
+
         System.assert(
             response.agreementHtml.contains(expectedDuration),
             'Agreement HTML should contain fallback duration.'
         );
+
         System.assert(
             response.agreementHtml.contains(
                 'No payment terms have been defined'
@@ -173,10 +194,12 @@ private class ClientAgreementInternalControllerTest {
         );
 
         Test.startTest();
+
         List<ClientAgreementDTO.SupportingFileDTO> files =
             ClientAgreementInternalController.getOpportunitySupportingFiles(
                 opportunityRecord.Id
             );
+
         Test.stopTest();
 
         System.assertEquals(
@@ -184,6 +207,7 @@ private class ClientAgreementInternalControllerTest {
             files.size(),
             'One supporting file should be returned.'
         );
+
         System.assertEquals(
             'Design Image.png',
             files[0].fileName,
@@ -217,10 +241,13 @@ private class ClientAgreementInternalControllerTest {
                 pdfBase64,
                 new List<String>{
                     String.valueOf(supportingVersion.ContentDocumentId)
-                }
+                },
+                null
             );
+
         } catch (AuraHandledException exceptionRecord) {
             emailExceptionThrown = true;
+
             System.assertNotEquals(
                 null,
                 exceptionRecord,
@@ -246,24 +273,131 @@ private class ClientAgreementInternalControllerTest {
             agreementRecord.Status__c,
             'Agreement should be moved to Sent before email processing.'
         );
+
         System.assertEquals(
             '<p>Agreement Body</p>',
             agreementRecord.Agreement_HTML__c,
             'Agreement HTML should be saved.'
         );
+
         System.assertEquals(
             opportunityRecord.Id,
             agreementRecord.Opportunity__c,
             'Agreement should be linked to Opportunity.'
         );
+
         System.assertNotEquals(
             null,
             agreementRecord.PDF_File_Id__c,
             'PDF File Id should be populated before email processing.'
         );
+
         System.assert(
             emailExceptionThrown || agreementId != null,
             'Send flow should either complete or fail only after creating agreement and PDF.'
+        );
+    }
+
+    /**
+     * @description Verifies that external supporting links
+     * are saved on the Client Agreement.
+     */
+    @IsTest
+    static void sendAgreementToClientShouldSaveExternalSupportingLinks() {
+        Opportunity opportunityRecord = createAreliaOpportunity(true, true);
+
+        String externalLinks =
+            'https://drive.google.com/file/d/1234567890abcdef/view';
+
+        String pdfBase64 = validPdfBase64();
+
+        Id agreementId;
+        Boolean emailExceptionThrown = false;
+
+        Test.startTest();
+
+        try {
+            agreementId = ClientAgreementInternalController.sendAgreementToClient(
+                opportunityRecord.Id,
+                '<p>Agreement Body With External Links</p>',
+                pdfBase64,
+                new List<String>(),
+                externalLinks
+            );
+
+        } catch (AuraHandledException exceptionRecord) {
+            emailExceptionThrown = true;
+
+            System.assertNotEquals(
+                null,
+                exceptionRecord,
+                'An email-related exception may occur during testing.'
+            );
+        }
+
+        Test.stopTest();
+
+        List<Client_Agreement__c> agreementRecords = [
+            SELECT Id,
+                   Opportunity__c,
+                   Agreement_HTML__c,
+                   External_Supporting_File_Links__c,
+                   Status__c,
+                   PDF_File_Id__c
+            FROM Client_Agreement__c
+            WHERE Opportunity__c = :opportunityRecord.Id
+            LIMIT 1
+        ];
+
+        System.assertEquals(
+            1,
+            agreementRecords.size(),
+            'One Client Agreement should be created.'
+        );
+
+        Client_Agreement__c agreementRecord = agreementRecords[0];
+
+        if (agreementId != null) {
+            System.assertEquals(
+                agreementId,
+                agreementRecord.Id,
+                'Returned agreement Id should match the saved agreement.'
+            );
+        }
+
+        System.assertEquals(
+            opportunityRecord.Id,
+            agreementRecord.Opportunity__c,
+            'Agreement should be linked to the correct Opportunity.'
+        );
+
+        System.assertEquals(
+            externalLinks,
+            agreementRecord.External_Supporting_File_Links__c,
+            'External supporting links should be saved.'
+        );
+
+        System.assertEquals(
+            '<p>Agreement Body With External Links</p>',
+            agreementRecord.Agreement_HTML__c,
+            'Agreement HTML should be saved.'
+        );
+
+        System.assertEquals(
+            'Sent',
+            agreementRecord.Status__c,
+            'Agreement status should be Sent.'
+        );
+
+        System.assertNotEquals(
+            null,
+            agreementRecord.PDF_File_Id__c,
+            'PDF File Id should be populated.'
+        );
+
+        System.assert(
+            emailExceptionThrown || agreementId != null,
+            'Agreement creation should complete or reach email processing.'
         );
     }
 
@@ -288,8 +422,10 @@ private class ClientAgreementInternalControllerTest {
             ClientAgreementInternalController.getOpportunitySupportingFiles(
                 null
             );
+
         } catch (AuraHandledException exceptionRecord) {
             exceptionThrown = true;
+
             System.assertNotEquals(
                 null,
                 exceptionRecord,
@@ -358,6 +494,7 @@ private class ClientAgreementInternalControllerTest {
     @IsTest
     static void getAgreementInitDataShouldThrowWhenClientEmailIsMissing() {
         Opportunity opportunityRecord = createAreliaOpportunity(true, true);
+
         opportunityRecord.Email__c = null;
         update opportunityRecord;
 
@@ -373,6 +510,7 @@ private class ClientAgreementInternalControllerTest {
     @IsTest
     static void getAgreementInitDataShouldThrowWhenSupervisorEmailIsMissing() {
         Opportunity opportunityRecord = createAreliaOpportunity(true, true);
+
         opportunityRecord.Supervisor_User__c = null;
         update opportunityRecord;
 
@@ -388,6 +526,7 @@ private class ClientAgreementInternalControllerTest {
     @IsTest
     static void sendAgreementToClientShouldThrowWhenClientEmailIsMissing() {
         Opportunity opportunityRecord = createAreliaOpportunity(true, true);
+
         opportunityRecord.Email__c = null;
         update opportunityRecord;
 
@@ -407,6 +546,7 @@ private class ClientAgreementInternalControllerTest {
     @IsTest
     static void sendAgreementToClientShouldThrowWhenSupervisorEmailIsMissing() {
         Opportunity opportunityRecord = createAreliaOpportunity(true, true);
+
         opportunityRecord.Supervisor_User__c = null;
         update opportunityRecord;
 
@@ -429,23 +569,25 @@ private class ClientAgreementInternalControllerTest {
             createAreliaOpportunity(true, true);
 
         /*
-        * Simulate an Opportunity whose Client Agreement
-        * has already been signed.
-        */
+         * Simulate an Opportunity whose Client Agreement
+         * has already been signed.
+         */
         opportunityRecord.Client_Agreement_Signed__c = true;
         update opportunityRecord;
 
-        Test.startTest();
-
         Boolean exceptionThrown = false;
+
+        Test.startTest();
 
         try {
             ClientAgreementInternalController.sendAgreementToClient(
                 opportunityRecord.Id,
                 '<p>Agreement Body</p>',
                 validPdfBase64(),
-                new List<String>()
+                new List<String>(),
+                null
             );
+
         } catch (AuraHandledException exceptionRecord) {
             exceptionThrown = true;
 
@@ -465,8 +607,8 @@ private class ClientAgreementInternalControllerTest {
         );
 
         /*
-        * Verify that no new agreement was created.
-        */
+         * Verify that no new agreement was created.
+         */
         Integer agreementCount = [
             SELECT COUNT()
             FROM Client_Agreement__c
@@ -489,8 +631,10 @@ private class ClientAgreementInternalControllerTest {
             ClientAgreementInternalController.getAgreementInitData(
                 opportunityId
             );
+
         } catch (AuraHandledException exceptionRecord) {
             exceptionThrown = true;
+
             System.assertNotEquals(
                 null,
                 exceptionRecord,
@@ -517,10 +661,13 @@ private class ClientAgreementInternalControllerTest {
                 opportunityId,
                 agreementHtml,
                 pdfBase64,
-                new List<String>()
+                new List<String>(),
+                null
             );
+
         } catch (AuraHandledException exceptionRecord) {
             exceptionThrown = true;
+
             System.assertNotEquals(
                 null,
                 exceptionRecord,
@@ -556,6 +703,7 @@ private class ClientAgreementInternalControllerTest {
         opportunityRecord.Lead_Name__c = 'Test Client';
         opportunityRecord.Site_Location__c = 'Hyderabad Site';
         opportunityRecord.Supervisor_Estimated_Budget__c = 100000;
+
         opportunityRecord.Project_Estimated_Completion_Months__c =
             getFirstActivePicklistValue(
                 Opportunity.Project_Estimated_Completion_Months__c
@@ -590,6 +738,7 @@ private class ClientAgreementInternalControllerTest {
         Decimal percentage
     ) {
         Payment_Term__c termRecord = new Payment_Term__c();
+
         termRecord.Name = name;
         termRecord.Opportunity__c = opportunityId;
         termRecord.Percentage__c = percentage;
@@ -606,6 +755,7 @@ private class ClientAgreementInternalControllerTest {
         String fileExtension
     ) {
         ContentVersion contentVersionRecord = new ContentVersion();
+
         contentVersionRecord.Title = title;
         contentVersionRecord.PathOnClient = title + '.' + fileExtension;
         contentVersionRecord.VersionData = Blob.valueOf(FILE_BODY);
@@ -685,7 +835,8 @@ private class ClientAgreementInternalControllerTest {
     }
 
     private static void createConfiguredEmailTemplate() {
-        String configuredDeveloperName = System.Label.Agreement_Email_Template;
+        String configuredDeveloperName =
+            System.Label.Agreement_Email_Template;
 
         if (String.isBlank(configuredDeveloperName)) {
             configuredDeveloperName = TEMPLATE_FALLBACK_NAME;
