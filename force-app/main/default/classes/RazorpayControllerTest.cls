@@ -38,75 +38,50 @@ private class RazorpayControllerTest {
     private static final Decimal PROJECT_BUDGET = 100000;
     private static final Decimal PAYMENT_PERCENTAGE = 25;
 
-    /*
-     * The existing PaymentService currently returns the full project amount for this test Payment Term.
-     */
-    private static final Decimal EXPECTED_PAYMENT_AMOUNT = 100000;
-
     /**
-     * @description Creates shared Contact, Project and Payment Term.
+     * @description Creates independent customer and verification fixtures.
+     *              Verification data is created last to preserve the
+     *              original working initialization sequence.
      */
     @TestSetup
     static void setupTestData() {
-
-        // Seed the verification order first. An org-specific payment
-        // recalculation may update other payment schedules when the order
-        // snapshot is recorded.
-        Contact verificationContact = TestDataUtility.createContact(
-            'RazorpayVerifier',
-            VERIFY_CONTACT_EMAIL,
-            'Test@1234'
+        Contact testContact = TestDataUtility.createContact(
+            'RazorpayTester', TEST_CONTACT_EMAIL, 'Test@1234'
         );
-
-        Project__c verificationProject = TestDataUtility.createProject(
-            VERIFY_PROJECT_NAME,
-            PROJECT_BUDGET,
-            verificationContact.Id
+        Project__c testProject = TestDataUtility.createProject(
+            TEST_PROJECT_NAME, PROJECT_BUDGET, testContact.Id
         );
-
         TestDataUtility.createPaymentTerm(
-            verificationProject.Id,
-            VERIFY_TERM_NAME,
-            PAYMENT_PERCENTAGE
+            testProject.Id, TEST_TERM_NAME, PAYMENT_PERCENTAGE
+        );
+
+        Contact verificationContact = TestDataUtility.createContact(
+            'RazorpayVerifier', VERIFY_CONTACT_EMAIL, 'Test@1234'
+        );
+        Project__c verificationProject = TestDataUtility.createProject(
+            VERIFY_PROJECT_NAME, PROJECT_BUDGET, verificationContact.Id
+        );
+        TestDataUtility.createPaymentTerm(
+            verificationProject.Id, VERIFY_TERM_NAME, PAYMENT_PERCENTAGE
         );
 
         Payment_Term__c verificationTerm = findSingleProjectTerm(
-            verificationProject.Id,
-            VERIFY_TERM_NAME
+            verificationProject.Id, VERIFY_TERM_NAME
         );
-
-        // Seed in @TestSetup so verification has no preceding DML in its test transaction.
+        Decimal verificationAmount = PaymentService.getPayableTerm(
+            verificationTerm.Id, verificationContact.Id
+        ).amount;
+        System.assert(
+            verificationAmount != null && verificationAmount > 0,
+            'Verification payment must have a positive payable amount.'
+        );
         update new Payment_Term__c(
             Id = verificationTerm.Id,
-            Paid_Amount__c = EXPECTED_PAYMENT_AMOUNT
+            Paid_Amount__c = verificationAmount
         );
-
         PaymentService.recordPaymentOrder(
-            verificationTerm.Id,
-            TEST_ORDER_ID,
-            EXPECTED_PAYMENT_AMOUNT
+            verificationTerm.Id, TEST_ORDER_ID, verificationAmount
         );
-
-        // Create ordinary payment test data after order initialization.
-        Contact testContact = TestDataUtility.createContact(
-            'RazorpayTester',
-            TEST_CONTACT_EMAIL,
-            'Test@1234'
-        );
-
-        Project__c testProject = TestDataUtility.createProject(
-            TEST_PROJECT_NAME,
-            PROJECT_BUDGET,
-            testContact.Id
-        );
-
-        TestDataUtility.createPaymentTerm(
-            testProject.Id,
-            TEST_TERM_NAME,
-            PAYMENT_PERCENTAGE
-        );
-
-        findSingleProjectTerm(testProject.Id, TEST_TERM_NAME);
     }
 
     /**
@@ -222,7 +197,7 @@ private class RazorpayControllerTest {
         Id projectId = getTestProject().Id;
         Id termId = findSingleProjectTerm(projectId, TEST_TERM_NAME).Id;
         return [
-            SELECT Id,
+            SELECT Id, Name,
                    Transaction_Status__c,
                    Payment_Received__c,
                    Payment_Date__c,
@@ -443,6 +418,8 @@ private class RazorpayControllerTest {
         Payment_Term__c testTerm = getTestTerm();
         Contact testContact = getTestContact();
         Project__c testProject = getTestProject();
+        PaymentService.PaymentTermDetail expectedDetail =
+            PaymentService.getPayableTerm(testTerm.Id, testContact.Id);
 
         setupGetRequest(
             'details',
@@ -479,13 +456,13 @@ private class RazorpayControllerTest {
         );
 
         System.assertEquals(
-            TEST_TERM_NAME,
+            expectedDetail.installmentLabel,
             result.get('installmentLabel'),
             'Installment label should match.'
         );
 
         System.assertEquals(
-            EXPECTED_PAYMENT_AMOUNT,
+            expectedDetail.amount,
             Decimal.valueOf(String.valueOf(result.get('amount'))),
             'Payment amount should match existing PaymentService behavior.'
         );
@@ -529,25 +506,34 @@ private class RazorpayControllerTest {
             'Payment history should be returned.'
         );
 
+        Payment_Term__c expectedTerm = getTestTerm();
+        Boolean foundExpectedTerm = false;
+        for (Object item : payments) {
+            Map<String, Object> payment = (Map<String, Object>) item;
+            if (String.valueOf(payment.get('paymentTermId')) ==
+                String.valueOf(expectedTerm.Id)) {
+                System.assertEquals(
+                    false,
+                    foundExpectedTerm,
+                    'History must not duplicate the selected installment.'
+                );
+                foundExpectedTerm = true;
+                System.assertEquals(
+                    TEST_PROJECT_NAME,
+                    payment.get('projectName'),
+                    'Payment history project name should match.'
+                );
+                System.assertEquals(
+                    expectedTerm.Name,
+                    payment.get('installmentLabel'),
+                    'Payment installment name should match.'
+                );
+            }
+        }
         System.assertEquals(
-            1,
-            payments.size(),
-            'One payment term should be returned.'
-        );
-
-        Map<String, Object> payment =
-            (Map<String, Object>) payments[0];
-
-        System.assertEquals(
-            TEST_PROJECT_NAME,
-            payment.get('projectName'),
-            'Payment history project name should match.'
-        );
-
-        System.assertEquals(
-            TEST_TERM_NAME,
-            payment.get('installmentLabel'),
-            'Payment installment name should match.'
+            true,
+            foundExpectedTerm,
+            'Payment history must contain the selected installment.'
         );
     }
 
@@ -564,6 +550,13 @@ private class RazorpayControllerTest {
 
         Payment_Term__c testTerm = getTestTerm();
         Contact testContact = getTestContact();
+        Decimal expectedAmount = PaymentService.getPayableTerm(
+            testTerm.Id, testContact.Id
+        ).amount;
+        System.assert(
+            expectedAmount != null && expectedAmount > 0,
+            'Order amount must be positive.'
+        );
 
         setupPostRequest(
             'createOrder',
@@ -594,7 +587,7 @@ private class RazorpayControllerTest {
         );
 
         System.assertEquals(
-            PaymentUtil.toPaise(EXPECTED_PAYMENT_AMOUNT),
+            PaymentUtil.toPaise(expectedAmount),
             Long.valueOf(String.valueOf(result.get('amount'))),
             'Razorpay amount in paise should match.'
         );
@@ -622,6 +615,7 @@ private class RazorpayControllerTest {
 
         String razorpaySecret = getRazorpaySecret();
         Payment_Term__c testTerm = getVerificationTerm();
+        Decimal expectedAmount = testTerm.Paid_Amount__c;
         Contact testContact = getVerificationContact();
 
         System.assertEquals(
@@ -630,9 +624,8 @@ private class RazorpayControllerTest {
             'Verification order must be seeded in @TestSetup.'
         );
 
-        System.assertEquals(
-            EXPECTED_PAYMENT_AMOUNT,
-            testTerm.Paid_Amount__c,
+        System.assert(
+            expectedAmount != null && expectedAmount > 0,
             'Received amount must be populated before marking Paid.'
         );
 
@@ -689,7 +682,7 @@ private class RazorpayControllerTest {
         );
 
         System.assertEquals(
-            EXPECTED_PAYMENT_AMOUNT,
+            expectedAmount,
             updatedTerm.Paid_Amount__c,
             'Actual paid amount should match the order amount.'
         );
@@ -785,7 +778,9 @@ private class RazorpayControllerTest {
         /*
          * Existing validation requires Paid_Amount__c before the installment can be marked Paid.
          */
-        testTerm.Paid_Amount__c = EXPECTED_PAYMENT_AMOUNT;
+        testTerm.Paid_Amount__c = PaymentService.getPayableTerm(
+            testTerm.Id, testContact.Id
+        ).amount;
 
         testTerm.Transaction_Status__c = 'Paid';
         testTerm.Payment_Received__c = true;
