@@ -1,321 +1,547 @@
 /**
- * @description Unit tests for PaymentService, covering the Razorpay payment
- * term lifecycle: read/authorization, pending assertion, success/failed/refund
- * transitions, history, and receipt retrieval.
+ * @description Unit tests for PaymentService's payment schedule, ownership,
+ *              order snapshots, payment lifecycle, history and receipts.
  */
-@isTest
+@IsTest(SeeAllData=false)
+@SuppressWarnings('PMD.TooManyMethods')
 private class PaymentServiceTest {
+    private static final String PAYER_EMAIL = 'payer@example.com';
+    private static final String PROJECT_NAME = 'Test Project';
+    private static final String TERM_NAME = 'Installment 1';
+    private static final String ORDER_ID = 'order_abc';
+    private static final String PAYMENT_ID = 'pay_abc';
+    private static final String SIGNATURE = 'sig_abc';
+    private static final String OFFLINE_DESCRIPTION = 'Will pay by cheque at the site office.';
+    private static final Decimal PROJECT_BUDGET = 1000000;
+    private static final Decimal TERM_PERCENTAGE = 25;
 
-    private static Contact testContact;
-    private static Project__c testProject;
-    private static Payment_Term__c testTerm;
-
-    private static void setupData() {
-        testContact = TestDataUtility.createContact('Payer', 'payer' + DateTime.now().getTime() + '@example.com', 'Test@1234');
-        testProject = TestDataUtility.createProject('Test Project', 1000000, testContact.Id);
-        testTerm = TestDataUtility.createPaymentTerm(testProject.Id, 'Installment 1', 25);
+    private class TestRecords {
+        public Contact contactRecord;
+        public Project__c projectRecord;
+        public Payment_Term__c termRecord;
     }
 
-    @isTest
+    /** @description Creates independent test data for one test method.
+     *  @return Test records. */
+    private static TestRecords createRecords() {
+        TestRecords records = new TestRecords();
+        records.contactRecord = TestDataUtility.createContact(
+            'Payer', PAYER_EMAIL, 'Test@1234'
+        );
+        records.projectRecord = TestDataUtility.createProject(
+            PROJECT_NAME, PROJECT_BUDGET, records.contactRecord.Id
+        );
+        records.termRecord = TestDataUtility.createPaymentTerm(
+            records.projectRecord.Id, TERM_NAME, TERM_PERCENTAGE
+        );
+        return records;
+    }
+
+    /** @description Returns a fresh Payment Term with payment fields.
+     *  @param termId Payment Term Id.
+     *  @return Persisted term. */
+    private static Payment_Term__c queryTerm(Id termId) {
+        return [
+            SELECT Id, Transaction_Status__c, Payment_Received__c,
+                   Paid_Amount__c, Order_Amount__c, Payment_Date__c,
+                   Razorpay_Order_Id__c, Razorpay_Payment_Id__c,
+                   Razorpay_Signature__c, Description__c,
+                   Payment_Mode__c, Offline_Payment_Description__c
+            FROM Payment_Term__c
+            WHERE Id = :termId
+            LIMIT 1
+        ];
+    }
+
+    /** @description Records the order amount allocated by PaymentService.
+     *  @param termId Payment Term Id.
+     *  @param contactId Owner Contact Id.
+     *  @param orderId Order Id.
+     *  @return Recorded order amount. */
+    private static Decimal prepareOrder(Id termId, Id contactId, String orderId) {
+        PaymentService.PaymentTermDetail detail =
+            PaymentService.getPayableTerm(termId, contactId);
+        PaymentService.assertPending(detail);
+        PaymentService.recordPaymentOrder(termId, orderId, detail.amount);
+        return detail.amount;
+    }
+
+    /** @description Pays the recorded order with matching identifiers.
+     *  @param termId Payment Term Id.
+     *  @param contactId Contact Id.
+     *  @return Payment amount recorded for the order. */
+    private static Decimal completePayment(Id termId, Id contactId) {
+        Decimal amount = prepareOrder(termId, contactId, ORDER_ID);
+        Boolean newlyPaid = PaymentService.markPaymentSuccess(
+            termId, ORDER_ID, PAYMENT_ID, SIGNATURE, amount
+        );
+        System.assertEquals(true, newlyPaid, 'The initial payment must settle.');
+        return amount;
+    }
+
+    /** @description Asserts an error message is present.
+     *  @param message Error message. */
+    private static void assertErrorMessage(String message) {
+        System.assert(String.isNotBlank(message), 'A payment error must be provided.');
+    }
+
+    @IsTest
     static void testGetPayableTermReturnsCorrectDetail() {
-        setupData();
-
+        TestRecords records = createRecords();
         Test.startTest();
-        PaymentService.PaymentTermDetail detail = PaymentService.getPayableTerm(testTerm.Id, testContact.Id);
+        PaymentService.PaymentTermDetail detail = PaymentService.getPayableTerm(
+            records.termRecord.Id, records.contactRecord.Id
+        );
         Test.stopTest();
-
-        System.assertEquals(testProject.Name, detail.projectName);
-        System.assertEquals(250000, detail.amount);
+        System.assertEquals(records.projectRecord.Name, detail.projectName);
+        System.assertEquals(PROJECT_BUDGET, detail.amount,
+            'A single scheduled term receives the project-wide allocation.');
+        System.assertEquals(PROJECT_BUDGET, detail.totalAmount);
         System.assertEquals('Pending', detail.status);
-        System.assertEquals(testTerm.Id, detail.paymentTermId);
+        System.assertEquals(records.termRecord.Id, detail.paymentTermId);
+        System.assertEquals(TERM_PERCENTAGE, detail.percentage);
     }
 
-    @isTest
+    @IsTest
     static void testGetPayableTermNullIdThrows() {
         Boolean caught = false;
         try {
             PaymentService.getPayableTerm(null, null);
-        } catch (PaymentException pe) {
+        } catch (PaymentException exceptionRecord) {
             caught = true;
-            System.assertEquals('A payment term is required.', pe.getMessage());
+            System.assertEquals('A payment term is required.', exceptionRecord.getMessage());
         }
-        System.assert(caught);
+        System.assertEquals(true, caught, 'Null Payment Term Id must be rejected.');
     }
 
-    @isTest
+    @IsTest
     static void testGetPayableTermNotFoundThrows() {
-        setupData();
-        Id deletedId = testTerm.Id;
-        delete testTerm;
-
+        TestRecords records = createRecords();
+        Id deletedId = records.termRecord.Id;
+        delete records.termRecord;
         Boolean caught = false;
         try {
-            PaymentService.getPayableTerm(deletedId, testContact.Id);
-        } catch (PaymentException pe) {
+            PaymentService.getPayableTerm(deletedId, records.contactRecord.Id);
+        } catch (PaymentException exceptionRecord) {
             caught = true;
-            System.assertEquals('Payment term not found.', pe.getMessage());
+            System.assertEquals('Payment term not found.', exceptionRecord.getMessage());
         }
-        System.assert(caught);
+        System.assertEquals(true, caught, 'Deleted terms must not be returned.');
     }
 
-    @isTest
+    @IsTest
     static void testGetPayableTermUnauthorizedContactThrows() {
-        setupData();
-        Contact otherContact = TestDataUtility.createContact('Other', 'other' + DateTime.now().getTime() + '@example.com', 'Test@1234');
-
+        TestRecords records = createRecords();
+        Contact otherContact = TestDataUtility.createContact(
+            'Other', 'other@example.com', 'Test@1234'
+        );
         Boolean caught = false;
         try {
-            PaymentService.getPayableTerm(testTerm.Id, otherContact.Id);
-        } catch (PaymentException pe) {
+            PaymentService.getPayableTerm(records.termRecord.Id, otherContact.Id);
+        } catch (PaymentException exceptionRecord) {
             caught = true;
-            System.assertEquals('You are not authorized to view this payment term.', pe.getMessage());
+            System.assertEquals(
+                'You are not authorized to view this payment term.',
+                exceptionRecord.getMessage()
+            );
         }
-        System.assert(caught);
+        System.assertEquals(true, caught, 'Unrelated contacts must not access terms.');
     }
 
-    @isTest
+    @IsTest
     static void testAssertPendingWithValidDetailDoesNotThrow() {
         PaymentService.PaymentTermDetail detail = new PaymentService.PaymentTermDetail();
         detail.status = 'Pending';
         detail.amount = 100;
-
-        Boolean caught = false;
-        try {
-            PaymentService.assertPending(detail);
-        } catch (PaymentException pe) {
-            caught = true;
-        }
-        System.assertEquals(false, caught);
+        PaymentService.assertPending(detail);
+        System.assertEquals('Pending', detail.status);
     }
 
-    @isTest
+    @IsTest
     static void testAssertPendingAlreadyPaidThrows() {
         PaymentService.PaymentTermDetail detail = new PaymentService.PaymentTermDetail();
         detail.status = 'Paid';
         detail.amount = 100;
-
         Boolean caught = false;
         try {
             PaymentService.assertPending(detail);
-        } catch (PaymentException pe) {
+        } catch (PaymentException exceptionRecord) {
             caught = true;
+            System.assertEquals(
+                'This installment has already been paid or is not currently payable.',
+                exceptionRecord.getMessage()
+            );
         }
-        System.assert(caught);
+        System.assertEquals(true, caught, 'Paid terms must be rejected.');
     }
 
-    @isTest
+    @IsTest
     static void testAssertPendingNullAmountThrows() {
         PaymentService.PaymentTermDetail detail = new PaymentService.PaymentTermDetail();
         detail.status = 'Pending';
         detail.amount = null;
-
         Boolean caught = false;
         try {
             PaymentService.assertPending(detail);
-        } catch (PaymentException pe) {
+        } catch (PaymentException exceptionRecord) {
             caught = true;
             System.assertEquals(
-                'The payment amount for this installment could not be determined. Please contact support.',
-                pe.getMessage()
+                'The payment amount could not be determined. Please contact support to reconcile the payment schedule.',
+                exceptionRecord.getMessage()
             );
         }
-        System.assert(caught);
+        System.assertEquals(true, caught, 'Missing amounts must be rejected.');
     }
 
-    @isTest
+    @IsTest
     static void testMarkPaymentSuccessUpdatesRecord() {
-        setupData();
-
+        TestRecords records = createRecords();
+        Decimal capturedAmount = prepareOrder(
+            records.termRecord.Id, records.contactRecord.Id, ORDER_ID
+        );
         Test.startTest();
-        PaymentService.markPaymentSuccess(testTerm.Id, 'order_abc', 'pay_abc', 'sig_abc', 250000);
+        Boolean newlyPaid = PaymentService.markPaymentSuccess(
+            records.termRecord.Id, ORDER_ID, PAYMENT_ID, SIGNATURE, capturedAmount
+        );
         Test.stopTest();
-
-        Payment_Term__c updated = [
-            SELECT Transaction_Status__c, Payment_Received__c, Razorpay_Order_Id__c, Razorpay_Payment_Id__c,
-                   Razorpay_Signature__c, Payment_Date__c, Description__c
-            FROM Payment_Term__c
-            WHERE Id = :testTerm.Id
-        ];
-
+        Payment_Term__c updated = queryTerm(records.termRecord.Id);
+        System.assertEquals(true, newlyPaid);
         System.assertEquals('Paid', updated.Transaction_Status__c);
         System.assertEquals(true, updated.Payment_Received__c);
-        System.assertEquals('order_abc', updated.Razorpay_Order_Id__c);
-        System.assertEquals('pay_abc', updated.Razorpay_Payment_Id__c);
-        System.assertEquals('sig_abc', updated.Razorpay_Signature__c);
+        System.assertEquals(capturedAmount, updated.Paid_Amount__c);
+        System.assertEquals(capturedAmount, updated.Order_Amount__c);
+        System.assertEquals(ORDER_ID, updated.Razorpay_Order_Id__c);
+        System.assertEquals(PAYMENT_ID, updated.Razorpay_Payment_Id__c);
+        System.assertEquals(SIGNATURE, updated.Razorpay_Signature__c);
         System.assertNotEquals(null, updated.Payment_Date__c);
-        System.assert(updated.Description__c.contains('pay_abc'));
+        System.assert(updated.Description__c.contains(PAYMENT_ID));
     }
 
-    @isTest
+    @IsTest
     static void testMarkPaymentSuccessAlreadyPaidIsNoOp() {
-        setupData();
-        testTerm.Transaction_Status__c = 'Paid';
-        update testTerm;
-
+        TestRecords records = createRecords();
+        Decimal capturedAmount = completePayment(
+            records.termRecord.Id, records.contactRecord.Id
+        );
         Test.startTest();
-        PaymentService.markPaymentSuccess(testTerm.Id, 'order_new', 'pay_new', 'sig_new', 250000);
+        Boolean newlyPaid = PaymentService.markPaymentSuccess(
+            records.termRecord.Id, ORDER_ID, PAYMENT_ID, SIGNATURE, capturedAmount
+        );
         Test.stopTest();
-
-        Payment_Term__c updated = [SELECT Razorpay_Order_Id__c FROM Payment_Term__c WHERE Id = :testTerm.Id];
-        System.assertEquals(null, updated.Razorpay_Order_Id__c);
+        Payment_Term__c updated = queryTerm(records.termRecord.Id);
+        System.assertEquals(false, newlyPaid, 'Identical retries must be idempotent.');
+        System.assertEquals(ORDER_ID, updated.Razorpay_Order_Id__c);
+        System.assertEquals(PAYMENT_ID, updated.Razorpay_Payment_Id__c);
+        System.assertEquals(capturedAmount, updated.Paid_Amount__c);
     }
 
-    @isTest
-    static void testMarkPaymentSuccessNotFoundThrows() {
-        setupData();
-        Id deletedId = testTerm.Id;
-        delete testTerm;
-
+    @IsTest
+    static void testMarkPaymentSuccessDifferentPaymentThrows() {
+        TestRecords records = createRecords();
+        Decimal capturedAmount = completePayment(
+            records.termRecord.Id, records.contactRecord.Id
+        );
         Boolean caught = false;
         try {
-            PaymentService.markPaymentSuccess(deletedId, 'order', 'pay', 'sig', 100);
-        } catch (PaymentException pe) {
+            PaymentService.markPaymentSuccess(
+                records.termRecord.Id, ORDER_ID, 'pay_different', SIGNATURE, capturedAmount
+            );
+        } catch (PaymentException exceptionRecord) {
             caught = true;
+            System.assertEquals(
+                'A different payment has already settled this installment.',
+                exceptionRecord.getMessage()
+            );
         }
-        System.assert(caught);
+        System.assertEquals(true, caught, 'Different payment IDs must be rejected.');
     }
 
-    @isTest
+    @IsTest
+    static void testMarkPaymentSuccessNotFoundThrows() {
+        TestRecords records = createRecords();
+        Id deletedId = records.termRecord.Id;
+        delete records.termRecord;
+        Boolean caught = false;
+        try {
+            PaymentService.markPaymentSuccess(deletedId, ORDER_ID, PAYMENT_ID, SIGNATURE, 100);
+        } catch (PaymentException exceptionRecord) {
+            caught = true;
+            System.assertEquals('Payment term not found.', exceptionRecord.getMessage());
+        }
+        System.assertEquals(true, caught, 'Missing terms must not be settled.');
+    }
+
+    @IsTest
     static void testSaveOfflinePaymentDetailsUpdatesRecord() {
-        setupData();
-
+        TestRecords records = createRecords();
         Test.startTest();
-        PaymentService.saveOfflinePaymentDetails(testTerm.Id, testContact.Id, 'Will pay by cheque at the site office.');
+        PaymentService.saveOfflinePaymentDetails(
+            records.termRecord.Id, records.contactRecord.Id, OFFLINE_DESCRIPTION
+        );
         Test.stopTest();
-
-        Payment_Term__c updated = [
-            SELECT Payment_Mode__c, Offline_Payment_Description__c, Transaction_Status__c
-            FROM Payment_Term__c
-            WHERE Id = :testTerm.Id
-        ];
+        Payment_Term__c updated = queryTerm(records.termRecord.Id);
         System.assertEquals('Offline', updated.Payment_Mode__c);
-        System.assertEquals('Will pay by cheque at the site office.', updated.Offline_Payment_Description__c);
+        System.assertEquals(OFFLINE_DESCRIPTION, updated.Offline_Payment_Description__c);
         System.assertNotEquals('Paid', updated.Transaction_Status__c);
     }
 
-    @isTest
+    @IsTest
     static void testSaveOfflinePaymentDetailsBlankDescriptionThrows() {
-        setupData();
-
+        TestRecords records = createRecords();
         Boolean caught = false;
         try {
-            PaymentService.saveOfflinePaymentDetails(testTerm.Id, testContact.Id, '   ');
-        } catch (PaymentException pe) {
+            PaymentService.saveOfflinePaymentDetails(
+                records.termRecord.Id, records.contactRecord.Id, '   '
+            );
+        } catch (PaymentException exceptionRecord) {
             caught = true;
-            System.assertEquals('Please describe how you will complete this payment offline.', pe.getMessage());
+            System.assertEquals(
+                'Please describe how you will complete this payment offline.',
+                exceptionRecord.getMessage()
+            );
         }
-        System.assert(caught);
+        System.assertEquals(true, caught, 'Blank descriptions must be rejected.');
     }
 
-    @isTest
+    @IsTest
     static void testSaveOfflinePaymentDetailsAlreadyPaidThrows() {
-        setupData();
-        testTerm.Transaction_Status__c = 'Paid';
-        update testTerm;
-
+        TestRecords records = createRecords();
+        completePayment(records.termRecord.Id, records.contactRecord.Id);
         Boolean caught = false;
         try {
-            PaymentService.saveOfflinePaymentDetails(testTerm.Id, testContact.Id, 'Cash payment planned.');
-        } catch (PaymentException pe) {
+            PaymentService.saveOfflinePaymentDetails(
+                records.termRecord.Id, records.contactRecord.Id, 'Cash payment planned.'
+            );
+        } catch (PaymentException exceptionRecord) {
             caught = true;
+            assertErrorMessage(exceptionRecord.getMessage());
         }
-        System.assert(caught);
+        System.assertEquals(true, caught, 'Paid installments cannot change to offline.');
     }
 
-    @isTest
+    @IsTest
     static void testMarkPaymentFailedUpdatesStatus() {
-        setupData();
-
-        PaymentService.markPaymentFailed(testTerm.Id, 'order_failed');
-
-        Payment_Term__c updated = [SELECT Transaction_Status__c, Razorpay_Order_Id__c FROM Payment_Term__c WHERE Id = :testTerm.Id];
+        TestRecords records = createRecords();
+        prepareOrder(records.termRecord.Id, records.contactRecord.Id, ORDER_ID);
+        Test.startTest();
+        PaymentService.markPaymentFailed(records.termRecord.Id, ORDER_ID);
+        Test.stopTest();
+        Payment_Term__c updated = queryTerm(records.termRecord.Id);
         System.assertEquals('Failed', updated.Transaction_Status__c);
-        System.assertEquals('order_failed', updated.Razorpay_Order_Id__c);
+        System.assertEquals(ORDER_ID, updated.Razorpay_Order_Id__c);
     }
 
-    @isTest
+    @IsTest
+    static void testMarkPaymentFailedDoesNotOverwritePaid() {
+        TestRecords records = createRecords();
+        completePayment(records.termRecord.Id, records.contactRecord.Id);
+        PaymentService.markPaymentFailed(records.termRecord.Id, ORDER_ID);
+        System.assertEquals('Paid', queryTerm(records.termRecord.Id).Transaction_Status__c);
+    }
+
+    @IsTest
+    static void testMarkPaymentFailedWrongOrderIsNoOp() {
+        TestRecords records = createRecords();
+        prepareOrder(records.termRecord.Id, records.contactRecord.Id, ORDER_ID);
+        PaymentService.markPaymentFailed(records.termRecord.Id, 'order_wrong');
+        Payment_Term__c updated = queryTerm(records.termRecord.Id);
+        System.assertNotEquals('Failed', updated.Transaction_Status__c);
+        System.assertEquals(ORDER_ID, updated.Razorpay_Order_Id__c);
+    }
+
+    @IsTest
     static void testMarkPaymentRefundedUpdatesStatus() {
-        setupData();
-        testTerm.Razorpay_Order_Id__c = 'order_refund';
-        update testTerm;
-
-        PaymentService.markPaymentRefunded('order_refund');
-
-        Payment_Term__c updated = [SELECT Transaction_Status__c FROM Payment_Term__c WHERE Id = :testTerm.Id];
-        System.assertEquals('Refunded', updated.Transaction_Status__c);
+        TestRecords records = createRecords();
+        completePayment(records.termRecord.Id, records.contactRecord.Id);
+        Test.startTest();
+        PaymentService.markPaymentRefunded(ORDER_ID);
+        Test.stopTest();
+        System.assertEquals(
+            'Refunded', queryTerm(records.termRecord.Id).Transaction_Status__c
+        );
     }
 
-    @isTest
+    @IsTest
     static void testMarkPaymentRefundedNoMatchIsNoOp() {
-        setupData();
-
+        TestRecords records = createRecords();
         Test.startTest();
         PaymentService.markPaymentRefunded('nonexistent_order_id');
         Test.stopTest();
-
-        Payment_Term__c unchanged = [SELECT Transaction_Status__c FROM Payment_Term__c WHERE Id = :testTerm.Id];
-        System.assertNotEquals('Refunded', unchanged.Transaction_Status__c);
+        System.assertNotEquals(
+            'Refunded', queryTerm(records.termRecord.Id).Transaction_Status__c
+        );
     }
 
-    @isTest
+    @IsTest
     static void testGetPaymentHistoryNullContactThrows() {
         Boolean caught = false;
         try {
             PaymentService.getPaymentHistory(null);
-        } catch (PaymentException pe) {
+        } catch (PaymentException exceptionRecord) {
             caught = true;
+            System.assertEquals('A contact is required.', exceptionRecord.getMessage());
         }
-        System.assert(caught);
+        System.assertEquals(true, caught, 'Null Contact Id must be rejected.');
     }
 
-    @isTest
+    @IsTest
     static void testGetPaymentHistoryReturnsItemsOrderedByDueDate() {
-        setupData();
-        Payment_Term__c secondTerm = TestDataUtility.createPaymentTerm(testProject.Id, 'Installment 2', 25);
-        secondTerm.Due_Date__c = testTerm.Due_Date__c.addDays(30);
+        TestRecords records = createRecords();
+        Payment_Term__c secondTerm = TestDataUtility.createPaymentTerm(
+            records.projectRecord.Id, 'Installment 2', TERM_PERCENTAGE
+        );
+        secondTerm.Due_Date__c = records.termRecord.Due_Date__c.addDays(30);
         update secondTerm;
-
-        List<PaymentService.PaymentHistoryItem> history = PaymentService.getPaymentHistory(testContact.Id);
-
+        Test.startTest();
+        List<PaymentService.PaymentHistoryItem> history =
+            PaymentService.getPaymentHistory(records.contactRecord.Id);
+        Test.stopTest();
         System.assertEquals(2, history.size());
-        System.assertEquals(testTerm.Id, history[0].paymentTermId);
+        System.assertEquals(records.termRecord.Id, history[0].paymentTermId);
         System.assertEquals(secondTerm.Id, history[1].paymentTermId);
+        System.assertEquals(PROJECT_BUDGET, history[0].amount + history[1].amount,
+            'Schedule allocations should add up to the project budget.');
     }
 
-    @isTest
+    @IsTest
     static void testGetPayableTermUsesLegacyPaymentReceivedFallback() {
-        setupData();
-        testTerm.Payment_Received__c = true;
-        update testTerm;
-
-        PaymentService.PaymentTermDetail detail = PaymentService.getPayableTerm(testTerm.Id, testContact.Id);
+        TestRecords records = createRecords();
+        // The legacy status fallback applies only when Transaction_Status__c is blank.
+        update new Payment_Term__c(
+            Id = records.termRecord.Id,
+            Transaction_Status__c = null,
+            Payment_Received__c = true,
+            Paid_Amount__c = PROJECT_BUDGET
+        );
+        PaymentService.PaymentTermDetail detail = PaymentService.getPayableTerm(
+            records.termRecord.Id, records.contactRecord.Id
+        );
         System.assertEquals('Paid', detail.status);
     }
 
-    @isTest
+    @IsTest
     static void testGetReceiptReturnsDataForPaidTerm() {
-        setupData();
-        PaymentService.markPaymentSuccess(testTerm.Id, 'order_receipt', 'pay_receipt', 'sig_receipt', 250000);
-
-        PaymentService.ReceiptData receipt = PaymentService.getReceipt(testTerm.Id, testContact.Id);
-
-        System.assertEquals('pay_receipt', receipt.receiptNumber);
+        TestRecords records = createRecords();
+        Decimal paidAmount = completePayment(
+            records.termRecord.Id, records.contactRecord.Id
+        );
+        Test.startTest();
+        PaymentService.ReceiptData receipt = PaymentService.getReceipt(
+            records.termRecord.Id, records.contactRecord.Id
+        );
+        Test.stopTest();
+        System.assertEquals(PAYMENT_ID, receipt.receiptNumber);
         System.assertEquals('Paid', receipt.status);
         System.assertEquals('INR', receipt.currencyCode);
-        System.assertEquals(250000, receipt.amount);
+        System.assertEquals(paidAmount, receipt.amount);
+        System.assertEquals(ORDER_ID, receipt.razorpayOrderId);
+        System.assertEquals(PAYMENT_ID, receipt.razorpayPaymentId);
     }
 
-    @isTest
+    @IsTest
     static void testGetReceiptNotPaidThrows() {
-        setupData();
-
+        TestRecords records = createRecords();
         Boolean caught = false;
         try {
-            PaymentService.getReceipt(testTerm.Id, testContact.Id);
-        } catch (PaymentException pe) {
+            PaymentService.getReceipt(records.termRecord.Id, records.contactRecord.Id);
+        } catch (PaymentException exceptionRecord) {
             caught = true;
-            System.assertEquals('No receipt is available until this installment is paid.', pe.getMessage());
+            System.assertEquals(
+                'No receipt is available until this installment is paid.',
+                exceptionRecord.getMessage()
+            );
         }
-        System.assert(caught);
+        System.assertEquals(true, caught, 'Pending terms must not have receipts.');
+    }
+
+    @IsTest
+    static void testRecordPaymentOrderStoresOriginalAmount() {
+        TestRecords records = createRecords();
+        Decimal allocatedAmount = prepareOrder(
+            records.termRecord.Id, records.contactRecord.Id, ORDER_ID
+        );
+        Payment_Term__c stored = queryTerm(records.termRecord.Id);
+        System.assertEquals(ORDER_ID, stored.Razorpay_Order_Id__c);
+        System.assertEquals(allocatedAmount, stored.Order_Amount__c);
+        PaymentService.PaymentTermDetail detail =
+            PaymentService.getPaymentVerificationDetail(
+                records.termRecord.Id, records.contactRecord.Id, ORDER_ID
+            );
+        System.assertEquals(allocatedAmount, detail.amount,
+            'Verification uses the stored order amount.');
+    }
+
+    @IsTest
+    static void testRecordPaymentOrderDifferentOrderThrows() {
+        TestRecords records = createRecords();
+        Decimal amount = prepareOrder(
+            records.termRecord.Id, records.contactRecord.Id, ORDER_ID
+        );
+        Boolean caught = false;
+        try {
+            PaymentService.recordPaymentOrder(records.termRecord.Id, 'order_other', amount);
+        } catch (PaymentException exceptionRecord) {
+            caught = true;
+            System.assertEquals(
+                'Another payment order already exists for this installment. Please try again.',
+                exceptionRecord.getMessage()
+            );
+        }
+        System.assertEquals(true, caught, 'A different open order must be rejected.');
+    }
+
+    @IsTest
+    static void testGetPaymentVerificationDetailWrongOrderThrows() {
+        TestRecords records = createRecords();
+        prepareOrder(records.termRecord.Id, records.contactRecord.Id, ORDER_ID);
+        Boolean caught = false;
+        try {
+            PaymentService.getPaymentVerificationDetail(
+                records.termRecord.Id, records.contactRecord.Id, 'order_wrong'
+            );
+        } catch (PaymentException exceptionRecord) {
+            caught = true;
+            System.assertEquals(
+                'The original payment order amount is unavailable. Please contact support to reconcile this payment.',
+                exceptionRecord.getMessage()
+            );
+        }
+        System.assertEquals(true, caught, 'Unknown orders must not be verified.');
+    }
+
+    @IsTest
+    static void testPaymentVerificationUsesOriginalAmountAfterBudgetChange() {
+        TestRecords records = createRecords();
+        Decimal originalAmount = prepareOrder(
+            records.termRecord.Id, records.contactRecord.Id, ORDER_ID
+        );
+        update new Project__c(
+            Id = records.projectRecord.Id,
+            Supervisor_Estimated_Budget__c = PROJECT_BUDGET + 50000
+        );
+        PaymentService.PaymentTermDetail detail =
+            PaymentService.getPaymentVerificationDetail(
+                records.termRecord.Id, records.contactRecord.Id, ORDER_ID
+            );
+        System.assertEquals(originalAmount, detail.amount,
+            'Verification must use the recorded amount, not the changed budget.');
+    }
+
+    @IsTest
+    static void testMarkPaymentSuccessRequiresOriginalOrder() {
+        TestRecords records = createRecords();
+        Boolean caught = false;
+        try {
+            PaymentService.markPaymentSuccess(
+                records.termRecord.Id, ORDER_ID, PAYMENT_ID, SIGNATURE, PROJECT_BUDGET
+            );
+        } catch (PaymentException exceptionRecord) {
+            caught = true;
+            System.assertEquals(
+                'The original payment order amount is unavailable. Please contact support to reconcile this payment.',
+                exceptionRecord.getMessage()
+            );
+        }
+        System.assertEquals(true, caught, 'Successful payment requires a stored order.');
     }
 }
