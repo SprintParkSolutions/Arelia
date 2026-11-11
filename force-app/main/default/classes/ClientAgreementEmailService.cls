@@ -146,12 +146,39 @@ public inherited sharing class ClientAgreementEmailService {
 
         content.subject = 'Client Agreement for {{OPPORTUNITY_NAME}}';
         content.htmlBody =
-            '<p>Dear {{LEAD_NAME}},</p>'
-            + '<p>Please find attached the client agreement for {{OPPORTUNITY_NAME}}.</p>'
-            + '<p>Please review and sign using the link below:</p>'
-            + '<p><a href="{{SIGNING_URL}}">Open and Sign Client Agreement</a></p>'
-            + '<p>Client Email: {{CLIENT_EMAIL}}</p>'
-            + '<p>Supervisor Email: {{SUPERVISOR_EMAIL}}</p>';
+            '<div style="font-family:Georgia,Times New Roman,serif;'
+            + 'font-size:14px;line-height:1.5;color:#222222;'
+            + 'background-color:#ffffff;padding:16px 24px;">'
+            + '<p style="margin:0 0 16px;">Hello {{LEAD_NAME}},</p>'
+            + '<p style="margin:0 0 16px;">Please find your Client Agreement PDF attached to this email.</p>'
+            + '<p style="margin:0 0 18px;">Please review the agreement carefully. '
+            + 'Once you are ready, you can digitally sign the agreement using the secure link below.</p>'
+            + '<hr style="border:0;border-top:1px solid #e3c788;margin:18px 0;" />'
+            + '<p style="margin:0 0 14px;"><strong>Agreement Details</strong></p>'
+            + '<ul style="padding-left:18px;margin:0 0 18px;">'
+            + '<li style="margin:0 0 6px;"><strong>Project:</strong> {{OPPORTUNITY_NAME}}</li>'
+            + '<li style="margin:0 0 6px;"><strong>Client Email:</strong> {{CLIENT_EMAIL}}</li>'
+            + '<li style="margin:0;"><strong>Supervisor Email:</strong> {{SUPERVISOR_EMAIL}}</li>'
+            + '</ul>'
+            + '<hr style="border:0;border-top:1px solid #e3c788;margin:18px 0;" />'
+            + '<p style="margin:0 0 14px;"><strong>External File Links</strong></p>'
+            + '<p style="margin:0 0 12px;">You can access additional agreement-related files '
+            + 'using the links provided below.</p>'
+            + '<div style="margin:0 0 18px;overflow-wrap:anywhere;">{{EXTERNAL_FILE_LINKS}}</div>'
+            + '<hr style="border:0;border-top:1px solid #e3c788;margin:18px 0;" />'
+            + '<p style="margin:0 0 14px;"><strong>Action Required</strong></p>'
+            + '<p style="margin:0 0 16px;">Please use the button below to securely open, '
+            + 'review, and digitally sign your Client Agreement.</p>'
+            + '<p style="margin:0 0 18px;">'
+            + '<a href="{{SIGNING_URL}}" style="display:inline-block;'
+            + 'background-color:#222222;color:#ffffff;text-decoration:none;'
+            + 'font-family:Arial,sans-serif;font-size:13px;font-weight:bold;'
+            + 'padding:9px 18px;border:1px solid #c4a35a;">'
+            + 'Open &amp; Sign Client Agreement</a></p>'
+            + '<p style="margin:0 0 18px;">If you have any questions regarding the agreement, '
+            + 'please contact your assigned supervisor before signing.</p>'
+            + '<p style="margin:0;">Warm regards,<br/><strong>Team Arelia</strong></p>'
+            + '</div>';
 
         if (String.isBlank(developerName)) {
             System.debug(

@@ -1,18 +1,12 @@
 /**
  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
  * Class Name      : ClientAgreementSignedPdfJob
- * Author          : <YourName>
+ * Author          : Arelia
  * Created Date    : Jun 11, 2026
- * Last Modified By: <YourName>
+ * Last Modified By: Arelia
  * Last Modified On: Jun 11, 2026
  * Description     : Saves signed agreement PDF and emails supervisor with signed PDF
  *                   plus selected supporting files linked to Client_Agreement__c.
- *  
- * Change History  :
- *  Date          │   Author     │   Change
- * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
- *  Jun 11, 2026  │ <YourName>   │ Initial version
- * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
  */
 
 /**
@@ -57,6 +51,7 @@ public without sharing class ClientAgreementSignedPdfJob implements Queueable {
                    Signed_File_Id__c,
                    Signed_Date__c,
                    Agreement_HTML__c,
+                   External_Supporting_File_Links__c,
                    Opportunity__c,
                    Opportunity__r.Name,
                    Opportunity__r.Email__c,
@@ -346,17 +341,11 @@ public without sharing class ClientAgreementSignedPdfJob implements Queueable {
 
         emailReq.mergeValues =
             new Map<String, String>{
-                'CLIENT_EMAIL' =>
-                    clientEmail,
-
-                'SUPERVISOR_EMAIL' =>
-                    supervisorEmail,
-
-                'OPPORTUNITY_NAME' =>
-                    agreement.Opportunity__r.Name,
-
-                'SIGNED_DATE' =>
-                    getSignedDateText(agreement)
+                'CLIENT_EMAIL' => clientEmail,
+                'SUPERVISOR_EMAIL' => supervisorEmail,
+                'OPPORTUNITY_NAME' => agreement.Opportunity__r.Name,
+                'SIGNED_DATE' => getSignedDateText(agreement),
+                'EXTERNAL_FILE_LINKS' => ClientAgreementExternalLinkService.buildEmailHtml(agreement.External_Supporting_File_Links__c)
             };
 
         ClientAgreementEmailService.sendEmail(emailReq);
@@ -454,23 +443,13 @@ public without sharing class ClientAgreementSignedPdfJob implements Queueable {
          * Client receives only the final signed agreement PDF.
          */
         emailReq.mergeValues = new Map<String, String>{
-                'LEAD_NAME' =>
-                    leadName,
-
-                'CLIENT_EMAIL' =>
-                    clientEmail,
-
-                'SUPERVISOR_EMAIL' =>
-                    supervisorEmail,
-
-                'OPPORTUNITY_NAME' =>
-                    agreement.Opportunity__r.Name,
-
-                'AGREEMENT_NAME' =>
-                    agreement.Name,
-
-                'SIGNED_DATE' =>
-                    getSignedDateText(agreement)
+                'LEAD_NAME' => leadName,
+                'CLIENT_EMAIL' => clientEmail,
+                'SUPERVISOR_EMAIL' => supervisorEmail,
+                'OPPORTUNITY_NAME' => agreement.Opportunity__r.Name,
+                'AGREEMENT_NAME' => agreement.Name,
+                'SIGNED_DATE' => getSignedDateText(agreement),
+                'EXTERNAL_FILE_LINKS' => ClientAgreementExternalLinkService.buildEmailHtml(agreement.External_Supporting_File_Links__c)
             };
 
         ClientAgreementEmailService.sendEmail(emailReq);
