@@ -1052,42 +1052,109 @@ private class ProspectProjectDetailsApiTest {
         );
     }
 
-    private static void verifyInvalidFields(
-        Map<String, Object> validPayload
-    ) {
+    /**
+    * @description Verifies invalid project field values and project type/scope compatibility validation.
+    * Preserves existing REST API behavior.
+    */
+    private static void verifyInvalidFields(Map<String, Object> validPayload) {
+        // Scenario 1: Invalid project type.
+        Map<String, Object> invalidTypePayload = validPayload.clone();
 
-        Map<String, String> invalidValues =
-            new Map<String, String>{
-                'typeOfProject' => 'Invalid',
-                'projectScope' => 'Invalid',
-                'planLevel' => 'Invalid'
-            };
+        invalidTypePayload.put(
+            'typeOfProject',
+            'Invalid'
+        );
 
-        Map<String, String> expectedMessages =
-            new Map<String, String>{
-                'typeOfProject' =>
-                    'Invalid Type Of Project value.',
-                'projectScope' =>
-                    'Invalid Project Scope value.',
-                'planLevel' =>
-                    'Invalid Plan Level value.'
-            };
+        assertValidationMessage(
+            invalidTypePayload,
+            'Invalid Type Of Project value.'
+        );
 
-        for (String fieldName : invalidValues.keySet()) {
+        // Scenario 2: Invalid project scope for Home.
+        // The API checks type/scope compatibility first.
+        Map<String, Object> invalidScopePayload =
+            validPayload.clone();
 
-            Map<String, Object> invalidPayload =
-                validPayload.clone();
+        invalidScopePayload.put(
+            'projectScope',
+            'Invalid'
+        );
 
-            invalidPayload.put(
-                fieldName,
-                invalidValues.get(fieldName)
-            );
+        assertValidationMessage(
+            invalidScopePayload,
+            'Select a project scope matching the type of project.'
+        );
 
-            assertValidationMessage(
-                invalidPayload,
-                expectedMessages.get(fieldName)
-            );
-        }
+        // Scenario 3: Valid Office scope used with Home type.
+        Map<String, Object> mismatchedHomePayload =
+            validPayload.clone();
+
+        mismatchedHomePayload.put(
+            'typeOfProject',
+            'Home'
+        );
+
+        mismatchedHomePayload.put(
+            'projectScope',
+            'Office Space'
+        );
+
+        assertValidationMessage(
+            mismatchedHomePayload,
+            'Select a project scope matching the type of project.'
+        );
+
+        // Scenario 4: Valid Home scope used with Office type.
+        Map<String, Object> mismatchedOfficePayload =
+            validPayload.clone();
+
+        mismatchedOfficePayload.put(
+            'typeOfProject',
+            'Office'
+        );
+
+        mismatchedOfficePayload.put(
+            'projectScope',
+            'Kitchen'
+        );
+
+        assertValidationMessage(
+            mismatchedOfficePayload,
+            'Select a project scope matching the type of project.'
+        );
+
+        // Scenario 5: Invalid Office scope.
+        Map<String, Object> invalidOfficeScopePayload =
+            validPayload.clone();
+
+        invalidOfficeScopePayload.put(
+            'typeOfProject',
+            'Office'
+        );
+
+        invalidOfficeScopePayload.put(
+            'projectScope',
+            'Invalid'
+        );
+
+        assertValidationMessage(
+            invalidOfficeScopePayload,
+            'Select a project scope matching the type of project.'
+        );
+
+        // Scenario 6: Invalid plan level.
+        Map<String, Object> invalidPlanPayload =
+            validPayload.clone();
+
+        invalidPlanPayload.put(
+            'planLevel',
+            'Invalid'
+        );
+
+        assertValidationMessage(
+            invalidPlanPayload,
+            'Invalid Plan Level value.'
+        );
     }
 
     private static void verifyInvalidBudget(
