@@ -21,47 +21,25 @@
 @SuppressWarnings('PMD.TooManyMethods')
 private class RazorpayControllerTest {
 
-    private static final String TEST_CONTACT_EMAIL =
-        'razorpaytester@testorg.com';
-
-    private static final String TEST_PROJECT_NAME =
-        'Razorpay Test Project';
-
-    private static final String TEST_TERM_NAME =
-        'Initial Payment';
-
-    private static final String VERIFY_CONTACT_EMAIL =
-        'razorpayverify@testorg.com';
-
-    private static final String VERIFY_PROJECT_NAME =
-        'Razorpay Verification Project';
-
-    private static final String VERIFY_TERM_NAME =
-        'Verification Payment';
-
-    private static final String TEST_ORDER_ID =
-        'order_test_123';
-
-    private static final String TEST_PAYMENT_ID =
-        'pay_verify_123';
-
-    private static final String TEST_DESCRIPTION =
-        'Customer will pay by cheque at site.';
-
-    private static final String BASE_ENDPOINT =
-        '/services/apexrest/payment/';
-
+    private static final String TEST_CONTACT_EMAIL = 'razorpaytester@testorg.com';
+    private static final String TEST_PROJECT_NAME = 'Razorpay Test Project';
+    private static final String TEST_TERM_NAME = 'Initial Payment';
+    private static final String VERIFY_CONTACT_EMAIL = 'razorpayverify@testorg.com';
+    private static final String VERIFY_PROJECT_NAME = 'Razorpay Verification Project';
+    private static final String VERIFY_TERM_NAME = 'Verification Payment';
+    private static final String TEST_ORDER_ID = 'order_test_123';
+    private static final String TEST_PAYMENT_ID = 'pay_verify_123';
+    private static final String TEST_DESCRIPTION = 'Customer will pay by cheque at site.';
+    private static final String BASE_ENDPOINT = '/services/apexrest/payment/';
     private static final Integer STATUS_SUCCESS = 200;
     private static final Integer STATUS_BAD_REQUEST = 400;
     private static final Integer STATUS_CONFLICT = 409;
     private static final Integer STATUS_NOT_FOUND = 404;
-
     private static final Decimal PROJECT_BUDGET = 100000;
     private static final Decimal PAYMENT_PERCENTAGE = 25;
 
     /*
-     * The existing PaymentService currently returns the
-     * full project amount for this test Payment Term.
+     * The existing PaymentService currently returns the full project amount for this test Payment Term.
      */
     private static final Decimal EXPECTED_PAYMENT_AMOUNT = 100000;
 
@@ -71,26 +49,9 @@ private class RazorpayControllerTest {
     @TestSetup
     static void setupTestData() {
 
-        Contact testContact = TestDataUtility.createContact(
-            'RazorpayTester',
-            TEST_CONTACT_EMAIL,
-            'Test@1234'
-        );
-
-        Project__c testProject = TestDataUtility.createProject(
-            TEST_PROJECT_NAME,
-            PROJECT_BUDGET,
-            testContact.Id
-        );
-
-        TestDataUtility.createPaymentTerm(
-            testProject.Id,
-            TEST_TERM_NAME,
-            PAYMENT_PERCENTAGE
-        );
-
-        // Keep the verification data separate so history tests retain
-        // exactly one payment for the original Contact.
+        // Seed the verification order first. An org-specific payment
+        // recalculation may update other payment schedules when the order
+        // snapshot is recorded.
         Contact verificationContact = TestDataUtility.createContact(
             'RazorpayVerifier',
             VERIFY_CONTACT_EMAIL,
@@ -109,16 +70,12 @@ private class RazorpayControllerTest {
             PAYMENT_PERCENTAGE
         );
 
-        Payment_Term__c verificationTerm = [
-            SELECT Id
-            FROM Payment_Term__c
-            WHERE Project__c = :verificationProject.Id
-            AND Name = :VERIFY_TERM_NAME
-            LIMIT 1
-        ];
+        Payment_Term__c verificationTerm = findSingleProjectTerm(
+            verificationProject.Id,
+            VERIFY_TERM_NAME
+        );
 
-        // Pre-seed the order in @TestSetup instead of creating it through
-        // the REST callout during the verification test transaction.
+        // Seed in @TestSetup so verification has no preceding DML in its test transaction.
         update new Payment_Term__c(
             Id = verificationTerm.Id,
             Paid_Amount__c = EXPECTED_PAYMENT_AMOUNT
@@ -129,6 +86,65 @@ private class RazorpayControllerTest {
             TEST_ORDER_ID,
             EXPECTED_PAYMENT_AMOUNT
         );
+
+        // Create ordinary payment test data after order initialization.
+        Contact testContact = TestDataUtility.createContact(
+            'RazorpayTester',
+            TEST_CONTACT_EMAIL,
+            'Test@1234'
+        );
+
+        Project__c testProject = TestDataUtility.createProject(
+            TEST_PROJECT_NAME,
+            PROJECT_BUDGET,
+            testContact.Id
+        );
+
+        TestDataUtility.createPaymentTerm(
+            testProject.Id,
+            TEST_TERM_NAME,
+            PAYMENT_PERCENTAGE
+        );
+
+        findSingleProjectTerm(testProject.Id, TEST_TERM_NAME);
+    }
+
+    /**
+     * @description Locates the uniquely created term through its Project Id.
+     *              The Name field may be generated or rewritten by automation.
+     * @param projectId Parent Project Id.
+     * @param expectedName Expected name when one of several terms exists.
+     * @return The matching Payment Term.
+     */
+    private static Payment_Term__c findSingleProjectTerm(Id projectId, String expectedName) {
+        List<Payment_Term__c> projectTerms = [
+            SELECT Id, Name
+            FROM Payment_Term__c
+            WHERE Project__c = :projectId
+            ORDER BY CreatedDate ASC, Id ASC
+        ];
+
+        System.assert(
+            !projectTerms.isEmpty(),
+            'TestDataUtility did not leave a Payment Term for Project ' +
+            String.valueOf(projectId) + '. Check org automation and ' +
+            'TestDataUtility.createPaymentTerm().' 
+        );
+
+        for (Payment_Term__c term : projectTerms) {
+            if (term.Name == expectedName) {
+                return term;
+            }
+        }
+
+        System.assertEquals(
+            1,
+            projectTerms.size(),
+            'Multiple Payment Terms were generated, but none has the ' +
+            'expected name ' + expectedName + '. Review payment schedule ' +
+            'automation instead of selecting an unrelated installment.'
+        );
+        return projectTerms[0];
     }
 
     /**
@@ -163,6 +179,13 @@ private class RazorpayControllerTest {
      * @return Verification Payment Term.
      */
     private static Payment_Term__c getVerificationTerm() {
+        Id projectId = [
+            SELECT Id
+            FROM Project__c
+            WHERE Name = :VERIFY_PROJECT_NAME
+            LIMIT 1
+        ].Id;
+        Id termId = findSingleProjectTerm(projectId, VERIFY_TERM_NAME).Id;
         return [
             SELECT Id,
                    Transaction_Status__c,
@@ -172,8 +195,7 @@ private class RazorpayControllerTest {
                    Razorpay_Order_Id__c,
                    Razorpay_Payment_Id__c
             FROM Payment_Term__c
-            WHERE Project__r.Name = :VERIFY_PROJECT_NAME
-            AND Name = :VERIFY_TERM_NAME
+            WHERE Id = :termId
             LIMIT 1
         ];
     }
@@ -197,7 +219,8 @@ private class RazorpayControllerTest {
      * @return Payment_Term__c record.
      */
     private static Payment_Term__c getTestTerm() {
-
+        Id projectId = getTestProject().Id;
+        Id termId = findSingleProjectTerm(projectId, TEST_TERM_NAME).Id;
         return [
             SELECT Id,
                    Transaction_Status__c,
@@ -209,8 +232,7 @@ private class RazorpayControllerTest {
                    Payment_Mode__c,
                    Offline_Payment_Description__c
             FROM Payment_Term__c
-            WHERE Project__r.Name = :TEST_PROJECT_NAME
-            AND Name = :TEST_TERM_NAME
+            WHERE Id = :termId
             LIMIT 1
         ];
     }
@@ -359,10 +381,7 @@ private class RazorpayControllerTest {
      * @param contactId Contact Id.
      * @return Payload map.
      */
-    private static Map<String, Object> createPaymentPayload(
-        Id paymentTermId,
-        Id contactId
-    ) {
+    private static Map<String, Object> createPaymentPayload(Id paymentTermId, Id contactId) {
 
         return new Map<String, Object>{
             'paymentTermId' => String.valueOf(paymentTermId),
@@ -377,11 +396,7 @@ private class RazorpayControllerTest {
      * @param secret Razorpay secret.
      * @return Hexadecimal signature.
      */
-    private static String generateSignature(
-        String orderId,
-        String paymentId,
-        String secret
-    ) {
+    private static String generateSignature(String orderId, String paymentId, String secret) {
 
         Blob signatureBlob = Crypto.generateMac(
             'hmacSHA256',
@@ -600,8 +615,7 @@ private class RazorpayControllerTest {
     }
 
     /**
-     * @description Tests successful payment verification
-     * with a matching persisted Razorpay order.
+     * @description Tests successful payment verification with a matching persisted Razorpay order.
      */
     @IsTest
     static void testHandleVerifyMarksPaymentPaid() {
@@ -639,8 +653,7 @@ private class RazorpayControllerTest {
 
         setupPostRequest('verify', payload);
 
-        // Do not perform DML or createOrder callouts in this test method
-        // before verification. The order is already saved in @TestSetup.
+        // Do not perform DML or createOrder callouts in this test method before verification. The order is already saved in @TestSetup.
         Test.startTest();
         RazorpayController.handlePost();
         Test.stopTest();
@@ -761,8 +774,7 @@ private class RazorpayControllerTest {
     }
 
     /**
-     * @description Tests receipt retrieval for
-     * an existing paid Payment Term.
+     * @description Tests receipt retrieval for an existing paid Payment Term.
      */
     @IsTest
     static void testHandleReceiptReturnsReceiptForPaidTerm() {
@@ -771,8 +783,7 @@ private class RazorpayControllerTest {
         Contact testContact = getTestContact();
 
         /*
-         * Existing validation requires Paid_Amount__c
-         * before the installment can be marked Paid.
+         * Existing validation requires Paid_Amount__c before the installment can be marked Paid.
          */
         testTerm.Paid_Amount__c = EXPECTED_PAYMENT_AMOUNT;
 
