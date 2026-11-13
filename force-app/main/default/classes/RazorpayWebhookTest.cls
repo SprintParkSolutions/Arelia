@@ -48,7 +48,12 @@ private class RazorpayWebhookTest {
 
         String orderId = 'order_webhook_123';
         String paymentId = 'pay_webhook_123';
+        // Simulate order creation: PaymentService.markPaymentSuccess only accepts
+        // the server-side amount recorded when the Razorpay order was created.
+        // Project budget 100000 x 25% = 25000.
+        Decimal orderAmount = 25000.00;
         term.Razorpay_Order_Id__c = orderId;
+        term.Order_Amount__c = orderAmount;
         update term;
 
         String rawBody = buildWebhookPayload('payment.captured', 'payment', new Map<String, Object>{
@@ -74,12 +79,13 @@ private class RazorpayWebhookTest {
         System.assertEquals('{"status":"ok"}', RestContext.response.responseBody.toString());
 
         Payment_Term__c updated = [
-            SELECT Transaction_Status__c, Payment_Received__c, Razorpay_Order_Id__c, Razorpay_Payment_Id__c
+            SELECT Transaction_Status__c, Payment_Received__c, Razorpay_Order_Id__c, Razorpay_Payment_Id__c, Paid_Amount__c
             FROM Payment_Term__c
             WHERE Id = :term.Id
         ];
 
         System.assertEquals('Paid', updated.Transaction_Status__c);
+        System.assertEquals(orderAmount, updated.Paid_Amount__c, 'Paid amount should equal the recorded order amount.');
         System.assertEquals(true, updated.Payment_Received__c);
         System.assertEquals(orderId, updated.Razorpay_Order_Id__c);
         System.assertEquals(paymentId, updated.Razorpay_Payment_Id__c);

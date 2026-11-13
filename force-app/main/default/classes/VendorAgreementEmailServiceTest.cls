@@ -1,19 +1,11 @@
 /**
  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
  * Class Name      : VendorAgreementEmailServiceTest
- * Author          : <YourName>
+ * Author          : Arelia
  * Created Date    : Jul 10, 2026
- * Last Modified By: <YourName>
+ * Last Modified By: Arelia
  * Last Modified On: Jul 16, 2026
  * Description     : Tests Vendor Agreement email delivery and validation.
- *
- * Change History  :
- *  Date          │   Author     │   Change
- * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
- *  Jul 10, 2026  │ <YourName>   │ Initial version
- *  Jul 15, 2026  │ <YourName>   │ Updated portable test data and assertions
- *  Jul 16, 2026  │ <YourName>   │ Removed hard-coded Vendor__c field dependency
- * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
  */
 
 /**
@@ -835,5 +827,88 @@ private class VendorAgreementEmailServiceTest {
         return String.valueOf(firstError.getStatusCode())
             + ': '
             + firstError.getMessage();
+    }
+
+    /**
+    * @description
+    * Verifies that a signed Vendor Agreement can enter the vendor
+    * email-delivery flow.
+    */
+    @IsTest
+    private static void
+        sendSignedAgreementToVendorShouldExecuteEmailFlow() {
+
+        AgreementTestData testData =
+            buildDefaultTestData();
+
+        testData.signedFileId =
+            createContentDocumentId();
+
+        Vendor_Agreement__c agreementRecord =
+            createAgreementRecord(testData);
+
+        Exception capturedException;
+        Integer emailInvocationsBefore;
+        Integer emailInvocationsAfter;
+
+        Test.startTest();
+
+        emailInvocationsBefore =
+            Limits.getEmailInvocations();
+
+        try {
+            VendorAgreementEmailService.sendSignedAgreementToVendor(agreementRecord);
+        } catch (Exception exceptionValue) {
+            capturedException = exceptionValue;
+        }
+
+        emailInvocationsAfter =
+            Limits.getEmailInvocations();
+
+        Test.stopTest();
+
+        assertEmailExecutionResult(
+            capturedException,
+            emailInvocationsBefore,
+            emailInvocationsAfter,
+            'Signed Vendor Agreement vendor email'
+        );
+    }
+
+    /**
+    * @description
+    * Verifies Vendor email validation for signed agreement delivery.
+    */
+    @IsTest
+    private static void
+        sendSignedAgreementToVendorShouldFailWhenVendorEmailIsMissing() {
+
+        AgreementTestData testData =
+            buildDefaultTestData();
+
+        testData.vendorEmail = null;
+        testData.signedFileId =
+            createContentDocumentId();
+
+        Vendor_Agreement__c agreementRecord =
+            createAgreementRecord(testData);
+
+        Exception capturedException;
+
+        Test.startTest();
+
+        try {
+            VendorAgreementEmailService.sendSignedAgreementToVendor(agreementRecord);
+        } catch (Exception exceptionValue) {
+            capturedException = exceptionValue;
+        }
+
+        Test.stopTest();
+
+        assertAuraHandledException(
+            capturedException,
+            'Missing Vendor email should result in an '
+            + 'AuraHandledException.'
+        );
     }
 }

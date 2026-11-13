@@ -40,7 +40,7 @@ export default class ProformaManagerAction extends LightningElement {
             return;
         }
 
-        getInvoice({ recordId: this.recordId })
+        getInvoice({ token: this.recordId })
             .then((result) => {
                 this.invoiceData = result;
                 this.comments = result.comments || '';
@@ -142,7 +142,7 @@ export default class ProformaManagerAction extends LightningElement {
         this.error = null;
 
         submitDecision({
-            recordId: this.recordId,
+            token: this.recordId,
             action,
             comments: this.comments
         })

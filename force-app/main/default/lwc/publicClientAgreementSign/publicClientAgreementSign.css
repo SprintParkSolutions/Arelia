@@ -535,7 +535,7 @@
     .agreement-preview {
         padding: 24px 16px;
         border-radius: 10px;
-        overflow-x: auto;
+        overflow-x: hidden;
     }
 
     .signature-section {
@@ -591,4 +591,36 @@
     .submission-box {
         padding: 28px 20px;
     }
+
+    .payment-terms-scroll {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        box-sizing: border-box;
+        margin-top: 14px;
+        margin-bottom: 26px;
+    }
+}
+
+.protected-brand-header {
+    text-align: center;
+    background: #ffffff;
+    margin-bottom: 18px;
+    padding-top: 8px;
+}
+
+.arelia-agreement-logo {
+    display: block;
+    width: 220px;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+    pointer-events: none;
+    user-select: none;
+}
+
+.brand-divider {
+    display: none;
 }

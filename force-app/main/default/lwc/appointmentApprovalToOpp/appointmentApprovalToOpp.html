@@ -50,69 +50,87 @@
                     </div>
                 </div>
 
-                <div class="whatBox">
-                    <div class="whatTitle">Available Actions</div>
-                    <ul class="whatList">
-                        <li><b>Approve</b> — Secure and confirm the site visit at the scheduled date and time.</li>
-                        <li><b>Reschedule</b> — Select a new, convenient date and time slot.</li>
-                    </ul>
-                </div>
-
-                <!-- Hides these action buttons if the reschedule panel is currently active -->
-                <template if:false={showReschedule}>
-                    <div class="actions">
-                        <button type="button" class="btn primary" onclick={onApproveClick} disabled={buttonsDisabled}>
-                            Approve Visit
-                        </button>
-                        <button type="button" class="btn secondary" onclick={onRescheduleClick} disabled={buttonsDisabled}>
-                            Reschedule
-                        </button>
+                <template if:true={alreadyResponded}>
+                    <div class="note">
+                        <lightning-icon icon-name="utility:success" size="x-small" class="noteIcon"></lightning-icon>
+                        <div class="noteText">
+                            This appointment has already been <b>{statusBadgeText}</b>. No further action is needed.
+                        </div>
                     </div>
+
+                    <template if:true={hasSupervisorContact}>
+                        <div class="note">
+                            <lightning-icon icon-name="utility:question_mark" size="x-small" class="noteIcon"></lightning-icon>
+                            <div class="noteText">{supervisorContactLine}</div>
+                        </div>
+                    </template>
                 </template>
 
-                <template if:true={showReschedule}>
-                    <div class="panel">
-                        <div class="panelTitle">Reschedule appointment</div>
-                        
-                        <div class="note">
-                            <lightning-icon icon-name="utility:info" size="x-small" class="noteIcon"></lightning-icon>
-                            <div class="noteText">
-                                Please select a new available date and time slot before submitting.
-                            </div>
-                        </div>
-
-                        <div class="grid">
-                            <div class="field">
-                                <lightning-input
-                                    type="date"
-                                    label="New Date"
-                                    min={minDate}
-                                    value={selectedDate}
-                                    onchange={handleDateChange}>
-                                </lightning-input>
-                            </div>
-
-                            <div class="field">
-                                <lightning-combobox
-                                    name="TimeSlot"
-                                    label="Time Slot"
-                                    value={selectedTimeSlot}
-                                    placeholder="Select a time slot"
-                                    options={timeSlotOptions}
-                                    onchange={handleTimeSlotChange}>
-                                </lightning-combobox>
-                            </div>
-                        </div>
-
-                        <div class="panelActions">
-                            <button type="button" class="btn primary" onclick={onRescheduleSubmitClick} disabled={buttonsDisabled}>
-                                Submit
-                            </button>
-                            <button type="button" class="btn ghost" onclick={cancelReschedule} disabled={buttonsDisabled}>
-                                Cancel
-                            </button>
-                        </div>
+                <template if:false={alreadyResponded}>
+                    <div class="whatBox">
+                        <div class="whatTitle">Available Actions</div>
+                        <ul class="whatList">
+                            <li><b>Approve</b> — Secure and confirm the site visit at the scheduled date and time.</li>
+                            <li><b>Reschedule</b> — Select a new, convenient date and time slot.</li>
+                        </ul>
                     </div>
+
+                    <!-- Hides these action buttons if the reschedule panel is currently active -->
+                    <template if:false={showReschedule}>
+                        <div class="actions">
+                            <button type="button" class="btn primary" onclick={onApproveClick} disabled={buttonsDisabled}>
+                                Approve Visit
+                            </button>
+                            <button type="button" class="btn secondary" onclick={onRescheduleClick} disabled={buttonsDisabled}>
+                                Reschedule
+                            </button>
+                        </div>
+                    </template>
+
+                    <template if:true={showReschedule}>
+                        <div class="panel">
+                            <div class="panelTitle">Reschedule appointment</div>
+
+                            <div class="note">
+                                <lightning-icon icon-name="utility:info" size="x-small" class="noteIcon"></lightning-icon>
+                                <div class="noteText">
+                                    Please select a new available date and time slot before submitting.
+                                </div>
+                            </div>
+
+                            <div class="grid">
+                                <div class="field">
+                                    <lightning-input
+                                        type="date"
+                                        label="New Date"
+                                        min={minDate}
+                                        value={selectedDate}
+                                        onchange={handleDateChange}>
+                                    </lightning-input>
+                                </div>
+
+                                <div class="field">
+                                    <lightning-combobox
+                                        name="TimeSlot"
+                                        label="Time Slot"
+                                        value={selectedTimeSlot}
+                                        placeholder="Select a time slot"
+                                        options={timeSlotOptions}
+                                        onchange={handleTimeSlotChange}>
+                                    </lightning-combobox>
+                                </div>
+                            </div>
+
+                            <div class="panelActions">
+                                <button type="button" class="btn primary" onclick={onRescheduleSubmitClick} disabled={buttonsDisabled}>
+                                    Submit
+                                </button>
+                                <button type="button" class="btn ghost" onclick={cancelReschedule} disabled={buttonsDisabled}>
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </template>
                 </template>
             </div>
         </div>

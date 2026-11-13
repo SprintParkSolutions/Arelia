@@ -967,4 +967,30 @@
     .loading-box {
         padding: 28px 20px;
     }
+
+    .agreement-preview .protected-brand-header .arelia-agreement-logo {
+        width: 90px !important;
+        max-width: 90px !important;
+    }
+}
+
+/* ================================
+   AGREEMENT PREVIEW LOGO
+================================ */
+
+.agreement-preview .protected-brand-header {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.agreement-preview .protected-brand-header .arelia-agreement-logo {
+    display: block;
+    width: 190px !important;
+    max-width: 190px !important;
+    height: auto !important;
+    margin: 0 auto;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
 }

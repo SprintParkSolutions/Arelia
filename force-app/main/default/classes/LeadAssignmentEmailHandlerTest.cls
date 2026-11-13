@@ -56,14 +56,18 @@ public class LeadAssignmentEmailHandlerTest {
         Map<Id, Lead> oldMap = new Map<Id, Lead>{ l.Id => l.clone(true, true, true, true) };
 
         // 2. Update Lead with Supervisor AND REQUIRED APPROVAL FIELDS
+        // Note: Appointment_Status__c is intentionally NOT set here - setting it to
+        // 'Approved' on a Lead that has never had an appointment scheduled (no
+        // Appointment_Date__c/Time_Slots__c/Appointment_Sent_date__c) trips
+        // LeadAppointmentResponseHandler's "No site visit appointment is available
+        // for response" validation, which is unrelated to what this test verifies.
         l.Supervisor_User__c = sup1.Id;
-        l.Appointment_Status__c = 'Approved';
         l.Project_Request_Submitted__c = true; // Fix: Added to satisfy validation rule
         l.Approval_Status__c = 'Approved';     // Fix: Satisfy Validation Rule
         update l;
 
         // 3. RE-QUERY to ensure Formula Field (Supervisor_User_Email__c) is calculated
-        Lead updatedLead = [SELECT Id, Supervisor_User__c, Supervisor_User_Email__c, Appointment_Status__c, RecordTypeId FROM Lead WHERE Id = :l.Id];
+        Lead updatedLead = [SELECT Id, RecordTypeId, Supervisor_User__c, Supervisor_User_Email__c, Appointment_Status__c FROM Lead WHERE Id = :l.Id];
 
         System.runAs(new User(Id = UserInfo.getUserId())) {
             Test.startTest();
@@ -105,7 +109,7 @@ public class LeadAssignmentEmailHandlerTest {
         l.Approval_Status__c = 'Approved';
         update l;
 
-        Lead updatedLead = [SELECT Id, Supervisor_User__c, Supervisor_User_Email__c, RecordTypeId FROM Lead WHERE Id = :l.Id];
+        Lead updatedLead = [SELECT Id, RecordTypeId, Supervisor_User__c, Supervisor_User_Email__c FROM Lead WHERE Id = :l.Id];
 
         System.runAs(new User(Id = UserInfo.getUserId())) {
             Test.startTest();
@@ -164,7 +168,7 @@ public class LeadAssignmentEmailHandlerTest {
         l.Approval_Status__c = 'Approved';
         update l;
 
-        Lead updatedLead = [SELECT Id, Supervisor_User__c, Supervisor_User_Email__c, RecordTypeId FROM Lead WHERE Id = :l.Id];
+        Lead updatedLead = [SELECT Id, RecordTypeId, Supervisor_User__c, Supervisor_User_Email__c FROM Lead WHERE Id = :l.Id];
 
         System.runAs(new User(Id = UserInfo.getUserId())) {
             Test.startTest();
@@ -247,15 +251,16 @@ public class LeadAssignmentEmailHandlerTest {
     @IsTest
     static void testSendEmailFailure() {
         User sup1 = [SELECT Id FROM User WHERE Alias = 'sup1' LIMIT 1];
-        Id areliaLeadRecordTypeId = Schema.SObjectType.Lead.getRecordTypeInfosByName().get('Arelia').getRecordTypeId();
 
         // 1. Prepare Data with NULL ID to cause Messaging.sendEmail failure
         // We do NOT provide an "Id" field in the JSON. This results in a Lead object with Id=null.
         // We DO provide Supervisor Email to pass the first check in buildEmail().
-        // RecordTypeId must be the Arelia Lead record type so isAreliaLead() lets it through.
+        // RecordTypeId must be a real Arelia Lead record type, or LeadEmailHandler.isAreliaLead()
+        // filters this record out before the handler ever attempts to send the email.
+        Id areliaLeadRTId = AreliaUtility.getAreliaLeadRecordTypeId();
         String leadJson = '{ ' +
             '"attributes": {"type": "Lead"}, ' +
-            '"RecordTypeId": "' + areliaLeadRecordTypeId + '", ' +
+            '"RecordTypeId": "' + areliaLeadRTId + '", ' +
             '"Supervisor_User__c": "' + sup1.Id + '", ' +
             '"Supervisor_User_Email__c": "test@test.com" ' +
         '}';

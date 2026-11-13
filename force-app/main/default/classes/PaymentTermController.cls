@@ -103,27 +103,18 @@ public without sharing class PaymentTermController {
 
     private static void executeSubmitToManager(Id recordId) {
         String sObjName = recordId.getSObjectType().getDescribe().getName();
-        if (sObjName == 'Project__c') { return; } 
+        if (sObjName == 'Project__c') { return; }
 
         SObject parent = fetchParentRecord(recordId, sObjName);
         parent.put('Payment_Terms_Status__c', 'Sent for Manager Approval');
         update parent;
-
-        sendSubmissionEmail(parent, recordId);
     }
 
     private static void executeSubmitDecision(Id recordId, DecisionInput data) {
         String sObjName = recordId.getSObjectType().getDescribe().getName();
-        if (sObjName == 'Project__c') { return; } 
+        if (sObjName == 'Project__c') { return; }
 
         updateStatusDecision(recordId, data, sObjName);
-        
-        ParentInfo info = getParentInfo(recordId);
-        if (data.userType == 'Manager') {
-            processManagerAction(data, info, recordId);
-        } else if (data.userType == 'Client') {
-            processClientAction(data, info, recordId);
-        }
     }
 
     private static void updateStatusDecision(Id recordId, DecisionInput data, String sObjName) {
@@ -264,8 +255,86 @@ public without sharing class PaymentTermController {
     }
 
     // =========================================================================
-    // 4. EMAIL LOGIC 
+    // 4. EMAIL LOGIC
     // =========================================================================
+
+    /**
+     * @description Sends Payment Terms notification emails for every Opportunity whose
+     * Payment_Terms_Status__c changed during this update, regardless of what updated the
+     * record (this controller, Data Loader, Flow, API, etc). Meant to be called from
+     * OpportunityTriggerHandler in an after update context. Failures are logged, not
+     * thrown, so an email issue never rolls back the triggering Opportunity update.
+     * @param newOpps Trigger.new Opportunity records.
+     * @param oldMap Trigger.oldMap Opportunity records.
+     */
+    public static void sendPaymentTermEmails(List<Opportunity> newOpps, Map<Id, Opportunity> oldMap) {
+        for (Opportunity newOpp : newOpps) {
+            Opportunity oldOpp = oldMap == null ? null : oldMap.get(newOpp.Id);
+            String oldStatus = oldOpp == null ? null : oldOpp.Payment_Terms_Status__c;
+
+            if (newOpp.Payment_Terms_Status__c == oldStatus) {
+                continue;
+            }
+
+            try {
+                dispatchPaymentTermEmail(newOpp.Id, newOpp.Payment_Terms_Status__c);
+            } catch (Exception ex) {
+                System.debug(LoggingLevel.ERROR, 'Payment Terms notification failed for ' + newOpp.Id + ': ' + ex.getMessage());
+            }
+        }
+    }
+
+    private static void dispatchPaymentTermEmail(Id recordId, String newStatus) {
+        if (newStatus == 'Sent for Manager Approval') {
+            sendManagerSubmissionEmail(recordId);
+        } else if (newStatus == 'Sent for Client Approval') {
+            sendClientApprovalRequestNotifications(recordId);
+        } else if (newStatus == 'Client Approved') {
+            sendClientApprovedNotifications(recordId);
+        } else if (newStatus == 'Manager Requested Changes' || newStatus == 'Client Requested Changes') {
+            sendSupervisorChangeRequestedNotification(recordId);
+        }
+    }
+
+    /**
+     * @description Notifies the management team that Payment Terms were (re)submitted for
+     * manager approval. Fires when Payment_Terms_Status__c transitions to 'Sent for Manager Approval'.
+     */
+    public static void sendManagerSubmissionEmail(Id recordId) {
+        SObject parent = fetchParentRecord(recordId, 'Opportunity');
+        if (parent != null) {
+            sendSubmissionEmail(parent, recordId);
+        }
+    }
+
+    /**
+     * @description Requests client approval and notifies the supervisor. Fires when
+     * Payment_Terms_Status__c transitions to 'Sent for Client Approval' (manager approved).
+     */
+    public static void sendClientApprovalRequestNotifications(Id recordId) {
+        ParentInfo info = getParentInfo(recordId);
+        sendClientApprovalRequest(info, recordId);
+        notifySupervisor(info, recordId);
+    }
+
+    /**
+     * @description Confirms approval to the client and notifies the supervisor. Fires when
+     * Payment_Terms_Status__c transitions to 'Client Approved'.
+     */
+    public static void sendClientApprovedNotifications(Id recordId) {
+        ParentInfo info = getParentInfo(recordId);
+        sendClientConfirmation(info, recordId);
+        notifySupervisor(info, recordId);
+    }
+
+    /**
+     * @description Notifies the supervisor that changes were requested. Fires when
+     * Payment_Terms_Status__c transitions to 'Manager Requested Changes' or 'Client Requested Changes'.
+     */
+    public static void sendSupervisorChangeRequestedNotification(Id recordId) {
+        ParentInfo info = getParentInfo(recordId);
+        notifySupervisor(info, recordId);
+    }
 
     private static void sendSubmissionEmail(SObject parent, Id recordId) {
         String clientRemarks = (String) parent.get('Payment_Term_Client_Remarks__c');
@@ -288,24 +357,6 @@ public without sharing class PaymentTermController {
         req.urlUserType = 'Manager';
         
         sendEmailGeneric(req);
-    }
-
-    private static void processManagerAction(DecisionInput data, ParentInfo info, Id recordId) {
-        if (data.action == 'Reject') {
-            notifySupervisor(info, recordId);
-        } else {
-            sendClientApprovalRequest(info, recordId);
-            notifySupervisor(info, recordId);
-        }
-    }
-
-    private static void processClientAction(DecisionInput data, ParentInfo info, Id recordId) {
-        if (data.action == 'Reject') {
-            notifySupervisor(info, recordId);
-        } else {
-            sendClientConfirmation(info, recordId);
-            notifySupervisor(info, recordId);
-        }
     }
 
     private static void sendClientApprovalRequest(ParentInfo info, Id recordId) {

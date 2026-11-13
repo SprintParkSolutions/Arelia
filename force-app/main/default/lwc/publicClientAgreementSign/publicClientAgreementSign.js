@@ -34,6 +34,10 @@ export default class PublicClientAgreementSign extends LightningElement {
         return this.errorMessage || this.errorDetails;
     }
 
+    get areliaLogoUrl() {
+        return ARELIA_LOGO;
+    }
+
     async connectedCallback() {
         try {
             this.clearError();
@@ -244,13 +248,246 @@ export default class PublicClientAgreementSign extends LightningElement {
     }
 
     renderAgreement() {
-        const preview = this.template.querySelector('.agreement-preview');
+        const preview =
+            this.template.querySelector(
+                '.agreement-preview'
+            );
 
         if (preview && this.agreementHtml) {
             preview.innerHTML =
-                this.applyAgreementProfessionalStyles(this.agreementHtml) +
-                this.buildSupportingImagesHtml(this.supportingFiles);
+                this.applyAgreementProfessionalStyles(
+                    this.agreementHtml
+                ) +
+                this.buildSupportingImagesHtml(
+                    this.supportingFiles
+                );
+
+            /*
+            * Apply Quill indentation to the manually rendered
+            * public Agreement Preview.
+            *
+            * The stored agreement HTML already contains ql-indent-*
+            * classes. PDFs understand those classes, but the manual
+            * browser preview requires equivalent inline spacing.
+            */
+            this.applyPreviewIndentStyles(preview);
+            /*
+            * NEW:
+            * Keep only the Payment Terms table readable
+            * on narrow/mobile screens.
+            */
+            this.applyResponsivePaymentTermsTable(preview);
         }
+    }
+
+    applyResponsivePaymentTermsTable(previewElement) {
+        if (!previewElement) {
+            return;
+        }
+
+        const tables =
+            Array.from(
+                previewElement.querySelectorAll(
+                    'table'
+                )
+            );
+
+        const paymentTermsTable =
+            tables.find((table) => {
+                const headers =
+                    Array.from(
+                        table.querySelectorAll(
+                            'th'
+                        )
+                    )
+                        .map((th) => {
+                            return String(
+                                th.textContent || ''
+                            )
+                                .replace(/\s+/g, ' ')
+                                .trim()
+                                .toUpperCase();
+                        });
+
+                return (
+                    headers.includes('PAYMENT TERM') &&
+                    headers.includes('PERCENTAGE') &&
+                    headers.includes('AMOUNT') &&
+                    headers.includes('DUE DATE')
+                );
+            });
+
+        if (!paymentTermsTable) {
+            return;
+        }
+
+        /*
+        * Only apply this behavior on mobile.
+        * Desktop / laptop / tablet stay unchanged.
+        */
+        if (window.innerWidth > 768) {
+            return;
+        }
+
+        /*
+        * Avoid wrapping the same table more than once because
+        * renderedCallback() can run multiple times.
+        */
+        if (
+            paymentTermsTable.parentElement &&
+            paymentTermsTable.parentElement.classList.contains(
+                'payment-terms-scroll'
+            )
+        ) {
+            return;
+        }
+
+        /*
+        * Create a scroll container only around the Payment Terms table.
+        */
+        const scrollWrapper = document.createElement('div');
+
+        scrollWrapper.className = 'payment-terms-scroll';
+
+        scrollWrapper.style.width = '100%';
+
+        scrollWrapper.style.maxWidth = '100%';
+
+        scrollWrapper.style.overflowX = 'auto';
+
+        scrollWrapper.style.overflowY = 'hidden';
+
+        scrollWrapper.style.webkitOverflowScrolling =
+            'touch';
+
+        scrollWrapper.style.boxSizing = 'border-box';
+
+        /*
+        * Replace table with wrapper, then move table inside it.
+        */
+        const parent = paymentTermsTable.parentNode;
+
+        parent.insertBefore(scrollWrapper, paymentTermsTable);
+
+        scrollWrapper.appendChild(paymentTermsTable);
+
+        /*
+        * Keep the table wide enough so all four columns remain readable.
+        */
+        paymentTermsTable.style.width = '620px';
+
+        paymentTermsTable.style.minWidth = '620px';
+
+        paymentTermsTable.style.maxWidth = 'none';
+
+        paymentTermsTable.style.tableLayout = 'fixed';
+
+        const columnWidths = [
+            '210px',  // Payment Term
+            '105px',  // Percentage
+            '180px',  // Amount
+            '125px'   // Due Date
+        ];
+
+        const rows =
+            Array.from(
+                paymentTermsTable.querySelectorAll(
+                    'tr'
+                )
+            );
+
+        rows.forEach((row) => {
+            const cells =
+                Array.from(
+                    row.querySelectorAll(
+                        'th, td'
+                    )
+                );
+
+            cells.forEach((cell, index) => {
+                if (index >= columnWidths.length) {
+                    return;
+                }
+
+                cell.style.width = columnWidths[index];
+
+                cell.style.minWidth = columnWidths[index];
+
+                cell.style.maxWidth = columnWidths[index];
+
+                cell.style.boxSizing = 'border-box';
+
+                cell.style.wordBreak = 'normal';
+
+                cell.style.overflowWrap = 'normal';
+
+                if (
+                    index === 1 ||
+                    index === 2 ||
+                    index === 3
+                ) {
+                    cell.style.whiteSpace = 'nowrap';
+                } else {
+                    cell.style.whiteSpace = 'normal';
+                }
+            });
+        });
+    }
+
+    applyPreviewIndentStyles(previewElement) {
+        if (!previewElement) {
+            return;
+        }
+
+        const indentedElements =
+            previewElement.querySelectorAll(
+                '[class*="ql-indent-"]'
+            );
+
+        indentedElements.forEach((element) => {
+            let indentLevel = 0;
+
+            Array.from(
+                element.classList || []
+            ).forEach((className) => {
+
+                if (
+                    !className.startsWith(
+                        'ql-indent-'
+                    )
+                ) {
+                    return;
+                }
+
+                const parsedLevel =
+                    Number.parseInt(
+                        className.replace(
+                            'ql-indent-',
+                            ''
+                        ),
+                        10
+                    );
+
+                if (
+                    Number.isFinite(parsedLevel) &&
+                    parsedLevel > indentLevel
+                ) {
+                    indentLevel =
+                        parsedLevel;
+                }
+            });
+
+            if (indentLevel <= 0) {
+                return;
+            }
+
+            /*
+            * Keep the public preview consistent with the
+            * modal preview and PDF indentation.
+            */
+            element.style.marginLeft =
+                (indentLevel * 24) + 'px';
+        });
     }
 
     buildSupportingImagesHtml(supportingFiles = []) {
@@ -337,6 +574,14 @@ export default class PublicClientAgreementSign extends LightningElement {
 
     getCanvasPosition(event) {
         const canvas = this.template.querySelector('.signature-canvas');
+
+        if (!canvas) {
+            return {
+                x: 0,
+                y: 0
+            };
+        }
+
         const rect = canvas.getBoundingClientRect();
 
         let clientX;
@@ -350,9 +595,20 @@ export default class PublicClientAgreementSign extends LightningElement {
             clientY = event.clientY;
         }
 
+        /*
+        * The canvas internal drawing dimensions may be different
+        * from its displayed CSS dimensions.
+        *
+        * Convert browser/mouse coordinates into actual canvas
+        * coordinates so the signature is drawn exactly under
+        * the cursor.
+        */
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
         return {
-            x: clientX - rect.left,
-            y: clientY - rect.top
+            x: (clientX - rect.left) * scaleX,
+            y: (clientY - rect.top) * scaleY
         };
     }
 
@@ -571,11 +827,6 @@ export default class PublicClientAgreementSign extends LightningElement {
 
     addPdfBrandHeader(ctx) {
         const pdf = ctx.pdf;
-
-        // const logoWidth = 112;
-        // const logoHeight = 54;
-        // const logoX = (ctx.pageWidth - logoWidth) / 2;
-        // const logoY = ctx.y;
 
         if (this.areliaLogoDataUrl) {
             const maximumLogoWidth = 92;
@@ -1432,9 +1683,6 @@ export default class PublicClientAgreementSign extends LightningElement {
         if (!html) {
             return '';
         }
-
-        // const container = document.createElement('div');
-        // container.innerHTML = html;
 
         /*
         * Keep an untouched copy of the rich-text editor HTML.

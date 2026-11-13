@@ -169,7 +169,9 @@ public class VendorAssignmentHandlerTest {
             Status__c = 'Completed',
             Vendor_Efficiency__c = 100,
             Vendor_Work_Start_Date__c = Date.today(),
-            Vendor_Work_End_Date__c = Date.today()
+            Vendor_Work_End_Date__c = Date.today(),
+            Vendor_Actual_Completion_Date__c = Date.today(),
+            Completion__c = 100
         );
         insert va1;
 
@@ -181,7 +183,9 @@ public class VendorAssignmentHandlerTest {
             Status__c = 'Completed',
             Vendor_Efficiency__c = 50,
             Vendor_Work_Start_Date__c = Date.today(),
-            Vendor_Work_End_Date__c = Date.today()
+            Vendor_Work_End_Date__c = Date.today().addDays(4),
+            Vendor_Actual_Completion_Date__c = Date.today().addDays(9),
+            Completion__c = 100
         );
         insert va2;
 

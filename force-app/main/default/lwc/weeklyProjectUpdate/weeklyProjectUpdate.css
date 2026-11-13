@@ -537,6 +537,14 @@
         0 0 18px rgba(212, 175, 55, 0.17);
 }
 
+.external-link-container {
+    margin-top: 16px;
+    padding: 18px;
+    border-radius: 16px;
+    background: var(--arelia-cream);
+    border: 1px solid rgba(229, 216, 170, 0.82);
+}
+
 /* =========================================
    UPLOAD
 ========================================= */

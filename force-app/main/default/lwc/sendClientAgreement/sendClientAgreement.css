@@ -80,3 +80,121 @@
     background: #f3f3f3;
     color: #444444;
 }
+
+/* =========================================================
+   Agreement Workflow Instruction Box
+   ========================================================= */
+
+.workflow-instruction-box {
+    background: #fffaf0;
+    border: 1px solid #e3c66f;
+    border-left: 4px solid #c99a2e;
+    border-radius: 6px;
+    padding: 14px 16px;
+    color: #181818;
+}
+
+.workflow-instruction-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.workflow-instruction-icon {
+    margin-right: 8px;
+}
+
+.workflow-instruction-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #6f5200;
+}
+
+.workflow-instruction-intro {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #444444;
+    margin: 0 0 12px 0;
+}
+
+.workflow-step {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.workflow-step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    width: 24px;
+    height: 24px;
+
+    margin-right: 10px;
+
+    border-radius: 50%;
+
+    background: #c99a2e;
+    color: #ffffff;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.workflow-step-content {
+    flex: 1;
+    font-size: 13px;
+    color: #333333;
+}
+
+.workflow-step-content strong {
+    font-weight: 700;
+    color: #222222;
+}
+
+.workflow-step-content p {
+    margin: 2px 0 0 0;
+    line-height: 1.45;
+    color: #555555;
+}
+
+.workflow-warning {
+    margin-top: 12px;
+    padding: 9px 11px;
+
+    background: #fff4d6;
+    border-radius: 4px;
+
+    font-size: 12px;
+    line-height: 1.45;
+
+    color: #5c4500;
+}
+
+.workflow-warning strong {
+    font-weight: 700;
+}
+
+.protected-brand-header {
+    text-align: center;
+    background: #ffffff;
+    margin-bottom: 18px;
+    padding-top: 8px;
+}
+
+.arelia-agreement-logo {
+    display: block;
+    width: 220px;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+    pointer-events: none;
+    user-select: none;
+}
+
+.brand-divider {
+    border-top: 2px solid #5b9bd5;
+    margin-top: 12px;
+}

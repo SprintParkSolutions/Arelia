@@ -2,7 +2,7 @@ import { LightningElement, wire } from "lwc";
 import { CurrentPageReference } from "lightning/navigation";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
 
-import HOME_URL from "@salesforce/label/c.Arelia_Site_Label";
+import HOME_URL from "@salesforce/label/c.ARELIA_SPACE_URL";   
 
 import getProject from "@salesforce/apex/ProjectAdditionalBudgetController.getProject";
 import approveRequest from "@salesforce/apex/ProjectAdditionalBudgetController.approveRequest";
@@ -16,7 +16,7 @@ export default class ProjectAdditionalBudgetApproval extends LightningElement {
   isBusy = false;
   hasResponded = false; // ✅ one-time response lock
 
-  showHistory = false;
+  showHistory = true;
 
   showRejectBox = false;
   rejectionReason = "";
@@ -99,11 +99,11 @@ export default class ProjectAdditionalBudgetApproval extends LightningElement {
     this.showRejectBox = true;
   }
 
-  cancelReject() {
-    if (this.disableActions) return;
-    this.showRejectBox = false;
-    this.rejectionReason = "";
-  }
+  cancelReject() {     
+    if (this.disableActions) return;     
+    this.showRejectBox = false;     
+    this.rejectionReason = "";     
+  }     
 
   handleRejectionReasonChange(event) {
     this.rejectionReason = event.target.value;
@@ -141,8 +141,7 @@ export default class ProjectAdditionalBudgetApproval extends LightningElement {
   // Navigate Home (Label)
   // -------------------
   navigateHome() {
-    const url = HOME_URL;
-    window.location.assign(url ? url : "/s/");
+    window.location.assign(HOME_URL ? HOME_URL : "/s/");
   }
 
   toast(title, message, variant) {

@@ -1,18 +1,11 @@
 import { LightningElement } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { loadScript } from 'lightning/platformResourceLoader';
-
 import JSPDF from '@salesforce/resourceUrl/jspdfs';
 import ARELIA_LOGO from '@salesforce/resourceUrl/AreliaLogo';
-
-import getAgreementById
-    from '@salesforce/apex/VendorAgreementSigningService.getAgreementById';
-
-import signAgreement
-    from '@salesforce/apex/VendorAgreementSigningService.signAgreement';
-
-import REDIRECT_URL
-    from '@salesforce/label/c.Arelia_Site_Redirect_URL_Label';
+import getAgreementById from '@salesforce/apex/VendorAgreementSigningService.getAgreementById';
+import signAgreement from '@salesforce/apex/VendorAgreementSigningService.signAgreement';
+import REDIRECT_URL from '@salesforce/label/c.Arelia_Site_Redirect_URL_Label';
 
 export default class VendorAgreementSigning extends LightningElement {
     agreementId;
@@ -25,33 +18,99 @@ export default class VendorAgreementSigning extends LightningElement {
     hasSignature = false;
     canvasContext;
     scriptsLoaded = false;
+    pdfResourcesPromise = null;
     showSuccessScreen = false;
     logoBase64 = '';
     logoAspectRatio = 1;
-
     errorMessage = '';
     showCompletedScreen = false;
     showErrorScreen = false;
 
-    // async connectedCallback() {
-    //     try {
-    //         const pageUrl = new URL(window.location.href);
+    get areliaLogoUrl() {
+        return ARELIA_LOGO;
+    }
 
-    //         this.agreementId =
-    //             pageUrl.searchParams.get('agreementId');
+    get previewAgreementBodyHtml() {
+        return this.removeAgreementHeaderForDisplay(this.agreementHtml);
+    }
 
-    //         await Promise.all([
-    //             this.loadPdfLibrary(),
-    //             this.preloadLogo()
-    //         ]);
+    removeAgreementHeaderForDisplay(htmlValue) {
+        if (!htmlValue) {
+            return '';
+        }
 
-    //         await this.loadAgreement();
-    //     } catch (error) {
-    //         this.errorMessage = this.getErrorMessage(error);
-    //     } finally {
-    //         this.isLoading = false;
-    //     }
-    // }
+        const container =
+            document.createElement('div');
+
+        container.innerHTML =
+            htmlValue;
+
+        /*
+        * Normal case.
+        */
+        const classBasedHeader =
+            container.querySelector(
+                '.agreement-header'
+            );
+
+        if (classBasedHeader) {
+            classBasedHeader.remove();
+
+            return container.innerHTML;
+        }
+
+        /*
+        * Defensive fallback for older/normalized HTML.
+        */
+        const normalizedText = (value) =>
+            String(value || '')
+                .replace(/\u00a0/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim()
+                .toUpperCase();
+
+        const candidates =
+            Array.from(
+                container.querySelectorAll(
+                    'div, p, span, h1, h2, h3'
+                )
+            );
+
+        const headerTexts =
+            new Set([
+                'ARELIA SPACE',
+                'VENDOR AGREEMENT',
+                'INTERIOR DESIGN VENDOR / CONTRACTOR AGREEMENT'
+            ]);
+
+        candidates.forEach((element) => {
+            const value =
+                normalizedText(
+                    element.textContent
+                );
+
+            if (!headerTexts.has(value)) {
+                return;
+            }
+
+            const childHasSameText =
+                Array.from(
+                    element.children || []
+                ).some((child) =>
+                    headerTexts.has(
+                        normalizedText(
+                            child.textContent
+                        )
+                    )
+                );
+
+            if (!childHasSameText) {
+                element.remove();
+            }
+        });
+
+        return container.innerHTML;
+    }
 
     async connectedCallback() {
         try {
@@ -64,17 +123,96 @@ export default class VendorAgreementSigning extends LightningElement {
                     'agreementId'
                 );
 
-            await Promise.all([
-                this.loadPdfLibrary(),
-                this.preloadLogo()
-            ]);
-
+            /*
+            * PERFORMANCE OPTIMIZATION
+            *
+            * The agreement is the only resource required to display
+            * the signing page.
+            *
+            * Do NOT block initial page rendering while jsPDF and the
+            * logo are being downloaded/processed.
+            */
             await this.loadAgreement();
+
         } catch (error) {
             this.handlePageError(error);
         } finally {
+            /*
+            * Display the agreement immediately.
+            */
             this.isLoading = false;
+
+            /*
+            * Prepare PDF resources in the background after the page
+            * has become usable.
+            */
+            this.schedulePdfResourcePreload();
         }
+    }
+
+    schedulePdfResourcePreload() {
+        const preloadResources = () => {
+            this.ensurePdfResourcesLoaded()
+                .catch(() => {
+                    /*
+                    * Do not show an error during background preload.
+                    *
+                    * If a resource genuinely cannot be loaded,
+                    * handleDone() will report the error when the
+                    * vendor attempts to sign.
+                    */
+                });
+        };
+
+        /*
+        * requestIdleCallback lets the browser finish rendering and
+        * interaction work before preparing PDF dependencies.
+        *
+        * setTimeout is used as the browser-compatible fallback.
+        */
+        if ('requestIdleCallback' in window) {
+            window.requestIdleCallback(
+                preloadResources,
+                {
+                    timeout: 2000
+                }
+            );
+        } else {
+            window.setTimeout(
+                preloadResources,
+                500
+            );
+        }
+    }
+
+    ensurePdfResourcesLoaded() {
+        if (
+            this.scriptsLoaded
+            && this.logoBase64
+        ) {
+            return Promise.resolve();
+        }
+
+        /*
+        * Reuse the same Promise so that background preload and
+        * handleDone() cannot load the resources twice.
+        */
+        if (!this.pdfResourcesPromise) {
+            this.pdfResourcesPromise =
+                Promise.all([
+                    this.loadPdfLibrary(),
+                    this.preloadLogo()
+                ]).catch((error) => {
+                    /*
+                    * Allow a later retry if the first attempt failed.
+                    */
+                    this.pdfResourcesPromise = null;
+
+                    throw error;
+                });
+        }
+
+        return this.pdfResourcesPromise;
     }
 
     async preloadLogo() {
@@ -118,21 +256,6 @@ export default class VendorAgreementSigning extends LightningElement {
 
         this.scriptsLoaded = true;
     }
-
-    // async loadAgreement() {
-    //     if (!this.agreementId) {
-    //         throw new Error('Agreement Id is missing.');
-    //     }
-
-    //     const response = await getAgreementById({
-    //         agreementId: this.agreementId
-    //     });
-
-    //     this.agreementHtml = response.agreementHtml;
-    //     this.vendorName = response.vendorName;
-    //     this.showSuccessScreen = false;
-    //     this.agreementLoaded = true;
-    // }
 
     async loadAgreement() {
         if (!this.agreementId) {
@@ -207,16 +330,32 @@ export default class VendorAgreementSigning extends LightningElement {
 
     getCoordinates(event) {
         const canvas = this.template.querySelector('canvas');
-        const rectangle = canvas.getBoundingClientRect();
 
-        const touch =
-            event.touches && event.touches.length > 0
-                ? event.touches[0]
-                : event;
+        if (!canvas) {
+            return {
+                x: 0,
+                y: 0
+            };
+        }
+
+        const rectangle = canvas.getBoundingClientRect();
+        const touch = event.touches && event.touches.length > 0 ? event.touches[0] : event;
+
+        /*
+        * The canvas internal dimensions can differ from its displayed CSS dimensions.
+        * Convert mouse/touch coordinates from browser coordinates into the canvas's actual drawing coordinate system.
+        */
+        const scaleX = canvas.width / rectangle.width;
+        const scaleY = canvas.height / rectangle.height;
 
         return {
-            x: touch.clientX - rectangle.left,
-            y: touch.clientY - rectangle.top
+            x:
+                (touch.clientX - rectangle.left)
+                * scaleX,
+
+            y:
+                (touch.clientY - rectangle.top)
+                * scaleY
         };
     }
 
@@ -251,21 +390,16 @@ export default class VendorAgreementSigning extends LightningElement {
             * before starting synchronous PDF generation.
             */
             await this.waitForNextPaint();
-
-            const signatureBase64 =
-                canvas.toDataURL('image/png');
-
-            const signedPdfBase64 =
-                this.generateSignedPdfBase64(
-                    signatureBase64
-                );
-
-            await signAgreement({
-                agreementId: this.agreementId,
-                signatureBase64,
-                signedPdfBase64
-            });
-
+            /*
+            * Make sure jsPDF and the optimized logo are ready.
+            *
+            * Normally they will already have been loaded in the background,
+            * so this returns immediately.
+            */
+            await this.ensurePdfResourcesLoaded();
+            const signatureBase64 = canvas.toDataURL('image/png');
+            const signedPdfBase64 = this.generateSignedPdfBase64(signatureBase64);
+            await signAgreement({agreementId: this.agreementId, signatureBase64, signedPdfBase64});
             this.agreementLoaded = false;
             this.showSuccessScreen = true;
             this.errorMessage = '';
@@ -569,14 +703,9 @@ export default class VendorAgreementSigning extends LightningElement {
             return;
         }
 
-        const alignment =
-            this.getNodeAlignment(node);
-
-        const indent =
-            this.getNodeIndent(node);
-
-        const availableWidth =
-            ctx.usableWidth - indent;
+        const alignment = this.getNodeAlignment(node);
+        const indent = this.getNodeIndent(node);
+        const availableWidth = ctx.usableWidth - indent;
 
         this.renderRichTextSegments(
             ctx,

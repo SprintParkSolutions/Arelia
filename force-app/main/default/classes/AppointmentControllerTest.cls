@@ -124,6 +124,25 @@ public class AppointmentControllerTest {
         Assert.isNotNull(values, 'Should return picklist values');
     }
 
+    @isTest
+    static void testGetSupervisorContact() {
+        User supervisor = [SELECT Id, Email FROM User WHERE Alias = 'apptSup' LIMIT 1];
+
+        TestDataUtility.AppointmentLeadParams params = new TestDataUtility.AppointmentLeadParams();
+        params.supervisorId = supervisor.Id;
+        params.status = 'Pending';
+        params.apptDate = Date.today();
+        params.slot = '10AM-11AM';
+        Lead myLead = TestDataUtility.createAppointmentLead(params);
+
+        Test.startTest();
+        AppointmentController.SupervisorContact contact = AppointmentController.getSupervisorContact(myLead.Id);
+        Test.stopTest();
+
+        Assert.isNotNull(contact, 'Supervisor contact wrapper should be returned.');
+        Assert.areEqual(supervisor.Email, contact.email, 'Supervisor email should match the assigned User.');
+    }
+
     // ==========================================
     // STATUS UPDATE TESTS
     // ==========================================
@@ -142,10 +161,9 @@ public class AppointmentControllerTest {
 
         Test.startTest();
         AppointmentController.updateAppointmentStatus(
-            myLead.Id, 
-            'Approved', 
-            null, 
-            null, 
+            myLead.Id,
+            'Approved',
+            null,
             null
         );
         Test.stopTest();
@@ -171,10 +189,9 @@ public class AppointmentControllerTest {
 
         Test.startTest();
         AppointmentController.updateAppointmentStatus(
-            myLead.Id, 
-            'Rescheduled', 
-            'Busy', 
-            newDate, 
+            myLead.Id,
+            'Rescheduled',
+            newDate,
             newSlot
         );
         Test.stopTest();
@@ -210,10 +227,9 @@ public class AppointmentControllerTest {
         Test.startTest();
         try {
             AppointmentController.updateAppointmentStatus(
-                myLead.Id, 
-                'Rescheduled', 
-                'Conflict', 
-                targetDate, 
+                myLead.Id,
+                'Rescheduled',
+                targetDate,
                 targetSlot
             );
             Assert.fail('Should throw exception for booking conflict');
@@ -237,12 +253,16 @@ public class AppointmentControllerTest {
 
         Test.startTest();
         try {
+            // Re-submitting the same status isn't treated as a response transition at all
+            // (LeadAppointmentResponseHandler.isCustomerResponseTransition short-circuits
+            // when old/new status match), so attempt a genuine transition instead -
+            // Rescheduled - which the handler must still reject because the prior
+            // status ('Approved') isn't in its RESPONSE_ALLOWED_FROM set.
             AppointmentController.updateAppointmentStatus(
-                myLead.Id, 
-                'Approved', 
-                null, 
-                null, 
-                null
+                myLead.Id,
+                'Rescheduled',
+                Date.today().addDays(3),
+                '2PM-3PM'
             );
             Assert.fail('Should prevent updates to already approved records');
         } catch (AuraHandledException e) {
@@ -266,11 +286,10 @@ public class AppointmentControllerTest {
         try {
             // Missing Reschedule Date/Slot
             AppointmentController.updateAppointmentStatus(
-                myLead.Id, 
-                'Rescheduled', 
-                null, 
-                null, 
-                null 
+                myLead.Id,
+                'Rescheduled',
+                null,
+                null
             );
             Assert.fail('Should validate missing fields');
         } catch (AuraHandledException e) {
@@ -293,11 +312,10 @@ public class AppointmentControllerTest {
         Test.startTest();
         try {
             AppointmentController.updateAppointmentStatus(
-                myLead.Id, 
-                'UnknownStatus', 
-                null, 
-                null, 
-                null 
+                myLead.Id,
+                'UnknownStatus',
+                null,
+                null
             );
             Assert.fail('Should validate status');
         } catch (AuraHandledException e) {

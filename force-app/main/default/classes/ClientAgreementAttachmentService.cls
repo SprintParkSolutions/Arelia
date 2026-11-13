@@ -1,22 +1,22 @@
 /**
  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
  * Class Name      : ClientAgreementAttachmentService
- * Author          : <YourName>
+ * Author          : Arelia
  * Created Date    : Jun 12, 2026
- * Last Modified By: <YourName>
+ * Last Modified By: Arelia
  * Last Modified On: Jun 12, 2026
  * Description     : This class implements for......
  *  
  * Change History  :
  *  Date          │   Author     │   Change
  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
- *  Jun 12, 2026  │ <YourName>   │ Initial version
+ *  Jun 12, 2026  │ Arelia   │ Initial version
  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
  */
 
 public without sharing class ClientAgreementAttachmentService {
 
-    private static final Integer MAX_FILES = 18;
+    private static final Integer MAX_FILES = 19;
     private static final Integer MAX_SINGLE_FILE_BYTES = 3000000;
     private static final Integer MAX_PDF_ATTACHMENT_BYTES = 10000000;
 
@@ -432,10 +432,7 @@ public without sharing class ClientAgreementAttachmentService {
         return title + '.' + extension;
     }
 
-    public static void linkOpportunitySupportingFilesToAgreement(
-        Id opportunityId,
-        Id agreementId
-    ) {
+    public static void linkOpportunitySupportingFilesToAgreement(Id opportunityId, Id agreementId) {
         if (opportunityId == null || agreementId == null) {
             return;
         }
@@ -510,10 +507,7 @@ public without sharing class ClientAgreementAttachmentService {
         }
     }
 
-    public static void linkSpecificSupportingFilesToAgreement(
-        Id agreementId,
-        List<String> contentDocumentIdValues
-    ) {
+    public static void linkSpecificSupportingFilesToAgreement(Id agreementId, List<String> contentDocumentIdValues) {
         if (agreementId == null
             || contentDocumentIdValues == null
             || contentDocumentIdValues.isEmpty()) {
@@ -666,8 +660,7 @@ public without sharing class ClientAgreementAttachmentService {
                 }
             }
 
-            ClientAgreementEmailService.EmailAttachment emailAttachment =
-                new ClientAgreementEmailService.EmailAttachment();
+            ClientAgreementEmailService.EmailAttachment emailAttachment = new ClientAgreementEmailService.EmailAttachment();
 
             emailAttachment.fileName = buildFileName(cv.Title, cv.FileExtension);
             emailAttachment.contentType = contentType;
@@ -720,9 +713,7 @@ public without sharing class ClientAgreementAttachmentService {
         return contentVersionIds;
     }
 
-    public static List<ClientAgreementEmailService.EmailAttachment> getAllSupportedEmailAttachments(
-        Id linkedRecordId
-    ) {
+    public static List<ClientAgreementEmailService.EmailAttachment> getAllSupportedEmailAttachments(Id linkedRecordId) {
         List<ClientAgreementEmailService.EmailAttachment> emailAttachments =
             new List<ClientAgreementEmailService.EmailAttachment>();
 
@@ -748,39 +739,66 @@ public without sharing class ClientAgreementAttachmentService {
         return emailAttachments;
     }
 
-    public static List<ClientAgreementDTO.SupportingFileDTO> getAgreementImageFilesExcludingAgreementAttachments(
-        Id opportunityId,
-        Id agreementId
-    ) {
+    public static List<ClientAgreementDTO.SupportingFileDTO> getAgreementImageFilesExcludingAgreementAttachments(Id opportunityId, Id agreementId, String agreementHtml) {
+
+        List<ClientAgreementDTO.SupportingFileDTO> agreementImages = new List<ClientAgreementDTO.SupportingFileDTO>();
+
+        if (opportunityId == null) {
+            return agreementImages;
+        }
+
+        /*
+        * Load the supported Opportunity files.
+        *
+        * IMPORTANT:
+        * Nothing is deleted or unlinked from Salesforce.
+        */
         List<ClientAgreementDTO.SupportingFileDTO> allOpportunityFiles =
             getSupportingFiles(opportunityId);
 
-        Set<String> separateAttachmentDocumentIds = new Set<String>();
-
-        if (agreementId != null) {
-            for (ContentDocumentLink linkRecord : [
-                SELECT ContentDocumentId
-                FROM ContentDocumentLink
-                WHERE LinkedEntityId = :agreementId
-            ]) {
-                separateAttachmentDocumentIds.add(String.valueOf(linkRecord.ContentDocumentId));
-            }
+        if (allOpportunityFiles == null || allOpportunityFiles.isEmpty()) {
+            return agreementImages;
         }
 
-        List<ClientAgreementDTO.SupportingFileDTO> agreementImages =
-            new List<ClientAgreementDTO.SupportingFileDTO>();
+        /*
+        * Only an image genuinely referenced inside Agreement_HTML__c
+        * belongs inside the Agreement Preview.
+        *
+        * Files merely existing on the Opportunity must NOT automatically
+        * become agreement exhibits.
+        *
+        * This is important for the Remove Supporting File functionality:
+        *
+        * - Removed file remains on Opportunity
+        * - Removed file remains in Files / Notes & Attachments
+        * - Removed file is not linked to Client Agreement
+        * - Removed file is not emailed
+        * - Removed file is not displayed in Agreement Preview
+        */
+        for (
+            ClientAgreementDTO.SupportingFileDTO fileDto :
+            allOpportunityFiles
+        ) {
 
-        for (ClientAgreementDTO.SupportingFileDTO fileDto : allOpportunityFiles) {
-            if (fileDto == null || fileDto.isImage != true) {
+            if (
+                fileDto == null ||
+                fileDto.isImage != true
+            ) {
                 continue;
             }
 
-            if (!String.isBlank(fileDto.contentDocumentId)
-                && separateAttachmentDocumentIds.contains(fileDto.contentDocumentId)) {
-                continue;
+            /*
+            * Only rich-text/embedded images referenced by the
+            * saved Agreement HTML should appear inside the agreement.
+            */
+            if (
+                isFileReferencedInAgreementHtml(
+                    fileDto,
+                    agreementHtml
+                )
+            ) {
+                agreementImages.add(fileDto);
             }
-
-            agreementImages.add(fileDto);
         }
 
         return agreementImages;

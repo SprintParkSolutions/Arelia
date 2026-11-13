@@ -14,7 +14,6 @@ public class SiteVisitReportHandlerTest {
         User supervisor = TestDataUtility.createSupervisorUser('SupSVR');
 
         // 2. Create Roles (for Manager email logic)
-        User mgrUser;
         System.runAs(new User(Id = UserInfo.getUserId())) {
             UserRole r;
             List<UserRole> roles = [SELECT Id FROM UserRole WHERE Name = 'Regional Manager' LIMIT 1];
@@ -24,15 +23,9 @@ public class SiteVisitReportHandlerTest {
                 r = TestDataUtility.createUserRole('Regional Manager');
             }
 
-            mgrUser = TestDataUtility.createUserWithRole('MgrUser', r.Id);
-        }
+            TestDataUtility.createUserWithRole('MgrUser', r.Id);
 
-        // 3. Create Email Templates using Labels
-        // Run as the freshly-created manager user (not the shared running user) so these
-        // templates land in a dedicated personal folder instead of the org's default
-        // test-execution user's folder, which many parallel-running test classes
-        // insert into concurrently and can cause UNABLE_TO_LOCK_ROW.
-        System.runAs(mgrUser) {
+            // 3. Create Email Templates using Labels
             String leadTplName = Label.Arelia_Living_Lead_Conversion_Approval_Email_Template;
             if (String.isNotBlank(leadTplName)) {
                 TestDataUtility.createSpecificEmailTemplate(
@@ -52,10 +45,18 @@ public class SiteVisitReportHandlerTest {
 
         // 4. Create Parent Records
         Lead l = TestDataUtility.createLead('Test Lead SVR');
-        l.Appointment_Completed__c = true;
-        l.Appointment_Status__c = 'Approved';
+
+        // Step 1: Simulate the appointment being scheduled (Appointment_Status__c
+        // stays at its default 'Pending'). LeadAppointmentResponseHandler's
+        // hasAppointment() check requires an appointment to already exist on the
+        // Lead's PRIOR state before it will allow a customer response transition.
         l.Appointment_Date__c = Date.today().addDays(1);
         l.Appointment_Time_Slots__c = '10AM-11AM';
+        update l;
+
+        // Step 2: Simulate the customer's separate "Approve" response.
+        l.Appointment_Completed__c = true;
+        l.Appointment_Status__c = 'Approved';
         update l;
 
         Opportunity opp = TestDataUtility.createOpportunity('Test Opp SVR', supervisor.Id);
@@ -120,6 +121,63 @@ public class SiteVisitReportHandlerTest {
 
         Opportunity opp = [SELECT Re_Visit_Site_Status__c FROM Opportunity WHERE Id = :svr.Opportunity__c];
         System.assertEquals('Negotiable', opp.Re_Visit_Site_Status__c);
+    }
+
+    @IsTest
+    static void testResolveTemplateNameFirstTimeApproval() {
+        Site_Visit_Report__c svr = [
+            SELECT Id, RecordType.DeveloperName, Negotiate__c, Negotation_Reason__c
+            FROM Site_Visit_Report__c WHERE Lead__c != null LIMIT 1
+        ];
+
+        String templateName = SiteVisitReportHandler.resolveTemplateNameForTest(svr, false);
+
+        System.assertEquals(
+            Label.Arelia_Living_Lead_Conversion_Approval_Email_Template,
+            templateName,
+            'A report with no negotiation history should use the first-time approval template.'
+        );
+    }
+
+    @IsTest
+    static void testResolveTemplateNameNegotiationResubmissionWithStaleFlag() {
+        // Reproduces the reported bug: the resubmission save reset Negotiate__c back to false
+        // in the same transaction that moved the status out of 'Negotiable' (Negotation_Reason__c
+        // is left populated, exactly as observed on the real record). Relying on the current
+        // Negotiate__c value alone would incorrectly pick the first-time template here.
+        Site_Visit_Report__c svr = [
+            SELECT Id, RecordType.DeveloperName, Negotiate__c, Negotation_Reason__c
+            FROM Site_Visit_Report__c WHERE Lead__c != null LIMIT 1
+        ];
+        svr.Negotiate__c = false;
+        svr.Negotation_Reason__c = 'Increase the price';
+
+        String templateName = SiteVisitReportHandler.resolveTemplateNameForTest(svr, true);
+
+        System.assertEquals(
+            Label.Arelia_Living_Lead_Site_Manager_Review_Approval_Email_Template,
+            templateName,
+            'A resubmission out of Negotiable status must use the review template even if Negotiate__c was reset in the same save.'
+        );
+    }
+
+    @IsTest
+    static void testResolveTemplateNameNegotiationFlagsStillSet() {
+        // Existing behavior preserved for direct callers without trigger old/new context.
+        Site_Visit_Report__c svr = [
+            SELECT Id, RecordType.DeveloperName, Negotiate__c, Negotation_Reason__c
+            FROM Site_Visit_Report__c WHERE Lead__c != null LIMIT 1
+        ];
+        svr.Negotiate__c = true;
+        svr.Negotation_Reason__c = 'Increase the price';
+
+        String templateName = SiteVisitReportHandler.resolveTemplateNameForTest(svr, false);
+
+        System.assertEquals(
+            Label.Arelia_Living_Lead_Site_Manager_Review_Approval_Email_Template,
+            templateName,
+            'Negotiate__c=true with a reason should still resolve to the review template.'
+        );
     }
 
     @IsTest

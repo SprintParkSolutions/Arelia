@@ -22,7 +22,9 @@ public without sharing class ReceiptArtifactService {
         Map<String, String> params = pdfPage.getParameters();
         params.put('project', detail.projectName);
         params.put('customer', detail.customerName);
+        params.put('customerEmail', detail.customerEmail);
         params.put('installment', detail.installmentLabel);
+        params.put('percentage', detail.percentage != null ? String.valueOf(detail.percentage) : '');
         params.put('amount', detail.amount != null ? String.valueOf(detail.amount) : '');
         params.put('currency', 'INR');
         params.put('paymentDate', Datetime.now().format());

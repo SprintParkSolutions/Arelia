@@ -1,7 +1,7 @@
 /**
  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
  * Class Name      : VendorAgreementSignedJob
- * Author          : <YourName>
+ * Author          : Arelia
  * Created Date    : Jul 7, 2026
  * Last Modified By: <YourName>
  * Last Modified On: Jul 7, 2026
@@ -10,7 +10,7 @@
  * Change History  :
  *  Date          │   Author     │   Change
  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
- *  Jul 7, 2026  │ <YourName>   │ Initial version
+ *  Jul 7, 2026  │ Arelia   │ Initial version
  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
  */
 
@@ -30,24 +30,8 @@ public without sharing class VendorAgreementSignedJob
 
     public void execute(QueueableContext queueableContext) {
         try {
-            Vendor_Agreement_Signature__c signatureRequest = [
-                SELECT Id,
-                       Submission_Status__c
-                FROM Vendor_Agreement_Signature__c
-                WHERE Id = :signatureRequestId
-                LIMIT 1
-            ];
-
-            Vendor_Agreement__c agreementRecord = [
-                SELECT Id,
-                       Name,
-                       Agreement_Status__c,
-                       Vendor_Opportunity__c,
-                       Signed_File_Id__c
-                FROM Vendor_Agreement__c
-                WHERE Id = :agreementId
-                LIMIT 1
-            ];
+            Vendor_Agreement_Signature__c signatureRequest = [SELECT Id, Submission_Status__c FROM Vendor_Agreement_Signature__c WHERE Id = :signatureRequestId LIMIT 1];
+            Vendor_Agreement__c agreementRecord = [SELECT Id, Name, Agreement_Status__c, Vendor_Opportunity__c, Signed_File_Id__c FROM Vendor_Agreement__c WHERE Id = :agreementId LIMIT 1];
 
             if (
                 agreementRecord.Agreement_Status__c
@@ -58,8 +42,7 @@ public without sharing class VendorAgreementSignedJob
                 );
             }
 
-            String signedPdfBase64 =
-                rebuildSignedPdfBase64(signatureRequestId);
+            String signedPdfBase64 = rebuildSignedPdfBase64(signatureRequestId);
 
             if (String.isBlank(signedPdfBase64)) {
                 throw new AuraHandledException(
@@ -67,8 +50,7 @@ public without sharing class VendorAgreementSignedJob
                 );
             }
 
-            Blob signedPdfBlob =
-                decodePdfBase64(signedPdfBase64);
+            Blob signedPdfBlob = decodePdfBase64(signedPdfBase64);
 
             if (
                 signedPdfBlob == null
@@ -79,8 +61,7 @@ public without sharing class VendorAgreementSignedJob
                 );
             }
 
-            Id signedFileId =
-                VendorAgreementFileService.createSignedAgreementPdfFromBlob(agreementRecord, signedPdfBlob);
+            Id signedFileId = VendorAgreementFileService.createSignedAgreementPdfFromBlob(agreementRecord, signedPdfBlob);
 
             update new Vendor_Agreement__c(
                 Id = agreementRecord.Id,
@@ -94,10 +75,9 @@ public without sharing class VendorAgreementSignedJob
                 );
             }
 
-            agreementRecord.Signed_File_Id__c =
-                String.valueOf(signedFileId);
-
+            agreementRecord.Signed_File_Id__c = String.valueOf(signedFileId);
             VendorAgreementEmailService.sendSignedAgreementToSupervisor(agreementRecord);
+            VendorAgreementEmailService.sendSignedAgreementToVendor(agreementRecord);
 
             update new Vendor_Agreement_Signature__c(
                 Id = signatureRequest.Id,
@@ -112,9 +92,7 @@ public without sharing class VendorAgreementSignedJob
         }
     }
 
-    private static String rebuildSignedPdfBase64(
-        Id signatureRequestId
-    ) {
+    private static String rebuildSignedPdfBase64(Id signatureRequestId) {
         if (signatureRequestId == null) {
             return null;
         }
@@ -142,9 +120,7 @@ public without sharing class VendorAgreementSignedJob
         return combinedPdfBase64;
     }
 
-    private static Blob decodePdfBase64(
-        String signedPdfBase64
-    ) {
+    private static Blob decodePdfBase64(String signedPdfBase64) {
         if (String.isBlank(signedPdfBase64)) {
             return null;
         }
@@ -175,10 +151,7 @@ public without sharing class VendorAgreementSignedJob
         );
     }
 
-    private static String leftSafe(
-        String value,
-        Integer maximumLength
-    ) {
+    private static String leftSafe(String value, Integer maximumLength) {
         if (String.isBlank(value)) {
             return null;
         }

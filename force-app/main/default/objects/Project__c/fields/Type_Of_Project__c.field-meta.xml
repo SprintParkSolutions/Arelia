@@ -30,6 +30,11 @@
                 <default>false</default>
                 <label>Other</label>
             </value>
+            <value>
+                <fullName>Interior Combo Package</fullName>
+                <default>false</default>
+                <label>Interior Combo Package</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

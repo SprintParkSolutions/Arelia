@@ -77,7 +77,7 @@
                     </div>
 
                     <template if:true={showHistory}>
-                        <template if:true={project.historyPretty}>
+                        <template if:true={project.historyPretty.length}>
                             <ul class="historyList">
                                 <template for:each={project.historyPretty} for:item="h">
                                     <li key={h} class="historyItem">{h}</li>
@@ -85,7 +85,7 @@
                             </ul>
                         </template>
 
-                        <template if:false={project.historyPretty}>
+                        <template if:false={project.historyPretty.length}>
                             <div class="muted">No history available.</div>
                         </template>
                     </template>
