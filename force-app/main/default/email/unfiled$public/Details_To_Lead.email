@@ -2,7 +2,7 @@
  <head>
   <title></title>
  </head>
- <body aria-readonly="false" style="height:auto;
+ <body style="height:auto;
 			 min-height:auto;
 			 margin:0;
 			 padding:0;
@@ -18,7 +18,6 @@
 							  background-color:#ffffff;
 							  border:2px solid #c9a75d;
 							  border-collapse:collapse;" width="100%">
-       <!-- Banner -->
        <tbody>
         <tr>
          <td style="padding:0;"><img alt="Arelia Email Banner Image" src="{[devName:Arelia_Email_Banner_Image]}" style="display:block;
@@ -26,7 +25,7 @@
 											max-width:100%;
 											height:auto;
 											border:0;" title="Arelia Email Banner Image" /></td>
-        </tr> <!-- Main Email Content -->
+        </tr>
         <tr>
          <td style="padding:30px 34px 32px 34px;"><p style="margin:0 0 18px 0;
 										  font-size:18px;
@@ -40,7 +39,7 @@
 										  font-size:18px;
 										  line-height:1.5;
 										  font-family:Times New Roman,Times,serif;
-										  color:#222222;">We have successfully received your information. Please find a summary of the details submitted for our review below.</p> <!-- Project Request Details -->
+										  color:#222222;">We have successfully received your information. Please find a summary of the details submitted for our review below.</p>
           <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
 											  border-collapse:collapse;
 											  margin-bottom:18px;" width="100%">
@@ -101,7 +100,7 @@
 													   font-size:17px;
 													   line-height:1.5;
 													   font-family:Times New Roman,Times,serif;
-													   color:#222222;"><strong>Site Space</strong></td>
+													   color:#222222;"><strong>Site Space (sq. ft.)</strong></td>
              <td style="width:60%;
 													   padding:12px 14px;
 													   border:1px solid #e3d2a8;
@@ -164,7 +163,7 @@
 													   color:#222222;"><strong>{{{Recipient.Customer_Budget__c}}}</strong></td>
             </tr>
            </tbody>
-          </table> <!-- What Happens Next -->
+          </table>
           <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
 											  border-collapse:collapse;
 											  margin-bottom:18px;" width="100%">
@@ -195,7 +194,7 @@
 										  line-height:1.5;
 										  font-family:Times New Roman,Times,serif;
 										  color:#222222;">Warm regards,<br /> <strong>Team Arelia</strong></p></td>
-        </tr> <!-- Short Professional Footer -->
+        </tr>
         <tr>
          <td align="center" style="background-color:#171717;
 									   border-top:2px solid #C99A3D;

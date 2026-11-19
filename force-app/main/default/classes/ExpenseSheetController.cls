@@ -39,29 +39,29 @@ public without sharing class ExpenseSheetController {
         try {
             SheetData data = (SheetData) JSON.deserialize(jsonData, SheetData.class);
             Project_Expense_Sheet__c sheet = new Project_Expense_Sheet__c();
-            
+
             if (String.isNotBlank(data.sheetId)) {
                 sheet.Id = data.sheetId;
                 delete [SELECT Id FROM Expense_Line_Item__c WHERE Project_Expense_Sheet__c = :data.sheetId];
             } else {
                 sheet.Project__c = data.projectId;
+                // Status__c is a restricted picklist with 'Submitted' marked as its default
+                // value, which the platform auto-applies on insert if the field is left
+                // completely unset - leaving it unset here would insert new sheets as
+                // 'Submitted' outright, making the real status update below a same-value
+                // no-op. Seed it as 'Draft' so that update always represents a genuine,
+                // detectable transition, including a brand-new sheet submitted directly.
+                sheet.Status__c = 'Draft';
             }
 
             sheet.Sheet_Date__c = Date.today();
-            sheet.Status__c = data.status; 
-            upsert sheet; 
+            upsert sheet;
 
             List<Expense_Line_Item__c> lines = new List<Expense_Line_Item__c>();
             for (LineItemData item : data.items) {
-                lines.add(new Expense_Line_Item__c(
-                    Project_Expense_Sheet__c = sheet.Id,
-                    Type__c = item.type,
-                    Item_Name__c = item.name,
-                    Brand__c = item.brand,
-                    Quantity__c = item.qty,
-                    Rate__c = item.rate,
-                    Amount__c = item.amount,
-                    Description__c = item.description
+                lines.add(new Expense_Line_Item__c( Project_Expense_Sheet__c = sheet.Id,
+                    Type__c = item.type, Item_Name__c = item.name, Brand__c = item.brand,
+                    Quantity__c = item.qty, Rate__c = item.rate, Amount__c = item.amount, Description__c = item.description
                 ));
             }
             insert lines;
@@ -79,9 +79,12 @@ public without sharing class ExpenseSheetController {
                 insert cvList;
             }
 
-            if (data.status == 'Submitted') {
-                generatePDFAndSendEmail(sheet.Id);
-            }
+            // Status is applied as its own update, after line items/files are attached, so
+            // ExpenseSheetTriggerHandler can detect the transition - including the very first
+            // submission of a brand-new sheet - and fire PDF generation + the manager approval
+            // email for any save path, not just this method.
+            sheet.Status__c = data.status;
+            update sheet;
 
             return 'Success';
         } catch (Exception e) {
@@ -90,6 +93,11 @@ public without sharing class ExpenseSheetController {
     }
 
     // --- ASYNC PDF GENERATION ---
+    /**
+     * @description Generates the expense report PDF and emails managers for approval. Called
+     * from ExpenseSheetTriggerHandler when Status__c transitions to 'Submitted', so it fires
+     * for any save path that submits a sheet, not just saveExpenseSheet.
+     */
     @Future(callout=true)
     public static void generatePDFAndSendEmail(Id sheetId) {
         List<ContentDocumentLink> oldPdfs = [
@@ -140,26 +148,22 @@ public without sharing class ExpenseSheetController {
         Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
     }
 
-    // --- STATUS UPDATE & SUPERVISOR NOTIFICATION ---
+    // --- STATUS UPDATE ---
     @AuraEnabled
     public static String updateSheetStatus(String sheetId, String status) {
         Project_Expense_Sheet__c sheet = [SELECT Id, Project__c FROM Project_Expense_Sheet__c WHERE Id = :sheetId AND Project__r.RecordType.Name = 'Arelia' LIMIT 1];
         sheet.Status__c = status;
         update sheet;
 
-        recalculateProjectTotal(sheet.Project__c);
-
-        if (status == 'Approved') {
-            sendApprovalNotification(sheet.Id);
-        }
-
         return 'Success';
     }
 
     /**
-     * Sends notification email to Supervisor with Full Name and ALL Attachments
+     * @description Sends notification email to Supervisor with Full Name and ALL Attachments.
+     * Called from ExpenseSheetTriggerHandler when Status__c transitions to 'Approved', so it
+     * fires regardless of what updated the record.
      */
-    private static void sendApprovalNotification(Id sheetId) {
+    public static void sendApprovalNotification(Id sheetId) {
         Project_Expense_Sheet__c sheet = [
             SELECT Id, Name, Grand_Total__c, Project__r.Name, Project__r.Client__r.Name, 
                    CreatedBy.Email, CreatedBy.Name,
@@ -248,7 +252,12 @@ public without sharing class ExpenseSheetController {
     }
 
     // --- ROLLUP LOGIC ---
-    private static void recalculateProjectTotal(Id projectId) {
+    /**
+     * @description Recalculates the Project's Total_Approved_Expenses__c rollup. Called from
+     * ExpenseSheetTriggerHandler whenever a sheet's Status__c changes, so it fires regardless
+     * of what updated the record.
+     */
+    public static void recalculateProjectTotal(Id projectId) {
         if (projectId == null) {
             return;
         }

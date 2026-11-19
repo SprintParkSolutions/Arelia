@@ -14,14 +14,14 @@ public without sharing class ProformaManagerController {
     // --- 1. Fetch Invoice Details ---
 
     @AuraEnabled(cacheable=true)
-    public static Map<String, Object> getInvoiceById(String recordId) {
+    public static Map<String, Object> getInvoiceById(String token) {
         try {
             Proforma_Invoice__c invoice = [
-                SELECT Id, Status__c, Manager_Approval__c, Manager_Comments__c, Related_File_Id__c, 
+                SELECT Id, Status__c, Manager_Approval__c, Manager_Comments__c, Related_File_Id__c,
                        Opportunity__r.Name, Opportunity__r.Lead_Name__c,
                        Project__r.Name, LastModifiedDate
-                FROM Proforma_Invoice__c 
-                WHERE Id = :recordId 
+                FROM Proforma_Invoice__c
+                WHERE Secure_Token__c = :token
                 LIMIT 1
             ];
             
@@ -52,35 +52,43 @@ public without sharing class ProformaManagerController {
     // --- 2. Submit Manager Decision ---
 
     @AuraEnabled
-    public static void submitManagerDecision(String recordId, String action, String comments) {
+    public static void submitManagerDecision(String token, String action, String comments) {
         try {
-            Proforma_Invoice__c invoice = [
-                SELECT Id, Opportunity__c, 
-                       Opportunity__r.Name, Opportunity__r.Lead_Name__c,
-                       Opportunity__r.Supervisor_User_Email__c,
-                       Opportunity__r.Primary_Contact__r.Email, 
-                       Opportunity__r.Supervisor_User__r.FirstName, 
-                       Opportunity__r.Supervisor_User__r.LastName,  
-                       Project__r.Name, Manager_Comments__c, Related_File_Id__c
-                FROM Proforma_Invoice__c 
-                WHERE Id = :recordId 
-                LIMIT 1
-            ];
-            
+            Proforma_Invoice__c invoice = [SELECT Id FROM Proforma_Invoice__c WHERE Secure_Token__c = :token LIMIT 1];
+
             if (action == 'Approve') {
                 invoice.Manager_Approval__c = true;
                 invoice.Manager_Comments__c = String.isNotBlank(comments) ? comments : 'Approved by manager';
             } else if (action == 'Reject') {
-                invoice.Manager_Approval__c = false; 
+                invoice.Manager_Approval__c = false;
                 invoice.Manager_Comments__c = comments;
             }
             update invoice;
 
-            sendManagerResponseNotification(invoice, action, invoice.Manager_Comments__c);
-
-        } catch (Exception e) { 
-            throw new AuraHandledException('Error submitting decision: ' + e.getMessage()); 
+        } catch (Exception e) {
+            throw new AuraHandledException('Error submitting decision: ' + e.getMessage());
         }
+    }
+
+    /**
+     * @description Sends the manager-decision notifications (internal + client final approval)
+     * for an invoice whose Manager_Approval__c/Manager_Comments__c just changed. Called from
+     * ProformaInvoiceTriggerHandler so it fires regardless of what updated the record.
+     */
+    public static void sendManagerDecisionNotifications(Id invoiceId, String action, String comments) {
+        Proforma_Invoice__c invoice = [
+            SELECT Id, Opportunity__c,
+                   Opportunity__r.Name, Opportunity__r.Lead_Name__c,
+                   Opportunity__r.Supervisor_User_Email__c,
+                   Opportunity__r.Primary_Contact__r.Email,
+                   Opportunity__r.Supervisor_User__r.FirstName,
+                   Opportunity__r.Supervisor_User__r.LastName,
+                   Project__r.Name, Manager_Comments__c, Related_File_Id__c
+            FROM Proforma_Invoice__c
+            WHERE Id = :invoiceId
+            LIMIT 1
+        ];
+        sendManagerResponseNotification(invoice, action, comments);
     }
 
     // --- 3. Notification Logic ---

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Weekly_Update_External_Link__c</fullName>
+    <description>Latest Google Drive / OneDrive link shared by the supervisor in the Weekly Project Update email. Set by WeeklyProjectUpdateController.sendWeeklyEmail.</description>
+    <inlineHelpText>External file link (Google Drive / OneDrive) included in the most recent weekly update email.</inlineHelpText>
+    <label>Weekly Update External Link</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Url</type>
+</CustomField>

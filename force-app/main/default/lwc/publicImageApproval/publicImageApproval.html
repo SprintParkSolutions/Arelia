@@ -49,6 +49,20 @@
                         </div>
                     </div>
 
+                    <template if:true={fileData.externalFileLink}>
+                        <div class="note-box slds-m-bottom_large slds-p-around_medium slds-grid slds-grid_vertical-align-center">
+                            <lightning-icon
+                                icon-name="utility:link"
+                                size="medium"
+                                class="note-icon slds-m-right_small">
+                            </lightning-icon>
+                            <div class="slds-text-align_left">
+                                <p><strong>Large files:</strong> Some files for this submission are too large to attach and are available here instead:</p>
+                                <p><a href={fileData.externalFileLink} target="_blank" rel="noopener noreferrer">{fileData.externalFileLink}</a></p>
+                            </div>
+                        </div>
+                    </template>
+
                     <template if:true={isFinalized}>
                         <div class={statusBadgeClass}>
                             Status: {fileData.status}

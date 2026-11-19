@@ -2,7 +2,7 @@
  <head>
   <title></title>
  </head>
- <body aria-readonly="false" style="height:auto;
+ <body style="height:auto;
 			 min-height:auto;
 			 margin:0;
 			 padding:0;
@@ -14,192 +14,294 @@
     <tr>
      <td align="center" style="padding:0;">
       <table border="0" cellpadding="0" cellspacing="0" style="max-width:760px;
-							  width:100%;
-							  background-color:#ffffff;
-							  border:2px solid #c9a75d;
-							  border-collapse:collapse;" width="100%">
-       <!-- Banner -->
+						  width:100%;
+						  background-color:#ffffff;
+						  border:2px solid #c9a75d;
+						  border-collapse:collapse;" width="100%">
+       <!-- EMAIL BANNER -->
        <tbody>
         <tr>
          <td style="padding:0;"><img alt="Arelia Email Banner Image" src="{[devName:Arelia_Email_Banner_Image]}" style="display:block;
-											width:100%;
-											max-width:100%;
-											height:auto;
-											border:0;" title="Arelia Email Banner Image" /></td>
-        </tr> <!-- Main Email Content -->
+									   width:100%;
+									   max-width:100%;
+									   height:auto;
+									   border:0;" title="Arelia Email Banner Image" /></td>
+        </tr>
+        <!-- EMAIL BODY -->
         <tr>
-         <td style="padding:30px 34px 32px 34px;"><p style="margin:0 0 18px 0;
-										  font-size:18px;
-										  line-height:1.5;
-										  font-family:Times New Roman,Times,serif;
-										  color:#222222;">Dear <strong>[CLIENT_NAME]</strong>,</p> <p style="margin:0 0 18px 0;
-										  font-size:18px;
-										  line-height:1.5;
-										  font-family:Times New Roman,Times,serif;
-										  color:#222222;">We are pleased to share the latest <strong>3D design submission</strong> for your project.</p> <p style="margin:0 0 22px 0;
-										  font-size:18px;
-										  line-height:1.5;
-										  font-family:Times New Roman,Times,serif;
-										  color:#222222;">The submitted design reflects the specifications, planning considerations, and stylistic elements discussed during the recent project updates.</p> <!-- Design Review -->
+         <td style="padding:30px 34px 32px 34px;">
+          <p style="margin:0 0 18px 0;
+									  font-size:18px;
+									  line-height:1.5;
+									  font-family:Times New Roman,Times,serif;
+									  color:#222222;">Dear <strong>[CLIENT_NAME]</strong>,</p>
+          <p style="margin:0 0 18px 0;
+									  font-size:18px;
+									  line-height:1.5;
+									  font-family:Times New Roman,Times,serif;
+									  color:#222222;">We are pleased to share the latest <strong>3D design submission</strong> for your project.</p>
+          <p style="margin:0 0 22px 0;
+									  font-size:18px;
+									  line-height:1.5;
+									  font-family:Times New Roman,Times,serif;
+									  color:#222222;">This project document reflects the design specifications, layout concepts, materials, and stylistic elements discussed during our recent project updates.</p>
+          <!-- HIGHLIGHT BOX -->
           <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
-											  border-collapse:collapse;
-											  margin-bottom:18px;" width="100%">
-           <tbody>
-            <tr>
-             <td style="border-top:1px solid #e3d2a8;
-													   padding-top:20px;"><p style="margin:0;
-														  font-size:20px;
-														  line-height:1.4;
-														  font-family:Times New Roman,Times,serif;
-														  color:#1f1f1f;"><strong>Design Review</strong></p></td>
-            </tr>
-           </tbody>
-          </table> <p style="margin:0 0 22px 0;
-										  font-size:18px;
-										  line-height:1.5;
-										  font-family:Times New Roman,Times,serif;
-										  color:#222222;">Please review the attached PDF/Image carefully. Your timely feedback will help us proceed with the next phase of the project and maintain the planned project schedule.</p> <!-- Action Required -->
-          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
-											  border-collapse:collapse;
-											  margin-bottom:20px;" width="100%">
-           <tbody>
-            <tr>
-             <td style="border-top:1px solid #e3d2a8;
-													   padding-top:20px;"><p style="margin:0;
-														  font-size:20px;
-														  line-height:1.4;
-														  font-family:Times New Roman,Times,serif;
-														  color:#1f1f1f;"><strong>Action Required</strong></p></td>
-            </tr>
-           </tbody>
-          </table> <p style="margin:0 0 18px 0;
-										  font-size:18px;
-										  line-height:1.5;
-										  font-family:Times New Roman,Times,serif;
-										  color:#222222;">Please use the button below to review the design and submit your decision.</p> <!-- Primary Approval Button -->
-          <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;
-											  margin:22px 0 26px 0;">
-           <tbody>
-            <tr>
-             <td align="center" style="background-color:#1b1b1b;
-													   border:1px solid #c9a75d;
-													   padding:12px 24px;
-													   text-align:center;"><a href="[APPROVAL_LINK]" style="font-size:17px;
-														  font-family:Arial,Helvetica,sans-serif;
-														  color:#ffffff;
-														  text-decoration:none;
-														  font-weight:bold;
-														  display:inline-block;">Review &amp; Submit Decision </a></td>
-            </tr>
-           </tbody>
-          </table> <!-- Next Steps -->
-          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
-											  border-collapse:collapse;
-											  margin-bottom:18px;" width="100%">
-           <tbody>
-            <tr>
-             <td style="border-top:1px solid #e3d2a8;
-													   padding-top:20px;"><p style="margin:0;
-														  font-size:20px;
-														  line-height:1.4;
-														  font-family:Times New Roman,Times,serif;
-														  color:#1f1f1f;"><strong>Next Steps</strong></p></td>
-            </tr>
-           </tbody>
-          </table>
-          <ol style="margin-top:8px;
-										   margin-bottom:24px;
-										   padding-left:24px;">
-           <li style="margin-bottom:12px;
-											   font-size:18px;
-											   line-height:1.5;
-											   font-family:Times New Roman,Times,serif;
-											   color:#222222;">Review the attached design file for complete details.</li>
-           <li style="margin-bottom:12px;
-											   font-size:18px;
-											   line-height:1.5;
-											   font-family:Times New Roman,Times,serif;
-											   color:#222222;">Select <strong>Approve</strong> if you are satisfied with the design.</li>
-           <li style="margin-bottom:12px;
-											   font-size:18px;
-											   line-height:1.5;
-											   font-family:Times New Roman,Times,serif;
-											   color:#222222;">Select <strong>Request Changes</strong> if any modifications are required and provide your remarks.</li>
-          </ol> <!-- Professional Fallback Link -->
-          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
-											  border-collapse:collapse;
-											  margin:0 0 24px 0;" width="100%">
+										  border-collapse:collapse;
+										  margin:0 0 24px 0;" width="100%">
            <tbody>
             <tr>
              <td style="background-color:#fbf8f1;
-													   border:1px solid #e3d2a8;
-													   border-left:4px solid #c9a75d;
-													   padding:16px 18px;"><p style="margin:0 0 7px 0;
-														  font-size:14px;
-														  line-height:1.5;
-														  font-family:Arial,Helvetica,sans-serif;
-														  color:#555555;"><strong>Unable to use the button above?</strong></p> <p style="margin:0 0 10px 0;
-														  font-size:13px;
-														  line-height:1.6;
-														  font-family:Arial,Helvetica,sans-serif;
-														  color:#777777;">You can access the design approval page using the secure link below.</p> <p style="margin:0;
-														  font-size:14px;
-														  line-height:1.5;
-														  font-family:Arial,Helvetica,sans-serif;"><a href="[APPROVAL_LINK]" style="color:#9A6D1F;
-															  text-decoration:none;
-															  font-weight:bold;">Open Approval Page › </a></p></td>
+												   border:1px solid #e3d2a8;
+												   border-left:4px solid #c99a3d;
+												   padding:16px 18px;">
+              <p style="margin:0 0 5px 0;
+													  font-size:18px;
+													  line-height:1.5;
+													  font-family:Times New Roman,Times,serif;
+													  color:#7a5a20;"><strong>3D Design Ready for Your Review</strong></p>
+              <p style="margin:0;
+													  font-size:16px;
+													  line-height:1.6;
+													  font-family:Times New Roman,Times,serif;
+													  color:#665d50;">Please review the submitted design carefully and provide your approval or requested changes so that our team can proceed with the next phase of your project.</p>
+             </td>
             </tr>
            </tbody>
-          </table> <p style="margin:0 0 22px 0;
-										  font-size:18px;
-										  line-height:1.5;
-										  font-family:Times New Roman,Times,serif;
-										  color:#222222;">Your feedback will help our design team ensure that the final design aligns with your vision and project requirements.</p> <p style="margin:0;
-										  font-size:18px;
-										  line-height:1.5;
-										  font-family:Times New Roman,Times,serif;
-										  color:#222222;">Warm regards,<br /> <strong>Team Arelia</strong></p></td>
-        </tr> <!-- Short Professional Footer -->
+          </table>
+          <!-- 3D DESIGN SUBMISSION -->
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+										  border-collapse:collapse;
+										  margin-bottom:18px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+												   padding-top:20px;">
+              <p style="margin:0;
+													  font-size:20px;
+													  line-height:1.4;
+													  font-family:Times New Roman,Times,serif;
+													  color:#1f1f1f;"><strong>3D Design Submission</strong></p>
+             </td>
+            </tr>
+           </tbody>
+          </table>
+          <p style="margin:0 0 18px 0;
+									  font-size:18px;
+									  line-height:1.5;
+									  font-family:Times New Roman,Times,serif;
+									  color:#222222;">Please review the attached PDF or images carefully. Your timely feedback will help us maintain the project schedule and move forward with the next stage of development.</p>
+          <!-- EXTERNAL FILE LINK -->[EXTERNAL_FILE_LINK_BLOCK] <!-- REVIEW SECTION -->
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+										  border-collapse:collapse;
+										  margin:28px 0 18px 0;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+												   padding-top:20px;">
+              <p style="margin:0;
+													  font-size:20px;
+													  line-height:1.4;
+													  font-family:Times New Roman,Times,serif;
+													  color:#1f1f1f;"><strong>Review &amp; Submit Your Decision</strong></p>
+             </td>
+            </tr>
+           </tbody>
+          </table>
+          <p style="margin:0 0 22px 0;
+									  font-size:18px;
+									  line-height:1.5;
+									  font-family:Times New Roman,Times,serif;
+									  color:#222222;">Once you have reviewed the submitted design, use the button below to either approve the design or request changes.</p>
+          <!-- PRIMARY CTA -->
+          <table border="0" cellpadding="0" cellspacing="0" style="margin:0 0 28px 0;">
+           <tbody>
+            <tr>
+             <td align="center" style="background-color:#171717;
+												   border:1px solid #c99a3d;
+												   border-radius:4px;
+												   text-align:center;"><a href="[APPROVAL_LINK]" style="font-size:16px;
+													  font-weight:bold;
+													  color:#d6b36a;
+													  text-decoration:none;
+													  padding:14px 30px;
+													  display:inline-block;
+													  font-family:Arial,Helvetica,sans-serif;
+													  letter-spacing:0.3px;">REVIEW &amp; SUBMIT DECISION </a></td>
+            </tr>
+           </tbody>
+          </table>
+          <!-- NEXT STEPS -->
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+										  border-collapse:collapse;
+										  margin-bottom:18px;" width="100%">
+           <tbody>
+            <tr>
+             <td style="border-top:1px solid #e3d2a8;
+												   padding-top:20px;">
+              <p style="margin:0;
+													  font-size:20px;
+													  line-height:1.4;
+													  font-family:Times New Roman,Times,serif;
+													  color:#1f1f1f;"><strong>Next Steps</strong></p>
+             </td>
+            </tr>
+           </tbody>
+          </table>
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+										  border-collapse:collapse;
+										  margin:0 0 26px 0;" width="100%">
+           <tbody>
+            <tr>
+             <td style="width:40px;
+												   padding:8px 0;
+												   font-size:18px;
+												   line-height:1.5;
+												   font-family:Times New Roman,Times,serif;
+												   color:#c99a3d;" valign="top"><strong>1.</strong></td>
+             <td style="padding:8px 0;
+												   font-size:18px;
+												   line-height:1.5;
+												   font-family:Times New Roman,Times,serif;
+												   color:#222222;">Review the attached PDF, images, or design files for the complete 3D design details.</td>
+            </tr>
+            <tr>
+             <td style="width:40px;
+												   padding:8px 0;
+												   font-size:18px;
+												   line-height:1.5;
+												   font-family:Times New Roman,Times,serif;
+												   color:#c99a3d;" valign="top"><strong>2.</strong></td>
+             <td style="padding:8px 0;
+												   font-size:18px;
+												   line-height:1.5;
+												   font-family:Times New Roman,Times,serif;
+												   color:#222222;">Click <strong>Review &amp; Submit Decision</strong> to access the design approval page.</td>
+            </tr>
+            <tr>
+             <td style="width:40px;
+												   padding:8px 0;
+												   font-size:18px;
+												   line-height:1.5;
+												   font-family:Times New Roman,Times,serif;
+												   color:#c99a3d;" valign="top"><strong>3.</strong></td>
+             <td style="padding:8px 0;
+												   font-size:18px;
+												   line-height:1.5;
+												   font-family:Times New Roman,Times,serif;
+												   color:#222222;">Select either <strong>Approve</strong> or <strong>Request Changes</strong> and submit your response.</td>
+            </tr>
+           </tbody>
+          </table>
+          <!-- PROFESSIONAL FALLBACK LINK -->
+          <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
+										  border-collapse:collapse;
+										  margin:0 0 28px 0;" width="100%">
+           <tbody>
+            <tr>
+             <td style="background-color:#faf8f3;
+												   border:1px solid #e3d2a8;
+												   border-left:4px solid #c99a3d;
+												   padding:18px 20px;">
+              <p style="margin:0 0 7px 0;
+													  font-size:16px;
+													  line-height:1.4;
+													  font-family:Times New Roman,Times,serif;
+													  color:#333333;"><strong>Having trouble with the button?</strong></p>
+              <p style="margin:0 0 15px 0;
+													  font-size:14px;
+													  line-height:1.6;
+													  font-family:Arial,Helvetica,sans-serif;
+													  color:#6b6b6b;">You can also securely access the design review page using the alternative link below.</p>
+              <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+               <tbody>
+                <tr>
+                 <td align="center" style="background-color:#ffffff;
+																   border:1px solid #c99a3d;
+																   border-radius:3px;
+																   text-align:center;"><a href="[APPROVAL_LINK]" style="display:inline-block;
+																	  padding:10px 18px;
+																	  font-size:13px;
+																	  line-height:1.3;
+																	  font-family:Arial,Helvetica,sans-serif;
+																	  font-weight:bold;
+																	  color:#8a681f;
+																	  text-decoration:none;
+																	  letter-spacing:0.2px;">OPEN DESIGN REVIEW PAGE </a></td>
+                </tr>
+               </tbody>
+              </table>
+              <p style="margin:13px 0 0 0;
+													  font-size:12px;
+													  line-height:1.5;
+													  font-family:Arial,Helvetica,sans-serif;
+													  color:#999999;">This link provides access to the same secure review page as the button above.</p>
+             </td>
+            </tr>
+           </tbody>
+          </table>
+          <p style="margin:0 0 22px 0;
+									  font-size:18px;
+									  line-height:1.5;
+									  font-family:Times New Roman,Times,serif;
+									  color:#222222;">If you have any questions regarding the submitted design or require clarification before providing your response, please contact your project supervisor.</p>
+          <p style="margin:0;
+									  font-size:18px;
+									  line-height:1.5;
+									  font-family:Times New Roman,Times,serif;
+									  color:#222222;">Warm regards,
+           <br />
+           <strong>Team Arelia</strong></p>
+         </td>
+        </tr>
+        <!-- FOOTER -->
         <tr>
          <td align="center" style="background-color:#171717;
-									   border-top:2px solid #C99A3D;
-									   padding:24px 32px 22px 32px;
-									   text-align:center;"><p style="margin:0 0 5px 0;
-										  font-size:24px;
-										  line-height:1.3;
-										  font-family:Times New Roman,Times,serif;
-										  color:#D6B36A;
-										  font-weight:bold;
-										  text-align:center;">Arelia</p> <p style="margin:0 0 18px 0;
-										  font-size:11px;
-										  line-height:1.5;
-										  font-family:Arial,Helvetica,sans-serif;
-										  color:#C99A3D;
-										  letter-spacing:2px;
-										  text-align:center;">PREMIUM &amp; LUXURY INTERIOR DESIGNS</p>
+								   border-top:2px solid #C99A3D;
+								   padding:24px 32px 22px 32px;
+								   text-align:center;">
+          <p style="margin:0 0 5px 0;
+									  font-size:24px;
+									  line-height:1.3;
+									  font-family:Times New Roman,Times,serif;
+									  color:#D6B36A;
+									  font-weight:bold;
+									  text-align:center;">Arelia</p>
+          <p style="margin:0 0 18px 0;
+									  font-size:11px;
+									  line-height:1.5;
+									  font-family:Arial,Helvetica,sans-serif;
+									  color:#C99A3D;
+									  letter-spacing:2px;
+									  text-align:center;">PREMIUM &amp; LUXURY INTERIOR DESIGNS</p>
           <table border="0" cellpadding="0" cellspacing="0" style="width:100%;
-											  border-collapse:collapse;" width="100%">
+										  border-collapse:collapse;" width="100%">
            <tbody>
             <tr>
              <td align="center" style="border-top:1px solid #6E5427;
-													   padding-top:16px;
-													   text-align:center;"><p style="margin:0 0 5px 0;
-														  font-size:11px;
-														  line-height:1.6;
-														  font-family:Arial,Helvetica,sans-serif;
-														  color:#8F887F;
-														  text-align:center;">This email was sent because a 3D design submission is ready for your review and approval.</p> <p style="margin:0;
-														  font-size:11px;
-														  line-height:1.6;
-														  font-family:Arial,Helvetica,sans-serif;
-														  color:#8F887F;
-														  text-align:center;">© 2026 Arelia. All rights reserved.</p></td>
+												   padding-top:16px;
+												   text-align:center;">
+              <p style="margin:0 0 5px 0;
+													  font-size:11px;
+													  line-height:1.6;
+													  font-family:Arial,Helvetica,sans-serif;
+													  color:#8F887F;
+													  text-align:center;">This email was sent to request your review and approval of the latest 3D design submission for your project.</p>
+              <p style="margin:0;
+													  font-size:11px;
+													  line-height:1.6;
+													  font-family:Arial,Helvetica,sans-serif;
+													  color:#8F887F;
+													  text-align:center;">© 2026 Arelia. All rights reserved.</p>
+             </td>
             </tr>
            </tbody>
-          </table></td>
+          </table>
+         </td>
         </tr>
        </tbody>
-      </table></td>
+      </table>
+     </td>
     </tr>
    </tbody>
   </table>

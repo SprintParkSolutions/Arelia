@@ -1,17 +1,11 @@
 /**
  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
  * Class Name      : ClientAgreementInternalController
- * Author          : <YourName>
+ * Author          : Arelia
  * Created Date    : Jun 10, 2026
- * Last Modified By: <YourName>
+ * Last Modified By: Arelia
  * Last Modified On: Jun 10, 2026
  * Description     : Internal controller for Send Client Agreement quick action.
- *  
- * Change History  :
- *  Date          │   Author     │   Change
- * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
- *  Jun 10, 2026  │ <YourName>   │ Initial version
- * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
  */
 
 public with sharing class ClientAgreementInternalController {
@@ -76,12 +70,7 @@ public with sharing class ClientAgreementInternalController {
     }
 
     @AuraEnabled
-    public static Id sendAgreementToClient(
-        Id opportunityId,
-        String agreementHtml,
-        String pdfBase64,
-        List<String> separateAttachmentContentDocumentIds
-    ) {
+    public static Id sendAgreementToClient(Id opportunityId, String agreementHtml, String pdfBase64, List<String> separateAttachmentContentDocumentIds, String externalSupportingLinks) {
         try {
             if (opportunityId == null) {
                 throw new AuraHandledException('Opportunity Id is required.');
@@ -101,13 +90,24 @@ public with sharing class ClientAgreementInternalController {
                     Email__c,
                     Supervisor_User_Email__c,
                     Lead_Name__c,
-                    RecordTypeId
+                    RecordTypeId,
+                    Client_Agreement_Signed__c
                 FROM Opportunity
                 WHERE Id = :opportunityId
                 LIMIT 1
             ];
 
             validateAreliaOpportunity(opp);
+
+            /*
+            * Prevent another Client Agreement from being sent
+            * after the client has already signed the agreement.
+            */
+            if (opp.Client_Agreement_Signed__c == true) {
+                throw new AuraHandledException(
+                    'The Client Agreement has already been signed. Another Client Agreement cannot be sent.'
+                );
+            }
 
             if (String.isBlank(opp.Email__c)) {
                 throw new AuraHandledException(
@@ -128,19 +128,19 @@ public with sharing class ClientAgreementInternalController {
             agreement.Status__c = 'Draft';
             agreement.Agreement_HTML__c = agreementHtml;
             agreement.Token__c = token;
-            agreement.Token_Expiry__c =
-                ClientAgreementTokenService.getDefaultExpiry();
+            agreement.Token_Expiry__c = ClientAgreementTokenService.getDefaultExpiry();
+            // Store validated external sharing links.
+            agreement.External_Supporting_File_Links__c = ClientAgreementExternalLinkService.validateLinks(externalSupportingLinks);
 
             insert agreement;
 
-            ClientAgreementAttachmentService.linkSpecificSupportingFilesToAgreement(
-                agreement.Id,
-                separateAttachmentContentDocumentIds
-            );
+            Client_Agreement__c insertedAgreement = [SELECT Id, Name FROM Client_Agreement__c WHERE Id = :agreement.Id LIMIT 1];
+
+            ClientAgreementAttachmentService.linkSpecificSupportingFilesToAgreement(agreement.Id, separateAttachmentContentDocumentIds);
 
             String fileName =
                 'Client_Agreement_' +
-                agreement.Name +
+                insertedAgreement.Name +
                 '.pdf';
 
             Id pdfContentVersionId =
@@ -190,7 +190,8 @@ public with sharing class ClientAgreementInternalController {
                 'SIGNING_URL' => signingUrl,
                 'CLIENT_EMAIL' => opp.Email__c,
                 'SUPERVISOR_EMAIL' => opp.Supervisor_User_Email__c,
-                'OPPORTUNITY_NAME' => opp.Name
+                'OPPORTUNITY_NAME' => opp.Name,
+                'EXTERNAL_FILE_LINKS' => ClientAgreementExternalLinkService.buildEmailHtml(agreement.External_Supporting_File_Links__c)
             };
 
             ClientAgreementEmailService.sendEmail(emailReq);
@@ -281,10 +282,10 @@ public with sharing class ClientAgreementInternalController {
         return ''
             + '<div style="font-family: Arial, Helvetica, sans-serif; color:#222222; line-height:1.55;">'
 
-            + '<div style="text-align:center; margin-bottom:18px;">'
-            + '<div style="font-size:34px; font-weight:700; color:#1f4e79; letter-spacing:1px;">ARELIA SPACE</div>'
-            + '<div style="border-top:2px solid #5b9bd5; margin:12px 0 0 0;"></div>'
-            + '</div>'
+            // + '<div style="text-align:center; margin-bottom:18px;">'
+            // + '<div style="font-size:34px; font-weight:700; color:#1f4e79; letter-spacing:1px;">ARELIA SPACE</div>'
+            // + '<div style="border-top:2px solid #5b9bd5; margin:12px 0 0 0;"></div>'
+            // + '</div>'
 
             + '<h1 style="font-size:20px; color:#1f4e79; text-transform:uppercase; margin-top:24px; margin-bottom:22px;">'
             + 'Client Interior Design &amp; Turnkey Project Agreement'
