@@ -204,6 +204,27 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="external-link-container">
+                                <label class="field-label" for="externalFileLink">
+                                    Large File Link (Google Drive / OneDrive) - optional
+                                </label>
+
+                                <p class="field-help">
+                                    If a file is too large to upload (e.g. a long video), upload it to
+                                    Google Drive or OneDrive, set sharing to "Anyone with the link", and
+                                    paste the link here instead. It will be included in the email.
+                                </p>
+
+                                <lightning-input
+                                    id="externalFileLink"
+                                    type="url"
+                                    variant="label-hidden"
+                                    placeholder="https://drive.google.com/... or https://onedrive.live.com/..."
+                                    value={externalFileLink}
+                                    onchange={handleExternalFileLinkChange}>
+                                </lightning-input>
+                            </div>
                         </section>
 
                         <!-- UPLOADED FILES -->

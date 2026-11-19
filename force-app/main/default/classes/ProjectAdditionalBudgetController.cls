@@ -865,20 +865,87 @@ public without sharing class ProjectAdditionalBudgetController {
      * @description
      *  Parses comma/semicolon/space separated ids string into List<Id>.
      */
-    private static List<Id> parseIds(String raw) {
-        List<Id> outList = new List<Id>();
-        if (String.isBlank(raw)) { return outList; }
+    // private static List<Id> parseIds(String raw) {
+    //     List<Id> outList = new List<Id>();
+    //     if (String.isBlank(raw)) { return outList; }
 
-        for (String token : raw.split('[,;\\s]+')) {
-            if (String.isBlank(token)) { continue; }
-            String t = token.trim();
+    //     for (String token : raw.split('[,;\\s]+')) {
+    //         if (String.isBlank(token)) { continue; }
+    //         String t = token.trim();
+    //         try {
+    //             outList.add((Id)t);
+    //         } catch (Exception ex) {
+    //             throw new AuraHandledException('Error::'+ex);
+    //         }
+    //     }
+    //     return outList;
+    // }
+
+    /**
+    * Converts a raw string containing ContentDocument IDs into a List<Id>.
+    *
+    * Supports different input formats:
+    * 1. Single ID: 069XXXXXXXXXXXXXXX
+    * 2. Comma-separated IDs: 069XXX,069YYY
+    * 3. Semicolon-separated IDs: 069XXX;069YYY
+    * 4. JSON-like values: ["069XXX","069YYY"]
+    * 5. Empty values: null, blank string, or []
+    *
+    * Invalid ID values are ignored instead of throwing an exception.
+    * This is important because this method can be called from trigger
+    * execution, where AuraHandledException should not be thrown.
+    *
+    * @param rawContentDocumentIds Raw string containing ContentDocument IDs.
+    * @return List<Id> containing only valid Salesforce IDs.
+    */
+    private static List<Id> parseIds(String rawContentDocumentIds) {
+
+        // Stores the valid Salesforce ContentDocument IDs.
+        List<Id> contentDocumentIds = new List<Id>();
+
+        // Return an empty list when the input is null, empty, or contains only spaces.
+        if (String.isBlank(rawContentDocumentIds)) {
+            return contentDocumentIds;
+        }
+        // Remove JSON array brackets and quotation marks.
+        // Example: ["069XXX","069YYY"] becomes 069XXX,069YYY.
+        String cleanedContentDocumentIds = rawContentDocumentIds.trim()
+            .replace('[', '')
+            .replace(']', '')
+            .replace('"', '')
+            .replace('\'', '');
+        // If the input contained only brackets or quotation marks,
+        // return an empty list because there are no IDs to process.
+        if (String.isBlank(cleanedContentDocumentIds)) {
+            return contentDocumentIds;
+        }
+        // Split the input using commas, semicolons, or whitespace.
+        // This supports multiple ID formats without requiring separate logic.
+        for (String contentDocumentIdValue : cleanedContentDocumentIds.split('[,;\\s]+')) {
+            // Skip empty values that may occur because of consecutive separators.
+            if (String.isBlank(contentDocumentIdValue)) {
+                continue;
+            }
+            // Remove any leading or trailing spaces from the individual ID.
+            String trimmedContentDocumentId = contentDocumentIdValue.trim();
+
             try {
-                outList.add((Id)t);
+                // Convert the string value into a Salesforce ID.
+                // Salesforce validates the ID format during this conversion.
+                Id contentDocumentId = (Id) trimmedContentDocumentId;
+                // Add the valid ID to the result list.
+                contentDocumentIds.add(contentDocumentId);
             } catch (Exception ex) {
-                throw new AuraHandledException('Error::'+ex);
+                // Ignore invalid ID values instead of throwing AuraHandledException.
+                // This prevents invalid input from interrupting trigger execution.
+                System.debug(
+                    LoggingLevel.WARN,
+                    'Skipping invalid ContentDocumentId: ' + trimmedContentDocumentId
+                    + '. Error: ' + ex.getMessage()
+                );
             }
         }
-        return outList;
+        // Return the list containing only valid ContentDocument IDs.
+        return contentDocumentIds;
     }
-
 }

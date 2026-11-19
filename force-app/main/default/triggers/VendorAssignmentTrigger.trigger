@@ -1,20 +1,47 @@
 trigger VendorAssignmentTrigger on Vendor_Assignment__c (
     before insert, before update,
-    after insert, after update, after delete) 
-{
+    after insert, after update, after delete
+) {
     // BEFORE: Calculate and set Vendor_Efficiency__c when eligible
     if (Trigger.isBefore && Trigger.isUpdate) {
         VendorAssignmentHandler.calculateEfficiency(Trigger.new);
     }
+
     if (Trigger.isAfter) {
+
+        // Existing vendor average efficiency logic
         if (Trigger.isInsert || Trigger.isUndelete) {
-            VendorAssignmentHandler.updateVendorAverageEfficiency(null, Trigger.new);
+            VendorAssignmentHandler.updateVendorAverageEfficiency(
+                null, Trigger.new
+            );
         }
+
         if (Trigger.isUpdate) {
-            VendorAssignmentHandler.updateVendorAverageEfficiency(Trigger.old, Trigger.new);
+            VendorAssignmentHandler.updateVendorAverageEfficiency(
+                Trigger.old, Trigger.new
+            );
         }
+
         if (Trigger.isDelete) {
-            VendorAssignmentHandler.updateVendorAverageEfficiency(Trigger.old, null);
+            VendorAssignmentHandler.updateVendorAverageEfficiency(
+                Trigger.old, null
+            );
+        }
+
+        // NEW: Recalculate remaining task percentage
+        // On insert and update
+        if (Trigger.isInsert) {
+            TaskVendorBudgetHandler.recalculateWhenBudgetChanges(
+                Trigger.new,
+                null
+            );
+        }
+
+        if (Trigger.isUpdate) {
+            TaskVendorBudgetHandler.recalculateWhenBudgetChanges(
+                Trigger.new,
+                Trigger.oldMap
+            );
         }
     }
 
@@ -44,7 +71,5 @@ trigger VendorAssignmentTrigger on Vendor_Assignment__c (
             // Call handler method to update project completion percentage
             VendorAssignmentHandler.updateProjectCompletion(projectIds);
         }
-
-        // if (Trigger.isInsert) {
     }
 }

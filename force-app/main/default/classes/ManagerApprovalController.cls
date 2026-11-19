@@ -6,9 +6,6 @@
 @SuppressWarnings('PMD.ApexCRUDViolation')
 public without sharing class ManagerApprovalController {
 
-    private static final String ARELIA_OPPORTUNITY_RECORD_TYPE_NAME = 'Arelia';
-    private static Id cachedAreliaOpportunityRecordTypeId;
-
     // --- Inner Classes ---
 
     private class ManagerNotificationData {
@@ -69,44 +66,112 @@ public without sharing class ManagerApprovalController {
         }
     }
 
-    @AuraEnabled
-    public static void submitManagerDecision(String recordId, String action, String comments) {
-        try {
-            // 1. Fetch the design (We need Opportunity__c field for the update logic)
-            Architecture_Design__c design = fetchDesignForDecision(recordId);
+   @AuraEnabled
+public static void submitManagerDecision(
+    String recordId,
+    String action,
+    String comments
+) {
+    try {
 
-            if (action == 'Approve') {
-                design.Manager_Approval__c = true;
-                design.Manager_Comments__c = String.isNotBlank(comments) ? comments : 'Approved By Manager';
-                
-                // 2. THIS WAS MISSING - Call the method to update Opportunity
-                handleOpportunityUpdate(design); 
-                
-            } else if (action == 'Reject') {
-                design.Manager_Approval__c = false;
-                design.Manager_Comments__c = comments;
-            }
+        // 1. Fetch Design
+        Architecture_Design__c design =
+            fetchDesignForDecision(recordId);
 
-            update design;
 
-            // 3. Send Notifications
-            ManagerNotificationData notificationData = new ManagerNotificationData();
-            notificationData.design = design;
-            notificationData.action = action;
-            notificationData.comments = design.Manager_Comments__c;
+        // Send the mobile push only on the first
+        // Manager approval.
+        Boolean sendClientMobilePush =
+            action == 'Approve' &&
+            design.Manager_Approval__c != true;
 
-            sendManagerResponseNotification(notificationData);
 
-        } catch (Exception e) {
-            throw new AuraHandledException('Error submitting decision: ' + e.getMessage());
+        if (action == 'Approve') {
+
+            design.Manager_Approval__c = true;
+
+            design.Manager_Comments__c =
+                String.isNotBlank(comments)
+                    ? comments
+                    : 'Approved By Manager';
+
+
+            // Existing Opportunity update.
+            handleOpportunityUpdate(design);
+
+
+        } else if (action == 'Reject') {
+
+            design.Manager_Approval__c = false;
+
+            design.Manager_Comments__c =
+                comments;
         }
-    }
 
+
+        // Existing Architecture Design update.
+        update design;
+
+
+        // =====================================================
+        // EXISTING EMAIL NOTIFICATIONS
+        // DO NOT CHANGE
+        // =====================================================
+
+        ManagerNotificationData notificationData =
+            new ManagerNotificationData();
+
+        notificationData.design =
+            design;
+
+        notificationData.action =
+            action;
+
+        notificationData.comments =
+            design.Manager_Comments__c;
+
+
+        sendManagerResponseNotification(
+            notificationData
+        );
+
+
+        // =====================================================
+        // NEW:
+        // MANAGER APPROVED -> CLIENT MOBILE NOTIFICATION
+        // =====================================================
+
+  /*     if (
+    sendClientMobilePush &&
+    design.Opportunity__c != null
+) {
+    System.debug(
+        LoggingLevel.INFO,
+        'MANAGER APPROVAL: Queuing client push for ' +
+        design.Id
+    );
+
+    System.enqueueJob(
+        new ArchitectureManagerApprovedPushJob(
+            new Set<Id>{ design.Id }
+        )
+    );
+}
+*/
+
+    } catch (Exception e) {
+
+        throw new AuraHandledException(
+            'Error submitting decision: ' +
+            e.getMessage()
+        );
+    } 
+}
 
     // Helper to reduce complexity in submitManagerDecision
     private static Architecture_Design__c fetchDesignForDecision(String recordId) {
         return [
-            SELECT Id, Opportunity__c, Related_File_Id__c,
+            SELECT Id, Opportunity__c, Related_File_Id__c,Manager_Approval__c,
                    Opportunity__r.RecordTypeId,
                    Opportunity__r.Name,
                    Opportunity__r.Project_Description__c,
@@ -302,20 +367,12 @@ public without sharing class ManagerApprovalController {
     }
 
     private static Id getAreliaOpportunityRecordTypeId() {
-        if (cachedAreliaOpportunityRecordTypeId != null) {
-            return cachedAreliaOpportunityRecordTypeId;
-        }
-
-        Schema.RecordTypeInfo recordTypeInfo = Schema.SObjectType.Opportunity
-            .getRecordTypeInfosByName()
-            .get(ARELIA_OPPORTUNITY_RECORD_TYPE_NAME);
-
-        if (recordTypeInfo == null) {
-            return null;
-        }
-
-        cachedAreliaOpportunityRecordTypeId = recordTypeInfo.getRecordTypeId();
-        return cachedAreliaOpportunityRecordTypeId;
+        // Delegates to AreliaUtility, which resolves this via a direct RecordType SOQL query
+        // rather than Schema.describe().getRecordTypeInfosByName(). The describe-based lookup
+        // only returns Record Types visible to the CURRENT USER'S PROFILE, so it silently
+        // returned null (blocking handleOpportunityUpdate) for the Guest User approving via
+        // the public managerArchitectureApproval site page, while working fine for Admin.
+        return AreliaUtility.getAreliaOpportunityRecordTypeId();
     }
 
     private static String resolveSupervisorName(Architecture_Design__c design) {
@@ -333,4 +390,263 @@ public without sharing class ManagerApprovalController {
         }
         return 'Valued Client';
     }
+    
+    // ============================================================================
+// MANAGER ARCHITECTURE APPROVAL -> CLIENT MOBILE PUSH
+// ============================================================================
+
+public class ManagerArchitectureApprovalPushQueueable
+    implements Queueable, Database.AllowsCallouts {
+
+    private Id designId;
+
+
+    public ManagerArchitectureApprovalPushQueueable(
+        Id designId
+    ) {
+
+        this.designId =
+            designId;
+    }
+
+
+    public void execute(
+        QueueableContext context
+    ) {
+
+        if (designId == null) {
+            return;
+        }
+
+
+        // =====================================================
+        // GET APPROVED ARCHITECTURE DESIGN
+        // =====================================================
+
+        List<Architecture_Design__c> designs = [
+            SELECT
+                Id,
+                Name,
+                Opportunity__c,
+                Manager_Approval__c
+            FROM Architecture_Design__c
+            WHERE Id = :designId
+            LIMIT 1
+        ];
+
+
+        if (designs.isEmpty()) {
+            return;
+        }
+
+
+        Architecture_Design__c design =
+            designs[0];
+
+
+        if (
+            design.Manager_Approval__c != true ||
+            design.Opportunity__c == null
+        ) {
+
+            return;
+        }
+
+
+        // =====================================================
+        // FIND ORIGINAL CONVERTED LEAD
+        //
+        // We need:
+        // Original Lead Id -> Flutter session validation
+        // Converted Contact -> Mobile Device Token
+        // =====================================================
+
+        List<Lead> convertedLeads = [
+            SELECT
+                Id,
+                ConvertedContactId,
+                ConvertedOpportunityId
+            FROM Lead
+            WHERE
+                IsConverted = true
+                AND ConvertedOpportunityId =
+                    :design.Opportunity__c
+                AND ConvertedContactId != null
+            LIMIT 1
+        ];
+
+
+        if (convertedLeads.isEmpty()) {
+
+            System.debug(
+                LoggingLevel.WARN,
+                'MANAGER APPROVAL PUSH: ' +
+                'Converted Lead not found for Opportunity ' +
+                design.Opportunity__c
+            );
+
+            return;
+        }
+
+
+        Lead prospect =
+            convertedLeads[0];
+
+
+        Id prospectLeadId =
+            prospect.Id;
+
+        Id contactId =
+            prospect.ConvertedContactId;
+
+
+        // =====================================================
+        // GET LATEST ACTIVE CLIENT DEVICE TOKEN
+        // =====================================================
+
+        List<Mobile_Device_Token__c> tokenRecords = [
+            SELECT
+                Id,
+                Contact__c,
+                FCM_Token__c,
+                Active__c,
+                Last_Seen__c
+            FROM Mobile_Device_Token__c
+            WHERE
+                Contact__c = :contactId
+                AND Active__c = true
+            ORDER BY Last_Seen__c DESC
+            LIMIT 1
+        ];
+
+
+        if (tokenRecords.isEmpty()) {
+
+            System.debug(
+                LoggingLevel.WARN,
+                'MANAGER APPROVAL PUSH: ' +
+                'No active Mobile_Device_Token__c found. ' +
+                'Contact: ' +
+                contactId
+            );
+
+            return;
+        }
+
+
+        Mobile_Device_Token__c tokenRecord =
+            tokenRecords[0];
+
+
+        if (
+            String.isBlank(
+                tokenRecord.FCM_Token__c
+            )
+        ) {
+
+            return;
+        }
+
+
+        // =====================================================
+        // FIREBASE PAYLOAD
+        // =====================================================
+
+        Map<String, String> dataPayload =
+            new Map<String, String>{
+                'recipientType' =>
+                    'prospect',
+
+                /*
+                 * Keep ORIGINAL Lead Id.
+                 * Flutter prospect session uses 00Q Id.
+                 */
+                'leadId' =>
+                    String.valueOf(
+                        prospectLeadId
+                    ),
+
+                'contactId' =>
+                    String.valueOf(
+                        contactId
+                    ),
+
+                'opportunityId' =>
+                    String.valueOf(
+                        design.Opportunity__c
+                    ),
+
+                'designId' =>
+                    String.valueOf(
+                        design.Id
+                    ),
+
+                'recordId' =>
+                    String.valueOf(
+                        design.Id
+                    ),
+
+                'notificationType' =>
+                    'ARCHITECTURE_MANAGER_APPROVED',
+
+                'type' =>
+                    'ARCHITECTURE_MANAGER_APPROVED',
+
+                /*
+                 * Reuse existing Flutter Architecture
+                 * Design navigation.
+                 */
+                'actionType' =>
+                    'OPEN_ARCHITECTURE_DESIGN',
+
+                'route' =>
+                    'prospect_architecture_design'
+            };
+
+
+        // =====================================================
+        // SEND PUSH
+        // =====================================================
+
+        try {
+
+            FirebasePushService.sendPushToToken(
+                tokenRecord.FCM_Token__c,
+
+                'Architecture Design Approved',
+
+                'Your architecture design has been approved by the manager. Tap to view the final design.',
+
+                dataPayload
+            );
+
+
+            System.debug(
+                LoggingLevel.INFO,
+                'MANAGER APPROVAL PUSH SENT' +
+                ' | Lead: ' +
+                prospectLeadId +
+                ' | Contact: ' +
+                contactId +
+                ' | Opportunity: ' +
+                design.Opportunity__c +
+                ' | Design: ' +
+                design.Id
+            );
+
+
+        } catch (Exception ex) {
+
+            /*
+             * Firebase failure must NOT affect
+             * Manager approval or existing emails.
+             */
+            System.debug(
+                LoggingLevel.ERROR,
+                'MANAGER APPROVAL PUSH ERROR: ' +
+                ex.getMessage()
+            );
+        }
+    }
+}
 }

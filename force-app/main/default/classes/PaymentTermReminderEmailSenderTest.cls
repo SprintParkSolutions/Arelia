@@ -24,7 +24,15 @@ private class PaymentTermReminderEmailSenderTest {
     private static Payment_Term__c createTerm(Id projectId, String label, Integer daysOffset, Boolean received) {
         Payment_Term__c term = TestDataUtility.createPaymentTerm(projectId, label, 10);
         term.Due_Date__c = daysOffset == null ? null : Date.today().addDays(daysOffset);
-        term.Payment_Received__c = received;
+        if (received == true) {
+            // Populate the actual amount received before marking the term paid.
+            // The created installment represents 10% of the project budget.
+            term.Paid_Amount__c = 5000;
+            term.Payment_Received__c = true;
+        } else {
+            term.Payment_Received__c = false;
+        }
+
         update term;
         return term;
     }
