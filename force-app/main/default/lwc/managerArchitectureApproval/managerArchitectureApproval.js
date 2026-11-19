@@ -49,7 +49,10 @@ export default class ManagerArchitectureApproval extends LightningElement {
                 this.isLoading = false;
             })
             .catch((error) => {
-                this.error = this.getErrorMessage(error, 'Invalid Link or Record not found.');
+                this.error = this.getErrorMessage(
+                    error,
+                    'Invalid Link or Record not found.'
+                );
                 this.isLoading = false;
             });
     }
@@ -81,7 +84,10 @@ export default class ManagerArchitectureApproval extends LightningElement {
             return 'decision-pill approved-pill';
         }
 
-        if (normalizedStatus.includes('rejected') || normalizedStatus.includes('revise')) {
+        if (
+            normalizedStatus.includes('rejected') ||
+            normalizedStatus.includes('revise')
+        ) {
             return 'decision-pill rejected-pill';
         }
 
@@ -89,15 +95,24 @@ export default class ManagerArchitectureApproval extends LightningElement {
     }
 
     handleApproveClick() {
+        if (this.isFinalized) {
+            return;
+        }
+
         this.error = null;
         this.comments = '';
         this.showCommentBox = false;
         this.pendingAction = 'Approve';
-        this.confirmationMessage = 'Are you sure you want to approve this design for final sign-off?';
+        this.confirmationMessage =
+            'Are you sure you want to approve this design for final sign-off?';
         this.showConfirmationModal = true;
     }
 
     handleRequestChangesClick() {
+        if (this.isFinalized) {
+            return;
+        }
+
         this.error = null;
         this.showCommentBox = true;
         this.pendingAction = null;
@@ -116,13 +131,23 @@ export default class ManagerArchitectureApproval extends LightningElement {
     }
 
     handleSubmitRejectionClick() {
-        const trimmedComments = this.comments ? this.comments.trim() : '';
+        if (this.isFinalized) {
+            return;
+        }
+
+        const trimmedComments = this.comments
+            ? this.comments.trim()
+            : '';
 
         if (!trimmedComments) {
-            const inputField = this.template.querySelector('.native-manager-textarea');
+            const inputField = this.template.querySelector(
+                '.native-manager-textarea'
+            );
 
             if (inputField) {
-                inputField.setCustomValidity('Please provide a reason for rejection.');
+                inputField.setCustomValidity(
+                    'Please provide a reason for rejection.'
+                );
                 inputField.reportValidity();
             }
 
@@ -131,7 +156,8 @@ export default class ManagerArchitectureApproval extends LightningElement {
 
         this.comments = trimmedComments;
         this.pendingAction = 'Reject';
-        this.confirmationMessage = 'Are you sure you want to reject this design and request changes?';
+        this.confirmationMessage =
+            'Are you sure you want to reject this design and request changes?';
         this.showConfirmationModal = true;
     }
 
@@ -146,6 +172,11 @@ export default class ManagerArchitectureApproval extends LightningElement {
             return;
         }
 
+        if (this.isFinalized) {
+            this.closeConfirmationModal();
+            return;
+        }
+
         const actionToSubmit = this.pendingAction;
         this.showConfirmationModal = false;
         this.pendingAction = null;
@@ -153,6 +184,10 @@ export default class ManagerArchitectureApproval extends LightningElement {
     }
 
     submitDecision(action) {
+        if (this.isLoading || this.isFinalized) {
+            return;
+        }
+
         this.error = null;
         this.isLoading = true;
 
@@ -168,19 +203,23 @@ export default class ManagerArchitectureApproval extends LightningElement {
 
                 this.designData = {
                     ...this.designData,
-                    status: action === 'Approve' ? 'Manager Approved' : 'Manager Rejected',
+                    status: action === 'Approve'
+                        ? 'Manager Approved'
+                        : 'Manager Rejected',
                     comments: this.comments
                 };
 
-                this.successMessage =
-                    action === 'Approve'
-                        ? 'The design has been successfully approved and finalized.'
-                        : 'The design has been rejected. Revision request has been sent to the team.';
+                this.successMessage = action === 'Approve'
+                    ? 'The design has been successfully approved and finalized.'
+                    : 'The design has been rejected. Revision request has been sent to the team.';
 
                 this.showSuccessModal = true;
             })
             .catch((error) => {
-                this.error = this.getErrorMessage(error, 'Error submitting decision.');
+                this.error = this.getErrorMessage(
+                    error,
+                    'Error submitting decision.'
+                );
                 this.isLoading = false;
             });
     }
@@ -194,7 +233,9 @@ export default class ManagerArchitectureApproval extends LightningElement {
     }
 
     clearTextareaValidation() {
-        const inputField = this.template.querySelector('.native-manager-textarea');
+        const inputField = this.template.querySelector(
+            '.native-manager-textarea'
+        );
 
         if (inputField) {
             inputField.setCustomValidity('');
@@ -207,15 +248,25 @@ export default class ManagerArchitectureApproval extends LightningElement {
             return false;
         }
 
-        const normalizedStatus = statusValue.toLowerCase();
+        const normalizedStatus = statusValue.trim().toLowerCase();
 
-        return (
+        const finalStatuses = [
+            'manager approved',
+            'manager rejected',
+            'manager revise',
+            'manager requested',
+            'final sign-off',
+            'finalized',
+            'approved',
+            'rejected',
+            'changes requested'
+        ];
+
+        return finalStatuses.some((status) =>
+            normalizedStatus === status ||
             normalizedStatus.includes('manager approved') ||
             normalizedStatus.includes('manager rejected') ||
-            normalizedStatus.includes('manager revise') ||
-            normalizedStatus.includes('manager requested') ||
-            normalizedStatus.includes('final sign-off') ||
-            normalizedStatus.includes('finalized')
+            normalizedStatus.includes('final sign-off')
         );
     }
 
