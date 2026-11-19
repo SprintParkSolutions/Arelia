@@ -16,10 +16,8 @@ private class ProformaInvoiceControllerTest {
         Opportunity opp = TestDataUtility.createOpportunity('Test Opportunity', supervisor.Id);
         opp.Primary_Contact__c = clientContact.Id;
         update opp;
-
         // 3. Create Project
         Project__c proj = TestDataUtility.createProject('Test Project', 50000, clientContact.Id);
-
         // 4. Create File (ContentVersion)
         TestDataUtility.createContentVersion('Proforma_Invoice_Draft', 'Test PDF Content Data');
 
@@ -78,7 +76,7 @@ private class ProformaInvoiceControllerTest {
             ProformaInvoiceController.sendInvoiceForApproval(opp.Id, new List<String>());
             System.assert(false, 'Exception should have been thrown due to missing files.');
         } catch (Exception e) {
-            // AuraHandledException messages are masked in Apex Tests as "Script-thrown exception". We verify the Type instead.
+            // AuraHandledException messages are masked in Apex Tests as "Script-thrown exception".
             System.assert(e.getTypeName() == 'System.AuraHandledException' || e.getMessage().contains('Script-thrown'), 'Should throw AuraHandledException for missing files.');
         }
         Test.stopTest();
@@ -101,18 +99,21 @@ private class ProformaInvoiceControllerTest {
         System.assertEquals(1, invoiceCount, 'Invoice should be created even when no client email is available.');
     }
 
+    // Standalone invoice (no Opportunity, no Project): queryInvoiceByToken's filter
+    // (Opportunity__c = null OR Opportunity__r.RecordTypeId = :areliaOpportunityRecordTypeId)
+    // passes unconditionally on the "Opportunity__c = null" branch, so this test never
+    // depends on an Arelia Opportunity Record Type - or any other org-specific record -
+    // existing in the target org.
     @isTest
     static void testSubmitClientDecisionApproved() {
-        Opportunity opp = [SELECT Id FROM Opportunity LIMIT 1];
-        Proforma_Invoice__c invoice = TestDataUtility.createProformaInvoice(opp.Id);
-        ContentVersion cv = [SELECT ContentDocumentId FROM ContentVersion LIMIT 1];
-        
-        invoice.Related_File_Id__c = cv.ContentDocumentId;
-        update invoice;
-        TestDataUtility.linkFileToRecord(cv.ContentDocumentId, invoice.Id);
+        Proforma_Invoice__c invoice = new Proforma_Invoice__c(
+            Secure_Token__c = UUID.randomUUID().toString(),
+            Status__c = 'Sent'
+        );
+        insert invoice;
 
         Test.startTest();
-        ProformaInvoiceController.submitClientDecision(invoice.Id, 'Approved', 'Looks great, please proceed.');
+        ProformaInvoiceController.submitClientDecision(invoice.Secure_Token__c, 'Approved', 'Looks great, please proceed.');
         Test.stopTest();
 
         Proforma_Invoice__c updatedInvoice = [SELECT Status__c, Client_Comments__c FROM Proforma_Invoice__c WHERE Id = :invoice.Id];
@@ -122,11 +123,14 @@ private class ProformaInvoiceControllerTest {
 
     @isTest
     static void testSubmitClientDecisionNoFilesAndDefaultComments() {
-        Opportunity opp = [SELECT Id FROM Opportunity LIMIT 1];
-        Proforma_Invoice__c invoice = TestDataUtility.createProformaInvoice(opp.Id);
+        Proforma_Invoice__c invoice = new Proforma_Invoice__c(
+            Secure_Token__c = UUID.randomUUID().toString(),
+            Status__c = 'Sent'
+        );
+        insert invoice;
 
         Test.startTest();
-        ProformaInvoiceController.submitClientDecision(invoice.Id, 'Approved', null);
+        ProformaInvoiceController.submitClientDecision(invoice.Secure_Token__c, 'Approved', null);
         Test.stopTest();
 
         Proforma_Invoice__c updatedInvoice = [SELECT Status__c, Client_Comments__c FROM Proforma_Invoice__c WHERE Id = :invoice.Id];
@@ -147,28 +151,46 @@ private class ProformaInvoiceControllerTest {
         Test.stopTest();
     }
 
+    // Standalone invoice - see note on testSubmitClientDecisionApproved above for why this
+    // avoids any Opportunity/Project/Record Type dependency.
     @isTest
     static void testGetInvoiceByIdSuccess() {
-        Opportunity opp = [SELECT Id, Name, Lead_Name__c FROM Opportunity LIMIT 1];
-        opp.Lead_Name__c = 'Named Client';
-        update opp;
-
-        Proforma_Invoice__c invoice = TestDataUtility.createProformaInvoice(opp.Id);
-        
-        ContentVersion cv = [SELECT ContentDocumentId FROM ContentVersion LIMIT 1];
-        invoice.Related_File_Id__c = cv.ContentDocumentId;
-        invoice.Status__c = 'Sent';
-        update invoice;
+        ContentVersion cv = createIsolatedFile('Proforma_Invoice_Draft');
+        Proforma_Invoice__c invoice = new Proforma_Invoice__c(
+            Secure_Token__c = UUID.randomUUID().toString(),
+            Related_File_Id__c = cv.ContentDocumentId,
+            Status__c = 'Sent'
+        );
+        insert invoice;
 
         Test.startTest();
-        Map<String, String> result = ProformaInvoiceController.getInvoiceById(invoice.Id);
+        Map<String, String> result = ProformaInvoiceController.getInvoiceById(invoice.Secure_Token__c);
         Test.stopTest();
 
         System.assertNotEquals(null, result, 'Result map should not be null.');
         System.assertEquals('Sent', result.get('status'), 'Status should match.');
         System.assertEquals('Proforma_Invoice_Draft', result.get('title'), 'File title should match the ContentDocument.');
-        System.assertEquals(opp.Name, result.get('projectName'), 'Project name should default to Opportunity Name.');
-        System.assertEquals('Named Client', result.get('clientName'), 'Client name should use Opportunity lead name when present.');
+        System.assertEquals('Proforma Invoice', result.get('projectName'), 'Standalone invoices (no Opportunity/Project) should fall back to the default project name.');
+        System.assertEquals('Valued Client', result.get('clientName'), 'Standalone invoices should fall back to the default client name.');
+    }
+
+    // Covers getInvoiceById's ContentDocumentLink fallback branch (Related_File_Id__c blank),
+    // which the Related_File_Id__c-populated test above doesn't exercise.
+    @isTest
+    static void testGetInvoiceByIdFileFallbackViaContentDocumentLink() {
+        ContentVersion cv = createIsolatedFile('Linked_Only_File');
+        Proforma_Invoice__c invoice = new Proforma_Invoice__c(
+            Secure_Token__c = UUID.randomUUID().toString(),
+            Status__c = 'Sent'
+        );
+        insert invoice;
+        TestDataUtility.linkFileToRecord(cv.ContentDocumentId, invoice.Id);
+
+        Test.startTest();
+        Map<String, String> result = ProformaInvoiceController.getInvoiceById(invoice.Secure_Token__c);
+        Test.stopTest();
+
+        System.assertEquals('Linked_Only_File', result.get('title'), 'Title should resolve via ContentDocumentLink when Related_File_Id__c is blank.');
     }
 
     @isTest
@@ -255,5 +277,10 @@ private class ProformaInvoiceControllerTest {
         System.assertEquals('', nullText, 'Null merge text should become blank.');
         System.assertEquals('Value=', replacedText, 'Null merge values should become blank.');
         System.assertEquals('Team', supervisorName, 'Missing supervisor relationship should use Team fallback.');
+    }
+
+    private static ContentVersion createIsolatedFile(String title) {
+        Id contentVersionId = TestDataUtility.createContentVersion(title, 'Test PDF Content Data').Id;
+        return [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :contentVersionId LIMIT 1];
     }
 }
