@@ -741,8 +741,6 @@ private class ProformaManagerApprovalNotifTriggerTest {
         }
     }
 
-
-    
     /**
     * @description Tests bulk updates containing multiple
     * manager approval states.
@@ -774,6 +772,7 @@ private class ProformaManagerApprovalNotifTriggerTest {
             MANAGER_COMMENT
         );
 
+        // First invoice: Approved with approval date.
         Proforma_Invoice__c firstUpdate =
             new Proforma_Invoice__c(
                 Id = firstInvoice.Id,
@@ -782,6 +781,7 @@ private class ProformaManagerApprovalNotifTriggerTest {
 
         setApprovalDate(firstUpdate, true);
 
+        // Second invoice: Not approved.
         Proforma_Invoice__c secondUpdate =
             new Proforma_Invoice__c(
                 Id = secondInvoice.Id,
@@ -789,12 +789,16 @@ private class ProformaManagerApprovalNotifTriggerTest {
                 Manager_Comments__c = 'Pending review.'
             );
 
+        // Third invoice: Approved with approval date.
         Proforma_Invoice__c thirdUpdate =
             new Proforma_Invoice__c(
                 Id = thirdInvoice.Id,
                 Manager_Approval__c = true
             );
 
+        setApprovalDate(thirdUpdate, true);
+
+        // Bulk update all three invoices.
         List<Proforma_Invoice__c> updates =
             new List<Proforma_Invoice__c>{
                 firstUpdate,
@@ -814,8 +818,7 @@ private class ProformaManagerApprovalNotifTriggerTest {
         System.assertEquals(
             ONE_JOB,
             jobsCreated,
-            'Bulk manager approvals must enqueue ' +
-            'one mobile push notification job.'
+            'Bulk manager approvals must enqueue one mobile push notification job.'
         );
 
         Test.stopTest();
@@ -877,10 +880,10 @@ private class ProformaManagerApprovalNotifTriggerTest {
         System.assertNotEquals(
             null,
             thirdResult.Proforma_Invoice_Approved_Date__c,
-            'Third invoice must have an approval date ' +
-            'when the existing automation populates it.'
+            'Third invoice must have an approval date.'
         );
     }
+
 
     /**
      * @description Verifies that an invoice without
