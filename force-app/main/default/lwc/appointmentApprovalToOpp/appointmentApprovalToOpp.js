@@ -2,6 +2,7 @@ import { LightningElement, track, wire } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getAvailableTimeSlots from '@salesforce/apex/AppointmentControllerToOpp.getAvailableTimeSlots';
 import updateAppointmentStatus from '@salesforce/apex/AppointmentControllerToOpp.updateAppointmentStatus';
+import getSupervisorContact from '@salesforce/apex/AppointmentControllerToOpp.getSupervisorContact';
 import { getRecord } from 'lightning/uiRecordApi';
 
 import OPP_APPT_STATUS from '@salesforce/schema/Opportunity.Re_Visit_Site_Appointment_Status__c';
@@ -31,14 +32,26 @@ export default class AppointmentApprovalToOpp extends LightningElement {
 
     recordId;
     minDate;
-    
+
     // Tracked Record Data
     currentStatus;
     appointmentDate;
     appointmentTime;
 
+    // @track so showing the already-responded status banner on initial load
+    // (set from wiredOpp, not from a user action) reliably re-renders the template.
+    @track alreadyResponded = false;
+
+    @track supervisorName = '';
+    @track supervisorEmail = '';
+    @track supervisorPhone = '';
+
     get confirmButtonsDisabled() {
         return this.isSubmitting;
+    }
+
+    get statusBadgeText() {
+        return this.currentStatus === 'Approved' ? 'Approved' : this.currentStatus;
     }
 
     get formattedAppointmentDate() {
@@ -73,10 +86,46 @@ export default class AppointmentApprovalToOpp extends LightningElement {
             this.currentStatus = data.fields.Re_Visit_Site_Appointment_Status__c?.value;
             this.appointmentDate = data.fields.Re_Visit_Appointment_Date__c ? data.fields.Re_Visit_Appointment_Date__c.value : null;
             this.appointmentTime = data.fields.Re_Visit_Appointment_Time_Slots__c ? data.fields.Re_Visit_Appointment_Time_Slots__c.value : null;
+
+            // Approved is the only terminal status here (AppointmentControllerToOpp's
+            // own guard still allows a new response while status is 'Rescheduled') -
+            // show the already-responded status + appointment details instead of
+            // the approve/reschedule form when this link is opened again after approval.
+            if (this.currentStatus === 'Approved') {
+                this.buttonsDisabled = true;
+                this.alreadyResponded = true;
+                this.loadSupervisorContact();
+            }
         } else if (error) {
             // eslint-disable-next-line no-console
             console.error('Error fetching record data:', error);
         }
+    }
+
+    // =========================================================
+    // SUPERVISOR CONTACT (shown on the already-responded screen)
+    // =========================================================
+    loadSupervisorContact() {
+        getSupervisorContact({ opportunityId: this.recordId })
+            .then((contact) => {
+                this.supervisorName = contact?.name || '';
+                this.supervisorEmail = contact?.email || '';
+                this.supervisorPhone = contact?.phone || '';
+            })
+            .catch((error) => {
+                // eslint-disable-next-line no-console
+                console.error('Error fetching supervisor contact:', error);
+            });
+    }
+
+    get hasSupervisorContact() {
+        return !!(this.supervisorEmail || this.supervisorPhone);
+    }
+
+    get supervisorContactLine() {
+        const details = [this.supervisorEmail, this.supervisorPhone].filter(Boolean).join(' / ');
+        const namePart = this.supervisorName ? ` (${this.supervisorName})` : '';
+        return `If you have any queries, please contact your supervisor${namePart}: ${details}`;
     }
 
     onApproveClick() {
