@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Signed Vendor Agreement to Vendor</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Vendor Signed Agreement</name>
+    <style>none</style>
+    <subject>Signed Vendor Agreement - [[AGREEMENT_NAME]]</subject>
+    <type>custom</type>
+    <uiType>SFX</uiType>
+</EmailTemplate>
