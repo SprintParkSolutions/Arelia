@@ -77,13 +77,40 @@
                         </p>
                     </div>
 
-                    <div class="agreement-preview-shell">
+                    <!--<div class="agreement-preview-shell">
                         <div class="document-ribbon">
                             <span>Agreement Preview</span>
                             <span class="document-ribbon-line"></span>
                         </div>
 
                         <div class="agreement-preview" lwc:dom="manual"></div>
+                    </div>-->
+
+                    <div class="agreement-preview-shell">
+                        <div class="document-ribbon">
+                            <span>Agreement Preview</span>
+                            <span class="document-ribbon-line"></span>
+                        </div>
+
+                        <div class="agreement-preview-container">
+
+                            <div class="protected-brand-header">
+                                <img
+                                    src={areliaLogoUrl}
+                                    alt="Arelia Space"
+                                    class="arelia-agreement-logo"
+                                    draggable="false"
+                                />
+
+                                <div class="brand-divider"></div>
+                            </div>
+
+                            <div
+                                class="agreement-preview"
+                                lwc:dom="manual">
+                            </div>
+
+                        </div>
                     </div>
 
                     <div class="signature-section">

@@ -423,6 +423,63 @@ private class ClientAgreementInternalControllerTest {
         );
     }
 
+    @IsTest
+    static void sendAgreementToClientShouldThrowWhenClientAgreementAlreadySigned() {
+        Opportunity opportunityRecord =
+            createAreliaOpportunity(true, true);
+
+        /*
+        * Simulate an Opportunity whose Client Agreement
+        * has already been signed.
+        */
+        opportunityRecord.Client_Agreement_Signed__c = true;
+        update opportunityRecord;
+
+        Test.startTest();
+
+        Boolean exceptionThrown = false;
+
+        try {
+            ClientAgreementInternalController.sendAgreementToClient(
+                opportunityRecord.Id,
+                '<p>Agreement Body</p>',
+                validPdfBase64(),
+                new List<String>()
+            );
+        } catch (AuraHandledException exceptionRecord) {
+            exceptionThrown = true;
+
+            System.assertNotEquals(
+                null,
+                exceptionRecord,
+                'AuraHandledException should be thrown when the Client Agreement is already signed.'
+            );
+        }
+
+        Test.stopTest();
+
+        System.assertEquals(
+            true,
+            exceptionThrown,
+            'Another Client Agreement must not be sent after the agreement is signed.'
+        );
+
+        /*
+        * Verify that no new agreement was created.
+        */
+        Integer agreementCount = [
+            SELECT COUNT()
+            FROM Client_Agreement__c
+            WHERE Opportunity__c = :opportunityRecord.Id
+        ];
+
+        System.assertEquals(
+            0,
+            agreementCount,
+            'No new Client Agreement should be created after the client has already signed.'
+        );
+    }
+
     private static Boolean initShouldThrow(Id opportunityId) {
         Boolean exceptionThrown = false;
 
