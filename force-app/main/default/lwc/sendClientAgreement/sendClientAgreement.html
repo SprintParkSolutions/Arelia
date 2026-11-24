@@ -32,6 +32,29 @@
                     disabled>
                 </lightning-input>
 
+                
+                <!-- External Supporting File Links -->
+                <div class="slds-m-top_medium">
+
+                    <lightning-textarea
+                        data-id="externalSupportingLinks"
+                        label="External Supporting File Links (Optional)"
+                        value={externalSupportingLinks}
+                        placeholder="Paste Google Drive or OneDrive links here. Enter each link on a new line."
+                        onchange={handleExternalSupportingLinksChange}
+                        max-length="32768">
+                    </lightning-textarea>
+
+                    <p class="slds-text-body_small slds-m-top_x-small">
+                        Add Google Drive or OneDrive sharing links for
+                        files that are too large to send as email
+                        attachments. Enter one link per line.
+                        The links will be included in the agreement emails.
+                    </p>
+
+                </div>
+
+
                 <!-- =====================================================
                      USER INSTRUCTIONS
                      Added only for guidance.
