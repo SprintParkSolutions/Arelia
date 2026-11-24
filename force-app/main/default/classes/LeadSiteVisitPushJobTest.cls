@@ -1,12 +1,10 @@
 /**
- * -----------------------------------------------------------------------------
- * Class Name      : LeadSiteVisitPushJobTest
- * Author          : Arelia
- * Created Date    : Oct 12, 2026
- * Last Modified By: Arelia
- * Last Modified On: Oct 12, 2026
- * Description     : Unit tests for LeadSiteVisitPushJob.
- * -----------------------------------------------------------------------------
+ * @description Unit tests for LeadSiteVisitPushJob.
+ * Validates appointment eligibility, customer device tokens,
+ * supervisor information, bulk processing, and Queueable execution.
+ *
+ * @author Arelia
+ * @lastModifiedDate 2026-11-17
  */
 @IsTest
 private class LeadSiteVisitPushJobTest {
@@ -26,8 +24,11 @@ private class LeadSiteVisitPushJobTest {
     private static final String FIREBASE_RESPONSE =
         '{"name":"projects/test/messages/test123"}';
 
+    private static final String JOB_COMPLETED =
+        'Completed';
+
     /**
-     * Mock Firebase HTTP callouts.
+     * @description Mocks Firebase HTTP responses.
      */
     private class FirebaseCalloutMock
         implements HttpCalloutMock {
@@ -51,11 +52,8 @@ private class LeadSiteVisitPushJobTest {
     }
 
     /**
-     * Retrieves an active Appointment Time Slot
-     * dynamically from Salesforce metadata.
-     *
-     * This avoids restricted picklist errors
-     * caused by hardcoded values.
+     * @description Returns an active appointment slot
+     * from Salesforce field metadata.
      */
     private static String getValidAppointmentSlot() {
 
@@ -84,7 +82,7 @@ private class LeadSiteVisitPushJobTest {
     }
 
     /**
-     * Creates a Lead with the required fields.
+     * @description Creates a Lead for appointment testing.
      */
     private static Lead createLead(
         String lastName,
@@ -115,7 +113,7 @@ private class LeadSiteVisitPushJobTest {
     }
 
     /**
-     * Creates a Prospect Device Token.
+     * @description Creates a Prospect Device Token.
      */
     private static Prospect_Device_Token__c createDevice(
         Id leadId,
@@ -138,7 +136,40 @@ private class LeadSiteVisitPushJobTest {
     }
 
     /**
-     * Executes the Queueable directly.
+     * @description Verifies Queueable execution status.
+     */
+    private static void assertQueueableCompleted(Id jobId) {
+
+        System.Assert.isNotNull(
+            jobId,
+            'Queueable job ID should be generated.'
+        );
+
+        AsyncApexJob jobResult = [
+            SELECT Id,
+                   Status,
+                   NumberOfErrors
+            FROM AsyncApexJob
+            WHERE Id = :jobId
+            LIMIT 1
+        ];
+
+        System.Assert.areEqual(
+            JOB_COMPLETED,
+            jobResult.Status,
+            'Queueable should complete successfully.'
+        );
+
+        System.Assert.areEqual(
+            0,
+            jobResult.NumberOfErrors,
+            'Queueable should execute without errors.'
+        );
+    }
+
+    /**
+     * @description Executes the Queueable using
+     * a valid Salesforce QueueableContext.
      */
     private static void executeJob(Set<Id> leadIds) {
 
@@ -149,16 +180,17 @@ private class LeadSiteVisitPushJobTest {
 
         Test.startTest();
 
-        LeadSiteVisitPushJob job =
-            new LeadSiteVisitPushJob(leadIds);
-
-        job.execute(null);
+        Id jobId = System.enqueueJob(
+            new LeadSiteVisitPushJob(leadIds)
+        );
 
         Test.stopTest();
+
+        assertQueueableCompleted(jobId);
     }
 
     /**
-     * Valid Lead with active device token
+     * @description Valid Lead with active device
      * and scheduled appointment.
      */
     @IsTest
@@ -197,13 +229,14 @@ private class LeadSiteVisitPushJobTest {
         System.Assert.areEqual(
             getValidAppointmentSlot(),
             result.Appointment_Time_Slots__c,
-            'Appointment slot should match ' +
-            'the configured picklist value.'
+            'Appointment slot should match the ' +
+            'configured picklist value.'
         );
     }
 
     /**
-     * Empty Lead IDs should return immediately.
+     * @description Empty Lead IDs should
+     * return without processing.
      */
     @IsTest
     static void emptyLeadIdsSkipsProcessing() {
@@ -222,7 +255,23 @@ private class LeadSiteVisitPushJobTest {
     }
 
     /**
-     * Lead without any device token.
+     * @description Null Lead IDs should
+     * be handled without exceptions.
+     */
+    @IsTest
+    static void nullLeadIdsSkipsProcessing() {
+
+        executeJob(null);
+
+        System.Assert.isTrue(
+            true,
+            'Null Lead IDs should be handled safely.'
+        );
+    }
+
+    /**
+     * @description Lead without a device token
+     * should not receive a push.
      */
     @IsTest
     static void leadWithoutDeviceSkipsPush() {
@@ -249,7 +298,7 @@ private class LeadSiteVisitPushJobTest {
     }
 
     /**
-     * Inactive device must be ignored.
+     * @description Inactive devices must be ignored.
      */
     @IsTest
     static void inactiveDeviceSkipsPush() {
@@ -284,7 +333,7 @@ private class LeadSiteVisitPushJobTest {
     }
 
     /**
-     * Blank FCM token must be ignored.
+     * @description Blank FCM tokens must be ignored.
      */
     @IsTest
     static void blankFcmTokenSkipsPush() {
@@ -318,7 +367,8 @@ private class LeadSiteVisitPushJobTest {
     }
 
     /**
-     * Missing appointment date must skip push.
+     * @description Missing appointment date
+     * should prevent push processing.
      */
     @IsTest
     static void missingAppointmentDateSkipsPush() {
@@ -353,8 +403,8 @@ private class LeadSiteVisitPushJobTest {
     }
 
     /**
-     * Missing appointment time slot
-     * must skip notification.
+     * @description Missing appointment time slot
+     * should prevent push processing.
      */
     @IsTest
     static void missingAppointmentSlotSkipsPush() {
@@ -391,7 +441,8 @@ private class LeadSiteVisitPushJobTest {
     }
 
     /**
-     * Latest active token should be selected.
+     * @description Multiple active device tokens
+     * should remain available for processing.
      */
     @IsTest
     static void multipleDevicesUsesLatestToken() {
@@ -440,10 +491,17 @@ private class LeadSiteVisitPushJobTest {
             devices[0].FCM_Token__c,
             'Most recent token should be first.'
         );
+
+        System.Assert.areEqual(
+            TEST_TOKEN,
+            devices[1].FCM_Token__c,
+            'Older active token should remain available.'
+        );
     }
 
     /**
-     * Multiple Leads should be processed.
+     * @description Multiple Leads should be
+     * processed in a single Queueable execution.
      */
     @IsTest
     static void multipleLeadsProcessedSuccessfully() {
@@ -504,7 +562,8 @@ private class LeadSiteVisitPushJobTest {
     }
 
     /**
-     * Deleted Lead ID should be ignored.
+     * @description Deleted Lead IDs should
+     * be handled without processing.
      */
     @IsTest
     static void nonexistentLeadSkipsProcessing() {
@@ -535,12 +594,8 @@ private class LeadSiteVisitPushJobTest {
     }
 
     /**
-     * Approved Lead with Supervisor information.
-     *
-     * Validation sequence:
-     * 1. Project Request Submitted = true.
-     * 2. Approval Status = Approved.
-     * 3. Assign Supervisor.
+     * @description Validates approval status,
+     * supervisor assignment, and appointment data.
      */
     @IsTest
     static void supervisorInformationIncludedInPush() {
@@ -597,6 +652,11 @@ private class LeadSiteVisitPushJobTest {
         );
 
         System.Assert.isNotNull(
+            result.Supervisor_User__r,
+            'Supervisor relationship should exist.'
+        );
+
+        System.Assert.isNotNull(
             result.Supervisor_User__r.Name,
             'Supervisor name should be available.'
         );
@@ -609,8 +669,8 @@ private class LeadSiteVisitPushJobTest {
     }
 
     /**
-     * Verify Queueable execution using
-     * System.enqueueJob.
+     * @description Verifies asynchronous Queueable
+     * execution with System.enqueueJob.
      */
     @IsTest
     static void queueableExecutesSuccessfully() {
@@ -628,45 +688,28 @@ private class LeadSiteVisitPushJobTest {
             Datetime.now()
         );
 
-        Test.setMock(
-            HttpCalloutMock.class,
-            new FirebaseCalloutMock()
+        executeJob(
+            new Set<Id>{ prospect.Id }
         );
 
-        Test.startTest();
-
-        Id jobId = System.enqueueJob(
-            new LeadSiteVisitPushJob(
-                new Set<Id>{ prospect.Id }
-            )
-        );
-
-        Test.stopTest();
-
-        System.Assert.isNotNull(
-            jobId,
-            'Queueable job ID should be generated.'
-        );
-
-        AsyncApexJob jobResult = [
+        Lead result = [
             SELECT Id,
-                   Status,
-                   NumberOfErrors
-            FROM AsyncApexJob
-            WHERE Id = :jobId
-            LIMIT 1
+                   Appointment_Date__c,
+                   Appointment_Time_Slots__c
+            FROM Lead
+            WHERE Id = :prospect.Id
         ];
 
-        System.Assert.areEqual(
-            'Completed',
-            jobResult.Status,
-            'Queueable should complete successfully.'
+        System.Assert.isNotNull(
+            result.Appointment_Date__c,
+            'Appointment date should exist.'
         );
 
-        System.Assert.areEqual(
-            0,
-            jobResult.NumberOfErrors,
-            'Queueable should not have errors.'
+        System.Assert.isTrue(
+            !String.isBlank(
+                result.Appointment_Time_Slots__c
+            ),
+            'Appointment slot should be available.'
         );
     }
 }
