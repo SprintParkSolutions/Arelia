@@ -1239,10 +1239,9 @@ private class PaymentTermsClientPushJobTest {
         );
     }
 
-    
     /**
-    * @description Validates bulk processing when Salesforce
-    *              automatically populates payment approval dates.
+    * @description Validates bulk processing when Opportunities
+    *              have both populated and missing approval dates.
     */
     @IsTest
     static void mixedApprovalDatesHandled() {
@@ -1277,6 +1276,7 @@ private class PaymentTermsClientPushJobTest {
             'datemissing'
         );
 
+        // Clear approval date on the second Opportunity.
         update new Opportunity(
             Id = secondOpportunityId,
             Payment_Terms_Approved_Date__c = null
@@ -1287,10 +1287,7 @@ private class PaymentTermsClientPushJobTest {
             secondOpportunityId
         };
 
-        Id jobId = enqueueJob(opportunityIds);
-
-        assertJobCompleted(jobId);
-
+        // Verify eligibility BEFORE Queueable execution.
         List<Opportunity> eligibleOpportunities = [
             SELECT Id,
                 Payment_Terms_Status__c,
@@ -1302,12 +1299,36 @@ private class PaymentTermsClientPushJobTest {
         ];
 
         System.assertEquals(
-            EXPECTED_TWO,
+            EXPECTED_ONE,
             eligibleOpportunities.size(),
-            'Both Opportunities must have populated approval dates.'
+            'Only one Opportunity must have a populated approval date before Queueable execution.'
         );
-    }
 
+        System.assertEquals(
+            firstOpportunityId,
+            eligibleOpportunities[0].Id,
+            'First Opportunity must remain eligible.'
+        );
+
+        Opportunity missingDateOpportunity = [
+            SELECT Id,
+                Payment_Terms_Approved_Date__c
+            FROM Opportunity
+            WHERE Id = :secondOpportunityId
+            LIMIT 1
+        ];
+
+        System.assertEquals(
+            null,
+            missingDateOpportunity.Payment_Terms_Approved_Date__c,
+            'Second Opportunity must have a null approval date before Queueable execution.'
+        );
+
+        // Execute Queueable after validating the test data.
+        Id jobId = enqueueJob(opportunityIds);
+
+        assertJobCompleted(jobId);
+    }
 
     /**
      * @description Tests Firebase error response handling.
