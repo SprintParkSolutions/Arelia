@@ -1,7 +1,5 @@
 public with sharing class OpportunityTriggerHandler {
 
-    private static final String ARELIA_RECORD_TYPE_NAME = 'Arelia';
-
     /**
      * Updates related Projects when Negotiation/Review Budget field is updated in the Opportunity.
      * Bulk-safe and PMD-compliant.
@@ -28,11 +26,12 @@ public with sharing class OpportunityTriggerHandler {
         }
 
         // Query Projects related to qualified Opportunities
+        Id areliaProjectRecordTypeId = AreliaUtility.getAreliaProjectRecordTypeId();
         List<Project__c> projectsToUpdate = [
             SELECT Id, Project_Name__c
             FROM Project__c
             WHERE Project_Name__c IN :qualifiedOpportunities.keySet()
-            AND RecordType.Name = :ARELIA_RECORD_TYPE_NAME
+            AND RecordTypeId = :areliaProjectRecordTypeId
         ];
 
         // Update each Project record
@@ -63,11 +62,51 @@ public with sharing class OpportunityTriggerHandler {
         return stageIsResumed && budgetNotNull && stageOrBudgetChanged;
     }
 
+    /**
+     * Sends the architect email whenever architect fields are populated/changed on an Arelia Opportunity,
+     * regardless of what updated the record. Delegates the qualification check and sending to
+     * ArchitectInfoController so there is a single implementation shared by every update source.
+     *
+     * @param newOpps List of updated Opportunities
+     * @param oldMap Map of old Opportunity records
+     */
+    public static void sendArchitectEmails(List<Opportunity> newOpps, Map<Id, Opportunity> oldMap) {
+        ArchitectInfoController.sendArchitectEmails(newOpps, oldMap);
+    }
+
+    /**
+     * Sends Payment Terms notification emails whenever Payment_Terms_Status__c changes on an
+     * Opportunity, regardless of what updated the record. Delegates the transition handling and
+     * sending to PaymentTermController so there is a single implementation shared by every update source.
+     *
+     * @param newOpps List of updated Opportunities
+     * @param oldMap Map of old Opportunity records
+     */
+    public static void sendPaymentTermEmails(List<Opportunity> newOpps, Map<Id, Opportunity> oldMap) {
+        PaymentTermController.sendPaymentTermEmails(newOpps, oldMap);
+    }
+
+    /**
+     * Sends Budget Review notification emails whenever Budget_Review_Status__c changes on an
+     * Opportunity, regardless of what updated the record. Delegates the transition handling and
+     * sending to OpportunityBudgetReviewController so there is a single implementation shared by
+     * every update source.
+     *
+     * @param newOpps List of updated Opportunities
+     * @param oldMap Map of old Opportunity records
+     */
+    public static void sendBudgetReviewEmails(List<Opportunity> newOpps, Map<Id, Opportunity> oldMap) {
+        OpportunityBudgetReviewController.sendBudgetReviewEmails(newOpps, oldMap);
+    }
+
     private static Boolean isAreliaOpportunity(Opportunity opp) {
-        Schema.RecordTypeInfo rtInfo = Opportunity.SObjectType.getDescribe()
-            .getRecordTypeInfosByName()
-            .get(ARELIA_RECORD_TYPE_NAME);
-        return rtInfo != null && opp.RecordTypeId == rtInfo.getRecordTypeId();
+        // AreliaUtility resolves this via a direct RecordType SOQL query rather than
+        // Schema.describe().getRecordTypeInfosByName(), which only returns Record Types
+        // visible to the CURRENT USER'S PROFILE - that describe-based lookup silently returned
+        // null (skipping this whole trigger branch) for Guest Users and other portal/community
+        // profiles that don't have "Arelia" assigned, while working fine for Admin.
+        Id areliaOpportunityRecordTypeId = AreliaUtility.getAreliaOpportunityRecordTypeId();
+        return areliaOpportunityRecordTypeId != null && opp.RecordTypeId == areliaOpportunityRecordTypeId;
     }
 
     /**
@@ -75,9 +114,9 @@ public with sharing class OpportunityTriggerHandler {
      *
      * @param project The Project record to update
      * @param opp The Opportunity record containing values
-     */
+     */  
     private static void applyProjectUpdate(Project__c project, Opportunity opp) {
         project.Supervisor_Estimated_Budget__c = opp.Negotiation_Review_Budget__c;
-        project.Status__c = 'In Progress';
+        project.Status__c = 'In progress';
     }
 }

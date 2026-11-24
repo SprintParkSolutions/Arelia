@@ -18,14 +18,14 @@
                 <!-- ✅ Upload supporting documents -->
                 <div class="uploadBox mt">
                     <div class="uploadTitle">Supporting Documents (optional)</div>
-                    <lightning-file-upload record-id={recordId} multiple accept={acceptedFormats}
-                        onuploadfinished={handleUploadFinished}>
-                    </lightning-file-upload>
+                    <lightning-input type="file" label="Attach Files" accept={acceptedFormats} multiple
+                        onchange={handleFileChange} variant="label-hidden">
+                    </lightning-input>
 
                     <template if:true={uploadedFiles.length}>
                         <ul class="fileList">
                             <template for:each={uploadedFiles} for:item="f">
-                                <li key={f.documentId} class="fileItem">
+                                <li key={f.name} class="fileItem">
                                     {f.name}
                                 </li>
                             </template>

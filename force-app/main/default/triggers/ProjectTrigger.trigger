@@ -1,13 +1,15 @@
 /**
  * @description       : 
- * @author            : Arelia Living
+ * @author            : ChangeMeIn@UserSettingsUnder.SFDoc
  * @group             : 
  * @last modified on  : 12-11-2025
- * @last modified by  : Arelia Living
+ * @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
 **/
 trigger ProjectTrigger on Project__c (before insert, before update, after insert, after update) {
 
     // ---- BEFORE INSERT ----
+
+
     if (Trigger.isBefore && Trigger.isInsert) {
         try {
             ProjectTriggerHandler.assignProjectCodes(Trigger.new);
@@ -17,6 +19,7 @@ trigger ProjectTrigger on Project__c (before insert, before update, after insert
     }
 
     // ---- BEFORE UPDATE ----
+    
     if (Trigger.isBefore && Trigger.isUpdate) {
         try {
             ProjectTriggerHelper.validateProjectCompletion(Trigger.new, Trigger.oldMap);
@@ -49,8 +52,20 @@ trigger ProjectTrigger on Project__c (before insert, before update, after insert
 
             //project completion status update send emials
             ProjectUpdateHandler.afterUpdate(Trigger.new, Trigger.oldMap);
+
+            //milestone/installment payment reminder emails to client
+            MilestonePaymentReminderHandler.afterUpdate(Trigger.new, Trigger.oldMap);
         } catch (Exception e) {
             System.debug('Failed during after-update: ' + e.getMessage());
+        }
+
+        // Isolated in its own try/catch so a failure in any handler above (e.g. running as a
+        // Guest/site user with different data visibility) can never block this one from firing.
+        try {
+            //additional budget request/approve/reject emails
+            ProjectAdditionalBudgetTriggerHandler.handleAfterUpdate(Trigger.new, Trigger.oldMap);
+        } catch (Exception e) {
+            System.debug('Failed during additional budget after-update: ' + e.getMessage());
         }
     }
 }
