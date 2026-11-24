@@ -144,5 +144,33 @@ private class WeeklyProjectUpdateControllerTest {
         Test.stopTest();
 
         Assert.areEqual(initialEmails + 1, finalEmails, 'Email should be sent successfully with only an external file link and no uploaded files.');
+
+        Project__c updated = [SELECT Weekly_Update_External_Link__c FROM Project__c WHERE Id = :proj.Id];
+        Assert.areEqual(
+            'https://drive.google.com/drive/folders/fake-large-file-folder',
+            updated.Weekly_Update_External_Link__c,
+            'External file link should be saved on the project.'
+        );
+    }
+
+    // ==========================================
+    // 6. Test Existing Link Is Kept When No New Link Is Sent
+    // ==========================================
+    @IsTest
+    static void testSendWeeklyEmailWithoutLinkKeepsExistingLink() {
+        Project__c proj = [SELECT Id FROM Project__c LIMIT 1];
+        proj.Weekly_Update_External_Link__c = 'https://onedrive.live.com/previous-link';
+        update proj;
+
+        Test.startTest();
+        WeeklyProjectUpdateController.sendWeeklyEmail(proj.Id, 'No external link this week', null, '');
+        Test.stopTest();
+
+        Project__c updated = [SELECT Weekly_Update_External_Link__c FROM Project__c WHERE Id = :proj.Id];
+        Assert.areEqual(
+            'https://onedrive.live.com/previous-link',
+            updated.Weekly_Update_External_Link__c,
+            'A blank link should not overwrite the previously saved link.'
+        );
     }
 }

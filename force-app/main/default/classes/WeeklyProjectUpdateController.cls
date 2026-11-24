@@ -98,6 +98,14 @@ public with sharing class WeeklyProjectUpdateController {
         AreliaUtility.setOrgWideEmailAddress(mail, System.Label.Arelia_OWD);
 
         Messaging.sendEmail(new Messaging.SingleEmailMessage[]{ mail });
+
+        // Keep the latest external link on the project so it can be viewed/reported on later.
+        if (String.isNotBlank(externalFileLink)) {
+            update new Project__c(
+                Id = proj.Id,
+                Weekly_Update_External_Link__c = externalFileLink.trim()
+            );
+        }
     }
 
     // Creates public (no-login) view links for each file so clients without a portal login can open them.
